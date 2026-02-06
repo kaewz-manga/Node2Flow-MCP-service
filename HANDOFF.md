@@ -1,0 +1,333 @@
+# HANDOFF - Node2Flow MCP Service
+
+> Centralized Platform + Plugin Architecture for multiple SaaS MCP products.
+
+**Repo**: https://github.com/kaewz-manga/Node2Flow-MCP-service
+**Local**: `D:\Dev\playground\Claude_Code_Commander\Node2Flow-MCP-service\`
+**Source of truth**: `D:\Dev\playground\Claude_Code_Commander\n8n-management-mcp\` (original, untouched)
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Dashboard (Single SPA)           app.node2flow.net                      │
+│  Sidebar: [Overview] [n8n] [WordPress] [Make] [Admin]                    │
+└────────────────────────────┬─────────────────────┬───────────────────────┘
+                             │ JWT                  │ JWT
+              ┌──────────────┴────────┐  ┌─────────┴──────────────────┐
+              │  Platform Worker      │  │  MCP Gateway Worker        │
+              │  platform.n2f.net     │  │  mcp.node2flow.net         │
+              │                       │  │                            │
+              │  /api/auth/*          │  │  POST /mcp (JSON-RPC 2.0)  │
+              │  /api/user/*          │  │  /api/connections (CRUD)   │
+              │  /api/billing/*       │  │  /api/proxy/:product/*     │
+              │  /api/admin/*         │  │                            │
+              │  /api/agent/*  (HMAC) │  │  plugins/                  │
+              │  /internal/*          │◄─┤    n8n/     (31 tools)     │
+              │                       │  │    wordpress/ (future)     │
+              │  D1: platform-db      │  │    make/     (future)      │
+              │  KV: rate-limits      │  │                            │
+              └───────────────────────┘  │  D1: products-db           │
+                                         └────────────────────────────┘
+```
+
+**2 Workers** (ไม่ว่าจะมีกี่ product):
+- **Platform Worker** - auth, billing, user management, rate limits, usage tracking
+- **MCP Gateway Worker** - MCP tools ทุก product เป็น plugin, connections CRUD
+
+**Service Binding**: Gateway → Platform (0ms latency, internal-only)
+
+---
+
+## Migration Progress
+
+| Phase | Description | Status | Commit |
+|-------|-------------|--------|--------|
+| **Phase 1** | Monorepo skeleton (Turborepo + pnpm) | Done | `12bbc4b` |
+| **Phase 2** | Extract shared code → `packages/` | Done | `a694762` |
+| **Phase 3** | Refactor into Plugin Architecture | Done | `296f3c1` |
+| **Phase 4** | Build Platform Worker with all routes | Done | `0091d5c` |
+| **Phase 5** | Data migration + switchover | Done | `2d11b46` |
+| **Phase 6** | Dashboard + DNS cutover | **TODO** | - |
+
+---
+
+## What's Done (Phase 1-5)
+
+### packages/platform-core (shared library)
+
+Extracted from `n8n-management-mcp/src/` — all platform-level code:
+
+| Module | Lines | Contents |
+|--------|-------|----------|
+| `auth.ts` | ~794 | Register, login, JWT, API key auth, TOTP, sudo |
+| `crypto-utils.ts` | ~504 | PBKDF2, AES-256-GCM, JWT, TOTP, API key generation |
+| `oauth.ts` | ~364 | GitHub + Google OAuth 2.0 flows |
+| `stripe.ts` | ~296 | Checkout, billing portal, Stripe webhooks |
+| `email.ts` | ~319 | Resend API integration, email templates |
+| `db/` | ~1,525 | 6 modules: users, plans, api-keys, usage, connections, admin |
+| `types/platform.ts` | ~285 | All TypeScript interfaces (PlatformEnv, User, Plan, etc.) |
+
+### apps/platform-worker (Central auth/billing)
+
+| Route File | Lines | Endpoints |
+|------------|-------|-----------|
+| `auth.ts` | 264 | register, login, OAuth, TOTP setup/enable/disable, sudo, plans (public), platform-stats (public) |
+| `user.ts` | 349 | profile, password, session-duration, export (JSON/CSV), delete/recover/force-delete, API keys, AI connections, bot connections, feedback, usage |
+| `admin.ts` | 202 | stats, users CRUD, analytics (usage/tools/top-users/revenue/errors), feedback mgmt, system controls (recalculate, clear-logs, full-reset, maintenance) |
+| `billing.ts` | 54 | Stripe checkout, portal, webhook |
+| `internal.ts` | 196 | validate-api-key, validate-token, report-usage, check-limits (service binding only) |
+| `agent.ts` | 93 | HMAC-authenticated config endpoints for Vercel agent |
+| `index.ts` | 140 | Main router + CORS + maintenance check + cron (log cleanup, account deletion) |
+
+**D1 Schema**: `migrations/001_platform_schema.sql` — 10 tables (users, plans, api_keys, usage_logs, usage_monthly, platform_stats, admin_logs, ai_connections, bot_connections, feedback)
+
+### apps/mcp-gateway (MCP tools as plugins)
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `index.ts` | 201 | Main router: MCP endpoint + Dashboard API + proxy |
+| `routes/auth.ts` | 163 | API key auth via Platform service binding + JWT verify |
+| `routes/mcp.ts` | 168 | JSON-RPC 2.0 handler: initialize, tools/list, tools/call, ping |
+| `routes/connections.ts` | 226 | Unified connection CRUD with AES-256-GCM encryption |
+| `plugin-registry.ts` | 41 | Plugin registration + tool discovery |
+| `plugins/n8n/` | 4 files | Full n8n plugin: 31 tools, HTTP client, types |
+| `plugins/_template/` | 1 file | Template for new plugins |
+
+**D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
+
+**MCP Request Flow**:
+```
+1. POST /mcp + Bearer n2f_xxx
+2. Gateway → Platform /internal/validate-api-key (service binding)
+3. Platform returns: user_id, plan, connection_id, usage
+4. Gateway queries connections WHERE id = connection_id
+5. Decrypt config → plugin.createClient(config)
+6. plugin.handleToolCall(toolName, args, client)
+7. Return MCP response
+8. ctx.waitUntil → Platform /internal/report-usage
+```
+
+### packages/dashboard-core (shared React components)
+
+Extracted from `n8n-management-mcp/dashboard/`:
+
+| Component | Description |
+|-----------|-------------|
+| `AuthContext` | JWT auth state management |
+| `SudoContext` | TOTP verification state |
+| `ConnectionContext` | Connection selection state |
+| `Layout` | Sidebar + main layout with dark theme |
+| `AdminLayout` | Admin panel layout |
+| `AdminRoute` | Protected admin route component |
+| `SudoModal` | TOTP verification modal |
+| `FeedbackBubble` | Floating feedback widget |
+| `Login` / `Register` | Auth pages |
+| `useSudo` | Sudo verification hook |
+
+### scripts/ (Data Migration)
+
+| File | Purpose |
+|------|---------|
+| `migrate-data.sql` | SQL to copy platform tables from old DB → platform-db |
+| `migrate-connections.ts` | TypeScript Worker to re-encrypt n8n connections → unified format |
+
+---
+
+## What's Left (Phase 6)
+
+### Phase 6: Dashboard + DNS Cutover
+
+1. **Dashboard API split**:
+   - Auth/billing/admin/usage calls → Platform Worker (`platform.n2f.net`)
+   - Connection CRUD/proxy calls → MCP Gateway (`mcp.node2flow.net`)
+   - Update `dashboard/src/lib/api.ts` → split into `platform-api.ts` + `gateway-api.ts`
+
+2. **Dashboard plugin system**:
+   - Move n8n pages → `dashboard/src/plugins/n8n/`
+   - Create plugin registry for sidebar routing
+   - Use `React.lazy()` for code-split per plugin
+
+3. **DNS + URL changes**:
+   - Platform: `platform.node2flow.net` (or keep existing URL with redirect)
+   - Gateway: `mcp.node2flow.net`
+   - Dashboard: `app.node2flow.net`
+   - Update OAuth redirect URLs
+   - Update Stripe webhook URL
+   - Keep old endpoints → redirect 30 days
+
+4. **Deployment**:
+   - Create D1 databases: `wrangler d1 create node2flow-platform-db` + `node2flow-products-db`
+   - Set secrets: `wrangler secret put JWT_SECRET`, `ENCRYPTION_KEY`, etc.
+   - Run data migration scripts
+   - Deploy Workers: `wrangler deploy` in each app
+   - Deploy Dashboard: CF Pages
+   - Verify: full flow login → connections → MCP tools → billing
+
+---
+
+## Data Split
+
+### Platform DB (platform-db)
+
+| Table | Rows From | Notes |
+|-------|-----------|-------|
+| users | Direct copy | All fields including TOTP, OAuth |
+| plans | Seeded | free, pro, enterprise |
+| api_keys | Direct copy | `connection_id` is cross-DB reference (no FK) |
+| usage_logs | Direct copy | 90-day retention via cron |
+| usage_monthly | Direct copy | Aggregated monthly stats |
+| platform_stats | Direct copy | total_users, total_executions, total_successes |
+| admin_logs | Direct copy | Admin action audit log |
+| ai_connections | Direct copy | BYOK AI provider keys |
+| bot_connections | Direct copy | Telegram/LINE bot configs |
+| feedback | Direct copy | User feedback |
+
+### Gateway DB (products-db)
+
+| Table | Rows From | Notes |
+|-------|-----------|-------|
+| connections | Transformed from `n8n_connections` | `product_type='n8n'`, config re-encrypted as JSON |
+
+**Migration**: Old `n8n_connections` (separate `n8n_url` + encrypted `api_key`) → unified `connections` (encrypted JSON `{"api_url":"...","api_key":"..."}` + `product_type`)
+
+---
+
+## Key Design Decisions
+
+| Decision | Choice | Reasoning |
+|----------|--------|-----------|
+| **2 Workers** | Platform + Gateway | Platform is stable, Gateway changes per product |
+| **Plugin Architecture** | 4 files per product | Add product without touching core code |
+| **Unified connections** | 1 table, `product_type` column | No new tables per product |
+| **Encrypted JSON config** | AES-256-GCM | Each product defines own config schema |
+| **Service Binding** | Gateway → Platform | 0ms latency, not internet-facing |
+| **API key scope** | 1 key = 1 connection | Key leak affects only 1 connection |
+| **Pooled billing** | Plan covers all products | 100 req/day = shared across n8n + WP + etc. |
+| **JWT SSO** | Shared secret between Workers | Login once, access all products |
+
+---
+
+## Adding a New Product
+
+Create 4 files + 1 line:
+
+```
+apps/mcp-gateway/src/plugins/new-product/
+├── index.ts    → Plugin registration (metadata + tools + handler)
+├── tools.ts    → MCP tool definitions
+├── client.ts   → HTTP client for target API
+└── types.ts    → Connection config schema
+```
+
+Then in `plugin-registry.ts`:
+```typescript
+import { newProductPlugin } from './plugins/new-product';
+PLUGINS.set('new-product', newProductPlugin);
+```
+
+No changes needed to: MCP protocol handler, auth, connections CRUD, rate limiting, billing, dashboard shell.
+
+---
+
+## File Tree
+
+```
+Node2Flow-MCP-service/
+├── turbo.json                          # Turborepo config
+├── pnpm-workspace.yaml                 # pnpm workspaces
+├── tsconfig.base.json                  # Shared TS config
+├── package.json                        # Root package
+│
+├── packages/
+│   ├── platform-core/                  # @node2flow/platform-core
+│   │   └── src/
+│   │       ├── auth.ts                 # Auth (register, login, JWT, TOTP, sudo)
+│   │       ├── crypto-utils.ts         # Crypto (PBKDF2, AES-GCM, HMAC)
+│   │       ├── oauth.ts               # OAuth (GitHub, Google)
+│   │       ├── stripe.ts              # Stripe (checkout, portal, webhook)
+│   │       ├── email.ts               # Email (Resend API)
+│   │       ├── db/                    # D1 database operations (6 modules)
+│   │       ├── types/platform.ts      # All TypeScript interfaces
+│   │       └── index.ts               # Barrel export
+│   │
+│   └── dashboard-core/                # @node2flow/dashboard-core
+│       └── src/
+│           ├── contexts/              # AuthContext, SudoContext, ConnectionContext
+│           ├── components/            # Layout, AdminRoute, SudoModal, etc.
+│           ├── pages/                 # Login, Register
+│           ├── hooks/                 # useSudo
+│           └── index.ts              # Barrel export
+│
+├── apps/
+│   ├── platform-worker/               # Central auth/billing Worker
+│   │   ├── migrations/               # D1 schema (10 tables)
+│   │   ├── src/
+│   │   │   ├── index.ts              # Main router + cron
+│   │   │   ├── types.ts              # Env interface
+│   │   │   ├── helpers.ts            # CORS, response helpers
+│   │   │   └── routes/               # auth, user, admin, billing, internal, agent
+│   │   └── wrangler.toml
+│   │
+│   ├── mcp-gateway/                   # MCP Gateway Worker (all products)
+│   │   ├── migrations/               # D1 schema (1 table: connections)
+│   │   ├── src/
+│   │   │   ├── index.ts              # Main router
+│   │   │   ├── types.ts              # Env, Plugin, Connection interfaces
+│   │   │   ├── plugin-registry.ts    # Plugin registration
+│   │   │   ├── routes/               # auth, mcp, connections
+│   │   │   └── plugins/
+│   │   │       ├── n8n/              # 31 tools, HTTP client
+│   │   │       └── _template/        # New plugin template
+│   │   └── wrangler.toml
+│   │
+│   └── dashboard/                     # Single SPA (Phase 6)
+│       └── (skeleton only)
+│
+├── scripts/
+│   ├── migrate-data.sql              # Platform data migration SQL
+│   └── migrate-connections.ts        # Connection re-encryption script
+│
+└── docs/
+    └── PLATFORM_PLAN.md              # Full architecture plan
+```
+
+---
+
+## Critical Warnings
+
+- **ENCRYPTION_KEY**: ใช้ key เดียวกันกับ `n8n-management-mcp` ห้ามเปลี่ยน
+- **JWT_SECRET**: ใช้ key เดียวกัน shared ระหว่าง Platform + Gateway
+- **API key prefix**: `n2f_` (old `saas_` keys ไม่ทำงาน)
+- **Original repo**: `n8n-management-mcp` ยังทำงานปกติ ไม่ได้แก้อะไร deploy แยกกัน
+- **Migration order**: ต้อง backup DB ก่อนทำ Phase 6 data migration
+
+---
+
+## Quick Reference
+
+```bash
+# Monorepo root
+cd D:\Dev\playground\Claude_Code_Commander\Node2Flow-MCP-service
+
+# Original (still running, untouched)
+cd D:\Dev\playground\Claude_Code_Commander\n8n-management-mcp
+
+# Git
+git log --oneline                    # See all phases
+git diff <hash1>..<hash2> --stat    # Compare phases
+
+# Future deployment
+wrangler d1 create node2flow-platform-db
+wrangler d1 create node2flow-products-db
+wrangler d1 migrations apply --remote   # In each app/
+wrangler secret put JWT_SECRET          # In each app/
+wrangler deploy                         # In each app/
+```
+
+---
+
+**Total code written**: 50 files, ~9,062 lines across 5 phases
+**Date**: 2026-02-07
