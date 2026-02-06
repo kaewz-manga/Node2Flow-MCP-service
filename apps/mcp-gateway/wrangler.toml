@@ -7,6 +7,7 @@ compatibility_date = "2025-01-13"
 binding = "DB"
 database_name = "node2flow-products-db"
 database_id = "" # TODO: Create with `wrangler d1 create node2flow-products-db`
+migrations_dir = "migrations"
 
 # Service Binding to Platform Worker
 [[services]]
