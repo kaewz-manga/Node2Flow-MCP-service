@@ -1,0 +1,26 @@
+name = "node2flow-platform"
+main = "src/index.ts"
+compatibility_date = "2025-01-13"
+
+# D1 Database - Platform data (users, plans, billing)
+[[d1_databases]]
+binding = "DB"
+database_name = "node2flow-platform-db"
+database_id = "" # TODO: Create with `wrangler d1 create node2flow-platform-db`
+
+# KV Namespace - Rate limiting
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "" # TODO: Create with `wrangler kv namespace create RATE_LIMIT_KV`
+
+# OAuth State KV
+[[kv_namespaces]]
+binding = "OAUTH_STATE_KV"
+id = "" # TODO: Create with `wrangler kv namespace create OAUTH_STATE_KV`
+
+# Cron triggers
+[triggers]
+crons = ["0 0 * * *"] # Daily at midnight UTC
+
+# Environment variables (set via wrangler secret)
+# JWT_SECRET, ENCRYPTION_KEY, STRIPE_SECRET_KEY, etc.
