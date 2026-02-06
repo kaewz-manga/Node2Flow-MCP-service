@@ -1,22 +1,56 @@
 // @node2flow/platform-core
 // Shared auth, billing, crypto, and database utilities
 
-// Auth
-export { } from './auth';
-
-// Crypto
-// export { } from './crypto-utils';
-
-// Database
-// export { } from './db/users';
-// export { } from './db/plans';
-// export { } from './db/usage';
-// export { } from './db/api-keys';
-// export { } from './db/admin';
-
-// Middleware
-// export { } from './middleware/rate-limiter';
-// export { } from './middleware/cors';
-
 // Types
-export type { } from './types/platform';
+export type {
+  User,
+  ApiKey,
+  UsageLog,
+  UsageMonthly,
+  Plan,
+  AiConnection,
+  BotConnection,
+  Feedback,
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+  UsageResponse,
+  AuthContext,
+  ApiResponse,
+  RateLimitInfo,
+  PlatformEnv,
+  ExportData,
+  MaintenanceState,
+} from './types/platform';
+
+// Crypto utilities
+export {
+  hashPassword,
+  verifyPassword,
+  generateJWT,
+  verifyJWT,
+  generateApiKey,
+  hashApiKey,
+  encryptData,
+  decryptData,
+  generateUUID,
+  generateTOTPSecret,
+  verifyTOTP,
+  generateTOTPUri,
+} from './crypto-utils';
+
+// Database operations
+export * from './db';
+
+// Auth (re-exported from auth.ts)
+// Note: auth.ts imports from ./saas-types and ./db - needs import path fix in Phase 3
+// export { handleRegister, handleLogin, ... } from './auth';
+
+// OAuth
+// export { handleGitHubCallback, handleGoogleCallback, ... } from './oauth';
+
+// Stripe
+// export { handleCreateCheckout, handleStripeWebhook, ... } from './stripe';
+
+// Email
+// export { sendEmail, ... } from './email';
