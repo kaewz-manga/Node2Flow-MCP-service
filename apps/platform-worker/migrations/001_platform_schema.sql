@@ -48,27 +48,9 @@ INSERT OR IGNORE INTO plans (id, name, daily_request_limit, requests_per_minute,
     ('enterprise', 'Enterprise', -1, -1, -1, -1, -1, '{"support": "dedicated", "analytics": true, "private_server": true, "contact_us": true}', 1);
 
 -- ============================================
--- n8n Connections (legacy - still used by Platform for connection management)
--- ============================================
-CREATE TABLE IF NOT EXISTS n8n_connections (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    n8n_url TEXT NOT NULL,
-    n8n_api_key_encrypted TEXT NOT NULL,
-    status TEXT DEFAULT 'active',
-    last_used_at TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now')),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE INDEX IF NOT EXISTS idx_connections_user ON n8n_connections(user_id);
-CREATE INDEX IF NOT EXISTS idx_connections_last_used ON n8n_connections(last_used_at);
-
--- ============================================
 -- API Keys
 -- ============================================
+-- connection_id references Gateway DB's connections table (cross-DB, no FK)
 CREATE TABLE IF NOT EXISTS api_keys (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
@@ -79,8 +61,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
     status TEXT DEFAULT 'active',
     last_used_at TEXT,
     created_at TEXT DEFAULT (datetime('now')),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (connection_id) REFERENCES n8n_connections(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);

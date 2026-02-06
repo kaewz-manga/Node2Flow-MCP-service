@@ -13,7 +13,6 @@ import {
   hashApiKey,
   getApiKeyByHash,
   getUserById,
-  getConnectionById,
   updateApiKeyLastUsed,
   getPlan,
   getCurrentDate,
@@ -67,14 +66,12 @@ export async function handleInternalRoutes(
       const user = await getUserById(env.DB, apiKeyRecord.user_id);
       if (!user || user.status !== 'active') return json({ error: 'Account suspended or deleted' }, 401);
 
-      const connection = await getConnectionById(env.DB, apiKeyRecord.connection_id);
-      if (!connection || connection.status !== 'active') return json({ error: 'Connection inactive or deleted' }, 401);
-
+      // Note: connection existence is validated by Gateway (connections live in Gateway DB)
       cachedData = {
         user_id: user.id,
         email: user.email,
         plan: user.plan,
-        connection_id: connection.id,
+        connection_id: apiKeyRecord.connection_id,
         api_key_id: apiKeyRecord.id,
       };
 

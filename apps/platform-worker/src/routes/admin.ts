@@ -8,7 +8,7 @@ import {
   verifyAdminToken,
   hasSudoSession,
   getUserById,
-  getConnectionsByUserId,
+  getApiKeysByUserId,
   getOrCreateMonthlyUsage,
   getCurrentYearMonth,
   getAllUsers,
@@ -69,14 +69,14 @@ export async function handleAdminRoutes(
   if (userDetailMatch && method === 'GET') {
     const user = await getUserById(env.DB, userDetailMatch[1]);
     if (!user) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
-    const connections = await getConnectionsByUserId(env.DB, userDetailMatch[1]);
+    const apiKeys = await getApiKeysByUserId(env.DB, userDetailMatch[1]);
     const yearMonth = getCurrentYearMonth();
     const usage = await getOrCreateMonthlyUsage(env.DB, userDetailMatch[1], yearMonth);
     return apiResponse({
       success: true,
       data: {
         user: { id: user.id, email: user.email, plan: user.plan, status: user.status, is_admin: (user as any).is_admin || 0, created_at: user.created_at },
-        connections: connections.map((c: any) => ({ id: c.id, name: c.name, n8n_url: c.n8n_url, status: c.status, created_at: c.created_at })),
+        api_keys: apiKeys.map((k: any) => ({ id: k.id, connection_id: k.connection_id, prefix: k.key_prefix, name: k.name, status: k.status, last_used_at: k.last_used_at })),
         usage: { request_count: usage.request_count, success_count: usage.success_count, error_count: usage.error_count },
       },
     });

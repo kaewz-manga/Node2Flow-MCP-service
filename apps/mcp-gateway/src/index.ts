@@ -91,7 +91,7 @@ export default {
           connection: { id: context.connectionId, product_type: context.productType, config: context.config },
           apiKey: { id: context.apiKeyId },
           usage: context.usage,
-        });
+        }, ctx);
       } catch (err) {
         return new Response(
           JSON.stringify({

@@ -1,11 +1,14 @@
 /**
  * User Routes: Profile, Password, Session, Export, Delete, Recover
+ * API Keys, AI Connections, Bot Connections, Feedback, Usage
+ *
+ * NOTE: MCP connection CRUD (create/list/delete) is handled by MCP Gateway Worker.
+ * Platform only manages API keys, AI connections, and bot connections.
  */
 
 import type { Env } from '../types';
 import { apiResponse, CORS_HEADERS } from '../helpers';
 import {
-  verifyAuthToken,
   getUserById,
   updateUserPassword,
   updateSessionDuration,
@@ -17,14 +20,11 @@ import {
   hardDeleteUser,
   getUserDataForExport,
   getUsageLogsForExport,
-  getConnectionsByUserId,
   getApiKeysByUserId,
-  handleCreateConnection,
-  deleteConnection,
   generateApiKey,
   createApiKey as createApiKeyDb,
+  hashApiKey,
   revokeApiKey,
-  countUserConnections,
   getOrCreateMonthlyUsage,
   getDailyUsage,
   getMinuteUsage,
@@ -176,49 +176,32 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { message: 'Account permanently deleted' } });
   }
 
-  // GET /api/connections
-  if (path === '/api/connections' && method === 'GET') {
-    const connections = await getConnectionsByUserId(env.DB, authUser.userId);
+  // ============================================
+  // API Keys (connection_id is a reference to Gateway DB)
+  // ============================================
+
+  // GET /api/api-keys
+  if (path === '/api/api-keys' && method === 'GET') {
     const apiKeys = await getApiKeysByUserId(env.DB, authUser.userId);
     return apiResponse({
       success: true,
       data: {
-        connections: connections.map((c: any) => ({
-          id: c.id, name: c.name, n8n_url: c.n8n_url, status: c.status, created_at: c.created_at,
-          api_keys: apiKeys.filter((k: any) => k.connection_id === c.id).map((k: any) => ({
-            id: k.id, prefix: k.key_prefix, name: k.name, status: k.status, last_used_at: k.last_used_at, created_at: k.created_at,
-          })),
+        api_keys: apiKeys.map((k: any) => ({
+          id: k.id, connection_id: k.connection_id, prefix: k.key_prefix,
+          name: k.name, status: k.status, last_used_at: k.last_used_at, created_at: k.created_at,
         })),
       },
     });
   }
 
-  // POST /api/connections
-  if (path === '/api/connections' && method === 'POST') {
-    const body = await request.json() as { name: string; n8n_url: string; n8n_api_key: string };
-    const result = await handleCreateConnection(env.DB, env.ENCRYPTION_KEY, authUser.userId, authUser.plan, body.name, body.n8n_url, body.n8n_api_key);
-    return apiResponse(result, result.success ? 201 : 400);
-  }
-
-  // DELETE /api/connections/:id
-  const deleteConnectionMatch = path.match(/^\/api\/connections\/([^/]+)$/);
-  if (deleteConnectionMatch && method === 'DELETE') {
-    const connections = await getConnectionsByUserId(env.DB, authUser.userId);
-    const connection = connections.find((c: any) => c.id === deleteConnectionMatch[1]);
-    if (!connection) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'Connection not found' } }, 404);
-    await deleteConnection(env.DB, deleteConnectionMatch[1]);
-    return apiResponse({ success: true, data: { message: 'Connection deleted' } });
-  }
-
-  // POST /api/connections/:id/api-keys
-  const newApiKeyMatch = path.match(/^\/api\/connections\/([^/]+)\/api-keys$/);
-  if (newApiKeyMatch && method === 'POST') {
-    const connections = await getConnectionsByUserId(env.DB, authUser.userId);
-    const connection = connections.find((c: any) => c.id === newApiKeyMatch[1]);
-    if (!connection) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'Connection not found' } }, 404);
-    const body = await request.json().catch(() => ({})) as { name?: string };
+  // POST /api/api-keys
+  if (path === '/api/api-keys' && method === 'POST') {
+    const body = await request.json() as { connection_id: string; name?: string };
+    if (!body.connection_id) {
+      return apiResponse({ success: false, error: { code: 'MISSING_FIELDS', message: 'connection_id is required' } }, 400);
+    }
     const { key, hash, prefix } = await generateApiKey();
-    await createApiKeyDb(env.DB, authUser.userId, newApiKeyMatch[1], hash, prefix, body.name || 'API Key');
+    await createApiKeyDb(env.DB, authUser.userId, body.connection_id, hash, prefix, body.name || 'API Key');
     return apiResponse({ success: true, data: { api_key: key, prefix, message: 'Save your API key now. It will not be shown again.' } }, 201);
   }
 
@@ -232,7 +215,9 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { message: 'API key revoked' } });
   }
 
-  // AI Connections
+  // ============================================
+  // AI Connections (BYOK - lives in Platform DB)
+  // ============================================
   if (path === '/api/ai-connections' && method === 'GET') {
     const connections = await getAiConnectionsByUserId(env.DB, authUser.userId);
     return apiResponse({ success: true, data: { connections: connections.map((c: any) => ({ id: c.id, name: c.name, provider_url: c.provider_url, model_name: c.model_name, is_default: c.is_default, status: c.status, created_at: c.created_at })) } });
@@ -259,7 +244,9 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { provider_url: conn.provider_url, api_key: apiKey, model_name: conn.model_name } });
   }
 
-  // Bot Connections
+  // ============================================
+  // Bot Connections (lives in Platform DB)
+  // ============================================
   if (path === '/api/bot-connections' && method === 'GET') {
     const connections = await getBotConnectionsByUserId(env.DB, authUser.userId);
     return apiResponse({ success: true, data: { connections: connections.map((c: any) => ({ id: c.id, platform: c.platform, name: c.name, ai_connection_id: c.ai_connection_id, webhook_active: c.webhook_active, webhook_url: c.webhook_url, status: c.status, created_at: c.created_at })) } });
@@ -312,7 +299,9 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { message: 'Webhook deregistered' } });
   }
 
+  // ============================================
   // Feedback
+  // ============================================
   if (path === '/api/feedback' && method === 'POST') {
     const body = await request.json() as { category?: string; message?: string };
     const validCategories = ['bug', 'feature', 'general', 'question'];
@@ -326,7 +315,9 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { feedback } });
   }
 
-  // GET /api/usage
+  // ============================================
+  // Usage Stats
+  // ============================================
   if (path === '/api/usage' && method === 'GET') {
     const today = getCurrentDate();
     const yearMonth = getCurrentYearMonth();
@@ -337,7 +328,6 @@ export async function handleUserRoutes(
     const freshUser = await getUserById(env.DB, authUser.userId);
     const currentPlanId = freshUser?.plan || authUser.plan;
     const plan = await getPlan(env.DB, currentPlanId);
-    const connectionCount = await countUserConnections(env.DB, authUser.userId);
     const dailyLimit = plan?.daily_request_limit ?? 100;
     const minuteLimit = plan?.requests_per_minute ?? 50;
     const isDailyUnlimited = dailyLimit < 0;
@@ -349,7 +339,6 @@ export async function handleUserRoutes(
         requests: { used: dailyUsage, limit: isDailyUnlimited ? -1 : dailyLimit, remaining: isDailyUnlimited ? -1 : Math.max(0, dailyLimit - dailyUsage), unlimited: isDailyUnlimited },
         rate_limit: { used: minuteUsage, limit: isMinuteUnlimited ? -1 : minuteLimit, remaining: isMinuteUnlimited ? -1 : Math.max(0, minuteLimit - minuteUsage), unlimited: isMinuteUnlimited },
         monthly: { period: yearMonth, used: usage.request_count, success_count: usage.success_count, error_count: usage.error_count },
-        connections: { used: connectionCount, limit: plan?.max_connections === -1 ? -1 : (plan?.max_connections || 1) },
         success_rate: usage.request_count > 0 ? Math.round((usage.success_count / usage.request_count) * 100) : 100,
         reset_at: getTomorrowReset(),
       },

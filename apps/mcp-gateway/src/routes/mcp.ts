@@ -4,7 +4,7 @@
  */
 
 import type { Env, MCPToolResult } from '../types';
-import { getAllTools, findPluginForTool } from '../plugin-registry';
+import { getAllTools, getPlugin, findPluginForTool } from '../plugin-registry';
 
 interface AuthContext {
   user: { id: string; email: string; plan: string };
@@ -62,7 +62,8 @@ function getTomorrowReset(): string {
 export async function handleMcpRequest(
   request: Request,
   env: Env,
-  authContext: AuthContext
+  authContext: AuthContext,
+  ctx: ExecutionContext
 ): Promise<Response> {
   let body: Record<string, unknown>;
   try {
@@ -107,7 +108,7 @@ export async function handleMcpRequest(
 
       case 'tools/list': {
         // Return tools for the specific product this API key is bound to
-        const plugin = findPluginForTool(authContext.connection.product_type);
+        const plugin = getPlugin(authContext.connection.product_type);
         const tools = plugin ? plugin.tools : getAllTools();
         return jsonRpcResponse(id, { tools }, rateLimitInfo);
       }
@@ -132,9 +133,26 @@ export async function handleMcpRequest(
         const result: MCPToolResult = await plugin.handleToolCall(toolName, args || {}, client);
         const responseTime = Date.now() - startTime;
 
-        // Report usage to Platform (non-blocking via service binding)
-        // In production, this calls env.PLATFORM.fetch() to report usage
         const isError = result.isError || false;
+
+        // Report usage to Platform (non-blocking via service binding)
+        ctx.waitUntil(
+          env.PLATFORM.fetch(
+            new Request('https://internal/report-usage', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: authContext.user.id,
+                api_key_id: authContext.apiKey.id,
+                connection_id: authContext.connection.id,
+                tool_name: toolName,
+                status: isError ? 'error' : 'success',
+                response_time_ms: responseTime,
+                error_message: isError ? result.content?.[0]?.text : undefined,
+              }),
+            })
+          ).catch(() => {}) // Silently ignore reporting errors
+        );
 
         // Update remaining count
         if (rateLimitInfo.remaining > 0) {

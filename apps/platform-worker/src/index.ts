@@ -27,10 +27,6 @@ import {
   deleteOldUsageLogs,
   getUsersScheduledForDeletion,
   hardDeleteUser,
-  getInactiveFreePlanConnections,
-  deleteConnection,
-  sendEmail,
-  connectionDeletedEmail,
 } from '@node2flow/platform-core';
 
 export default {
@@ -150,26 +146,8 @@ export default {
       console.error(`[CRON] Failed to process scheduled deletions: ${error.message}`);
     }
 
-    // Task 3: Delete inactive connections for free plan users (14 days)
-    try {
-      const inactiveConnections = await getInactiveFreePlanConnections(env.DB, 14);
-      console.log(`[CRON] Found ${inactiveConnections.length} inactive connections for free plan users`);
-
-      for (const conn of inactiveConnections) {
-        try {
-          await deleteConnection(env.DB, conn.id);
-          console.log(`[CRON] Deleted inactive connection "${conn.name}" for user ${conn.user_email}`);
-
-          if (env.RESEND_API_KEY) {
-            ctx.waitUntil(sendEmail(env as any, connectionDeletedEmail(conn.user_email, conn.name)));
-          }
-        } catch (err: any) {
-          console.error(`[CRON] Failed to delete connection ${conn.id}: ${err.message}`);
-        }
-      }
-    } catch (error: any) {
-      console.error(`[CRON] Failed to process inactive connections: ${error.message}`);
-    }
+    // Note: Inactive connection cleanup is handled by MCP Gateway Worker
+    // (connections live in Gateway DB, not Platform DB)
 
     console.log(`[CRON] Scheduled tasks completed at ${new Date().toISOString()}`);
   },
