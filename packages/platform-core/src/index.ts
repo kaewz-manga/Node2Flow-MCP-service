@@ -31,8 +31,8 @@ export {
   verifyJWT,
   generateApiKey,
   hashApiKey,
-  encryptData,
-  decryptData,
+  encrypt,
+  decrypt,
   generateUUID,
   generateTOTPSecret,
   verifyTOTP,
@@ -42,15 +42,44 @@ export {
 // Database operations
 export * from './db';
 
-// Auth (re-exported from auth.ts)
-// Note: auth.ts imports from ./saas-types and ./db - needs import path fix in Phase 3
-// export { handleRegister, handleLogin, ... } from './auth';
+// Auth
+export {
+  handleRegister,
+  handleLogin,
+  authenticateMcpRequest,
+  handleCreateConnection,
+  verifyAuthToken,
+  verifyAdminToken,
+  verifySudoTOTP,
+  hasSudoSession,
+  revokeSudoSession,
+  setupTOTP,
+  verifyTOTPSetup,
+  disableTOTP,
+  getTOTPStatus,
+} from './auth';
 
 // OAuth
-// export { handleGitHubCallback, handleGoogleCallback, ... } from './oauth';
+export {
+  getOAuthAuthorizeUrl,
+  handleOAuthCallback,
+  generateOAuthState,
+  validateOAuthState,
+} from './oauth';
 
 // Stripe
-// export { handleCreateCheckout, handleStripeWebhook, ... } from './stripe';
+export {
+  createCheckoutSession,
+  createBillingPortalSession,
+  handleStripeWebhook,
+} from './stripe';
 
 // Email
-// export { sendEmail, ... } from './email';
+export {
+  sendEmail,
+  welcomeEmail,
+  deletionScheduledEmail,
+  accountRecoveredEmail,
+  usageLimitWarningEmail,
+  connectionDeletedEmail,
+} from './email';

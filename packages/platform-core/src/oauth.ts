@@ -3,9 +3,12 @@
  * Supports GitHub and Google OAuth 2.0
  */
 
-import { Env, ApiResponse } from './saas-types';
+import type { PlatformEnv, ApiResponse } from './types/platform';
 import { generateJWT, generateUUID } from './crypto-utils';
 import { createUser, getUserByEmail, getUserByEmailIncludingDeleted, reactivateUser } from './db';
+
+// Use PlatformEnv as Env for backward compatibility
+type Env = PlatformEnv;
 
 // ============================================
 // OAuth Configuration

@@ -2,7 +2,7 @@
  * Authentication Middleware and Handlers
  */
 
-import { Env, AuthContext, ApiResponse } from './saas-types';
+import type { PlatformEnv, ApiResponse } from './types/platform';
 import {
   hashPassword,
   verifyPassword,
@@ -39,6 +39,7 @@ import {
   disableUserTOTP,
   getUserTOTPStatus,
 } from './db';
+
 
 // ============================================
 // Auth Handlers (for Management API)
@@ -206,8 +207,8 @@ export async function handleLogin(
  */
 export async function authenticateMcpRequest(
   request: Request,
-  env: Env
-): Promise<{ context: AuthContext | null; error: ApiResponse | null }> {
+  env: PlatformEnv
+): Promise<{ context: { user: { id: string; email: string; plan: string }; connection: { id: string; n8n_url: string; n8n_api_key: string }; apiKey: { id: string }; usage: { current: number; limit: number; remaining: number } } | null; error: ApiResponse | null }> {
   // Extract API key from header
   const authHeader = request.headers.get('Authorization');
 

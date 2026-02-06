@@ -4,7 +4,10 @@
  * https://developers.cloudflare.com/workers/tutorials/send-emails-with-resend/
  */
 
-import { Env } from './saas-types';
+import type { PlatformEnv } from './types/platform';
+
+// Use PlatformEnv as Env for backward compatibility
+type Env = PlatformEnv;
 
 // ============================================
 // Types

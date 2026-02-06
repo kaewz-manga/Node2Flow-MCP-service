@@ -3,8 +3,11 @@
  * Uses fetch directly (no SDK) for Cloudflare Workers compatibility
  */
 
-import { Env } from './saas-types';
+import type { PlatformEnv } from './types/platform';
 import { getUserById, updateUserPlan, updateUserStripeCustomerId, getUserByStripeCustomerId } from './db';
+
+// Use PlatformEnv as Env for backward compatibility
+type Env = PlatformEnv;
 
 // ============================================
 // Plan to Stripe Price ID Mapping
