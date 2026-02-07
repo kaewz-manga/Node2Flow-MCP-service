@@ -21,10 +21,8 @@ import {
   getMinuteUsage,
   incrementDailyUsage,
   incrementMinuteUsage,
-  incrementMonthlyUsage,
-  logUsage,
   getCurrentYearMonth,
-  incrementPlatformStat,
+  generateUUID,
   verifyJWT,
 } from '@node2flow/platform-core';
 
@@ -152,14 +150,36 @@ export async function handleInternalRoutes(
     const yearMonth = getCurrentYearMonth();
     const minuteKey = getCurrentMinuteKey();
     const isSuccess = body.status === 'success';
+    const now = new Date().toISOString();
+    const logId = generateUUID();
+    const successInc = isSuccess ? 1 : 0;
+    const errorInc = isSuccess ? 0 : 1;
 
+    // D1 batch = atomic transaction (all succeed or all fail)
+    const d1Stmts: D1PreparedStatement[] = [
+      env.DB.prepare(
+        `UPDATE usage_monthly SET request_count = request_count + 1, success_count = success_count + ?, error_count = error_count + ?, updated_at = ? WHERE user_id = ? AND year_month = ?`
+      ).bind(successInc, errorInc, now, body.user_id, yearMonth),
+      env.DB.prepare(
+        `INSERT INTO usage_logs (id, user_id, api_key_id, connection_id, tool_name, status, response_time_ms, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(logId, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null, now),
+      env.DB.prepare(
+        `INSERT INTO platform_stats (key, value, updated_at) VALUES ('total_executions', 1, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = value + 1, updated_at = datetime('now')`
+      ),
+    ];
+    if (isSuccess) {
+      d1Stmts.push(
+        env.DB.prepare(
+          `INSERT INTO platform_stats (key, value, updated_at) VALUES ('total_successes', 1, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = value + 1, updated_at = datetime('now')`
+        )
+      );
+    }
+
+    // Run D1 batch (atomic) + KV rate counters in parallel
     await Promise.all([
+      env.DB.batch(d1Stmts),
       incrementMinuteUsage(env.RATE_LIMIT_KV, body.user_id, minuteKey),
       incrementDailyUsage(env.RATE_LIMIT_KV, body.user_id, today),
-      incrementMonthlyUsage(env.DB, body.user_id, yearMonth, isSuccess),
-      logUsage(env.DB, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null),
-      incrementPlatformStat(env.DB, 'total_executions'),
-      isSuccess ? incrementPlatformStat(env.DB, 'total_successes') : Promise.resolve(),
     ]);
 
     return json({ received: true });
