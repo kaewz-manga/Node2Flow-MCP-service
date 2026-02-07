@@ -20,11 +20,11 @@ const faqData: FAQCategory[] = [
     icon: <Lightning className="h-5 w-5" />,
     items: [
       {
-        question: 'What is n8n Management MCP?',
+        question: 'What is Node2Flow?',
         answer: (
           <div className="space-y-2">
             <p>
-              n8n Management MCP is a hosted service that allows AI assistants (like Claude, Cursor, or other MCP-compatible clients)
+              Node2Flow is a hosted service that allows AI assistants (like Claude, Cursor, or other MCP-compatible clients)
               to interact with your n8n automation platform.
             </p>
             <p>
@@ -399,7 +399,7 @@ export default function FAQ() {
           </div>
           <h1 className="text-3xl font-bold text-n2f-text mb-2">Frequently Asked Questions</h1>
           <p className="text-n2f-text-secondary max-w-xl mx-auto">
-            Find answers to common questions about n8n Management MCP. Can't find what you're looking for?{' '}
+            Find answers to common questions about Node2Flow. Can't find what you're looking for?{' '}
             <a href="mailto:support@node2flow.net" className="text-n2f-accent hover:underline">
               Contact support
             </a>
@@ -497,7 +497,7 @@ export default function FAQ() {
               <div className="bg-n2f-accent p-2 rounded-lg">
                 <Zap className="h-5 w-5 text-gray-900" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">n8n Management MCP</span>
+              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
             </Link>
             <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />

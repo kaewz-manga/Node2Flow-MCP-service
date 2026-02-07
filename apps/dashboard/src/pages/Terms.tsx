@@ -19,7 +19,7 @@ export default function Terms() {
             <div>
               <h2 className="text-lg font-semibold text-yellow-400 mb-2">Important Notice</h2>
               <p className="text-yellow-200/80 text-sm">
-                n8n Management MCP is a <strong>tool for AI agents</strong> to interact with your n8n instances.
+                Node2Flow is a <strong>tool for AI agents</strong> to interact with your n8n instances.
                 You are fully responsible for all actions performed by AI agents using this service.
                 The Service proxies requests to YOUR n8n instance - we have no control over what workflows
                 are executed or what data is processed.
@@ -33,7 +33,7 @@ export default function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-n2f-text mb-4">1. Agreement to Terms</h2>
             <p className="mb-3">
-              By accessing or using n8n Management MCP ("Service"), you agree to be bound by these Terms of Service ("Terms").
+              By accessing or using Node2Flow ("Service"), you agree to be bound by these Terms of Service ("Terms").
               If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.
             </p>
             <p>
@@ -45,7 +45,7 @@ export default function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-n2f-text mb-4">2. Description of Service</h2>
             <p className="mb-3">
-              n8n Management MCP provides a hosted Model Context Protocol (MCP) server that enables AI assistants
+              Node2Flow provides a hosted Model Context Protocol (MCP) server that enables AI assistants
               (such as Claude, Cursor, or other MCP-compatible clients) to interact with your n8n automation platform.
             </p>
             <p className="mb-3">The Service includes:</p>
@@ -237,7 +237,7 @@ export default function Terms() {
                 documentation, is owned by Node2Flow. You may not copy, modify, or distribute it without permission.
               </p>
               <p>
-                <strong className="text-n2f-text">Trademarks:</strong> "n8n Management MCP" and "Node2Flow" are our
+                <strong className="text-n2f-text">Trademarks:</strong> "Node2Flow" and "Node2Flow" are our
                 trademarks. "n8n" is a trademark of n8n GmbH.
               </p>
             </div>
@@ -421,7 +421,7 @@ export default function Terms() {
               <div className="bg-n2f-accent p-2 rounded-lg">
                 <Zap className="h-5 w-5 text-gray-900" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">n8n Management MCP</span>
+              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
             </Link>
             <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />

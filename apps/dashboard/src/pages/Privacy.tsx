@@ -54,7 +54,7 @@ export default function Privacy() {
           <section>
             <h2 className="text-xl font-semibold text-n2f-text mb-4">1. Introduction</h2>
             <p className="mb-3">
-              n8n Management MCP ("Service", "we", "us", "our") is operated by Node2Flow. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our hosted MCP service.
+              Node2Flow ("Service", "we", "us", "our") is operated by Node2Flow. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our hosted MCP service.
             </p>
             <p>
               We are committed to protecting your privacy. We do not sell your personal information and we minimize data collection to only what is necessary to provide the Service.
@@ -322,7 +322,7 @@ export default function Privacy() {
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
               <div className="bg-n2f-accent p-2 rounded-lg"><Zap className="h-5 w-5 text-gray-900" /></div>
-              <span className="text-xl font-bold text-n2f-text">n8n Management MCP</span>
+              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
             </Link>
             <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />Back to Home

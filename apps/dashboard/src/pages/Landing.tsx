@@ -46,7 +46,7 @@ export default function Landing() {
               <div className="bg-n2f-accent p-2 rounded-lg">
                 <Zap className="h-5 w-5 text-gray-900" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">n8n Management MCP</span>
+              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -271,7 +271,7 @@ Would you like me to activate the Data Sync Pipeline?`}</code>
             Ready to automate with AI?
           </h2>
           <p className="text-xl text-n2f-text-secondary mb-8 max-w-2xl mx-auto">
-            Join developers using n8n Management MCP to supercharge their automation workflows.
+            Join developers using Node2Flow to supercharge their automation workflows.
           </p>
           <Link
             to="/register"
@@ -341,10 +341,10 @@ Would you like me to activate the Data Sync Pipeline?`}</code>
               <div className="bg-n2f-accent p-2 rounded-lg">
                 <Zap className="h-4 w-4 text-gray-900" />
               </div>
-              <span className="text-lg font-bold text-n2f-text">n8n Management MCP</span>
+              <span className="text-lg font-bold text-n2f-text">Node2Flow</span>
             </div>
             <p className="text-n2f-text-muted text-sm">
-              &copy; {new Date().getFullYear()} n8n Management MCP. All rights reserved.
+              &copy; {new Date().getFullYear()} Node2Flow. All rights reserved.
             </p>
           </div>
         </div>
