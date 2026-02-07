@@ -95,6 +95,7 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugin-registry.ts` | 41 | Plugin registration + tool discovery |
 | `plugins/n8n/` | 4 files | Full n8n plugin: 27 tools, HTTP client, types |
 | `plugins/wordpress/` | 4 files | WordPress plugin: 20 tools, REST API client |
+| `plugins/cl-n8n-mcp/` | 4 files | cl-n8n-mcp proxy plugin: 20 tools, JSON-RPC client |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -170,7 +171,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (47 tools: n8n 27 + WP 20) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (67 tools: n8n 27 + WP 20 + cl-n8n-mcp 20) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -208,12 +209,25 @@ All infrastructure deployed and verified:
    - FAQ page merges generic categories + plugin-specific categories
    - Documentation tools tab fetches from all plugins dynamically
 
+### Session 9: cl-n8n-mcp Plugin (2026-02-07)
+
+1. **cl-n8n-mcp proxy plugin added** (`f31c02a`):
+   - **Gateway**: `plugins/cl-n8n-mcp/` — Proxy plugin that forwards tool calls to cl-n8n-mcp server via JSON-RPC 2.0
+   - **Client**: `ClN8nMcpClient` sends `POST {mcp_url}/mcp` with `tools/call` method, Bearer auth, optional `x-n8n-url`/`x-n8n-key` headers
+   - **20 tools**: 7 documentation (search_nodes, get_node, validate_node, templates, validate_workflow) + 13 management (workflow CRUD, autofix, test, deploy_template, versions)
+   - **Tool prefix**: All names prefixed `mcp_` (e.g., `mcp_search_nodes`) to avoid conflicts with existing n8n plugin
+   - **Dashboard**: Connections page (MCP URL, auth token, optional n8n URL + API key), Node Explorer, Templates, Workflow Tools pages
+   - **Gateway total**: 67 tools (n8n 27 + WordPress 20 + cl-n8n-mcp 20)
+
+2. **Unique architecture**: Unlike n8n/WordPress plugins that call APIs directly, cl-n8n-mcp plugin PROXIES to an external MCP server. The `handleToolCall` strips `mcp_` prefix and forwards via JSON-RPC.
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
 3. **Custom domain for old system** - `n8n-management-mcp.node2flow.net` still live separately
 4. **WordPress pages** - PostList/PageList/MediaList/CommentList are placeholder pages (MCP tool guidance only)
+5. **cl-n8n-mcp pages** - NodeExplorer/Templates/WorkflowTools are placeholder pages
 
 ---
 
@@ -330,6 +344,7 @@ Node2Flow-MCP-service/
 │   │   │   └── plugins/
 │   │   │       ├── n8n/              # 27 tools, HTTP client
 │   │   │       ├── wordpress/        # 20 tools, REST API client
+│   │   │       ├── cl-n8n-mcp/      # 20 tools, JSON-RPC proxy
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -347,9 +362,10 @@ Node2Flow-MCP-service/
 │           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
 │           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
 │           ├── plugins/
-│           │   ├── registry.ts        # Plugin registration (n8n + WordPress)
+│           │   ├── registry.ts        # Plugin registration (n8n + WordPress + cl-n8n-mcp)
 │           │   ├── n8n/               # n8n plugin (7 pages + content)
-│           │   └── wordpress/         # WordPress plugin (6 pages + content)
+│           │   ├── wordpress/         # WordPress plugin (6 pages + content)
+│           │   └── cl-n8n-mcp/        # cl-n8n-mcp plugin (5 pages + content)
 │           └── pages/
 │               ├── Landing.tsx ... Status.tsx   # 11 platform pages
 │               └── admin/             # 7 admin pages
@@ -398,8 +414,10 @@ wrangler deploy                         # In each app/
 
 ---
 
-**Total code written**: ~90 files across 6 phases
+**Total code written**: ~100 files across 6 phases + 3 plugin sessions
 **Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
+**Session 8**: Multi-product refactor + WordPress plugin (2 commits)
+**Session 9**: cl-n8n-mcp proxy plugin (`f31c02a`) — 67 total gateway tools
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
-**Deployed**: 2026-02-07 — Platform + Gateway + Dashboard all live (`a38af50`)
+**Deployed**: 2026-02-07 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-07
