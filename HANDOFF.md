@@ -93,7 +93,8 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `routes/mcp.ts` | 168 | JSON-RPC 2.0 handler: initialize, tools/list, tools/call, ping |
 | `routes/connections.ts` | 226 | Unified connection CRUD with AES-256-GCM encryption |
 | `plugin-registry.ts` | 41 | Plugin registration + tool discovery |
-| `plugins/n8n/` | 4 files | Full n8n plugin: 31 tools, HTTP client, types |
+| `plugins/n8n/` | 4 files | Full n8n plugin: 27 tools, HTTP client, types |
+| `plugins/wordpress/` | 4 files | WordPress plugin: 20 tools, REST API client |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -169,7 +170,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (27 tools) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (47 tools: n8n 27 + WP 20) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -187,11 +188,32 @@ All infrastructure deployed and verified:
 
 **Data**: Fresh start, no migration from old system. New ENCRYPTION_KEY + JWT_SECRET.
 
+### Session 8: Multi-Product Plugin Refactor + WordPress Plugin (2026-02-07)
+
+1. **Dashboard pages plugin-driven** (`c638672`):
+   - Extracted n8n-specific content from 4 global pages (Dashboard, Landing, Documentation, FAQ)
+   - Created `PluginContent` interface in registry with tagline, features, FAQ, docs, etc.
+   - Each plugin provides content via `content.tsx` — global pages read from registry
+   - Adding new product = create content file, no need to touch global pages
+
+2. **WordPress plugin added** (`258a8a3`):
+   - **Gateway**: `plugins/wordpress/` — 20 MCP tools (posts, pages, media, comments, categories, tags, users, site info)
+   - **Dashboard**: `plugins/wordpress/` — Connections page (with Application Password auth), Posts, Pages, Media, Comments pages
+   - **Content**: WordPress-specific landing, docs, FAQ content
+   - **Gateway total**: 47 tools (n8n 27 + WordPress 20), verified via `GET mcp.node2flow.net/`
+
+3. **Plugin system proven**:
+   - Sidebar shows both n8n Management + WordPress sections
+   - Each section has its own connection selector + sub-pages
+   - FAQ page merges generic categories + plugin-specific categories
+   - Documentation tools tab fetches from all plugins dynamically
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
 3. **Custom domain for old system** - `n8n-management-mcp.node2flow.net` still live separately
+4. **WordPress pages** - PostList/PageList/MediaList/CommentList are placeholder pages (MCP tool guidance only)
 
 ---
 
@@ -306,7 +328,8 @@ Node2Flow-MCP-service/
 │   │   │   ├── plugin-registry.ts    # Plugin registration
 │   │   │   ├── routes/               # auth, mcp, connections
 │   │   │   └── plugins/
-│   │   │       ├── n8n/              # 31 tools, HTTP client
+│   │   │       ├── n8n/              # 27 tools, HTTP client
+│   │   │       ├── wordpress/        # 20 tools, REST API client
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -324,8 +347,9 @@ Node2Flow-MCP-service/
 │           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
 │           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
 │           ├── plugins/
-│           │   ├── registry.ts        # Plugin registration
-│           │   └── n8n/               # n8n plugin (7 pages + 3 components)
+│           │   ├── registry.ts        # Plugin registration (n8n + WordPress)
+│           │   ├── n8n/               # n8n plugin (7 pages + content)
+│           │   └── wordpress/         # WordPress plugin (6 pages + content)
 │           └── pages/
 │               ├── Landing.tsx ... Status.tsx   # 11 platform pages
 │               └── admin/             # 7 admin pages
