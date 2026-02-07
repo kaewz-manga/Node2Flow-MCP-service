@@ -7,11 +7,11 @@ import {
   Zap,
   Shield,
   BarChart3,
-  Globe,
+  Layers,
   Bot,
   Check,
   ArrowRight,
-  Github,
+  BookOpen,
   ExternalLink,
   Users,
   Activity,
@@ -22,9 +22,6 @@ import {
 export default function Landing() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [stats, setStats] = useState<PlatformStats | null>(null);
-
-  const firstPlugin = plugins[0];
-  const pc = firstPlugin?.content;
 
   useEffect(() => {
     getPlans().then((res) => {
@@ -68,10 +65,10 @@ export default function Landing() {
       <section className="py-20 bg-gradient-to-b from-n2f-card to-n2f-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-n2f-text mb-6">
-            {pc?.tagline || 'Connect your tools with AI'}
+            Connect Your Tools with AI
           </h1>
           <p className="text-xl text-n2f-text-secondary max-w-2xl mx-auto mb-8">
-            {pc?.description || 'Connect your AI assistant to your automation platforms.'}
+            One MCP gateway for n8n, WordPress, and more. Let Claude, Cursor, or any MCP client manage your services through natural language.
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-12">
@@ -79,12 +76,12 @@ export default function Landing() {
               Start Free <ArrowRight className="h-5 w-5 ml-2" />
             </Link>
             <a
-              href="https://github.com/anthropics/claude-code"
+              href="https://modelcontextprotocol.io"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary text-lg px-8 py-3"
             >
-              <Github className="h-5 w-5 mr-2" />
+              <BookOpen className="h-5 w-5 mr-2" />
               Learn about MCP
             </a>
           </div>
@@ -98,7 +95,17 @@ export default function Landing() {
               <span className="ml-2 text-n2f-text-muted text-sm">Claude Desktop</span>
             </div>
             <pre className="text-sm text-green-400 overflow-x-auto">
-              <code>{pc?.demoCode || '> Connect your tools and start automating with AI'}</code>
+              <code>{`> List my active n8n workflows
+
+Found 5 active workflows in your n8n instance.
+
+> Create a WordPress post about our new release
+
+✅ Created draft post "New Release v2.0" on your WordPress site.
+
+> Search for HTTP Request nodes in n8n
+
+Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
             </pre>
           </div>
         </div>
@@ -142,6 +149,39 @@ export default function Landing() {
         </section>
       )}
 
+      {/* Products Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-n2f-text mb-4">
+              {plugins.length} Products, One Gateway
+            </h2>
+            <p className="text-lg text-n2f-text-secondary max-w-2xl mx-auto">
+              Connect your AI assistant to multiple services through a single MCP endpoint.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {plugins.map((plugin) => {
+              const Icon = plugin.icon;
+              return (
+                <div
+                  key={plugin.id}
+                  className="bg-n2f-card p-8 rounded-xl border border-n2f-border hover:border-n2f-accent/30 hover:shadow-lg transition-all text-center"
+                >
+                  <div className="bg-n2f-accent/10 w-16 h-16 rounded-2xl flex items-center justify-center text-n2f-accent mx-auto mb-6">
+                    <Icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-n2f-text mb-2">{plugin.name}</h3>
+                  <p className="text-n2f-text-secondary mb-4">{plugin.content.tagline}</p>
+                  <p className="text-sm text-n2f-text-muted">{plugin.content.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -163,12 +203,12 @@ export default function Landing() {
             <FeatureCard
               icon={<Shield className="h-6 w-6" />}
               title="Secure by Design"
-              description="Your n8n credentials are encrypted at rest. API keys are hashed and can be revoked instantly."
+              description="Your credentials are encrypted at rest with AES-256-GCM. API keys are hashed and can be revoked instantly."
             />
             <FeatureCard
-              icon={<Globe className="h-6 w-6" />}
-              title="Multi-Instance Support"
-              description="Connect multiple n8n instances. Switch between production and staging with different API keys."
+              icon={<Layers className="h-6 w-6" />}
+              title="Multi-Service Support"
+              description="Connect multiple services across different platforms. Manage n8n, WordPress, and more from one place."
             />
             <FeatureCard
               icon={<BarChart3 className="h-6 w-6" />}
@@ -204,8 +244,8 @@ export default function Landing() {
             />
             <StepCard
               number={2}
-              title={pc?.setupSteps[0]?.title || 'Add connection'}
-              description={pc?.setupSteps[0]?.description || 'Add your service credentials. We\'ll encrypt and securely store them.'}
+              title="Add Connection"
+              description="Connect your n8n, WordPress, or other services. We'll encrypt and securely store your credentials."
             />
             <StepCard
               number={3}
@@ -294,15 +334,17 @@ export default function Landing() {
                 <li><Link to="/docs" className="text-n2f-text-muted hover:text-n2f-accent">Documentation</Link></li>
                 <li><Link to="/docs?tab=api" className="text-n2f-text-muted hover:text-n2f-accent">API Reference</Link></li>
                 <li>
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-n2f-text-muted hover:text-n2f-accent inline-flex items-center gap-1">
-                    GitHub <ExternalLink className="h-3 w-3" />
+                  <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer" className="text-n2f-text-muted hover:text-n2f-accent inline-flex items-center gap-1">
+                    MCP Protocol <ExternalLink className="h-3 w-3" />
                   </a>
                 </li>
-                <li>
-                  <a href="https://docs.n8n.io" target="_blank" rel="noopener noreferrer" className="text-n2f-text-muted hover:text-n2f-accent inline-flex items-center gap-1">
-                    n8n Documentation <ExternalLink className="h-3 w-3" />
-                  </a>
-                </li>
+                {plugins.filter(p => p.content.externalDocUrl).map(p => (
+                  <li key={p.id}>
+                    <a href={p.content.externalDocUrl} target="_blank" rel="noopener noreferrer" className="text-n2f-text-muted hover:text-n2f-accent inline-flex items-center gap-1">
+                      {p.name} Docs <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -405,10 +447,10 @@ function PricingCard({ plan }: { plan: Plan }) {
       </div>
 
       <ul className="space-y-3 mb-6">
-        {/* n8n Instances */}
+        {/* Service Connections */}
         <li className="flex items-center gap-2 text-sm text-n2f-text-secondary">
           <Check className="h-4 w-4 text-emerald-400" />
-          {isEnterprise ? 'Custom' : 'Unlimited'} n8n instances
+          {isEnterprise ? 'Custom' : 'Unlimited'} service connections
         </li>
         {/* Rate Limits */}
         <li className="flex items-center gap-2 text-sm text-n2f-text-secondary">
