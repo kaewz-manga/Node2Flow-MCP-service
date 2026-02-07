@@ -237,7 +237,40 @@ const linePlugin: AppPlugin = {
 };
 
 // ============================================
+// Telegram Plugin
+// ============================================
+
+import { telegramContent } from './telegram/content';
+import {
+  Send as TelegramIcon,
+  Link as TelegramLinkIcon,
+  Send as TelegramSend,
+  Users as TelegramUsers,
+  Globe as TelegramWebhook,
+} from 'lucide-react';
+
+const telegramPlugin: AppPlugin = {
+  id: 'telegram',
+  name: 'Telegram Bot',
+  icon: TelegramIcon,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/telegram/connections', icon: TelegramLinkIcon },
+    { name: 'Messages', href: '/telegram/messages', icon: TelegramSend },
+    { name: 'Chats', href: '/telegram/chats', icon: TelegramUsers },
+    { name: 'Webhooks', href: '/telegram/webhooks', icon: TelegramWebhook },
+  ],
+  routes: [
+    { path: '/telegram/connections', component: lazy(() => import('./telegram/Connections')) },
+    { path: '/telegram/messages', component: lazy(() => import('./telegram/MessageTools')) },
+    { path: '/telegram/chats', component: lazy(() => import('./telegram/ChatManagement')) },
+    { path: '/telegram/webhooks', component: lazy(() => import('./telegram/WebhookSettings')) },
+  ],
+  content: telegramContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin];
