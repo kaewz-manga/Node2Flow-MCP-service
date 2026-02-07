@@ -228,7 +228,7 @@ export default function Documentation() {
                 <p className="text-n2f-text-secondary mb-4">
                   Sign up at{' '}
                   <Link to="/register" className="text-n2f-accent hover:underline">
-                    n8n-management-dashboard.node2flow.net/register
+                    app.node2flow.net/register
                   </Link>{' '}
                   using email or OAuth (GitHub/Google).
                 </p>
@@ -391,7 +391,7 @@ export default function Documentation() {
             <div className="space-y-8">
               <section>
                 <h2 className="text-xl font-semibold text-n2f-text mb-4">Base URL</h2>
-                <CodeBlock code="https://n8n-management-mcp.node2flow.net" />
+                <CodeBlock code="https://mcp.node2flow.net" />
               </section>
 
               <section>

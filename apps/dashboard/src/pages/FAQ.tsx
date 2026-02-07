@@ -68,7 +68,7 @@ const faqData: FAQCategory[] = [
 {`{
   "mcpServers": {
     "n8n": {
-      "url": "https://n8n-management-mcp.node2flow.net/mcp",
+      "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
@@ -278,7 +278,7 @@ const faqData: FAQCategory[] = [
           <div className="space-y-2">
             <p>Check the following:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Verify the MCP server URL is correct: <code className="bg-n2f-elevated px-1 rounded">https://n8n-management-mcp.node2flow.net/mcp</code></li>
+              <li>Verify the MCP server URL is correct: <code className="bg-n2f-elevated px-1 rounded">https://mcp.node2flow.net/mcp</code></li>
               <li>Ensure your API key starts with <code className="bg-n2f-elevated px-1 rounded">n2f_</code></li>
               <li>Check that the API key hasn't been revoked</li>
               <li>Make sure the Authorization header format is correct: <code className="bg-n2f-elevated px-1 rounded">Bearer n2f_...</code></li>

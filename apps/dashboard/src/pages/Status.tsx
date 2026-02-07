@@ -180,7 +180,7 @@ export default function Status() {
     try {
       // Check Worker API
       const workerStart = Date.now();
-      const workerResponse = await fetch('https://n8n-management-mcp.node2flow.net/api/plans');
+      const workerResponse = await fetch('https://platform.node2flow.net/api/plans');
       const workerLatency = Date.now() - workerStart;
       const workerOk = workerResponse.ok;
 
