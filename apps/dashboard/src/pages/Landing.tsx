@@ -220,8 +220,8 @@ export default function Landing() {
               <pre className="bg-black rounded-lg p-4 text-sm text-green-400 overflow-x-auto">
 {`{
   "mcpServers": {
-    "n8n": {
-      "url": "https://your-api.workers.dev/mcp",
+    "node2flow": {
+      "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }

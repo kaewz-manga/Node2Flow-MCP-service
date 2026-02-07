@@ -779,8 +779,8 @@ export default function Settings() {
           <pre className="text-sm text-green-400">
 {`{
   "mcpServers": {
-    "n8n": {
-      "url": "${import.meta.env.VITE_API_URL || 'https://your-api.workers.dev'}/mcp",
+    "node2flow": {
+      "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
