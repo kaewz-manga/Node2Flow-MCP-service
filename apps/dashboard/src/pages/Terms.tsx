@@ -237,7 +237,7 @@ export default function Terms() {
                 documentation, is owned by Node2Flow. You may not copy, modify, or distribute it without permission.
               </p>
               <p>
-                <strong className="text-n2f-text">Trademarks:</strong> "Node2Flow" and "Node2Flow" are our
+                <strong className="text-n2f-text">Trademarks:</strong> "Node2Flow" is our
                 trademarks. "n8n" is a trademark of n8n GmbH.
               </p>
             </div>
