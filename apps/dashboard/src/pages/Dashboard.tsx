@@ -35,12 +35,17 @@ export default function Dashboard() {
           getPlatformStats(),
         ]);
 
-        if (usageRes.success && usageRes.data) {
-          setUsage(usageRes.data);
-        }
-
         if (connectionsRes.success && connectionsRes.data) {
           setConnections(connectionsRes.data.connections);
+        }
+
+        if (usageRes.success && usageRes.data) {
+          const connCount = connectionsRes.success && connectionsRes.data
+            ? connectionsRes.data.connections.length : 0;
+          setUsage({
+            ...usageRes.data,
+            connections: usageRes.data.connections || { used: connCount, limit: -1 },
+          });
         }
 
         if (statsRes.success && statsRes.data) {

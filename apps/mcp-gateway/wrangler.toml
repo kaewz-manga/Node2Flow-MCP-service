@@ -2,11 +2,15 @@ name = "node2flow-mcp-gateway"
 main = "src/index.ts"
 compatibility_date = "2025-01-13"
 
+routes = [
+  { pattern = "mcp.node2flow.net", custom_domain = true }
+]
+
 # D1 Database - Product data (connections for all products)
 [[d1_databases]]
 binding = "DB"
 database_name = "node2flow-products-db"
-database_id = "" # TODO: Create with `wrangler d1 create node2flow-products-db`
+database_id = "d58d9176-0836-4e83-90d9-4450ca8b3bb9"
 migrations_dir = "migrations"
 
 # Service Binding to Platform Worker
