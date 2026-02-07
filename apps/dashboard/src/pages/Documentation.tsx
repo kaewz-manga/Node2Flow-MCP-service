@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@node2flow/dashboard-core';
 import {
@@ -17,10 +17,12 @@ import {
   Tag,
   Variable,
   Users,
-  Shield,
   Terminal,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
+import { plugins } from '../plugins/registry';
+import { getPluginTools } from '../lib/gateway-api';
 
 type TabId = 'quickstart' | 'tools' | 'api' | 'config' | 'errors';
 
@@ -29,48 +31,6 @@ interface Tool {
   description: string;
   category: string;
 }
-
-const mcpTools: Tool[] = [
-  // Workflow tools
-  { name: 'list_workflows', description: 'List all workflows with optional filters', category: 'Workflows' },
-  { name: 'get_workflow', description: 'Get a specific workflow by ID', category: 'Workflows' },
-  { name: 'create_workflow', description: 'Create a new workflow', category: 'Workflows' },
-  { name: 'update_workflow', description: 'Update an existing workflow', category: 'Workflows' },
-  { name: 'delete_workflow', description: 'Delete a workflow by ID', category: 'Workflows' },
-  { name: 'activate_workflow', description: 'Activate a workflow', category: 'Workflows' },
-  { name: 'deactivate_workflow', description: 'Deactivate a workflow', category: 'Workflows' },
-  // Execution tools
-  { name: 'list_executions', description: 'List workflow executions with filters', category: 'Executions' },
-  { name: 'get_execution', description: 'Get execution details by ID', category: 'Executions' },
-  { name: 'delete_execution', description: 'Delete an execution by ID', category: 'Executions' },
-  { name: 'retry_execution', description: 'Retry a failed execution', category: 'Executions' },
-  // Credential tools
-  { name: 'list_credentials', description: 'List all credentials', category: 'Credentials' },
-  { name: 'get_credential', description: 'Get credential details (without secrets)', category: 'Credentials' },
-  { name: 'create_credential', description: 'Create a new credential', category: 'Credentials' },
-  { name: 'delete_credential', description: 'Delete a credential by ID', category: 'Credentials' },
-  // Tag tools
-  { name: 'list_tags', description: 'List all workflow tags', category: 'Tags' },
-  { name: 'create_tag', description: 'Create a new tag', category: 'Tags' },
-  { name: 'update_tag', description: 'Update an existing tag', category: 'Tags' },
-  { name: 'delete_tag', description: 'Delete a tag by ID', category: 'Tags' },
-  // Variable tools
-  { name: 'list_variables', description: 'List all environment variables', category: 'Variables' },
-  { name: 'create_variable', description: 'Create a new variable', category: 'Variables' },
-  { name: 'delete_variable', description: 'Delete a variable by ID', category: 'Variables' },
-  // User tools
-  { name: 'list_users', description: 'List all n8n users (admin only)', category: 'Users' },
-  { name: 'get_user', description: 'Get user details by ID', category: 'Users' },
-  // Connection tools
-  { name: 'list_connections', description: 'List your n8n connections', category: 'Connections' },
-  { name: 'get_connection', description: 'Get connection details', category: 'Connections' },
-  { name: 'test_connection', description: 'Test n8n connection health', category: 'Connections' },
-  { name: 'switch_connection', description: 'Switch active n8n connection', category: 'Connections' },
-  // Utility tools
-  { name: 'get_usage', description: 'Get your API usage statistics', category: 'Utility' },
-  { name: 'get_plan', description: 'Get your current plan details', category: 'Utility' },
-  { name: 'whoami', description: 'Get current user information', category: 'Utility' },
-];
 
 const errorCodes = [
   { code: 'UNAUTHORIZED', status: 401, description: 'Invalid or missing API key', solution: 'Check your API key is correct and not revoked' },
@@ -139,6 +99,41 @@ export default function Documentation() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('quickstart');
   const [toolFilter, setToolFilter] = useState('');
+  const [mcpTools, setMcpTools] = useState<Tool[]>([]);
+  const [toolsLoading, setToolsLoading] = useState(false);
+
+  const firstPlugin = plugins[0];
+  const pc = firstPlugin?.content;
+  const mcpConfigName = pc?.mcpConfigName || firstPlugin?.id || 'service';
+
+  // Fetch tools from Gateway API
+  useEffect(() => {
+    async function fetchTools() {
+      setToolsLoading(true);
+      try {
+        const allTools: Tool[] = [];
+        for (const plugin of plugins) {
+          const res = await getPluginTools(plugin.id);
+          if (res.success && res.data) {
+            for (const t of res.data.tools) {
+              // Derive category from tool name prefix (e.g., n8n_list_workflows -> Workflows)
+              const parts = t.name.replace(`${plugin.id}_`, '').split('_');
+              const action = parts.slice(0, -1).join('_'); // e.g., "list"
+              const resource = parts[parts.length - 1]; // e.g., "workflows"
+              const category = resource.charAt(0).toUpperCase() + resource.slice(1);
+              allTools.push({ name: t.name, description: t.description, category });
+            }
+          }
+        }
+        if (allTools.length > 0) setMcpTools(allTools);
+      } catch {
+        // Keep empty tools - will show "no tools" state
+      } finally {
+        setToolsLoading(false);
+      }
+    }
+    fetchTools();
+  }, []);
 
   const filteredTools = mcpTools.filter(
     (tool) =>
@@ -237,16 +232,13 @@ export default function Documentation() {
               <section>
                 <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
                   <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                  Add Your n8n Connection
+                  Add Your Connection
                 </h2>
-                <p className="text-n2f-text-secondary mb-4">
-                  Go to <strong>Connections</strong> and add your n8n instance:
-                </p>
-                <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
-                  <li><strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "Production n8n")</li>
-                  <li><strong className="text-n2f-text">URL:</strong> Your n8n instance URL (e.g., https://n8n.example.com)</li>
-                  <li><strong className="text-n2f-text">API Key:</strong> Generated from n8n Settings → API</li>
-                </ul>
+                {pc?.connectionGuide || (
+                  <p className="text-n2f-text-secondary mb-4">
+                    Go to <strong>Connections</strong> and add your service instance.
+                  </p>
+                )}
               </section>
 
               <section>
@@ -285,7 +277,7 @@ export default function Documentation() {
                     <CodeBlock
                       code={`{
   "mcpServers": {
-    "n8n": {
+    "${mcpConfigName}": {
       "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer n2f_your_api_key_here"
@@ -303,7 +295,7 @@ export default function Documentation() {
                     </p>
                     <CodeBlock
                       code={`{
-  "n8n": {
+  "${mcpConfigName}": {
     "url": "https://mcp.node2flow.net/mcp",
     "headers": {
       "Authorization": "Bearer n2f_your_api_key_here"
@@ -324,9 +316,9 @@ export default function Documentation() {
                   Restart your MCP client and try asking:
                 </p>
                 <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
-                  <p className="text-n2f-text italic">"List all my n8n workflows"</p>
-                  <p className="text-n2f-text italic mt-2">"Show me the last 5 failed executions"</p>
-                  <p className="text-n2f-text italic mt-2">"Create a new workflow called Test Automation"</p>
+                  {(pc?.examplePrompts || ['List all my workflows', 'Show me recent executions', 'Create a new workflow']).map((prompt, i) => (
+                    <p key={i} className={`text-n2f-text italic${i > 0 ? ' mt-2' : ''}`}>"{prompt}"</p>
+                  ))}
                 </div>
               </section>
             </div>
@@ -524,7 +516,7 @@ export default function Documentation() {
                 <CodeBlock
                   code={`{
   "mcpServers": {
-    "n8n": {
+    "${mcpConfigName}": {
       "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer n2f_your_api_key_here"
@@ -535,58 +527,7 @@ export default function Documentation() {
                 />
               </section>
 
-              <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Multiple n8n Instances</h2>
-                <p className="text-n2f-text-secondary mb-4">
-                  If you have multiple n8n connections, the MCP server will use the first one by default.
-                  You can switch connections using the <code className="bg-n2f-elevated px-1 rounded">switch_connection</code> tool.
-                </p>
-                <CodeBlock
-                  code={`// Ask your AI assistant:
-"Switch to my staging n8n connection"
-
-// Or use the tool directly:
-{
-  "name": "switch_connection",
-  "arguments": {
-    "connection_id": "conn_abc123"
-  }
-}`}
-                />
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">n8n API Key Permissions</h2>
-                <p className="text-n2f-text-secondary mb-4">
-                  Your n8n API key needs the following permissions for full functionality:
-                </p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Shield className="h-4 w-4 text-green-400" />
-                      <span className="text-n2f-text font-medium">Required</span>
-                    </div>
-                    <ul className="text-sm text-n2f-text-secondary space-y-1">
-                      <li>workflow:list</li>
-                      <li>workflow:read</li>
-                      <li>execution:list</li>
-                      <li>execution:read</li>
-                    </ul>
-                  </div>
-                  <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Shield className="h-4 w-4 text-yellow-400" />
-                      <span className="text-n2f-text font-medium">Optional (for write access)</span>
-                    </div>
-                    <ul className="text-sm text-n2f-text-secondary space-y-1">
-                      <li>workflow:create</li>
-                      <li>workflow:update</li>
-                      <li>workflow:delete</li>
-                      <li>credential:*</li>
-                    </ul>
-                  </div>
-                </div>
-              </section>
+              {pc?.configSections}
 
               <section>
                 <h2 className="text-xl font-semibold text-n2f-text mb-4">Environment Variables</h2>

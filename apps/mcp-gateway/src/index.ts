@@ -193,6 +193,27 @@ export default {
         });
       }
 
+      // GET /api/plugins/:id/tools
+      const pluginToolsMatch = path.match(/^\/api\/plugins\/([^/]+)\/tools$/);
+      if (pluginToolsMatch && method === 'GET') {
+        const plugin = getPlugin(pluginToolsMatch[1]);
+        if (!plugin) {
+          return json({ success: false, error: { code: 'NOT_FOUND', message: 'Plugin not found' } }, 404);
+        }
+        return json({
+          success: true,
+          data: {
+            plugin_id: plugin.id,
+            plugin_name: plugin.name,
+            tools: plugin.tools.map(t => ({
+              name: t.name,
+              description: t.description,
+              inputSchema: t.inputSchema,
+            })),
+          },
+        });
+      }
+
       return json({ success: false, error: { code: 'NOT_FOUND', message: 'Endpoint not found' } }, 404);
     }
 

@@ -1,11 +1,72 @@
 /**
  * Dashboard Plugin Registry
- * Registers product plugins for sidebar navigation and lazy-loaded routes.
+ * Registers product plugins for sidebar navigation, lazy-loaded routes,
+ * and content metadata used by global pages (Landing, Dashboard, Documentation, FAQ).
  */
 
 import { lazy } from 'react';
-import type { ComponentType, LazyExoticComponent } from 'react';
+import type { ComponentType, LazyExoticComponent, ReactNode } from 'react';
 import type { DashboardPlugin } from '@node2flow/dashboard-core';
+
+// ============================================
+// Plugin Types
+// ============================================
+
+export interface PluginRoute {
+  path: string;
+  component: LazyExoticComponent<ComponentType<any>>;
+}
+
+export interface PluginFeature {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}
+
+export interface PluginFAQItem {
+  question: string;
+  answer: ReactNode;
+}
+
+export interface PluginFAQCategory {
+  name: string;
+  icon: ReactNode;
+  items: PluginFAQItem[];
+}
+
+export interface PluginContent {
+  // Landing page
+  tagline: string;
+  description: string;
+  features: PluginFeature[];
+  setupSteps: { title: string; description: string }[];
+  demoCode: string;
+  externalDocUrl?: string;
+
+  // Dashboard
+  quickStartSteps: string[];
+  emptyConnectionCTA: string;
+
+  // Documentation
+  connectionGuide: ReactNode;
+  examplePrompts: string[];
+  configSections?: ReactNode;
+  mcpConfigName?: string;
+
+  // FAQ
+  faqCategories: PluginFAQCategory[];
+}
+
+export interface AppPlugin extends DashboardPlugin {
+  routes: PluginRoute[];
+  content: PluginContent;
+}
+
+// ============================================
+// n8n Plugin
+// ============================================
+
+import { n8nContent } from './n8n/content';
 import {
   Server,
   Link as LinkIcon,
@@ -16,19 +77,6 @@ import {
   Variable,
   Users,
 } from 'lucide-react';
-
-export interface PluginRoute {
-  path: string;
-  component: LazyExoticComponent<ComponentType<any>>;
-}
-
-export interface AppPlugin extends DashboardPlugin {
-  routes: PluginRoute[];
-}
-
-// ============================================
-// n8n Plugin
-// ============================================
 
 const n8nPlugin: AppPlugin = {
   id: 'n8n',
@@ -53,6 +101,7 @@ const n8nPlugin: AppPlugin = {
     { path: '/n8n/variables', component: lazy(() => import('./n8n/VariableList')) },
     { path: '/n8n/users', component: lazy(() => import('./n8n/N8nUserList')) },
   ],
+  content: n8nContent,
 };
 
 // ============================================

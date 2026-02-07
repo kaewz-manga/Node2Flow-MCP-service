@@ -51,6 +51,18 @@ export async function getPlugins(): Promise<ApiResponse<{ plugins: PluginInfo[] 
   return gatewayRequest('/api/plugins');
 }
 
+export interface PluginTool {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export async function getPluginTools(
+  pluginId: string
+): Promise<ApiResponse<{ plugin_id: string; plugin_name: string; tools: PluginTool[] }>> {
+  return gatewayRequest(`/api/plugins/${pluginId}/tools`);
+}
+
 // ============================================
 // n8n Proxy (via Gateway proxy routes)
 // ============================================

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, ArrowLeft, ChevronDown, Search, HelpCircle, Zap as Lightning, Shield, CreditCard, Code, AlertTriangle } from 'lucide-react';
+import { Zap, ArrowLeft, ChevronDown, Search, HelpCircle, Zap as Lightning, Shield, CreditCard, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@node2flow/dashboard-core';
+import { plugins } from '../plugins/registry';
 
 interface FAQItem {
   question: string;
@@ -14,7 +15,10 @@ interface FAQCategory {
   items: FAQItem[];
 }
 
-const faqData: FAQCategory[] = [
+const productNames = plugins.map(p => p.name).join(', ');
+const mcpConfigName = plugins[0]?.content.mcpConfigName || plugins[0]?.id || 'service';
+
+const genericCategories: FAQCategory[] = [
   {
     name: 'Getting Started',
     icon: <Lightning className="h-5 w-5" />,
@@ -25,11 +29,11 @@ const faqData: FAQCategory[] = [
           <div className="space-y-2">
             <p>
               Node2Flow is a hosted service that allows AI assistants (like Claude, Cursor, or other MCP-compatible clients)
-              to interact with your n8n automation platform.
+              to interact with your tools and services{productNames ? ` including ${productNames}` : ''}.
             </p>
             <p>
               MCP (Model Context Protocol) is a standard protocol that enables AI assistants to use external tools and services.
-              Our service acts as a bridge between your AI assistant and your n8n instance.
+              Our service acts as a bridge between your AI assistant and your connected services.
             </p>
           </div>
         ),
@@ -39,7 +43,7 @@ const faqData: FAQCategory[] = [
         answer: (
           <ol className="list-decimal pl-5 space-y-2">
             <li><strong>Create an account</strong> - Sign up with email or OAuth (GitHub/Google)</li>
-            <li><strong>Add your n8n connection</strong> - Enter your n8n instance URL and API key</li>
+            <li><strong>Add a connection</strong> - Connect your service instance with its URL and API key</li>
             <li><strong>Generate an API key</strong> - Create an API key for your MCP client</li>
             <li><strong>Configure your MCP client</strong> - Add the MCP server URL and API key to Claude Desktop, Cursor, etc.</li>
           </ol>
@@ -67,7 +71,7 @@ const faqData: FAQCategory[] = [
             <pre className="bg-black rounded-lg p-3 text-sm text-green-400 overflow-x-auto">
 {`{
   "mcpServers": {
-    "n8n": {
+    "${mcpConfigName}": {
       "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
@@ -85,84 +89,18 @@ const faqData: FAQCategory[] = [
     ],
   },
   {
-    name: 'n8n Connection',
-    icon: <Code className="h-5 w-5" />,
-    items: [
-      {
-        question: 'How do I get my n8n API key?',
-        answer: (
-          <ol className="list-decimal pl-5 space-y-2">
-            <li>Log in to your n8n instance</li>
-            <li>Go to <strong>Settings → API</strong> (or click your user icon → Settings)</li>
-            <li>Click <strong>"Create API Key"</strong></li>
-            <li>Give it a name and copy the generated key</li>
-            <li>Paste it when adding a connection in our dashboard</li>
-          </ol>
-        ),
-      },
-      {
-        question: 'Is my n8n API key secure?',
-        answer: (
-          <div className="space-y-2">
-            <p>Yes, we take security seriously:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Your n8n API key is <strong>encrypted with AES-256-GCM</strong> before storage</li>
-              <li>Encryption uses a unique key that is not stored in the database</li>
-              <li>We only decrypt the key when proxying requests to your n8n instance</li>
-              <li>All communications use HTTPS/TLS encryption</li>
-            </ul>
-          </div>
-        ),
-      },
-      {
-        question: 'Can I connect multiple n8n instances?',
-        answer: 'Yes! You can add multiple n8n connections to your account. Each connection can have its own API keys for different MCP clients or purposes.',
-      },
-      {
-        question: 'What n8n features can I access via MCP?',
-        answer: (
-          <div className="space-y-2">
-            <p>Our MCP server provides 31 tools covering:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li><strong>Workflows</strong> - List, get, create, update, delete, activate/deactivate</li>
-              <li><strong>Executions</strong> - List, get details, delete, retry failed executions</li>
-              <li><strong>Credentials</strong> - List, get, create, delete credential entries</li>
-              <li><strong>Tags</strong> - List, create, update, delete workflow tags</li>
-              <li><strong>Variables</strong> - List, create, delete environment variables</li>
-              <li><strong>Users</strong> - List and manage n8n users (admin only)</li>
-            </ul>
-          </div>
-        ),
-      },
-      {
-        question: 'Why is my connection showing "error" status?',
-        answer: (
-          <div className="space-y-2">
-            <p>Common reasons for connection errors:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li><strong>Invalid API key</strong> - The n8n API key may have been revoked or expired</li>
-              <li><strong>n8n instance unreachable</strong> - Your n8n server may be down or behind a firewall</li>
-              <li><strong>Incorrect URL</strong> - Make sure the URL includes the protocol (https://)</li>
-              <li><strong>API not enabled</strong> - Ensure the Public API is enabled in n8n settings</li>
-            </ul>
-          </div>
-        ),
-      },
-    ],
-  },
-  {
     name: 'API Keys & Authentication',
     icon: <Shield className="h-5 w-5" />,
     items: [
       {
-        question: 'What is the difference between n8n API keys and service API keys?',
+        question: 'What is the difference between connection API keys and service API keys?',
         answer: (
           <div className="space-y-2">
             <p>There are two types of API keys:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong>n8n API key</strong> - Generated in your n8n instance. Used to authenticate
-                our service with your n8n. Stored encrypted.
+                <strong>Connection API key</strong> - Generated in your connected service (e.g., n8n). Used to authenticate
+                our service with your instance. Stored encrypted.
               </li>
               <li>
                 <strong>Service API key (n2f_...)</strong> - Generated in our dashboard. Used to authenticate
@@ -301,14 +239,14 @@ const faqData: FAQCategory[] = [
         ),
       },
       {
-        question: 'Workflows are not showing up',
+        question: 'Tools are not returning results',
         answer: (
           <div className="space-y-2">
-            <p>If the workflow list is empty:</p>
+            <p>If tool calls return empty or error results:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Verify your n8n connection status is "active"</li>
-              <li>Check that your n8n API key has permission to access workflows</li>
-              <li>Ensure the n8n instance URL is correct and accessible</li>
+              <li>Verify your connection status is "active" in the dashboard</li>
+              <li>Check that your connection's API key has the required permissions</li>
+              <li>Ensure the service URL is correct and accessible</li>
               <li>Try refreshing or re-adding the connection</li>
             </ul>
           </div>
@@ -337,6 +275,10 @@ const faqData: FAQCategory[] = [
     ],
   },
 ];
+
+// Merge generic categories with plugin-specific categories
+const pluginCategories: FAQCategory[] = plugins.flatMap(p => p.content.faqCategories);
+const faqData: FAQCategory[] = [...genericCategories, ...pluginCategories];
 
 function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) {
   return (

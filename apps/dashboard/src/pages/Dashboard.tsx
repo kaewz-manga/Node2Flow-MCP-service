@@ -5,6 +5,7 @@ import { getUsage, getPlatformStats } from '../lib/platform-api';
 import type { Connection } from '@node2flow/dashboard-core';
 import { getConnections } from '@node2flow/dashboard-core';
 import { useAuth } from '@node2flow/dashboard-core';
+import { plugins } from '../plugins/registry';
 import {
   Zap,
   Link as LinkIcon,
@@ -25,6 +26,8 @@ export default function Dashboard() {
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const connectionsHref = plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
 
   useEffect(() => {
     async function fetchData() {
@@ -252,7 +255,7 @@ export default function Dashboard() {
             Your Connections
           </h2>
           <Link
-            to="/n8n/connections"
+            to={connectionsHref}
             className="text-sm text-n2f-accent hover:text-n2f-accent-light flex items-center gap-1"
           >
             View all
@@ -264,8 +267,8 @@ export default function Dashboard() {
           <div className="text-center py-8">
             <LinkIcon className="h-12 w-12 text-n2f-text-muted mx-auto mb-3" />
             <p className="text-n2f-text-secondary mb-4">No connections yet</p>
-            <Link to="/n8n/connections" className="btn-primary">
-              Add your first n8n connection
+            <Link to={connectionsHref} className="btn-primary">
+              {plugins[0]?.content.emptyConnectionCTA || 'Add your first connection'}
             </Link>
           </div>
         ) : (
@@ -302,12 +305,11 @@ export default function Dashboard() {
             Quick Start Guide
           </h2>
           <ol className="list-decimal list-inside space-y-2 text-n2f-accent">
-            <li>Add your n8n instance URL and API key</li>
-            <li>Copy the generated SaaS API key</li>
-            <li>Configure your MCP client (Claude Desktop, Cursor, etc.)</li>
-            <li>Start automating with AI!</li>
+            {(plugins[0]?.content.quickStartSteps || []).map((step, i) => (
+              <li key={i}>{step}</li>
+            ))}
           </ol>
-          <Link to="/n8n/connections" className="btn-primary mt-4 inline-flex">
+          <Link to={connectionsHref} className="btn-primary mt-4 inline-flex">
             Get Started
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>

@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPlans, getPlatformStats } from '../lib/platform-api';
 import type { Plan, PlatformStats } from '../lib/platform-api';
+import { plugins } from '../plugins/registry';
 import {
   Zap,
   Shield,
   BarChart3,
   Globe,
-  Code,
   Bot,
   Check,
   ArrowRight,
@@ -22,6 +22,9 @@ import {
 export default function Landing() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [stats, setStats] = useState<PlatformStats | null>(null);
+
+  const firstPlugin = plugins[0];
+  const pc = firstPlugin?.content;
 
   useEffect(() => {
     getPlans().then((res) => {
@@ -65,11 +68,10 @@ export default function Landing() {
       <section className="py-20 bg-gradient-to-b from-n2f-card to-n2f-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-n2f-text mb-6">
-            Control n8n with AI
+            {pc?.tagline || 'Connect your tools with AI'}
           </h1>
           <p className="text-xl text-n2f-text-secondary max-w-2xl mx-auto mb-8">
-            Connect your AI assistant to n8n automation. Let Claude, Cursor, or any MCP-compatible client
-            manage your workflows, executions, and more.
+            {pc?.description || 'Connect your AI assistant to your automation platforms.'}
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-12">
@@ -96,17 +98,7 @@ export default function Landing() {
               <span className="ml-2 text-n2f-text-muted text-sm">Claude Desktop</span>
             </div>
             <pre className="text-sm text-green-400 overflow-x-auto">
-              <code>{`> List all my n8n workflows
-
-I found 5 workflows in your n8n instance:
-
-1. Email Newsletter (active)
-2. Slack Notifications (active)
-3. Data Sync Pipeline (inactive)
-4. Customer Onboarding (active)
-5. Weekly Reports (active)
-
-Would you like me to activate the Data Sync Pipeline?`}</code>
+              <code>{pc?.demoCode || '> Connect your tools and start automating with AI'}</code>
             </pre>
           </div>
         </div>
@@ -158,7 +150,7 @@ Would you like me to activate the Data Sync Pipeline?`}</code>
               Everything you need to automate with AI
             </h2>
             <p className="text-lg text-n2f-text-secondary max-w-2xl mx-auto">
-              Our MCP server provides a complete interface between your AI assistant and n8n.
+              Our MCP server provides a complete interface between your AI assistant and your tools.
             </p>
           </div>
 
@@ -183,11 +175,9 @@ Would you like me to activate the Data Sync Pipeline?`}</code>
               title="Usage Analytics"
               description="Track API usage, monitor success rates, and optimize your automation workflows."
             />
-            <FeatureCard
-              icon={<Code className="h-6 w-6" />}
-              title="Full n8n API Access"
-              description="Workflows, executions, credentials, tags, variables, and users - all accessible through MCP."
-            />
+            {plugins.flatMap(p => p.content.features).map((f, i) => (
+              <FeatureCard key={`plugin-feature-${i}`} icon={f.icon} title={f.title} description={f.description} />
+            ))}
             <FeatureCard
               icon={<Zap className="h-6 w-6" />}
               title="Edge Deployment"
@@ -214,8 +204,8 @@ Would you like me to activate the Data Sync Pipeline?`}</code>
             />
             <StepCard
               number={2}
-              title="Connect n8n"
-              description="Add your n8n instance URL and API key. We'll encrypt and securely store your credentials."
+              title={pc?.setupSteps[0]?.title || 'Add connection'}
+              description={pc?.setupSteps[0]?.description || 'Add your service credentials. We\'ll encrypt and securely store them.'}
             />
             <StepCard
               number={3}
