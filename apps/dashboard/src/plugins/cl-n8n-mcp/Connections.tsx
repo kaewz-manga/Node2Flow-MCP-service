@@ -1,0 +1,387 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { createConnection, deleteConnection } from '../../lib/gateway-api';
+import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
+import type { ApiKeyInfo } from '../../lib/platform-api';
+import { getConnections, useConnection, useSudoContext, type Connection } from '@node2flow/dashboard-core';
+import {
+  Plus,
+  Trash2,
+  Key,
+  Copy,
+  Check,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  X,
+  Shield,
+  Cpu,
+} from 'lucide-react';
+
+export default function Connections() {
+  const { withSudo, totpEnabled } = useSudoContext();
+  const { activeConnection, setActiveConnectionId } = useConnection();
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [newApiKey, setNewApiKey] = useState('');
+
+  const [formName, setFormName] = useState('');
+  const [formMcpUrl, setFormMcpUrl] = useState('');
+  const [formAuthToken, setFormAuthToken] = useState('');
+  const [formN8nUrl, setFormN8nUrl] = useState('');
+  const [formN8nApiKey, setFormN8nApiKey] = useState('');
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  const [copied, setCopied] = useState(false);
+  const [copiedMcp, setCopiedMcp] = useState(false);
+
+  const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
+
+  const fetchConnections = async () => {
+    setLoading(true);
+    const [connRes, keysRes] = await Promise.all([
+      getConnections('cl-n8n-mcp'),
+      getApiKeys(),
+    ]);
+    if (connRes.success && connRes.data) {
+      setConnections(connRes.data.connections);
+    } else {
+      setError(connRes.error?.message || 'Failed to load connections');
+    }
+    if (keysRes.success && keysRes.data) {
+      setApiKeys(keysRes.data.api_keys);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const handleAddConnection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    setFormLoading(true);
+
+    const res = await createConnection('cl-n8n-mcp', formName, {
+      mcp_url: formMcpUrl,
+      auth_token: formAuthToken,
+      n8n_url: formN8nUrl || undefined,
+      n8n_api_key: formN8nApiKey || undefined,
+    });
+
+    if (res.success && res.data) {
+      const keyRes = await createApiKey((res.data as any).id || (res.data as any).connection?.id);
+      if (keyRes.success && keyRes.data) {
+        setNewApiKey(keyRes.data.api_key);
+        setShowApiKeyModal(true);
+      }
+      setShowAddModal(false);
+      setFormName('');
+      setFormMcpUrl('');
+      setFormAuthToken('');
+      setFormN8nUrl('');
+      setFormN8nApiKey('');
+      fetchConnections();
+    } else {
+      setFormError(res.error?.message || 'Failed to add connection');
+    }
+
+    setFormLoading(false);
+  };
+
+  const handleDeleteConnection = async (id: string) => {
+    if (!totpEnabled) {
+      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      return;
+    }
+    if (!confirm('Are you sure you want to delete this connection? All API keys will be revoked.')) {
+      return;
+    }
+    await withSudo(async () => {
+      const res = await deleteConnection(id);
+      if (res.success) {
+        fetchConnections();
+      } else {
+        alert(res.error?.message || 'Failed to delete connection');
+      }
+      return true;
+    });
+  };
+
+  const handleGenerateApiKey = async (connectionId: string) => {
+    if (!totpEnabled) {
+      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      return;
+    }
+    await withSudo(async () => {
+      const res = await createApiKey(connectionId);
+      if (res.success && res.data) {
+        setNewApiKey(res.data.api_key);
+        setShowApiKeyModal(true);
+        fetchConnections();
+      } else {
+        alert(res.error?.message || 'Failed to generate API key');
+      }
+      return true;
+    });
+  };
+
+  const handleRevokeApiKey = async (keyId: string) => {
+    if (!totpEnabled) {
+      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      return;
+    }
+    if (!confirm('Are you sure you want to revoke this API key?')) return;
+    await withSudo(async () => {
+      const res = await revokeApiKey(keyId);
+      if (res.success) {
+        fetchConnections();
+      } else {
+        alert(res.error?.message || 'Failed to revoke API key');
+      }
+      return true;
+    });
+  };
+
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getKeysForConnection = (connectionId: string) =>
+    apiKeys.filter((k) => k.connection_id === connectionId);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-n2f-accent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-n2f-text">cl-n8n-mcp Connections</h1>
+          <p className="text-n2f-text-secondary mt-1">Manage your n8n Workflow Builder connections</p>
+        </div>
+        <button onClick={() => setShowAddModal(true)} className="btn-primary">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Connection
+        </button>
+      </div>
+
+      <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-n2f-text-secondary">MCP Endpoint</p>
+          <code className="text-sm font-mono text-n2f-text break-all">{mcpUrl}</code>
+        </div>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(mcpUrl);
+            setCopiedMcp(true);
+            setTimeout(() => setCopiedMcp(false), 2000);
+          }}
+          className="btn-secondary shrink-0 py-2 px-3"
+        >
+          {copiedMcp ? (
+            <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
+          ) : (
+            <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
+          )}
+        </button>
+      </div>
+
+      {!totpEnabled && (
+        <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield className="h-5 w-5 text-amber-400" />
+            <div>
+              <p className="text-amber-300 font-medium">Enable Two-Factor Authentication</p>
+              <p className="text-sm text-amber-300/80">
+                Set up 2FA to manage connections securely
+              </p>
+            </div>
+          </div>
+          <Link to="/settings" className="btn-secondary text-amber-400 border-amber-600 hover:bg-amber-900/30">
+            Enable 2FA
+          </Link>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 rounded-lg p-4 flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 text-red-400" />
+          <span className="text-red-300">{error}</span>
+        </div>
+      )}
+
+      {connections.length === 0 ? (
+        <div className="card text-center py-12">
+          <div className="bg-n2f-elevated w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Cpu className="h-8 w-8 text-n2f-text-muted" />
+          </div>
+          <h3 className="text-lg font-medium text-n2f-text mb-2">No connections yet</h3>
+          <p className="text-n2f-text-secondary mb-6 max-w-sm mx-auto">
+            Add your first cl-n8n-mcp server to start building workflows with AI.
+          </p>
+          <button onClick={() => setShowAddModal(true)} className="btn-primary">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Connection
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {connections.map((conn) => {
+            const connKeys = getKeysForConnection(conn.id);
+            return (
+              <div key={conn.id} className="card">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-3 h-3 rounded-full mt-1.5 ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-n2f-text-muted'}`} />
+                    <div>
+                      <h3 className="font-semibold text-n2f-text">{conn.name}</h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Cpu className="h-3 w-3 text-n2f-text-muted" />
+                        <span className="text-sm text-n2f-text-secondary">{conn.product_type}</span>
+                      </div>
+                      <p className="text-xs text-n2f-text-muted mt-1">
+                        Added {new Date(conn.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleGenerateApiKey(conn.id)} className="btn-secondary text-xs py-1.5">
+                      <RefreshCw className="h-3 w-3 mr-1" />
+                      New Key
+                    </button>
+                    <button onClick={() => handleDeleteConnection(conn.id)} className="p-2 text-n2f-text-muted hover:text-red-400 hover:bg-red-900/30 rounded-lg">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                {connKeys.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-n2f-border">
+                    <h4 className="text-sm font-medium text-n2f-text-secondary mb-2">API Keys</h4>
+                    <div className="space-y-2">
+                      {connKeys.map((key) => (
+                        <div key={key.id} className="flex items-center justify-between py-2 px-3 bg-n2f-card rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Key className="h-4 w-4 text-n2f-text-muted" />
+                            <div>
+                              <code className="text-sm font-mono text-n2f-text-secondary">{key.prefix}...</code>
+                              <span className="ml-2 text-xs text-n2f-text-secondary">{key.name}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : 'bg-n2f-elevated text-n2f-text-secondary'}`}>
+                              {key.status}
+                            </span>
+                            {key.status === 'active' && (
+                              <button onClick={() => handleRevokeApiKey(key.id)} className="text-xs text-red-400 hover:text-red-300">Revoke</button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Add Connection Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-n2f-card rounded-xl shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b border-n2f-border">
+              <h2 className="text-lg font-semibold text-n2f-text">Add cl-n8n-mcp Connection</h2>
+              <button onClick={() => setShowAddModal(false)} className="p-1 text-n2f-text-muted hover:text-n2f-text-secondary">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddConnection} className="p-4 space-y-4">
+              {formError && (
+                <div className="bg-red-900/30 border border-red-700 text-red-300 px-3 py-2 rounded-lg text-sm">{formError}</div>
+              )}
+              <div>
+                <label className="label">Connection Name</label>
+                <input type="text" className="input" placeholder="My Workflow Builder" value={formName} onChange={(e) => setFormName(e.target.value)} required />
+              </div>
+              <div>
+                <label className="label">MCP URL</label>
+                <input type="url" className="input" placeholder="https://cl-n8n-mcp.node2flow.net" value={formMcpUrl} onChange={(e) => setFormMcpUrl(e.target.value)} required />
+                <p className="text-xs text-n2f-text-secondary mt-1">Your cl-n8n-mcp server URL</p>
+              </div>
+              <div>
+                <label className="label">Auth Token</label>
+                <input type="password" className="input" placeholder="n2f_xxx or your auth token" value={formAuthToken} onChange={(e) => setFormAuthToken(e.target.value)} required />
+                <p className="text-xs text-n2f-text-secondary mt-1">Your cl-n8n-mcp authentication token or n2f_ API key</p>
+              </div>
+              <div>
+                <label className="label">n8n URL <span className="text-n2f-text-muted">(optional)</span></label>
+                <input type="url" className="input" placeholder="https://your-n8n.example.com" value={formN8nUrl} onChange={(e) => setFormN8nUrl(e.target.value)} />
+                <p className="text-xs text-n2f-text-secondary mt-1">Your n8n instance URL for workflow management tools</p>
+              </div>
+              <div>
+                <label className="label">n8n API Key <span className="text-n2f-text-muted">(optional)</span></label>
+                <input type="password" className="input" placeholder="Your n8n REST API key" value={formN8nApiKey} onChange={(e) => setFormN8nApiKey(e.target.value)} />
+                <p className="text-xs text-n2f-text-secondary mt-1">Required for workflow management tools (create, test, deploy)</p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary flex-1">Cancel</button>
+                <button type="submit" disabled={formLoading} className="btn-primary flex-1">
+                  {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* API Key Display Modal */}
+      {showApiKeyModal && (
+        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-n2f-card rounded-xl shadow-xl max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-emerald-900/30 p-2 rounded-full">
+                  <Check className="h-6 w-6 text-emerald-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-n2f-text">Your API Key</h2>
+              </div>
+              <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4 mb-4">
+                <p className="text-sm text-yellow-300">
+                  <strong>Important:</strong> Copy this API key now. You won't be able to see it again!
+                </p>
+              </div>
+              <div className="bg-n2f-elevated rounded-lg p-3 flex items-center gap-2">
+                <code className="flex-1 text-sm font-mono break-all text-n2f-text">{newApiKey}</code>
+                <button onClick={() => copyToClipboard(newApiKey)} className="btn-secondary p-2">
+                  {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                </button>
+              </div>
+              <button
+                onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}
+                className="btn-primary w-full mt-6"
+              >
+                I've saved my API key
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

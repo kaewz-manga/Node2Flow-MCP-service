@@ -141,7 +141,40 @@ const wordpressPlugin: AppPlugin = {
 };
 
 // ============================================
+// cl-n8n-mcp Plugin (n8n Workflow Builder)
+// ============================================
+
+import { clN8nMcpContent } from './cl-n8n-mcp/content';
+import {
+  Cpu,
+  Link as McpLinkIcon,
+  Search,
+  FileCode,
+  Wrench,
+} from 'lucide-react';
+
+const clN8nMcpPlugin: AppPlugin = {
+  id: 'cl-n8n-mcp',
+  name: 'Workflow Builder',
+  icon: Cpu,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/cl-n8n-mcp/connections', icon: McpLinkIcon },
+    { name: 'Node Explorer', href: '/cl-n8n-mcp/nodes', icon: Search },
+    { name: 'Templates', href: '/cl-n8n-mcp/templates', icon: FileCode },
+    { name: 'Workflow Tools', href: '/cl-n8n-mcp/tools', icon: Wrench },
+  ],
+  routes: [
+    { path: '/cl-n8n-mcp/connections', component: lazy(() => import('./cl-n8n-mcp/Connections')) },
+    { path: '/cl-n8n-mcp/nodes', component: lazy(() => import('./cl-n8n-mcp/NodeExplorer')) },
+    { path: '/cl-n8n-mcp/templates', component: lazy(() => import('./cl-n8n-mcp/Templates')) },
+    { path: '/cl-n8n-mcp/tools', component: lazy(() => import('./cl-n8n-mcp/WorkflowTools')) },
+  ],
+  content: clN8nMcpContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin];
