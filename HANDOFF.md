@@ -50,7 +50,7 @@
 | **Phase 3** | Refactor into Plugin Architecture | Done | `296f3c1` |
 | **Phase 4** | Build Platform Worker with all routes | Done | `0091d5c` |
 | **Phase 5** | Data migration + switchover | Done | `2d11b46` |
-| **Phase 6** | Dashboard SPA build | Done | (pending commit) |
+| **Phase 6** | Dashboard SPA build | Done | `858d92e` |
 
 ---
 
@@ -126,6 +126,7 @@ Extracted from `n8n-management-mcp/dashboard/`:
 | `FeedbackBubble` | Floating feedback widget |
 | `Login` / `Register` | Auth pages |
 | `useSudo` | Sudo verification hook |
+| `lib/api.ts` | Configurable API layer (`configureApi`, `platformRequest`, `gatewayRequest`) |
 
 ### scripts/ (Data Migration)
 
@@ -359,4 +360,5 @@ wrangler deploy                         # In each app/
 
 **Total code written**: ~90 files across 6 phases
 **Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
+**Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Date**: 2026-02-07
