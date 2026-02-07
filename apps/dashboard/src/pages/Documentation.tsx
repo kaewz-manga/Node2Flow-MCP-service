@@ -286,7 +286,7 @@ export default function Documentation() {
                       code={`{
   "mcpServers": {
     "n8n": {
-      "url": "https://n8n-management-mcp.node2flow.net/mcp",
+      "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer n2f_your_api_key_here"
       }
@@ -304,7 +304,7 @@ export default function Documentation() {
                     <CodeBlock
                       code={`{
   "n8n": {
-    "url": "https://n8n-management-mcp.node2flow.net/mcp",
+    "url": "https://mcp.node2flow.net/mcp",
     "headers": {
       "Authorization": "Bearer n2f_your_api_key_here"
     }
@@ -525,7 +525,7 @@ export default function Documentation() {
                   code={`{
   "mcpServers": {
     "n8n": {
-      "url": "https://n8n-management-mcp.node2flow.net/mcp",
+      "url": "https://mcp.node2flow.net/mcp",
       "headers": {
         "Authorization": "Bearer n2f_your_api_key_here"
       }
