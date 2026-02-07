@@ -128,19 +128,16 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Requests Used */}
+        {/* Monthly Requests */}
         <div className="stat-card">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-n2f-accent/10 rounded-lg">
               <Activity className="h-5 w-5 text-n2f-accent" />
             </div>
             <div>
-              <p className="stat-label">Requests Used</p>
+              <p className="stat-label">Requests This Month</p>
               <p className="stat-value">
-                {usage?.requests.used.toLocaleString() || 0}
-                <span className="text-lg font-normal text-n2f-text-muted">
-                  /{usage?.requests.limit.toLocaleString() || 100}
-                </span>
+                {usage?.monthly?.used.toLocaleString() || 0}
               </p>
             </div>
           </div>
@@ -160,21 +157,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Usage Progress */}
+      {/* Daily Rate Limit */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-n2f-text">
-            Daily Usage
+            Daily Rate Limit
           </h2>
           <span className="text-sm text-n2f-text-secondary">
-            Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'next month'}
+            Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
           </span>
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-n2f-text-secondary">
-              {usage?.requests.used.toLocaleString()} requests used
+              {usage?.requests.used.toLocaleString()} used today
             </span>
             <span className="text-n2f-text-secondary">
               {usage?.requests.remaining.toLocaleString()} remaining
@@ -193,7 +190,7 @@ export default function Dashboard() {
             />
           </div>
           <p className="text-xs text-n2f-text-secondary">
-            {usagePercent}% of daily limit used
+            {usagePercent}% of daily limit ({usage?.requests.limit.toLocaleString()}/day)
           </p>
         </div>
       </div>
