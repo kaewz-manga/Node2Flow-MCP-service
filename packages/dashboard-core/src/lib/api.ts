@@ -130,7 +130,9 @@ async function baseRequest<T>(
     const data = await response.json();
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 && token) {
+        // Only redirect to login if user had a token (expired/invalid session)
+        // Don't redirect for unauthenticated API calls from public pages
         clearToken();
         window.location.href = '/login';
       }
