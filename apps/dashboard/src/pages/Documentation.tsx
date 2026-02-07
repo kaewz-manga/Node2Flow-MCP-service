@@ -289,19 +289,28 @@ export default function Documentation() {
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-medium text-n2f-text mb-2">Claude Desktop</h3>
+                    <h3 className="font-medium text-n2f-text mb-2">Claude Desktop (stdio proxy)</h3>
                     <p className="text-sm text-n2f-text-muted mb-2">
-                      Edit <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS)
-                      or <code className="bg-n2f-elevated px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code> (Windows)
+                      First, install the stdio server:
+                    </p>
+                    <CodeBlock
+                      code={`git clone https://github.com/kaewz-manga/n8n-management-mcp.git
+cd n8n-management-mcp && npm install`}
+                      language="bash"
+                    />
+                    <p className="text-sm text-n2f-text-muted mt-3 mb-2">
+                      Then edit <code className="bg-n2f-elevated px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code> (Windows)
+                      or <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS):
                     </p>
                     <CodeBlock
                       code={`{
   "mcpServers": {
     "${mcpConfigName}": {
-      "url": "https://mcp.node2flow.net/mcp",
-      "headers": {
-        "Authorization": "Bearer n2f_your_api_key_here"
-      }
+      "command": "node",
+      "args": [
+        "/path/to/n8n-management-mcp/stdio-server.js",
+        "n2f_your_api_key_here"
+      ]
     }
   }
 }`}
@@ -309,9 +318,9 @@ export default function Documentation() {
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-n2f-text mb-2">Cursor</h3>
+                    <h3 className="font-medium text-n2f-text mb-2">Cursor / Claude Code / Windsurf</h3>
                     <p className="text-sm text-n2f-text-muted mb-2">
-                      Add to your Cursor MCP settings
+                      Clients that support HTTP transport can connect directly:
                     </p>
                     <CodeBlock
                       code={`{
@@ -526,21 +535,37 @@ export default function Documentation() {
               <section>
                 <h2 className="text-xl font-semibold text-n2f-text mb-4">Claude Desktop Configuration</h2>
                 <p className="text-n2f-text-secondary mb-4">
-                  Full configuration file location:
+                  Config file location:
                 </p>
                 <ul className="list-disc pl-6 space-y-1 text-n2f-text-secondary mb-4">
-                  <li><strong className="text-n2f-text">macOS:</strong> <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
                   <li><strong className="text-n2f-text">Windows:</strong> <code className="bg-n2f-elevated px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code></li>
+                  <li><strong className="text-n2f-text">macOS:</strong> <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
                   <li><strong className="text-n2f-text">Linux:</strong> <code className="bg-n2f-elevated px-1 rounded">~/.config/Claude/claude_desktop_config.json</code></li>
                 </ul>
+                <h3 className="font-medium text-n2f-text mb-2">stdio proxy (recommended)</h3>
+                <p className="text-sm text-n2f-text-muted mb-2">
+                  Install first: <code className="bg-n2f-elevated px-1 rounded">git clone https://github.com/kaewz-manga/n8n-management-mcp.git && cd n8n-management-mcp && npm install</code>
+                </p>
                 <CodeBlock
                   code={`{
   "mcpServers": {
     "${mcpConfigName}": {
-      "url": "https://mcp.node2flow.net/mcp",
-      "headers": {
-        "Authorization": "Bearer n2f_your_api_key_here"
-      }
+      "command": "node",
+      "args": [
+        "/path/to/n8n-management-mcp/stdio-server.js",
+        "n2f_your_api_key_here"
+      ]
+    }
+  }
+}`}
+                />
+                <h3 className="font-medium text-n2f-text mt-4 mb-2">HTTP transport (Cursor / Claude Code / Windsurf)</h3>
+                <CodeBlock
+                  code={`{
+  "${mcpConfigName}": {
+    "url": "https://mcp.node2flow.net/mcp",
+    "headers": {
+      "Authorization": "Bearer n2f_your_api_key_here"
     }
   }
 }`}
