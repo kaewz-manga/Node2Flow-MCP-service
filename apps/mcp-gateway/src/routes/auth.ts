@@ -85,7 +85,7 @@ export async function authenticateMcpRequest(
     try {
       // Validate API key via Platform service binding
       const platformResponse = await env.PLATFORM.fetch(
-        new Request('https://internal/validate-api-key', {
+        new Request('https://platform.internal/internal/validate-api-key', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ api_key: token }),

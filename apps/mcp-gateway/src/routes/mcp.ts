@@ -138,7 +138,7 @@ export async function handleMcpRequest(
         // Report usage to Platform (non-blocking via service binding)
         ctx.waitUntil(
           env.PLATFORM.fetch(
-            new Request('https://internal/report-usage', {
+            new Request('https://platform.internal/internal/report-usage', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
