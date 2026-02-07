@@ -270,7 +270,40 @@ const telegramPlugin: AppPlugin = {
 };
 
 // ============================================
+// Notion Plugin
+// ============================================
+
+import { notionContent } from './notion/content';
+import {
+  BookOpen as NotionIcon,
+  Link as NotionLinkIcon,
+  Database as NotionDB,
+  FileText as NotionPages,
+  LayoutList,
+} from 'lucide-react';
+
+const notionPlugin: AppPlugin = {
+  id: 'notion',
+  name: 'Notion',
+  icon: NotionIcon,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/notion/connections', icon: NotionLinkIcon },
+    { name: 'Databases', href: '/notion/databases', icon: NotionDB },
+    { name: 'Pages', href: '/notion/pages', icon: NotionPages },
+    { name: 'Blocks', href: '/notion/blocks', icon: LayoutList },
+  ],
+  routes: [
+    { path: '/notion/connections', component: lazy(() => import('./notion/Connections')) },
+    { path: '/notion/databases', component: lazy(() => import('./notion/DatabaseList')) },
+    { path: '/notion/pages', component: lazy(() => import('./notion/PageList')) },
+    { path: '/notion/blocks', component: lazy(() => import('./notion/BlockList')) },
+  ],
+  content: notionContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin];
