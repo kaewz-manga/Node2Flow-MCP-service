@@ -50,7 +50,7 @@
 | **Phase 3** | Refactor into Plugin Architecture | Done | `296f3c1` |
 | **Phase 4** | Build Platform Worker with all routes | Done | `0091d5c` |
 | **Phase 5** | Data migration + switchover | Done | `2d11b46` |
-| **Phase 6** | Dashboard + DNS cutover | **TODO** | - |
+| **Phase 6** | Dashboard SPA build | Done | (pending commit) |
 
 ---
 
@@ -136,29 +136,40 @@ Extracted from `n8n-management-mcp/dashboard/`:
 
 ---
 
-## What's Left (Phase 6)
+## What's Done (Phase 6)
 
-### Phase 6: Dashboard + DNS Cutover
+### Phase 6: Dashboard SPA Build
 
-1. **Dashboard API split**:
-   - Auth/billing/admin/usage calls → Platform Worker (`platform.n2f.net`)
-   - Connection CRUD/proxy calls → MCP Gateway (`mcp.node2flow.net`)
-   - Update `dashboard/src/lib/api.ts` → split into `platform-api.ts` + `gateway-api.ts`
+1. **Dashboard API split** (Done):
+   - `packages/dashboard-core/src/lib/api.ts` — configurable API layer with `configureApi({ platformUrl, gatewayUrl })`
+   - `apps/dashboard/src/lib/platform-api.ts` — Platform Worker API (~40 functions)
+   - `apps/dashboard/src/lib/gateway-api.ts` — Gateway Worker API (connections + n8n proxy)
 
-2. **Dashboard plugin system**:
-   - Move n8n pages → `dashboard/src/plugins/n8n/`
-   - Create plugin registry for sidebar routing
-   - Use `React.lazy()` for code-split per plugin
+2. **Dashboard plugin system** (Done):
+   - `apps/dashboard/src/plugins/registry.ts` — Plugin registry with `DashboardPlugin` interface
+   - `apps/dashboard/src/plugins/n8n/` — 7 pages + 3 components (lazy-loaded)
+   - Layout accepts `plugins` prop for dynamic sidebar navigation
+   - Each plugin: icon, expandable sidebar, connection selector per product
 
-3. **DNS + URL changes**:
-   - Platform: `platform.node2flow.net` (or keep existing URL with redirect)
+3. **Full page migration** (Done):
+   - 11 platform pages: Landing, Dashboard, Usage, Settings, AuthCallback, AccountDeleted, Terms, Privacy, FAQ, Documentation, Status
+   - 7 admin pages: AdminOverview, AdminUsers, AdminAnalytics, AdminRevenue, AdminHealth, AdminFeedback, AdminSystem
+   - App.tsx with ProtectedRoute, PublicRoute, SmartRoute wrappers
+
+4. **Build verification** (Done):
+   - TypeScript: `tsc --noEmit` passes with 0 errors
+   - Vite build: 1810 modules, 3.56s, all plugin pages code-split
+   - dashboard-core also passes TypeScript check independently
+
+### What's Left: Deployment
+
+1. **DNS + URL changes**:
+   - Platform: `platform.node2flow.net`
    - Gateway: `mcp.node2flow.net`
    - Dashboard: `app.node2flow.net`
-   - Update OAuth redirect URLs
-   - Update Stripe webhook URL
-   - Keep old endpoints → redirect 30 days
+   - Update OAuth redirect URLs + Stripe webhook URL
 
-4. **Deployment**:
+2. **Deployment**:
    - Create D1 databases: `wrangler d1 create node2flow-platform-db` + `node2flow-products-db`
    - Set secrets: `wrangler secret put JWT_SECRET`, `ENCRYPTION_KEY`, etc.
    - Run data migration scripts
@@ -284,7 +295,24 @@ Node2Flow-MCP-service/
 │   │   └── wrangler.toml
 │   │
 │   └── dashboard/                     # Single SPA (Phase 6)
-│       └── (skeleton only)
+│       ├── index.html
+│       ├── vite.config.ts
+│       ├── tailwind.config.js
+│       ├── postcss.config.js
+│       └── src/
+│           ├── main.tsx               # Entry: configureApi() + render
+│           ├── App.tsx                # Routing + providers
+│           ├── index.css              # Tailwind + n2f theme
+│           ├── vite-env.d.ts          # Vite type declarations
+│           ├── lib/
+│           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
+│           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
+│           ├── plugins/
+│           │   ├── registry.ts        # Plugin registration
+│           │   └── n8n/               # n8n plugin (7 pages + 3 components)
+│           └── pages/
+│               ├── Landing.tsx ... Status.tsx   # 11 platform pages
+│               └── admin/             # 7 admin pages
 │
 ├── scripts/
 │   ├── migrate-data.sql              # Platform data migration SQL
@@ -329,5 +357,6 @@ wrangler deploy                         # In each app/
 
 ---
 
-**Total code written**: 50 files, ~9,062 lines across 5 phases
+**Total code written**: ~90 files across 6 phases
+**Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
 **Date**: 2026-02-07
