@@ -1,11 +1,12 @@
 import type { MCPPlugin } from './types';
 import { n8nPlugin } from './plugins/n8n';
+import { wordpressPlugin } from './plugins/wordpress';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
 // Register plugins
 PLUGINS.set('n8n', n8nPlugin);
-// PLUGINS.set('wordpress', wordpressPlugin);
+PLUGINS.set('wordpress', wordpressPlugin);
 // PLUGINS.set('make', makePlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {

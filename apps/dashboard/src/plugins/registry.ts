@@ -105,7 +105,43 @@ const n8nPlugin: AppPlugin = {
 };
 
 // ============================================
+// WordPress Plugin
+// ============================================
+
+import { wordpressContent } from './wordpress/content';
+import {
+  Globe,
+  Link as WPLinkIcon,
+  FileText,
+  File,
+  Image,
+  MessageCircle,
+} from 'lucide-react';
+
+const wordpressPlugin: AppPlugin = {
+  id: 'wordpress',
+  name: 'WordPress',
+  icon: Globe,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/wordpress/connections', icon: WPLinkIcon },
+    { name: 'Posts', href: '/wordpress/posts', icon: FileText },
+    { name: 'Pages', href: '/wordpress/pages', icon: File },
+    { name: 'Media', href: '/wordpress/media', icon: Image },
+    { name: 'Comments', href: '/wordpress/comments', icon: MessageCircle },
+  ],
+  routes: [
+    { path: '/wordpress/connections', component: lazy(() => import('./wordpress/Connections')) },
+    { path: '/wordpress/posts', component: lazy(() => import('./wordpress/PostList')) },
+    { path: '/wordpress/pages', component: lazy(() => import('./wordpress/PageList')) },
+    { path: '/wordpress/media', component: lazy(() => import('./wordpress/MediaList')) },
+    { path: '/wordpress/comments', component: lazy(() => import('./wordpress/CommentList')) },
+  ],
+  content: wordpressContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin];
