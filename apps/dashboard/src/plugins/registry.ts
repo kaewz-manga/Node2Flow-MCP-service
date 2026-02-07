@@ -204,7 +204,40 @@ const geminiRagPlugin: AppPlugin = {
 };
 
 // ============================================
+// LINE Plugin
+// ============================================
+
+import { lineContent } from './line/content';
+import {
+  MessageCircle as LineIcon,
+  Link as LineLinkIcon,
+  Send,
+  Menu as LineMenu,
+  Users as LineUsers,
+} from 'lucide-react';
+
+const linePlugin: AppPlugin = {
+  id: 'line',
+  name: 'LINE Bot',
+  icon: LineIcon,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/line/connections', icon: LineLinkIcon },
+    { name: 'Messages', href: '/line/messages', icon: Send },
+    { name: 'Rich Menus', href: '/line/richmenus', icon: LineMenu },
+    { name: 'Users & Groups', href: '/line/users', icon: LineUsers },
+  ],
+  routes: [
+    { path: '/line/connections', component: lazy(() => import('./line/Connections')) },
+    { path: '/line/messages', component: lazy(() => import('./line/MessageTools')) },
+    { path: '/line/richmenus', component: lazy(() => import('./line/RichMenuList')) },
+    { path: '/line/users', component: lazy(() => import('./line/UserList')) },
+  ],
+  content: lineContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin];
