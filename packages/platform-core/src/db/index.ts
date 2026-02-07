@@ -94,6 +94,8 @@ export {
   getRecentErrors,
   getPlanDistribution,
   getErrorTrend,
+  getUsageByProduct,
+  getTopToolsByProduct,
   recalculateUsageMonthly,
   recalculatePlatformStats,
   clearAllLogs,

@@ -174,6 +174,48 @@ export async function getErrorTrend(
 }
 
 // ============================================
+// Per-Product Analytics
+// ============================================
+
+export async function getUsageByProduct(
+  db: D1Database,
+  days: number = 30
+): Promise<{ product: string; requests: number; errors: number; avg_response_ms: number }[]> {
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const result = await db.prepare(
+    `SELECT
+      CASE
+        WHEN tool_name LIKE 'n8n_%' THEN 'n8n'
+        WHEN tool_name LIKE 'wp_%' THEN 'wordpress'
+        WHEN tool_name LIKE 'mcp_%' THEN 'cl-n8n-mcp'
+        ELSE 'other'
+      END as product,
+      COUNT(*) as requests,
+      SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as errors,
+      ROUND(AVG(response_time_ms)) as avg_response_ms
+    FROM usage_logs
+    WHERE created_at >= ?
+    GROUP BY product
+    ORDER BY requests DESC`
+  ).bind(since).all<{ product: string; requests: number; errors: number; avg_response_ms: number }>();
+  return result.results || [];
+}
+
+export async function getTopToolsByProduct(
+  db: D1Database,
+  productType: string,
+  days: number = 30,
+  limit: number = 10
+): Promise<{ tool_name: string; count: number; error_count: number; avg_response_ms: number }[]> {
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const prefix = productType === 'n8n' ? 'n8n_%' : productType === 'wordpress' ? 'wp_%' : 'mcp_%';
+  const result = await db.prepare(
+    "SELECT tool_name, COUNT(*) as count, SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_count, ROUND(AVG(response_time_ms)) as avg_response_ms FROM usage_logs WHERE created_at >= ? AND tool_name LIKE ? GROUP BY tool_name ORDER BY count DESC LIMIT ?"
+  ).bind(since, prefix, limit).all();
+  return (result.results || []) as { tool_name: string; count: number; error_count: number; avg_response_ms: number }[];
+}
+
+// ============================================
 // System Controls
 // ============================================
 
@@ -277,8 +319,7 @@ export async function fullSystemReset(
     bot_connections_deleted += r2.meta.changes || 0;
     const r3 = await db.prepare('DELETE FROM ai_connections WHERE user_id = ?').bind(userId).run();
     ai_connections_deleted += r3.meta.changes || 0;
-    const r4 = await db.prepare('DELETE FROM n8n_connections WHERE user_id = ?').bind(userId).run();
-    connections_deleted += r4.meta.changes || 0;
+    // Note: connections live in Gateway's products-db, not platform-db
     await db.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
   }
 
@@ -451,10 +492,8 @@ export async function getUserDataForExport(db: D1Database, userId: string): Prom
 
   if (!user) return null;
 
-  const connections = await db
-    .prepare('SELECT id, name, n8n_url, status, created_at FROM n8n_connections WHERE user_id = ? AND status != ?')
-    .bind(userId, 'deleted')
-    .all<{ id: string; name: string; n8n_url: string; status: string; created_at: string }>();
+  // Note: connections live in Gateway's products-db, not platform-db
+  const connections = { results: [] as { id: string; name: string; status: string; created_at: string }[] };
 
   const apiKeys = await db
     .prepare('SELECT id, connection_id, key_prefix, name, status, last_used_at, created_at FROM api_keys WHERE user_id = ?')

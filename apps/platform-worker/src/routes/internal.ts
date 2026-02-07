@@ -24,7 +24,6 @@ import {
   incrementMonthlyUsage,
   logUsage,
   getCurrentYearMonth,
-  updateConnectionLastUsed,
   incrementPlatformStat,
   verifyJWT,
 } from '@node2flow/platform-core';
@@ -159,7 +158,6 @@ export async function handleInternalRoutes(
       incrementDailyUsage(env.RATE_LIMIT_KV, body.user_id, today),
       incrementMonthlyUsage(env.DB, body.user_id, yearMonth, isSuccess),
       logUsage(env.DB, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null),
-      updateConnectionLastUsed(env.DB, body.connection_id),
       incrementPlatformStat(env.DB, 'total_executions'),
       isSuccess ? incrementPlatformStat(env.DB, 'total_successes') : Promise.resolve(),
     ]);

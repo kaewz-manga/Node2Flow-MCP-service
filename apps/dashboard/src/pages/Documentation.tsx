@@ -101,10 +101,11 @@ export default function Documentation() {
   const [toolFilter, setToolFilter] = useState('');
   const [mcpTools, setMcpTools] = useState<Tool[]>([]);
   const [toolsLoading, setToolsLoading] = useState(false);
+  const [selectedPluginIdx, setSelectedPluginIdx] = useState(0);
 
-  const firstPlugin = plugins[0];
-  const pc = firstPlugin?.content;
-  const mcpConfigName = pc?.mcpConfigName || firstPlugin?.id || 'service';
+  const selectedPlugin = plugins[selectedPluginIdx];
+  const pc = selectedPlugin?.content;
+  const mcpConfigName = pc?.mcpConfigName || selectedPlugin?.id || 'service';
 
   // Fetch tools from Gateway API
   useEffect(() => {
@@ -170,6 +171,25 @@ export default function Documentation() {
             <p className="text-n2f-text-secondary">Learn how to integrate Node2Flow with your AI assistant</p>
           </div>
         </div>
+
+        {/* Product Selector */}
+        {plugins.length > 1 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {plugins.map((plugin, idx) => (
+              <button
+                key={plugin.id}
+                onClick={() => setSelectedPluginIdx(idx)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  idx === selectedPluginIdx
+                    ? 'bg-n2f-accent text-gray-900'
+                    : 'bg-n2f-elevated text-n2f-text-secondary hover:text-n2f-text'
+                }`}
+              >
+                {plugin.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-n2f-border">

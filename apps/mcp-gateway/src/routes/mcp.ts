@@ -135,6 +135,14 @@ export async function handleMcpRequest(
 
         const isError = result.isError || false;
 
+        // Update connection last_used_at in products-db (non-blocking)
+        ctx.waitUntil(
+          env.DB.prepare('UPDATE connections SET last_used_at = ? WHERE id = ?')
+            .bind(new Date().toISOString(), authContext.connection.id)
+            .run()
+            .catch(() => {})
+        );
+
         // Report usage to Platform (non-blocking via service binding)
         ctx.waitUntil(
           env.PLATFORM.fetch(

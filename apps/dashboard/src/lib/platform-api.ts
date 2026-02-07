@@ -351,8 +351,23 @@ export async function getAdminUsageTimeseries(days?: number): Promise<ApiRespons
   return platformRequest(`/api/admin/analytics/usage${days ? `?days=${days}` : ''}`);
 }
 
-export async function getAdminTopTools(days?: number): Promise<ApiResponse<{ tools: TopTool[] }>> {
-  return platformRequest(`/api/admin/analytics/tools${days ? `?days=${days}` : ''}`);
+export async function getAdminTopTools(days?: number, product?: string): Promise<ApiResponse<{ tools: TopTool[] }>> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  if (product) params.set('product', product);
+  const qs = params.toString();
+  return platformRequest(`/api/admin/analytics/tools${qs ? `?${qs}` : ''}`);
+}
+
+export interface ProductUsage {
+  product: string;
+  requests: number;
+  errors: number;
+  avg_response_ms: number;
+}
+
+export async function getAdminUsageByProduct(days?: number): Promise<ApiResponse<{ products: ProductUsage[] }>> {
+  return platformRequest(`/api/admin/analytics/by-product${days ? `?days=${days}` : ''}`);
 }
 
 export async function getAdminTopUsers(days?: number): Promise<ApiResponse<{ users: TopUser[] }>> {

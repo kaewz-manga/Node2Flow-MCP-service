@@ -152,10 +152,8 @@ export async function deleteUser(db: D1Database, userId: string): Promise<void> 
     .bind('revoked', userId)
     .run();
 
-  await db
-    .prepare('UPDATE n8n_connections SET status = ? WHERE user_id = ?')
-    .bind('deleted', userId)
-    .run();
+  // Note: connections live in Gateway's products-db, not platform-db
+  // Gateway handles connection cleanup separately
 }
 
 // ============================================
@@ -250,6 +248,6 @@ export async function hardDeleteUser(db: D1Database, userId: string): Promise<vo
   await db.prepare('DELETE FROM api_keys WHERE user_id = ?').bind(userId).run();
   await db.prepare('DELETE FROM bot_connections WHERE user_id = ?').bind(userId).run();
   await db.prepare('DELETE FROM ai_connections WHERE user_id = ?').bind(userId).run();
-  await db.prepare('DELETE FROM n8n_connections WHERE user_id = ?').bind(userId).run();
+  // Note: connections live in Gateway's products-db, not platform-db
   await db.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
 }

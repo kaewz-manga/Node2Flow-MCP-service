@@ -19,7 +19,9 @@ import {
   getAdminStats,
   getUsageTimeseries,
   getTopTools,
+  getTopToolsByProduct,
   getTopUsers,
+  getUsageByProduct,
   getPlanDistribution,
   getRecentErrors,
   getErrorTrend,
@@ -120,8 +122,18 @@ export async function handleAdminRoutes(
   }
   if (path === '/api/admin/analytics/tools' && method === 'GET') {
     const params = new URL(request.url).searchParams;
-    const tools = await getTopTools(env.DB, parseInt(params.get('days') || '30'), parseInt(params.get('limit') || '10'));
+    const days = parseInt(params.get('days') || '30');
+    const limit = parseInt(params.get('limit') || '10');
+    const product = params.get('product') || undefined;
+    const tools = product
+      ? await getTopToolsByProduct(env.DB, product, days, limit)
+      : await getTopTools(env.DB, days, limit);
     return apiResponse({ success: true, data: { tools } });
+  }
+  if (path === '/api/admin/analytics/by-product' && method === 'GET') {
+    const days = parseInt(new URL(request.url).searchParams.get('days') || '30');
+    const products = await getUsageByProduct(env.DB, days);
+    return apiResponse({ success: true, data: { products } });
   }
   if (path === '/api/admin/analytics/top-users' && method === 'GET') {
     const params = new URL(request.url).searchParams;
