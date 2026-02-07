@@ -2,6 +2,7 @@ import type { MCPPlugin } from './types';
 import { n8nPlugin } from './plugins/n8n';
 import { wordpressPlugin } from './plugins/wordpress';
 import { clN8nMcpPlugin } from './plugins/cl-n8n-mcp';
+import { geminiRagPlugin } from './plugins/gemini-rag';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -9,6 +10,7 @@ const PLUGINS = new Map<string, MCPPlugin>();
 PLUGINS.set('n8n', n8nPlugin);
 PLUGINS.set('wordpress', wordpressPlugin);
 PLUGINS.set('cl-n8n-mcp', clN8nMcpPlugin);
+PLUGINS.set('gemini-rag', geminiRagPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

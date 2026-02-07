@@ -174,7 +174,37 @@ const clN8nMcpPlugin: AppPlugin = {
 };
 
 // ============================================
+// Gemini RAG Plugin
+// ============================================
+
+import { geminiRagContent } from './gemini-rag/content';
+import {
+  Database,
+  Link as GeminiLinkIcon,
+  FolderOpen,
+  FileSearch,
+} from 'lucide-react';
+
+const geminiRagPlugin: AppPlugin = {
+  id: 'gemini-rag',
+  name: 'Gemini RAG',
+  icon: Database,
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/gemini-rag/connections', icon: GeminiLinkIcon },
+    { name: 'Stores', href: '/gemini-rag/stores', icon: FolderOpen },
+    { name: 'Documents', href: '/gemini-rag/documents', icon: FileSearch },
+  ],
+  routes: [
+    { path: '/gemini-rag/connections', component: lazy(() => import('./gemini-rag/Connections')) },
+    { path: '/gemini-rag/stores', component: lazy(() => import('./gemini-rag/StoreList')) },
+    { path: '/gemini-rag/documents', component: lazy(() => import('./gemini-rag/DocumentList')) },
+  ],
+  content: geminiRagContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin];
