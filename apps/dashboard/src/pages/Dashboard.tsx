@@ -252,7 +252,7 @@ export default function Dashboard() {
             Your Connections
           </h2>
           <Link
-            to="/connections"
+            to="/n8n/connections"
             className="text-sm text-n2f-accent hover:text-n2f-accent-light flex items-center gap-1"
           >
             View all
@@ -264,7 +264,7 @@ export default function Dashboard() {
           <div className="text-center py-8">
             <LinkIcon className="h-12 w-12 text-n2f-text-muted mx-auto mb-3" />
             <p className="text-n2f-text-secondary mb-4">No connections yet</p>
-            <Link to="/connections" className="btn-primary">
+            <Link to="/n8n/connections" className="btn-primary">
               Add your first n8n connection
             </Link>
           </div>
@@ -307,7 +307,7 @@ export default function Dashboard() {
             <li>Configure your MCP client (Claude Desktop, Cursor, etc.)</li>
             <li>Start automating with AI!</li>
           </ol>
-          <Link to="/connections" className="btn-primary mt-4 inline-flex">
+          <Link to="/n8n/connections" className="btn-primary mt-4 inline-flex">
             Get Started
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
