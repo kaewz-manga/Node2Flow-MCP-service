@@ -162,21 +162,36 @@ Extracted from `n8n-management-mcp/dashboard/`:
    - Vite build: 1810 modules, 3.56s, all plugin pages code-split
    - dashboard-core also passes TypeScript check independently
 
-### What's Left: Deployment
+### Deployment (Done - 2026-02-07)
 
-1. **DNS + URL changes**:
-   - Platform: `platform.node2flow.net`
-   - Gateway: `mcp.node2flow.net`
-   - Dashboard: `app.node2flow.net`
-   - Update OAuth redirect URLs + Stripe webhook URL
+All infrastructure deployed and verified:
 
-2. **Deployment**:
-   - Create D1 databases: `wrangler d1 create node2flow-platform-db` + `node2flow-products-db`
-   - Set secrets: `wrangler secret put JWT_SECRET`, `ENCRYPTION_KEY`, etc.
-   - Run data migration scripts
-   - Deploy Workers: `wrangler deploy` in each app
-   - Deploy Dashboard: CF Pages
-   - Verify: full flow login → connections → MCP tools → billing
+| Resource | URL / ID | Status |
+|----------|----------|--------|
+| Platform Worker | `platform.node2flow.net` | ✅ Live |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (27 tools) |
+| Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
+| D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
+| D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
+| KV: RATE_LIMIT_KV | `45d5d994b649440ab34e4f0a3a5eaa66` | ✅ Reused |
+| KV: OAUTH_STATE_KV | `a65a07688d774d56bb915cf9e961881a` | ✅ New |
+| OAuth (GitHub/Google) | redirect URIs updated | ✅ |
+| Secrets | JWT_SECRET, ENCRYPTION_KEY, OAuth, Resend | ✅ Fresh keys |
+
+**Deployment commit**: `a38af50`
+
+**Issues fixed during deployment**:
+1. OAuth redirect URI path: `/api/auth/oauth/{provider}/callback` (not `/callback/{provider}`)
+2. `APP_URL` secret must be set to `https://app.node2flow.net` for OAuth redirect
+3. Dashboard crash: `usage.connections` undefined (connections live in Gateway DB, not Platform DB)
+
+**Data**: Fresh start, no migration from old system. New ENCRYPTION_KEY + JWT_SECRET.
+
+### What's Left
+
+1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
+2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
+3. **Custom domain for old system** - `n8n-management-mcp.node2flow.net` still live separately
 
 ---
 
@@ -327,11 +342,12 @@ Node2Flow-MCP-service/
 
 ## Critical Warnings
 
-- **ENCRYPTION_KEY**: ใช้ key เดียวกันกับ `n8n-management-mcp` ห้ามเปลี่ยน
+- **ENCRYPTION_KEY**: Fresh key ใหม่ (ไม่ได้ใช้ key เดิมจาก n8n-management-mcp)
 - **JWT_SECRET**: ใช้ key เดียวกัน shared ระหว่าง Platform + Gateway
+- **APP_URL**: ต้องตั้ง secret `APP_URL=https://app.node2flow.net` บน Platform Worker (OAuth redirect)
 - **API key prefix**: `n2f_` (old `saas_` keys ไม่ทำงาน)
 - **Original repo**: `n8n-management-mcp` ยังทำงานปกติ ไม่ได้แก้อะไร deploy แยกกัน
-- **Migration order**: ต้อง backup DB ก่อนทำ Phase 6 data migration
+- **OAuth callback path**: `/api/auth/oauth/{provider}/callback` (ไม่ใช่ `/callback/{provider}`)
 
 ---
 
@@ -361,4 +377,5 @@ wrangler deploy                         # In each app/
 **Total code written**: ~90 files across 6 phases
 **Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
+**Deployed**: 2026-02-07 — Platform + Gateway + Dashboard all live (`a38af50`)
 **Date**: 2026-02-07
