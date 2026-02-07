@@ -111,52 +111,52 @@ export default function Register() {
   const formDisabled = !acceptedTerms;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-n2f-bg py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="inline-flex items-center gap-1 text-sm text-n2f-text-secondary hover:text-n2f-accent mb-6">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
           <div className="flex justify-center">
-            <div className="bg-n2f-accent p-3 rounded-xl">
-              <Zap className="h-8 w-8 text-gray-900" />
+            <div className="bg-primary p-3 rounded-xl">
+              <Zap className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-n2f-text">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-n2f-text-secondary">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-n2f-accent hover:text-n2f-accent-light">
+            <Link to="/login" className="font-medium text-primary hover:text-primary/80">
               Sign in
             </Link>
           </p>
         </div>
 
         {/* Terms checkbox - must accept first */}
-        <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
+        <div className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-start gap-3">
             <input
               id="terms"
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-n2f-border bg-n2f-elevated text-n2f-accent focus:ring-n2f-accent focus:ring-offset-0 cursor-pointer"
+              className="mt-1 h-4 w-4 rounded border-border bg-muted text-primary focus:ring-ring focus:ring-offset-0 cursor-pointer"
             />
-            <label htmlFor="terms" className="text-sm text-n2f-text cursor-pointer">
+            <label htmlFor="terms" className="text-sm text-foreground cursor-pointer">
               I agree to the{' '}
-              <Link to="/terms" className="text-n2f-accent hover:text-n2f-accent-light">
+              <Link to="/terms" className="text-primary hover:text-primary/80">
                 Terms of Service
               </Link>
               {' '}and{' '}
-              <Link to="/privacy" className="text-n2f-accent hover:text-n2f-accent-light">
+              <Link to="/privacy" className="text-primary hover:text-primary/80">
                 Privacy Policy
               </Link>
             </label>
           </div>
           {!acceptedTerms && (
-            <p className="mt-2 text-xs text-n2f-text-muted">
+            <p className="mt-2 text-xs text-muted-foreground">
               Please accept the terms to continue
             </p>
           )}
@@ -171,16 +171,16 @@ export default function Register() {
                 type="button"
                 onClick={() => handleOAuthLogin(provider.id)}
                 disabled={formDisabled || oauthLoading !== null}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-n2f-border rounded-lg shadow-sm bg-n2f-card hover:bg-n2f-elevated transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg shadow-sm bg-card hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {oauthLoading === provider.id ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-n2f-text-muted" />
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 ) : provider.id === 'github' ? (
-                  <GitHubIcon className="h-5 w-5 text-n2f-text" />
+                  <GitHubIcon className="h-5 w-5 text-foreground" />
                 ) : (
                   <GoogleIcon className="h-5 w-5" />
                 )}
-                <span className="text-sm font-medium text-n2f-text">
+                <span className="text-sm font-medium text-foreground">
                   Continue with {provider.name}
                 </span>
               </button>
@@ -188,10 +188,10 @@ export default function Register() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-n2f-border" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-n2f-bg text-n2f-text-muted">Or register with email</span>
+                <span className="px-2 bg-background text-muted-foreground">Or register with email</span>
               </div>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="mt-1 text-xs text-n2f-text-muted">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Must be at least 8 characters
               </p>
             </div>

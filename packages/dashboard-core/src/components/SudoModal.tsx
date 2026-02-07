@@ -91,18 +91,18 @@ export default function SudoModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-n2f-card border border-n2f-border rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+      <div className="bg-card border border-border rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="bg-n2f-accent/10 p-2 rounded-full">
-              <Shield className="h-5 w-5 text-n2f-accent" />
+            <div className="bg-primary/10 p-2 rounded-full">
+              <Shield className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-n2f-text">Security Verification</h3>
+            <h3 className="text-lg font-semibold text-foreground">Security Verification</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-n2f-text-muted hover:text-n2f-text p-1"
+            className="text-muted-foreground hover:text-foreground p-1"
             disabled={loading}
           >
             <X className="h-5 w-5" />
@@ -112,7 +112,7 @@ export default function SudoModal({
         {/* Step: Verify */}
         {step === 'verify' && (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-sm text-n2f-text-secondary">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Smartphone className="h-4 w-4" />
               <span>Enter the 6-digit code from your authenticator app</span>
             </div>
@@ -130,7 +130,7 @@ export default function SudoModal({
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
                   disabled={loading}
-                  className="w-12 h-14 text-center text-2xl font-bold bg-n2f-elevated border border-n2f-border rounded-lg text-n2f-text focus:outline-none focus:ring-2 focus:ring-n2f-accent disabled:opacity-50"
+                  className="w-12 h-14 text-center text-2xl font-bold bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                 />
               ))}
             </div>
@@ -144,11 +144,11 @@ export default function SudoModal({
 
             {loading && (
               <div className="flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-n2f-accent" />
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
             )}
 
-            <p className="text-xs text-n2f-text-muted text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Open Google Authenticator, Authy, or your preferred authenticator app
             </p>
           </div>
@@ -160,8 +160,8 @@ export default function SudoModal({
             <div className="bg-emerald-900/30 p-3 rounded-full w-fit mx-auto mb-4">
               <CheckCircle className="h-8 w-8 text-emerald-400" />
             </div>
-            <p className="text-n2f-text font-medium">Verification Successful</p>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+            <p className="text-foreground font-medium">Verification Successful</p>
+            <p className="text-sm text-muted-foreground mt-1">
               Sudo mode active for 15 minutes
             </p>
           </div>

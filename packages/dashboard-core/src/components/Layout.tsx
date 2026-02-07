@@ -78,7 +78,7 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-n2f-bg">
+    <div className="min-h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -89,22 +89,22 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-n2f-card border-r border-n2f-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-n2f-border">
-            <div className="bg-n2f-accent p-2 rounded-lg">
-              <Zap className="h-5 w-5 text-gray-900" />
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
+            <div className="bg-primary p-2 rounded-lg">
+              <Zap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-n2f-text">Node2Flow</span>
+            <span className="font-semibold text-foreground">Node2Flow</span>
             <button
               className="ml-auto lg:hidden"
               onClick={() => setSidebarOpen(false)}
             >
-              <X className="h-5 w-5 text-n2f-text-secondary" />
+              <X className="h-5 w-5 text-muted-foreground" />
             </button>
           </div>
 
@@ -118,8 +118,8 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
                   to={item.href}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-n2f-accent/10 text-n2f-accent'
-                      : 'text-n2f-text-secondary hover:bg-n2f-elevated'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
@@ -131,10 +131,10 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
 
             {/* Dynamic Plugin Sections */}
             {plugins.map((plugin) => (
-              <div key={plugin.id} className="pt-4 mt-4 border-t border-n2f-border">
+              <div key={plugin.id} className="pt-4 mt-4 border-t border-border">
                 <button
                   onClick={() => togglePlugin(plugin.id)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-n2f-text-secondary hover:bg-n2f-elevated w-full"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted w-full"
                 >
                   <plugin.icon className="h-5 w-5" />
                   <span className="flex-1 text-left">{plugin.name}</span>
@@ -148,7 +148,7 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
                         <select
                           value={activeConnection?.id || ''}
                           onChange={(e) => setActiveConnectionId(e.target.value)}
-                          className="w-full text-xs px-2 py-1.5 border border-n2f-border rounded-lg bg-n2f-card text-n2f-text-secondary focus:ring-2 focus:ring-n2f-accent"
+                          className="w-full text-xs px-2 py-1.5 border border-border rounded-lg bg-card text-muted-foreground focus:ring-2 focus:ring-ring"
                         >
                           {connections
                             .filter(c => c.product_type === plugin.id)
@@ -166,8 +166,8 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
                           to={item.href}
                           className={`flex items-center gap-3 px-3 py-2 ml-2 rounded-lg text-sm font-medium transition-colors ${
                             isActive
-                              ? 'bg-n2f-accent/10 text-n2f-accent'
-                              : 'text-n2f-text-muted hover:bg-n2f-elevated'
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-muted'
                           }`}
                           onClick={() => setSidebarOpen(false)}
                         >
@@ -182,8 +182,8 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
             ))}
 
             {/* Resources */}
-            <div className="pt-4 mt-4 border-t border-n2f-border">
-              <p className="px-3 mb-1 text-xs font-semibold text-n2f-text-muted uppercase tracking-wider">Resources</p>
+            <div className="pt-4 mt-4 border-t border-border">
+              <p className="px-3 mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
               {resourceNavigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
@@ -192,8 +192,8 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
                     to={item.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-n2f-accent/10 text-n2f-accent'
-                        : 'text-n2f-text-secondary hover:bg-n2f-elevated'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:bg-muted'
                     }`}
                     onClick={() => setSidebarOpen(false)}
                   >
@@ -206,7 +206,7 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
 
             {/* Admin Panel */}
             {isAdmin && (
-              <div className="pt-4 mt-4 border-t border-n2f-border">
+              <div className="pt-4 mt-4 border-t border-border">
                 <Link
                   to="/admin"
                   className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/30"
@@ -220,19 +220,19 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
           </nav>
 
           {/* User section */}
-          <div className="p-4 border-t border-n2f-border">
+          <div className="p-4 border-t border-border">
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-n2f-text truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.email}
                 </p>
-                <p className="text-xs text-n2f-text-secondary capitalize">
+                <p className="text-xs text-muted-foreground capitalize">
                   {user?.plan} plan
                 </p>
               </div>
               <button
                 onClick={logout}
-                className="p-2 text-n2f-text-muted hover:text-n2f-text rounded-lg hover:bg-n2f-elevated"
+                className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted"
                 title="Sign out"
               >
                 <LogOut className="h-5 w-5" />
@@ -245,19 +245,19 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Mobile header */}
-        <header className="sticky top-0 z-30 bg-n2f-card border-b border-n2f-border lg:hidden">
+        <header className="sticky top-0 z-30 bg-card border-b border-border lg:hidden">
           <div className="flex items-center gap-4 px-4 py-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 -ml-2 text-n2f-text-secondary hover:text-n2f-text"
+              className="p-2 -ml-2 text-muted-foreground hover:text-foreground"
             >
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="bg-n2f-accent p-1.5 rounded-lg">
-                <Zap className="h-4 w-4 text-gray-900" />
+              <div className="bg-primary p-1.5 rounded-lg">
+                <Zap className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-n2f-text">Node2Flow</span>
+              <span className="font-semibold text-foreground">Node2Flow</span>
             </div>
           </div>
         </header>

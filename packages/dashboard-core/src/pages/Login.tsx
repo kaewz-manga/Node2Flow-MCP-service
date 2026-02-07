@@ -89,24 +89,24 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-n2f-bg py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="inline-flex items-center gap-1 text-sm text-n2f-text-secondary hover:text-n2f-accent mb-6">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
           <div className="flex justify-center">
-            <div className="bg-n2f-accent p-3 rounded-xl">
-              <Zap className="h-8 w-8 text-gray-900" />
+            <div className="bg-primary p-3 rounded-xl">
+              <Zap className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-n2f-text">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-n2f-text-secondary">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Or{' '}
-            <Link to="/register" className="font-medium text-n2f-accent hover:text-n2f-accent-light">
+            <Link to="/register" className="font-medium text-primary hover:text-primary/80">
               create a new account
             </Link>
           </p>
@@ -121,16 +121,16 @@ export default function Login() {
                 type="button"
                 onClick={() => handleOAuthLogin(provider.id)}
                 disabled={oauthLoading !== null}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-n2f-border rounded-lg shadow-sm bg-n2f-card hover:bg-n2f-elevated transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg shadow-sm bg-card hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {oauthLoading === provider.id ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-n2f-text-muted" />
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 ) : provider.id === 'github' ? (
-                  <GitHubIcon className="h-5 w-5 text-n2f-text" />
+                  <GitHubIcon className="h-5 w-5 text-foreground" />
                 ) : (
                   <GoogleIcon className="h-5 w-5" />
                 )}
-                <span className="text-sm font-medium text-n2f-text">
+                <span className="text-sm font-medium text-foreground">
                   Continue with {provider.name}
                 </span>
               </button>
@@ -138,10 +138,10 @@ export default function Login() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-n2f-border" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-n2f-bg text-n2f-text-muted">Or continue with email</span>
+                <span className="px-2 bg-background text-muted-foreground">Or continue with email</span>
               </div>
             </div>
           </div>
