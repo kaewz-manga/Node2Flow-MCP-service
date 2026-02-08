@@ -74,6 +74,7 @@ export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton, InputGr
 export { Toaster } from './components/ui/sonner';
 export { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from './components/ui/alert-dialog';
 export { Switch } from './components/ui/switch';
+export { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator, ItemHeader, ItemFooter } from './components/ui/item';
 
 // Hooks
 export { useSudo } from './hooks/useSudo';
