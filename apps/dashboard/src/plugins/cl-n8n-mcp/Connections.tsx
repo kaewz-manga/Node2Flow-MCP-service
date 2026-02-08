@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon } from '@node2flow/dashboard-core';
 import {
   Plus,
   Trash2,
@@ -15,10 +15,11 @@ import {
   RefreshCw,
   Shield,
   Cpu,
+  Globe,
+  Lock,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -350,67 +351,77 @@ export default function Connections() {
               </Alert>
             )}
 
-            <div>
-              <Label>Connection Name</Label>
-              <Input
-                type="text"
-                placeholder="My Workflow Builder"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
+            <Field>
+              <FieldLabel>Connection Name</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput
+                  type="text"
+                  placeholder="My Workflow Builder"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </Field>
 
-            <div>
-              <Label>MCP URL</Label>
-              <Input
-                type="url"
-                placeholder="https://cl-n8n-mcp.node2flow.net"
-                value={formMcpUrl}
-                onChange={(e) => setFormMcpUrl(e.target.value)}
-                required
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Your cl-n8n-mcp server URL</p>
-            </div>
+            <Field>
+              <FieldLabel>MCP URL</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupInput
+                  type="url"
+                  placeholder="https://cl-n8n-mcp.node2flow.net"
+                  value={formMcpUrl}
+                  onChange={(e) => setFormMcpUrl(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>Your cl-n8n-mcp server URL</FieldDescription>
+            </Field>
 
-            <div>
-              <Label>Auth Token</Label>
-              <Input
-                type="password"
-                placeholder="n2f_xxx or your auth token"
-                value={formAuthToken}
-                onChange={(e) => setFormAuthToken(e.target.value)}
-                required
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Your cl-n8n-mcp authentication token or n2f_ API key</p>
-            </div>
+            <Field>
+              <FieldLabel>Auth Token</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupInput
+                  type="password"
+                  placeholder="n2f_xxx or your auth token"
+                  value={formAuthToken}
+                  onChange={(e) => setFormAuthToken(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>Your cl-n8n-mcp authentication token or n2f_ API key</FieldDescription>
+            </Field>
 
-            <div>
-              <Label>n8n URL <span className="text-muted-foreground">(optional)</span></Label>
-              <Input
-                type="url"
-                placeholder="https://your-n8n.example.com"
-                value={formN8nUrl}
-                onChange={(e) => setFormN8nUrl(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Your n8n instance URL for workflow management tools</p>
-            </div>
+            <Field>
+              <FieldLabel optional>n8n URL</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupInput
+                  type="url"
+                  placeholder="https://your-n8n.example.com"
+                  value={formN8nUrl}
+                  onChange={(e) => setFormN8nUrl(e.target.value)}
+                />
+              </InputGroup>
+              <FieldDescription>Your n8n instance URL for workflow management tools</FieldDescription>
+            </Field>
 
-            <div>
-              <Label>n8n API Key <span className="text-muted-foreground">(optional)</span></Label>
-              <Input
-                type="password"
-                placeholder="Your n8n REST API key"
-                value={formN8nApiKey}
-                onChange={(e) => setFormN8nApiKey(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Required for workflow management tools (create, test, deploy)</p>
-            </div>
+            <Field>
+              <FieldLabel optional>n8n API Key</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupInput
+                  type="password"
+                  placeholder="Your n8n REST API key"
+                  value={formN8nApiKey}
+                  onChange={(e) => setFormN8nApiKey(e.target.value)}
+                />
+              </InputGroup>
+              <FieldDescription>Required for workflow management tools (create, test, deploy)</FieldDescription>
+            </Field>
 
             <div className="flex gap-3 pt-2">
               <Button

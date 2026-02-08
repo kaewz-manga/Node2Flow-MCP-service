@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useAuth, useSudoContext, type Connection } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useAuth, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon } from '@node2flow/dashboard-core';
 import {
   Plus,
   Trash2,
@@ -15,10 +15,11 @@ import {
   RefreshCw,
   Shield,
   Server,
+  Globe,
+  Lock,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -377,47 +378,49 @@ export default function Connections() {
               </Alert>
             )}
 
-            <div>
-              <Label>Connection Name</Label>
-              <Input
-                type="text"
-                placeholder="My n8n Instance"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
+            <Field>
+              <FieldLabel>Connection Name</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput
+                  type="text"
+                  placeholder="My n8n Instance"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </Field>
 
-            <div>
-              <Label>n8n URL</Label>
-              <Input
-                type="url"
-                placeholder="https://your-n8n.example.com"
-                value={formUrl}
-                onChange={(e) => setFormUrl(e.target.value)}
-                required
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                The base URL of your n8n instance
-              </p>
-            </div>
+            <Field>
+              <FieldLabel>n8n URL</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupInput
+                  type="url"
+                  placeholder="https://your-n8n.example.com"
+                  value={formUrl}
+                  onChange={(e) => setFormUrl(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>The base URL of your n8n instance</FieldDescription>
+            </Field>
 
-            <div>
-              <Label>n8n API Key</Label>
-              <Input
-                type="password"
-                placeholder="n8n_api_..."
-                value={formApiKey}
-                onChange={(e) => setFormApiKey(e.target.value)}
-                required
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Generate from n8n Settings &rarr; API
-              </p>
-            </div>
+            <Field>
+              <FieldLabel>n8n API Key</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupInput
+                  type="password"
+                  placeholder="n8n_api_..."
+                  value={formApiKey}
+                  onChange={(e) => setFormApiKey(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>Generate from n8n Settings &rarr; API</FieldDescription>
+            </Field>
 
             <div className="flex gap-3 pt-2">
               <Button

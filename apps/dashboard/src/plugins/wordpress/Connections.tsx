@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon } from '@node2flow/dashboard-core';
 import {
   Plus,
   Trash2,
@@ -15,11 +15,12 @@ import {
   RefreshCw,
   Shield,
   Globe,
+  Lock,
+  Tag,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -330,27 +331,39 @@ export default function Connections() {
                 <AlertDescription>{formError}</AlertDescription>
               </Alert>
             )}
-            <div>
-              <Label>Connection Name</Label>
-              <Input type="text" placeholder="My WordPress Site" value={formName} onChange={(e) => setFormName(e.target.value)} required />
-            </div>
-            <div>
-              <Label>Site URL</Label>
-              <Input type="url" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
-              <p className="text-xs text-muted-foreground mt-1">Your WordPress site URL (without /wp-admin)</p>
-            </div>
-            <div>
-              <Label>Username</Label>
-              <Input type="text" placeholder="admin" value={formUsername} onChange={(e) => setFormUsername(e.target.value)} required />
-              <p className="text-xs text-muted-foreground mt-1">Your WordPress login username</p>
-            </div>
-            <div>
-              <Label>Application Password</Label>
-              <Input type="password" placeholder="xxxx xxxx xxxx xxxx" value={formAppPassword} onChange={(e) => setFormAppPassword(e.target.value)} required />
-              <p className="text-xs text-muted-foreground mt-1">
+            <Field>
+              <FieldLabel>Connection Name</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput type="text" placeholder="My WordPress Site" value={formName} onChange={(e) => setFormName(e.target.value)} required />
+              </InputGroup>
+            </Field>
+            <Field>
+              <FieldLabel>Site URL</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupInput type="url" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
+              </InputGroup>
+              <FieldDescription>Your WordPress site URL (without /wp-admin)</FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel>Username</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><User /></InputGroupAddon>
+                <InputGroupInput type="text" placeholder="admin" value={formUsername} onChange={(e) => setFormUsername(e.target.value)} required />
+              </InputGroup>
+              <FieldDescription>Your WordPress login username</FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel>Application Password</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupInput type="password" placeholder="xxxx xxxx xxxx xxxx" value={formAppPassword} onChange={(e) => setFormAppPassword(e.target.value)} required />
+              </InputGroup>
+              <FieldDescription>
                 From Users &rarr; Profile &rarr; Application Passwords (spaces will be removed automatically)
-              </p>
-            </div>
+              </FieldDescription>
+            </Field>
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)} className="flex-1">Cancel</Button>
               <Button type="submit" disabled={formLoading} className="flex-1">

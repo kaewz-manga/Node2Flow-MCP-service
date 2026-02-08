@@ -46,6 +46,10 @@ export { default as AdminRoute } from './components/AdminRoute';
 export { default as SudoModal } from './components/SudoModal';
 export { default as FeedbackBubble } from './components/FeedbackBubble';
 
+// UI Components (re-export for plugins)
+export { Field, FieldLabel, FieldDescription, FieldError } from './components/ui/field';
+export { InputGroup, InputGroupInput, InputGroupAddon } from './components/ui/input-group';
+
 // Hooks
 export { useSudo } from './hooks/useSudo';
 
