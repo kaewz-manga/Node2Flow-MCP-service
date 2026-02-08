@@ -337,6 +337,26 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
 
 6. **25 files changed**: 846 insertions, 217 deletions
 
+### Session 18: Dashboard Page Visual Redesign (2026-02-08)
+
+1. **Dashboard.tsx rewritten** with shadcn SectionCards pattern (`a39e53b`):
+   - Gradient stat cards: `bg-gradient-to-t from-primary/5 to-card`
+   - `CardDescription` (label) → `CardTitle` (big number) → `CardFooter` (icon + context)
+   - 4 stats: Current Plan, Connected Services (x/7), Requests This Month, Success Rate
+
+2. **Platform stats strip**: Inline `Users · Executions · Pass Rate` with vertical `Separator`s
+
+3. **Services grid** (4 columns on desktop):
+   - Each plugin card: icon + name + tagline + tool count + Connect/Manage button
+   - Connected services: green left border (`border-l-4 border-l-emerald-500`) + "Connected" badge
+   - `TOOL_COUNTS` map for displaying per-plugin tool counts
+
+4. **Two-column layout**:
+   - Left 2/3: Connections Table (`Table, TableHeader, TableBody, TableRow, TableCell`)
+   - Right 1/3: Daily Rate Limit (Progress bar) + MCP Endpoint card (or Quick Start for new users)
+
+5. **1 file changed**: 290 insertions, 222 deletions
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -550,6 +570,7 @@ wrangler deploy                         # In each app/
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
 **Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 refactor + UI consolidation
 **Session 17**: Toast/AlertDialog/Switch + replaced 68 alert(), 9 native select, confirm() across 25 files
+**Session 18**: Dashboard page visual redesign — SectionCards pattern, gradient stats, services grid, connections table
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
