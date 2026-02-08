@@ -307,6 +307,36 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
    - Deleted all 19 duplicate UI files from `apps/dashboard/src/components/ui/`
    - Single source of truth: all UI components now live only in `packages/dashboard-core/`
 
+### Session 17: shadcn Toast, AlertDialog, Switch + Native HTML Replacement (2026-02-08)
+
+1. **3 new shadcn components created** (`7ab1e28`):
+   - `sonner.tsx` — Toast notifications (dark theme, replaces `alert()`)
+   - `alert-dialog.tsx` — Confirmation dialogs (replaces `confirm()`)
+   - `switch.tsx` — Toggle switch (replaces button toggles)
+   - New deps: `sonner`, `@radix-ui/react-alert-dialog`, `@radix-ui/react-switch`
+   - `<Toaster />` added to Layout.tsx root
+
+2. **68 `alert()` → `toast.success()`/`toast.error()`**:
+   - 7 Connections.tsx (all plugins: n8n, wordpress, cl-n8n-mcp, gemini-rag, line, telegram, notion)
+   - 6 n8n plugin pages: CredentialList, ExecutionList, WorkflowList, TagList, VariableList, N8nUserList
+   - 2 admin pages: AdminUsers, AdminFeedback
+
+3. **`confirm()` → AlertDialog**:
+   - 7 Connections.tsx — delete connection, revoke API key
+   - AdminUsers.tsx — delete user
+   - Each uses state pattern: `deleteTarget` state → open dialog → confirm → execute
+
+4. **9 native `<select>` → shadcn Select**:
+   - AdminFeedback.tsx — status filter, category filter, status in modal (3)
+   - AdminAnalytics.tsx — days filter, product filter (2)
+   - AdminUsers.tsx — plan filter, status filter, plan change (3)
+   - ExecutionList.tsx — status filter (1)
+   - Used `"all"` as default value (shadcn Select doesn't allow empty string)
+
+5. **Switch component**: AdminSystem.tsx — maintenance mode toggle button → Switch
+
+6. **25 files changed**: 846 insertions, 217 deletions
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -406,10 +436,11 @@ Node2Flow-MCP-service/
 │       └── src/
 │           ├── contexts/              # AuthContext, SudoContext, ConnectionContext
 │           ├── components/            # Layout, AdminLayout, AdminRoute, SudoModal, FeedbackBubble
-│           │   └── ui/               # shadcn/ui: Button, Card, Input, Select, Badge, Table,
-│           │                          #   Dialog, Alert, Tabs, Tooltip, Separator, Label,
-│           │                          #   Textarea, Progress, Sheet, Skeleton, Sidebar,
-│           │                          #   Collapsible, DropdownMenu
+│           │   └── ui/               # shadcn/ui: 26 components — Button, Card, Input, Select,
+│           │                          #   Badge, Table, Dialog, Alert, AlertDialog, Tabs, Tooltip,
+│           │                          #   Separator, Label, Textarea, Progress, Sheet, Skeleton,
+│           │                          #   Sidebar, Collapsible, DropdownMenu, Sonner (Toast),
+│           │                          #   Switch, Field, InputGroup, Popover, InputOTP, Avatar
 │           ├── pages/                 # Login, Register
 │           ├── hooks/                 # useSudo, use-mobile
 │           └── index.ts              # Barrel export
@@ -518,6 +549,7 @@ wrangler deploy                         # In each app/
 **Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
 **Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 refactor + UI consolidation
+**Session 17**: Toast/AlertDialog/Switch + replaced 68 alert(), 9 native select, confirm() across 25 files
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
