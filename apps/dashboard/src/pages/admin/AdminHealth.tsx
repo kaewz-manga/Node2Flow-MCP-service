@@ -27,18 +27,10 @@ export default function AdminHealth() {
     fetch();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   const maxErrors = Math.max(...trend.map(d => d.count), 1);
   const totalErrors = trend.reduce((sum, d) => sum + d.count, 0);
 
-  // Compute additional stats
+  // Compute additional stats (must be before early return to respect Rules of Hooks)
   const stats = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
     const todayErrors = trend.find(d => d.date === todayStr)?.count || 0;
@@ -50,6 +42,14 @@ export default function AdminHealth() {
     const isHealthy = totalErrors === 0;
     return { todayErrors, avgPerDay, uniqueTools, avgResponseTime, isHealthy };
   }, [errors, trend, totalErrors]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
