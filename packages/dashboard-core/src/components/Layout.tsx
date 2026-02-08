@@ -17,8 +17,8 @@ import {
   User,
 } from 'lucide-react';
 import FeedbackBubble from './FeedbackBubble';
-import { Button } from './ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +39,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -132,51 +135,72 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Plugin Sections */}
-        {plugins.map((plugin) => (
-          <SidebarGroup key={plugin.id}>
-            <SidebarGroupLabel>
-              <plugin.icon className="mr-1.5" />
-              {plugin.name}
-            </SidebarGroupLabel>
-            <SidebarMenu>
-              {/* Connection selector — hidden in icon mode */}
-              {plugin.requiresConnection && connections.filter(c => c.product_type === plugin.id).length > 0 && (
-                <li className="px-2 py-1 group-data-[collapsible=icon]:hidden">
-                  <Select
-                    value={activeConnection?.id || ''}
-                    onValueChange={(val) => setActiveConnectionId(val)}
-                  >
-                    <SelectTrigger className="h-7 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {connections
-                        .filter(c => c.product_type === plugin.id)
-                        .map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+        {/* Plugin Sections — collapsible dropdowns */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Services</SidebarGroupLabel>
+          <SidebarMenu>
+            {plugins.map((plugin) => {
+              const isPluginActive = plugin.sidebarItems.some(item =>
+                location.pathname.startsWith(item.href)
+              );
+              return (
+                <Collapsible
+                  key={plugin.id}
+                  asChild
+                  defaultOpen={isPluginActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={plugin.name} isActive={isPluginActive}>
+                        <plugin.icon />
+                        <span>{plugin.name}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {/* Connection selector */}
+                        {plugin.requiresConnection && connections.filter(c => c.product_type === plugin.id).length > 0 && (
+                          <li className="px-1 py-1">
+                            <Select
+                              value={activeConnection?.id || ''}
+                              onValueChange={(val) => setActiveConnectionId(val)}
+                            >
+                              <SelectTrigger className="h-6 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {connections
+                                  .filter(c => c.product_type === plugin.id)
+                                  .map((c) => (
+                                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </li>
+                        )}
+                        {plugin.sidebarItems.map((item) => (
+                          <SidebarMenuSubItem key={item.name}>
+                            <SidebarMenuSubButton
+                              isActive={location.pathname.startsWith(item.href)}
+                              asChild
+                            >
+                              <Link to={item.href}>
+                                <item.icon />
+                                <span>{item.name}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         ))}
-                    </SelectContent>
-                  </Select>
-                </li>
-              )}
-              {plugin.sidebarItems.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    tooltip={item.name}
-                    isActive={location.pathname.startsWith(item.href)}
-                    asChild
-                  >
-                    <Link to={item.href}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
 
         {/* Resources */}
         <SidebarGroup>
