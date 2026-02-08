@@ -47,8 +47,8 @@ export { default as SudoModal } from './components/SudoModal';
 export { default as FeedbackBubble } from './components/FeedbackBubble';
 
 // UI Components (re-export for plugins)
-export { Field, FieldLabel, FieldDescription, FieldError } from './components/ui/field';
-export { InputGroup, InputGroupInput, InputGroupAddon } from './components/ui/input-group';
+export { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldContent } from './components/ui/field';
+export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton, InputGroupText } from './components/ui/input-group';
 
 // Hooks
 export { useSudo } from './hooks/useSudo';
