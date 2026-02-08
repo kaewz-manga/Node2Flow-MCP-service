@@ -280,6 +280,19 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
    - Connections list: shows all connections (not limited to 3), with plugin icon + product badge
    - Quick Start Guide: generic steps instead of plugin-specific
 
+4. **shadcn v4 Field/InputGroup refactor** (`bd07087`):
+   - Rewrote `field.tsx` and `input-group.tsx` to match actual shadcn/ui v4 source patterns
+   - `cva` (class-variance-authority) for variant-based styling, `data-slot` attributes throughout
+   - Field: `orientation` prop (vertical/horizontal), `FieldGroup` container, `FieldContent` wrapper
+   - FieldLabel: `optional` prop with "(optional)" badge
+   - FieldError: `errors` array prop with deduplication + single/list rendering
+   - FieldDescription: auto-styled links (`[&>a]:text-primary`)
+   - InputGroupAddon: `align` prop (inline-start/inline-end), click-to-focus behavior
+   - InputGroupInput: uses `Input` component (borderless, no shadow)
+   - New: `InputGroupButton` (action button inside group), `InputGroupText` (static text)
+   - Added `data-slot="input"` to base Input component
+   - All existing plugin imports remain compatible (additive exports only)
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -490,7 +503,7 @@ wrangler deploy                         # In each app/
 **Sessions 8-9**: WordPress + cl-n8n-mcp plugins (67 gateway tools)
 **Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
-**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid on Dashboard
+**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 component refactor
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
