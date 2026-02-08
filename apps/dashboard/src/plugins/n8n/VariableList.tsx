@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { listVariables, createVariable, updateVariable, deleteVariable } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription } from '@node2flow/dashboard-core';
+
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variable } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
+
+
+
+
 
 export default function VariableList() {
   const { activeConnection } = useConnection();

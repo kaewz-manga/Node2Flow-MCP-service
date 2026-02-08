@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { createCredential, updateCredential, deleteCredential, getCredentialSchema } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Label, Card, CardContent, Textarea } from '@node2flow/dashboard-core';
+
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Trash2, Search, X, Pencil, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+
+
+
+
+
 
 export default function CredentialList() {
   const { activeConnection } = useConnection();

@@ -1,4 +1,5 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@node2flow/dashboard-core';
+
 
 const colors: Record<string, string> = {
   active: 'bg-emerald-900/30 text-emerald-400',

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, type AdminStats } from '../../lib/platform-api';
 import { Users, DollarSign, Activity, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@node2flow/dashboard-core';
+
 
 export default function AdminOverview() {
   const [stats, setStats] = useState<AdminStats | null>(null);

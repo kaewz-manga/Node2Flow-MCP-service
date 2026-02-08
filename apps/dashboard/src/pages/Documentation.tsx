@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+
 import {
   Zap,
   ArrowLeft,
@@ -23,11 +24,11 @@ import {
 } from 'lucide-react';
 import { plugins } from '../plugins/registry';
 import { getPluginTools } from '../lib/gateway-api';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+
+
+
+
+
 
 type TabId = 'quickstart' | 'tools' | 'api' | 'config' | 'errors';
 

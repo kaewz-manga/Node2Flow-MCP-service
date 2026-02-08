@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { listTags, createTag, updateTag, deleteTag } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription } from '@node2flow/dashboard-core';
+
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
+
+
+
 
 export default function TagList() {
   const { activeConnection } = useConnection();

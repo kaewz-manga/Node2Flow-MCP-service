@@ -1,6 +1,7 @@
 import { Database } from 'lucide-react';
-import { useConnection } from '@node2flow/dashboard-core';
-import { Card, CardContent } from '@/components/ui/card';
+import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+
+
 
 export default function DatabaseList() {
   const { activeConnection } = useConnection();

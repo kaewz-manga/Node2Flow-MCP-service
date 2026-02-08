@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Zap, ArrowLeft, AlertTriangle, CheckCircle, XCircle, Mail, Scale } from 'lucide-react';
-import { useAuth } from '@node2flow/dashboard-core';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { useAuth, Card, CardContent, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+
+
+
+
 
 export default function Terms() {
   const { user } = useAuth();

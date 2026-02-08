@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getPlans, getPlatformStats } from '../lib/platform-api';
 import type { Plan, PlatformStats } from '../lib/platform-api';
 import { plugins } from '../plugins/registry';
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Separator } from '@node2flow/dashboard-core';
 import {
   Zap,
   Shield,
@@ -18,10 +19,10 @@ import {
   CheckCircle,
   TrendingUp,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+
+
+
+
 
 export default function Landing() {
   const [plans, setPlans] = useState<Plan[]>([]);

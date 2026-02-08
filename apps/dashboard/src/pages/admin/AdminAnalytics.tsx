@@ -10,8 +10,9 @@ import {
   type ProductUsage,
 } from '../../lib/platform-api';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+
+
 
 const PRODUCT_LABELS: Record<string, string> = {
   'n8n': 'n8n',

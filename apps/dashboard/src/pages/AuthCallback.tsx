@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { handleOAuthToken } from '@node2flow/dashboard-core';
+import { handleOAuthToken, Button } from '@node2flow/dashboard-core';
+
 import { useAuth } from '@node2flow/dashboard-core';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 
 export default function AuthCallback() {
   const navigate = useNavigate();

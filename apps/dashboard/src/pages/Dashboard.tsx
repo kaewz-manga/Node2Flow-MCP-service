@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import type { Usage, PlatformStats } from '../lib/platform-api';
 import { getUsage, getPlatformStats } from '../lib/platform-api';
 import type { Connection } from '@node2flow/dashboard-core';
-import { getConnections } from '@node2flow/dashboard-core';
+import { getConnections, Card, CardContent, CardHeader, CardTitle, Button, Alert, AlertDescription, Progress, Badge } from '@node2flow/dashboard-core';
+
 import { useAuth } from '@node2flow/dashboard-core';
 import { plugins } from '../plugins/registry';
 import {
@@ -18,11 +19,11 @@ import {
   CheckCircle,
   Globe,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+
+
+
+
+
 
 export default function Dashboard() {
   const { user } = useAuth();

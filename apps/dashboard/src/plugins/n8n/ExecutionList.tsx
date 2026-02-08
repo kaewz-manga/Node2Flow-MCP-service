@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   listExecutions, getExecution, deleteExecution, retryExecution,
 } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription } from '@node2flow/dashboard-core';
+
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -10,10 +11,10 @@ import {
   Loader2, RefreshCw, Trash2, RotateCcw, AlertCircle, Filter,
   ChevronDown, ChevronRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
+
+
+
 
 export default function ExecutionList() {
   const { activeConnection } = useConnection();

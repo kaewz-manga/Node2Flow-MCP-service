@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { listN8nUsers, deleteN8nUser } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+
 import StatusBadge from './components/StatusBadge';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, RefreshCw, Trash2, AlertCircle, UserCog } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+
+
+
+
+
 
 export default function N8nUserList() {
   const { activeConnection } = useConnection();

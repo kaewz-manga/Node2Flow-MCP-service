@@ -7,14 +7,15 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+
 import { Loader2, RotateCcw, Trash2, AlertTriangle, Power } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+
+
+
+
+
+
 
 export default function AdminSystem() {
   const { withSudo } = useSudoContext();

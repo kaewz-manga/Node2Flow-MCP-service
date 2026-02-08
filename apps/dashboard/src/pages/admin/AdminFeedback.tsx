@@ -4,6 +4,7 @@ import {
   updateAdminFeedback,
   type AdminFeedbackItem,
 } from '../../lib/platform-api';
+import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea } from '@node2flow/dashboard-core';
 import {
   Loader2,
   ChevronLeft,
@@ -13,13 +14,13 @@ import {
   MessageSquare,
   HelpCircle,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+
+
+
+
+
+
+
 
 const categoryConfig: Record<string, { label: string; icon: typeof Bug; color: string; badgeClass: string }> = {
   bug: { label: 'Bug', icon: Bug, color: 'text-red-400', badgeClass: 'bg-red-500/10 text-red-400' },

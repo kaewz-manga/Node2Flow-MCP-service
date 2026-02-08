@@ -4,7 +4,8 @@ import {
   activateWorkflow, deactivateWorkflow, executeWorkflow,
   getWorkflowTags, updateWorkflowTags, listTags,
 } from '../../lib/gateway-api';
-import { useConnection } from '@node2flow/dashboard-core';
+import { useConnection, Button, Card, CardContent, Textarea, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -12,11 +13,11 @@ import {
   Loader2, Play, Trash2, RefreshCw, Plus, AlertCircle,
   Power, PowerOff, ChevronDown, ChevronRight, X, Save, Pencil, Tag,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+
+
+
+
+
 
 export default function WorkflowList() {
   const { activeConnection } = useConnection();

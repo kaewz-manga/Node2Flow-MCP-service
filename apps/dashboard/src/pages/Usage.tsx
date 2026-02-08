@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Usage as UsageType, Plan } from '../lib/platform-api';
 import { getUsage, getPlans, createCheckoutSession } from '../lib/platform-api';
-import { useAuth } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, Button, Alert, AlertDescription, Progress, Badge } from '@node2flow/dashboard-core';
+
 import {
   Activity,
   TrendingUp,
@@ -11,11 +12,11 @@ import {
   AlertCircle,
   ArrowUpRight,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+
+
+
+
+
 
 export default function Usage() {
   const { user } = useAuth();

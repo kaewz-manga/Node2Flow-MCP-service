@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@node2flow/dashboard-core';
+
 
 function JsonNode({ name, value, depth = 0 }: { name?: string; value: any; depth?: number }) {
   const [expanded, setExpanded] = useState(depth < 2);

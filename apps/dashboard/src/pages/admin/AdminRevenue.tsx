@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getAdminRevenueOverview, type PlanDist } from '../../lib/platform-api';
 import { Loader2, DollarSign } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+
+
 
 export default function AdminRevenue() {
   const [mrr, setMrr] = useState(0);

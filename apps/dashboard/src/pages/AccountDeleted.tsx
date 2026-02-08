@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Zap, UserX, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Button, Separator } from '@node2flow/dashboard-core';
+
+
 
 export default function AccountDeleted() {
   return (
