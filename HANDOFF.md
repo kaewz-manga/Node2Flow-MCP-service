@@ -256,6 +256,30 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
    - `@radix-ui/react-collapsible`, `@radix-ui/react-dropdown-menu` in dashboard-core
    - `use-mobile.tsx` hook for responsive sidebar behavior
 
+### Session 16: Dashboard UX Polish (2026-02-08)
+
+1. **Sidebar reorganization** (`a714715`):
+   - Moved Usage, Settings from Platform group to user DropdownMenu
+   - Moved Documentation, FAQ, Status from Resources group to user DropdownMenu
+   - Moved Admin Panel to user DropdownMenu (admin only)
+   - Platform nav = Dashboard only; removed Resources + Admin SidebarGroups
+   - Cleaner sidebar: only Dashboard + Services (collapsible plugins)
+
+2. **Field + InputGroup components** (`e9bf03b`):
+   - New `packages/dashboard-core/src/components/ui/field.tsx` — Field, FieldLabel (with `optional` prop), FieldDescription, FieldError
+   - New `packages/dashboard-core/src/components/ui/input-group.tsx` — InputGroup (shared border/focus ring), InputGroupInput, InputGroupAddon (icon container)
+   - Applied to all 7 plugin Connections.tsx forms for consistent styling
+   - Icons: Tag (name), Lock (passwords/tokens), Globe (URLs), User (username)
+
+3. **Dashboard redesign with Services Status Grid** (`2f8067f`):
+   - Replaced "Connections" stat card with "Services" (connected count / total plugins)
+   - New Services Status Grid: 4-column grid of all plugins from registry
+   - Each card: plugin icon + name + connection count + status dot (green = connected, muted = not)
+   - Click card → navigate to plugin's Connections page
+   - Auto-scales when new plugins are added to registry (reads from `plugins` array)
+   - Connections list: shows all connections (not limited to 3), with plugin icon + product badge
+   - Quick Start Guide: generic steps instead of plugin-specific
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -466,6 +490,7 @@ wrangler deploy                         # In each app/
 **Sessions 8-9**: WordPress + cl-n8n-mcp plugins (67 gateway tools)
 **Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
+**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid on Dashboard
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
