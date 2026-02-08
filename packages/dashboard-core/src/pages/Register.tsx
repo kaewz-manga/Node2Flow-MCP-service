@@ -3,7 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { register, login, getOAuthProviders, getOAuthUrl } from '../lib/api';
 import type { OAuthProvider } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Zap, ArrowLeft } from 'lucide-react';
+import { Loader2, Zap, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Separator } from '../components/ui/separator';
 
 // GitHub Icon
 function GitHubIcon({ className }: { className?: string }) {
@@ -100,14 +106,12 @@ export default function Register() {
       await refreshUser();
       navigate('/dashboard');
     } else {
-      // Registration succeeded but login failed - redirect to login
       navigate('/login');
     }
 
     setLoading(false);
   };
 
-  // Check if form should be disabled
   const formDisabled = !acceptedTerms;
 
   return (
@@ -134,61 +138,62 @@ export default function Register() {
           </p>
         </div>
 
-        {/* Terms checkbox - must accept first */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <input
-              id="terms"
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-border bg-muted text-primary focus:ring-ring focus:ring-offset-0 cursor-pointer"
-            />
-            <label htmlFor="terms" className="text-sm text-foreground cursor-pointer">
-              I agree to the{' '}
-              <Link to="/terms" className="text-primary hover:text-primary/80">
-                Terms of Service
-              </Link>
-              {' '}and{' '}
-              <Link to="/privacy" className="text-primary hover:text-primary/80">
-                Privacy Policy
-              </Link>
-            </label>
-          </div>
-          {!acceptedTerms && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Please accept the terms to continue
-            </p>
-          )}
-        </div>
+        {/* Terms checkbox */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border bg-muted text-primary focus:ring-ring focus:ring-offset-0 cursor-pointer"
+              />
+              <Label htmlFor="terms" className="text-sm text-foreground cursor-pointer font-normal leading-relaxed">
+                I agree to the{' '}
+                <Link to="/terms" className="text-primary hover:text-primary/80">
+                  Terms of Service
+                </Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="text-primary hover:text-primary/80">
+                  Privacy Policy
+                </Link>
+              </Label>
+            </div>
+            {!acceptedTerms && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Please accept the terms to continue
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* OAuth Buttons */}
         {providers.length > 0 && (
           <div className={`space-y-3 ${formDisabled ? 'opacity-50' : ''}`}>
             {providers.map((provider) => (
-              <button
+              <Button
                 key={provider.id}
                 type="button"
+                variant="outline"
                 onClick={() => handleOAuthLogin(provider.id)}
                 disabled={formDisabled || oauthLoading !== null}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg shadow-sm bg-card hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 gap-3"
               >
                 {oauthLoading === provider.id ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : provider.id === 'github' ? (
-                  <GitHubIcon className="h-5 w-5 text-foreground" />
+                  <GitHubIcon className="h-5 w-5" />
                 ) : (
                   <GoogleIcon className="h-5 w-5" />
                 )}
-                <span className="text-sm font-medium text-foreground">
-                  Continue with {provider.name}
-                </span>
-              </button>
+                <span>Continue with {provider.name}</span>
+              </Button>
             ))}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+                <Separator />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-background text-muted-foreground">Or register with email</span>
@@ -199,63 +204,55 @@ export default function Register() {
 
         <form className={`mt-8 space-y-6 ${formDisabled ? 'opacity-50' : ''}`} onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="label">
-                Email address
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
                 disabled={formDisabled}
-                className="input disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="label">
-                Password
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="new-password"
                 required
                 disabled={formDisabled}
-                className="input disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Must be at least 8 characters
               </p>
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="label">
-                Confirm password
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 autoComplete="new-password"
                 required
                 disabled={formDisabled}
-                className="input disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -263,22 +260,20 @@ export default function Register() {
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={formDisabled || loading || oauthLoading !== null}
-              className="btn-primary w-full py-3"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Creating account...
-                </>
-              ) : (
-                'Create account'
-              )}
-            </button>
-          </div>
+          <Button
+            type="submit"
+            disabled={formDisabled || loading || oauthLoading !== null}
+            className="w-full h-11"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin h-4 w-4" />
+                Creating account...
+              </>
+            ) : (
+              'Create account'
+            )}
+          </Button>
         </form>
       </div>
     </div>

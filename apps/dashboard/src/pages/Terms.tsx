@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Zap, ArrowLeft, AlertTriangle, CheckCircle, XCircle, Mail, Scale } from 'lucide-react';
 import { useAuth } from '@node2flow/dashboard-core';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
 export default function Terms() {
   const { user } = useAuth();
@@ -8,8 +11,8 @@ export default function Terms() {
   const content = (
     <>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-n2f-text mb-2">Terms of Service</h1>
-          <p className="text-n2f-text-muted">Last updated: February 5, 2026</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Terms of Service</h1>
+          <p className="text-muted-foreground">Last updated: February 5, 2026</p>
         </div>
 
         {/* Important Notice */}
@@ -28,10 +31,10 @@ export default function Terms() {
           </div>
         </div>
 
-        <div className="space-y-8 text-n2f-text-secondary">
+        <div className="space-y-8 text-muted-foreground">
           {/* 1. Agreement to Terms */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">1. Agreement to Terms</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">1. Agreement to Terms</h2>
             <p className="mb-3">
               By accessing or using Node2Flow ("Service"), you agree to be bound by these Terms of Service ("Terms").
               If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.
@@ -43,7 +46,7 @@ export default function Terms() {
 
           {/* 2. Description of Service */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">2. Description of Service</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">2. Description of Service</h2>
             <p className="mb-3">
               Node2Flow provides a hosted Model Context Protocol (MCP) server that enables AI assistants
               (such as Claude, Cursor, or other MCP-compatible clients) to interact with your n8n automation platform.
@@ -56,7 +59,7 @@ export default function Terms() {
               <li>Usage tracking and rate limiting</li>
               <li>Web dashboard for account management</li>
             </ul>
-            <p className="mt-3 text-sm text-n2f-text-muted">
+            <p className="mt-3 text-sm text-muted-foreground">
               <strong>Disclaimer:</strong> This Service is NOT affiliated with, endorsed by, or officially connected to n8n GmbH.
               "n8n" is a trademark of n8n GmbH.
             </p>
@@ -64,7 +67,7 @@ export default function Terms() {
 
           {/* 3. Account Registration */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">3. Account Registration</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">3. Account Registration</h2>
             <p className="mb-3">To use the Service, you must create an account. You agree to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide accurate and complete registration information</li>
@@ -81,13 +84,13 @@ export default function Terms() {
 
           {/* 4. API Key Management */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">4. API Key Management</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">4. API Key Management</h2>
             <p className="mb-3">API keys are used to authenticate MCP clients with the Service.</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong className="text-n2f-text">Generation:</strong> API keys are generated securely and shown only once</li>
-              <li><strong className="text-n2f-text">Storage:</strong> Keys are stored as SHA-256 hashes - we cannot retrieve your original key</li>
-              <li><strong className="text-n2f-text">Revocation:</strong> You can revoke keys at any time from the dashboard</li>
-              <li><strong className="text-n2f-text">Responsibility:</strong> You are responsible for keeping your API keys secure</li>
+              <li><strong className="text-foreground">Generation:</strong> API keys are generated securely and shown only once</li>
+              <li><strong className="text-foreground">Storage:</strong> Keys are stored as SHA-256 hashes - we cannot retrieve your original key</li>
+              <li><strong className="text-foreground">Revocation:</strong> You can revoke keys at any time from the dashboard</li>
+              <li><strong className="text-foreground">Responsibility:</strong> You are responsible for keeping your API keys secure</li>
             </ul>
             <p className="mt-3 text-yellow-400 text-sm">
               <strong>Warning:</strong> Treat API keys like passwords. Do not commit them to public repositories or share them.
@@ -96,52 +99,52 @@ export default function Terms() {
 
           {/* 5. Service Plans & Billing */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">5. Service Plans & Billing</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">5. Service Plans & Billing</h2>
 
             <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-n2f-border">
-                    <th className="text-left py-2 text-n2f-text">Plan</th>
-                    <th className="text-left py-2 text-n2f-text">Price</th>
-                    <th className="text-left py-2 text-n2f-text">Daily Limit</th>
-                    <th className="text-left py-2 text-n2f-text">Rate Limit</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-n2f-border">
-                  <tr>
-                    <td className="py-2">Free</td>
-                    <td className="py-2">$0/month</td>
-                    <td className="py-2">100 requests/day</td>
-                    <td className="py-2">50 requests/min</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2">Pro</td>
-                    <td className="py-2">$19/month</td>
-                    <td className="py-2">5,000 requests/day</td>
-                    <td className="py-2">100 requests/min</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2">Enterprise</td>
-                    <td className="py-2">Custom</td>
-                    <td className="py-2">Unlimited</td>
-                    <td className="py-2">Custom</td>
-                  </tr>
-                </tbody>
-              </table>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Daily Limit</TableHead>
+                    <TableHead>Rate Limit</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Free</TableCell>
+                    <TableCell>$0/month</TableCell>
+                    <TableCell>100 requests/day</TableCell>
+                    <TableCell>50 requests/min</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pro</TableCell>
+                    <TableCell>$19/month</TableCell>
+                    <TableCell>5,000 requests/day</TableCell>
+                    <TableCell>100 requests/min</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Enterprise</TableCell>
+                    <TableCell>Custom</TableCell>
+                    <TableCell>Unlimited</TableCell>
+                    <TableCell>Custom</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
 
             <div className="space-y-3">
-              <p><strong className="text-n2f-text">Billing:</strong> Paid plans are billed monthly via Stripe. Subscriptions auto-renew unless cancelled.</p>
-              <p><strong className="text-n2f-text">Upgrades:</strong> Plan upgrades take effect immediately with prorated billing.</p>
-              <p><strong className="text-n2f-text">Downgrades:</strong> Plan downgrades take effect at the next billing cycle.</p>
-              <p><strong className="text-n2f-text">Refunds:</strong> We do not offer refunds for partial months. You may cancel at any time.</p>
+              <p><strong className="text-foreground">Billing:</strong> Paid plans are billed monthly via Stripe. Subscriptions auto-renew unless cancelled.</p>
+              <p><strong className="text-foreground">Upgrades:</strong> Plan upgrades take effect immediately with prorated billing.</p>
+              <p><strong className="text-foreground">Downgrades:</strong> Plan downgrades take effect at the next billing cycle.</p>
+              <p><strong className="text-foreground">Refunds:</strong> We do not offer refunds for partial months. You may cancel at any time.</p>
             </div>
           </section>
 
           {/* 6. Permitted Use */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">6. Permitted Use</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">6. Permitted Use</h2>
             <p className="mb-3">You may use the Service to:</p>
             <div className="space-y-2">
               <div className="flex items-start gap-2">
@@ -165,7 +168,7 @@ export default function Terms() {
 
           {/* 7. Prohibited Uses */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">7. Prohibited Uses</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">7. Prohibited Uses</h2>
             <p className="mb-3">You may NOT use the Service to:</p>
             <div className="space-y-2">
               <div className="flex items-start gap-2">
@@ -204,7 +207,7 @@ export default function Terms() {
 
           {/* 8. AI Agent Responsibility */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">8. AI Agent Responsibility</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">8. AI Agent Responsibility</h2>
             <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-4">
               <p className="text-red-200">
                 <strong className="text-red-400">CRITICAL:</strong> You accept full responsibility for all actions
@@ -226,18 +229,18 @@ export default function Terms() {
 
           {/* 9. Intellectual Property */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">9. Intellectual Property</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">9. Intellectual Property</h2>
             <div className="space-y-3">
               <p>
-                <strong className="text-n2f-text">Your Content:</strong> You retain all rights to your n8n workflows,
+                <strong className="text-foreground">Your Content:</strong> You retain all rights to your n8n workflows,
                 credentials, and data. We do not claim ownership of your content.
               </p>
               <p>
-                <strong className="text-n2f-text">Our Service:</strong> The Service, including its design, code, and
+                <strong className="text-foreground">Our Service:</strong> The Service, including its design, code, and
                 documentation, is owned by Node2Flow. You may not copy, modify, or distribute it without permission.
               </p>
               <p>
-                <strong className="text-n2f-text">Trademarks:</strong> "Node2Flow" is our
+                <strong className="text-foreground">Trademarks:</strong> "Node2Flow" is our
                 trademarks. "n8n" is a trademark of n8n GmbH.
               </p>
             </div>
@@ -245,12 +248,12 @@ export default function Terms() {
 
           {/* 10. Third-Party Services */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">10. Third-Party Services</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">10. Third-Party Services</h2>
             <p className="mb-3">The Service relies on the following third-party providers:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong className="text-n2f-text">Cloudflare:</strong> Hosting, CDN, and DDoS protection</li>
-              <li><strong className="text-n2f-text">Stripe:</strong> Payment processing</li>
-              <li><strong className="text-n2f-text">GitHub/Google:</strong> OAuth authentication (optional)</li>
+              <li><strong className="text-foreground">Cloudflare:</strong> Hosting, CDN, and DDoS protection</li>
+              <li><strong className="text-foreground">Stripe:</strong> Payment processing</li>
+              <li><strong className="text-foreground">GitHub/Google:</strong> OAuth authentication (optional)</li>
             </ul>
             <p className="mt-3">
               Your use of the Service is also subject to the terms and privacy policies of these providers.
@@ -259,10 +262,10 @@ export default function Terms() {
 
           {/* 11. Data & Privacy */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">11. Data & Privacy</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">11. Data & Privacy</h2>
             <p className="mb-3">
               Your privacy is important to us. Please review our{' '}
-              <Link to="/privacy" className="text-n2f-accent hover:underline">Privacy Policy</Link>{' '}
+              <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>{' '}
               for detailed information about how we collect, use, and protect your data.
             </p>
             <p>Key points:</p>
@@ -276,9 +279,9 @@ export default function Terms() {
 
           {/* 12. Service Availability */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">12. Service Availability & SLA</h2>
-            <div className="bg-n2f-elevated rounded-lg p-4 mb-4">
-              <p className="text-n2f-text font-medium mb-2">Beta Status Notice</p>
+            <h2 className="text-xl font-semibold text-foreground mb-4">12. Service Availability & SLA</h2>
+            <div className="bg-muted rounded-lg p-4 mb-4">
+              <p className="text-foreground font-medium mb-2">Beta Status Notice</p>
               <p className="text-sm">
                 The Service is currently in <strong>beta</strong>. While we strive for high availability,
                 we do not guarantee any specific uptime SLA at this time.
@@ -294,9 +297,9 @@ export default function Terms() {
 
           {/* 13. Limitation of Liability */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">13. Limitation of Liability</h2>
-            <div className="bg-n2f-elevated rounded-lg p-4 mb-4">
-              <p className="font-medium text-n2f-text mb-2">Liability Cap</p>
+            <h2 className="text-xl font-semibold text-foreground mb-4">13. Limitation of Liability</h2>
+            <div className="bg-muted rounded-lg p-4 mb-4">
+              <p className="font-medium text-foreground mb-2">Liability Cap</p>
               <p className="text-sm">
                 Our maximum liability is limited to the <strong>greater of: (a) $100 USD, or (b) the total
                 amount you paid us in the 12 months preceding the claim</strong>.
@@ -315,7 +318,7 @@ export default function Terms() {
 
           {/* 14. Indemnification */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">14. Indemnification</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">14. Indemnification</h2>
             <p>
               You agree to indemnify and hold harmless Node2Flow and its affiliates from any claims,
               damages, losses, or expenses (including legal fees) arising from:
@@ -330,18 +333,18 @@ export default function Terms() {
 
           {/* 15. Termination */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">15. Termination</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">15. Termination</h2>
             <div className="space-y-3">
               <p>
-                <strong className="text-n2f-text">By You:</strong> You may terminate your account at any time
+                <strong className="text-foreground">By You:</strong> You may terminate your account at any time
                 through Dashboard &rarr; Settings &rarr; Delete Account.
               </p>
               <p>
-                <strong className="text-n2f-text">By Us:</strong> We may suspend or terminate your account
+                <strong className="text-foreground">By Us:</strong> We may suspend or terminate your account
                 immediately for violations of these Terms, without notice or refund.
               </p>
               <p>
-                <strong className="text-n2f-text">Effect:</strong> Upon termination, your right to use the
+                <strong className="text-foreground">Effect:</strong> Upon termination, your right to use the
                 Service ceases immediately. Data is retained for 30 days, then permanently deleted.
               </p>
             </div>
@@ -349,12 +352,12 @@ export default function Terms() {
 
           {/* 16. Governing Law */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">16. Governing Law & Disputes</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">16. Governing Law & Disputes</h2>
             <div className="flex items-start gap-3 mb-4">
-              <Scale className="h-5 w-5 text-n2f-accent flex-shrink-0 mt-0.5" />
+              <Scale className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
               <div>
                 <p className="mb-2">
-                  These Terms are governed by the laws of <strong className="text-n2f-text">Thailand</strong>,
+                  These Terms are governed by the laws of <strong className="text-foreground">Thailand</strong>,
                   without regard to conflict of law principles.
                 </p>
                 <p>
@@ -363,20 +366,20 @@ export default function Terms() {
                 </p>
               </div>
             </div>
-            <p className="text-sm text-n2f-text-muted">
+            <p className="text-sm text-muted-foreground">
               For EU users: Nothing in these Terms affects your statutory rights under applicable EU consumer protection laws.
             </p>
           </section>
 
           {/* 17. Contact */}
           <section>
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">17. Contact Information</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">17. Contact Information</h2>
             <p className="mb-4">For questions about these Terms or to report violations:</p>
-            <div className="bg-n2f-elevated rounded-lg p-4 flex items-center gap-3">
-              <Mail className="h-5 w-5 text-n2f-accent" />
+            <div className="bg-muted rounded-lg p-4 flex items-center gap-3">
+              <Mail className="h-5 w-5 text-primary" />
               <div>
-                <p className="text-n2f-text font-medium">Email</p>
-                <a href="mailto:legal@node2flow.net" className="text-n2f-accent hover:underline">
+                <p className="text-foreground font-medium">Email</p>
+                <a href="mailto:legal@node2flow.net" className="text-primary hover:underline">
                   legal@node2flow.net
                 </a>
               </div>
@@ -384,26 +387,31 @@ export default function Terms() {
           </section>
 
           {/* Changes Notice */}
-          <section className="bg-n2f-card border border-n2f-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-n2f-text mb-4">Changes to These Terms</h2>
-            <p>
-              We may update these Terms from time to time. We will notify you of significant changes via
-              email or in-app notification at least <strong className="text-n2f-text">14 days</strong> before
-              they take effect. Continued use of the Service after changes constitutes acceptance of the updated Terms.
-            </p>
-          </section>
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Changes to These Terms</h2>
+              <p>
+                We may update these Terms from time to time. We will notify you of significant changes via
+                email or in-app notification at least <strong className="text-foreground">14 days</strong> before
+                they take effect. Continued use of the Service after changes constitutes acceptance of the updated Terms.
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Footer navigation */}
         {!user && (
-          <div className="mt-12 pt-8 border-t border-n2f-border flex justify-between">
-            <Link to="/privacy" className="text-n2f-accent hover:underline">
-              &larr; Privacy Policy
-            </Link>
-            <Link to="/" className="text-n2f-accent hover:underline">
-              Back to Home &rarr;
-            </Link>
-          </div>
+          <>
+            <Separator className="mt-12" />
+            <div className="mt-8 flex justify-between">
+              <Link to="/privacy" className="text-primary hover:underline">
+                &larr; Privacy Policy
+              </Link>
+              <Link to="/" className="text-primary hover:underline">
+                Back to Home &rarr;
+              </Link>
+            </div>
+          </>
         )}
     </>
   );
@@ -413,17 +421,17 @@ export default function Terms() {
   }
 
   return (
-    <div className="min-h-screen bg-n2f-bg">
-      <header className="border-b border-n2f-border sticky top-0 bg-n2f-bg/95 backdrop-blur z-10">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <div className="bg-n2f-accent p-2 rounded-lg">
-                <Zap className="h-5 w-5 text-gray-900" />
+              <div className="bg-primary p-2 rounded-lg">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
+              <span className="text-xl font-bold text-foreground">Node2Flow</span>
             </Link>
-            <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
+            <Link to="/" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Link>

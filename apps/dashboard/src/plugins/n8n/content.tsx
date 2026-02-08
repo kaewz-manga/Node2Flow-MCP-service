@@ -66,20 +66,20 @@ Would you like me to activate the Data Sync Pipeline?`,
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your n8n instance:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "Production
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "Production
           n8n")
         </li>
         <li>
-          <strong className="text-n2f-text">URL:</strong> Your n8n instance URL (e.g.,
+          <strong className="text-foreground">URL:</strong> Your n8n instance URL (e.g.,
           https://n8n.example.com)
         </li>
         <li>
-          <strong className="text-n2f-text">API Key:</strong> Generated from n8n Settings → API
+          <strong className="text-foreground">API Key:</strong> Generated from n8n Settings → API
         </li>
       </ul>
     </>
@@ -96,38 +96,38 @@ Would you like me to activate the Data Sync Pipeline?`,
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Multiple n8n Instances</h2>
-        <p className="text-n2f-text-secondary mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Multiple n8n Instances</h2>
+        <p className="text-muted-foreground mb-4">
           If you have multiple n8n connections, the MCP server will use the first one by default. You
           can switch connections using the{' '}
-          <code className="bg-n2f-elevated px-1 rounded">switch_connection</code> tool.
+          <code className="bg-muted px-1 rounded">switch_connection</code> tool.
         </p>
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">n8n API Key Permissions</h2>
-        <p className="text-n2f-text-secondary mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">n8n API Key Permissions</h2>
+        <p className="text-muted-foreground mb-4">
           Your n8n API key needs the following permissions for full functionality:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-green-400" />
-              <span className="text-n2f-text font-medium">Required</span>
+              <span className="text-foreground font-medium">Required</span>
             </div>
-            <ul className="text-sm text-n2f-text-secondary space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li>workflow:list</li>
               <li>workflow:read</li>
               <li>execution:list</li>
               <li>execution:read</li>
             </ul>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-yellow-400" />
-              <span className="text-n2f-text font-medium">Optional (for write access)</span>
+              <span className="text-foreground font-medium">Optional (for write access)</span>
             </div>
-            <ul className="text-sm text-n2f-text-secondary space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li>workflow:create</li>
               <li>workflow:update</li>
               <li>workflow:delete</li>

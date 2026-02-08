@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import {
   AuthProvider,
   useAuth,
@@ -14,27 +14,27 @@ import {
 import { plugins } from './plugins/registry';
 import { Loader2 } from 'lucide-react';
 
-// Platform pages
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import Usage from './pages/Usage';
-import Settings from './pages/Settings';
-import AuthCallback from './pages/AuthCallback';
-import AccountDeleted from './pages/AccountDeleted';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import FAQ from './pages/FAQ';
-import Documentation from './pages/Documentation';
-import Status from './pages/Status';
+// Platform pages (lazy-loaded)
+const Landing = lazy(() => import('./pages/Landing'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Usage = lazy(() => import('./pages/Usage'));
+const Settings = lazy(() => import('./pages/Settings'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const AccountDeleted = lazy(() => import('./pages/AccountDeleted'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Documentation = lazy(() => import('./pages/Documentation'));
+const Status = lazy(() => import('./pages/Status'));
 
-// Admin pages
-import AdminOverview from './pages/admin/AdminOverview';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminRevenue from './pages/admin/AdminRevenue';
-import AdminHealth from './pages/admin/AdminHealth';
-import AdminFeedback from './pages/admin/AdminFeedback';
-import AdminSystem from './pages/admin/AdminSystem';
+// Admin pages (lazy-loaded)
+const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
+const AdminRevenue = lazy(() => import('./pages/admin/AdminRevenue'));
+const AdminHealth = lazy(() => import('./pages/admin/AdminHealth'));
+const AdminFeedback = lazy(() => import('./pages/admin/AdminFeedback'));
+const AdminSystem = lazy(() => import('./pages/admin/AdminSystem'));
 
 const queryClient = new QueryClient();
 
@@ -81,57 +81,57 @@ function SmartRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/account-deleted" element={<AccountDeleted />} />
+    <Suspense fallback={<LoadingSpinner />}>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/account-deleted" element={<AccountDeleted />} />
 
-      {/* Info pages - with Layout if logged in, standalone if not */}
-      <Route path="/terms" element={<SmartRoute><Terms /></SmartRoute>} />
-      <Route path="/privacy" element={<SmartRoute><Privacy /></SmartRoute>} />
-      <Route path="/faq" element={<SmartRoute><FAQ /></SmartRoute>} />
-      <Route path="/docs" element={<SmartRoute><Documentation /></SmartRoute>} />
-      <Route path="/status" element={<SmartRoute><Status /></SmartRoute>} />
+        {/* Info pages - with Layout if logged in, standalone if not */}
+        <Route path="/terms" element={<SmartRoute><Terms /></SmartRoute>} />
+        <Route path="/privacy" element={<SmartRoute><Privacy /></SmartRoute>} />
+        <Route path="/faq" element={<SmartRoute><FAQ /></SmartRoute>} />
+        <Route path="/docs" element={<SmartRoute><Documentation /></SmartRoute>} />
+        <Route path="/status" element={<SmartRoute><Status /></SmartRoute>} />
 
-      {/* Protected routes */}
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        {/* Protected routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-      {/* Admin routes */}
-      <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
-      <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-      <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
-      <Route path="/admin/revenue" element={<AdminRoute><AdminRevenue /></AdminRoute>} />
-      <Route path="/admin/health" element={<AdminRoute><AdminHealth /></AdminRoute>} />
-      <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
-      <Route path="/admin/system" element={<AdminRoute><AdminSystem /></AdminRoute>} />
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+        <Route path="/admin/revenue" element={<AdminRoute><AdminRevenue /></AdminRoute>} />
+        <Route path="/admin/health" element={<AdminRoute><AdminHealth /></AdminRoute>} />
+        <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
+        <Route path="/admin/system" element={<AdminRoute><AdminSystem /></AdminRoute>} />
 
-      {/* Dynamic plugin routes (lazy-loaded) */}
-      {plugins.flatMap(plugin =>
-        plugin.routes.map(route => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={
-              <ProtectedRoute>
-                <Suspense fallback={<LoadingSpinner />}>
+        {/* Dynamic plugin routes (lazy-loaded) */}
+        {plugins.flatMap(plugin =>
+          plugin.routes.map(route => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <ProtectedRoute>
                   <route.component />
-                </Suspense>
-              </ProtectedRoute>
-            }
-          />
-        ))
-      )}
+                </ProtectedRoute>
+              }
+            />
+          ))
+        )}
 
-      {/* Landing page */}
-      <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+        {/* Landing page */}
+        <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
 
-      {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 

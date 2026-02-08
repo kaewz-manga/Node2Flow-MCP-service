@@ -89,21 +89,21 @@ Comment created successfully.`,
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your Notion integration token:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My Workspace")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My Workspace")
         </li>
         <li>
-          <strong className="text-n2f-text">Integration Token:</strong> Your internal integration
+          <strong className="text-foreground">Integration Token:</strong> Your internal integration
           token from{' '}
           <a
             href="https://www.notion.so/profile/integrations"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-n2f-accent hover:underline"
+            className="text-primary hover:underline"
           >
             Notion Integrations
           </a>
@@ -130,38 +130,38 @@ Comment created successfully.`,
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Workflow: Pages, Blocks, Databases
         </h2>
         <div className="grid sm:grid-cols-3 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Layout className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">1. Create Pages</span>
+              <Layout className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">1. Create Pages</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Use <code className="bg-n2f-elevated px-1 rounded">notion_create_page</code> to add
+            <p className="text-sm text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">notion_create_page</code> to add
               pages to databases or as sub-pages.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">2. Add Content</span>
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">2. Add Content</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Use <code className="bg-n2f-elevated px-1 rounded">notion_append_blocks</code> to add
+            <p className="text-sm text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">notion_append_blocks</code> to add
               paragraphs, headings, lists, code blocks, and more.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Database className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">3. Query Data</span>
+              <Database className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">3. Query Data</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
+            <p className="text-sm text-muted-foreground">
               Use{' '}
-              <code className="bg-n2f-elevated px-1 rounded">notion_query_data_source</code> to
+              <code className="bg-muted px-1 rounded">notion_query_data_source</code> to
               filter and sort database pages.
             </p>
           </div>
@@ -169,20 +169,20 @@ Comment created successfully.`,
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">API Versions</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">API Versions</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">2025-09-03 (Latest)</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">2025-09-03 (Latest)</span>
+            <p className="text-sm text-muted-foreground mt-1">
               Data Sources API, move pages, improved search. Use{' '}
-              <code className="bg-n2f-elevated px-1 rounded">notion_*_data_source</code> tools.
+              <code className="bg-muted px-1 rounded">notion_*_data_source</code> tools.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">Legacy Database Endpoints</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">Legacy Database Endpoints</span>
+            <p className="text-sm text-muted-foreground mt-1">
               Still available for backward compatibility. Use{' '}
-              <code className="bg-n2f-elevated px-1 rounded">notion_*_database</code> tools.
+              <code className="bg-muted px-1 rounded">notion_*_database</code> tools.
             </p>
           </div>
         </div>
@@ -209,7 +209,7 @@ Comment created successfully.`,
                   href="https://www.notion.so/profile/integrations"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-n2f-accent hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Notion Integrations
                 </a>

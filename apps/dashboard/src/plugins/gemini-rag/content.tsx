@@ -83,20 +83,20 @@ Sources: API Reference (Section 3.2), User Guide (Chapter 5)`,
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your Gemini API key:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My RAG Store")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My RAG Store")
         </li>
         <li>
-          <strong className="text-n2f-text">API Key:</strong> Your Gemini API key from{' '}
+          <strong className="text-foreground">API Key:</strong> Your Gemini API key from{' '}
           <a
             href="https://aistudio.google.com/apikey"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-n2f-accent hover:underline"
+            className="text-primary hover:underline"
           >
             Google AI Studio
           </a>
@@ -117,35 +117,35 @@ Sources: API Reference (Section 3.2), User Guide (Chapter 5)`,
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Workflow: Stores, Documents, Queries</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Workflow: Stores, Documents, Queries</h2>
         <div className="grid sm:grid-cols-3 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Database className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">1. Create Store</span>
+              <Database className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">1. Create Store</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Use <code className="bg-n2f-elevated px-1 rounded">gemini_create_store</code> to create a
+            <p className="text-sm text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">gemini_create_store</code> to create a
               knowledge base for your documents.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Upload className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">2. Upload Documents</span>
+              <Upload className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">2. Upload Documents</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Use <code className="bg-n2f-elevated px-1 rounded">gemini_upload_to_store</code> for text/PDF or{' '}
-              <code className="bg-n2f-elevated px-1 rounded">gemini_import_file_to_store</code> for large files.
+            <p className="text-sm text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">gemini_upload_to_store</code> for text/PDF or{' '}
+              <code className="bg-muted px-1 rounded">gemini_import_file_to_store</code> for large files.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Search className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">3. Query with RAG</span>
+              <Search className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">3. Query with RAG</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Use <code className="bg-n2f-elevated px-1 rounded">gemini_rag_query</code> to ask questions and
+            <p className="text-sm text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">gemini_rag_query</code> to ask questions and
               get AI answers grounded in your documents.
             </p>
           </div>
@@ -153,20 +153,20 @@ Sources: API Reference (Section 3.2), User Guide (Chapter 5)`,
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Supported File Types</h2>
-        <p className="text-n2f-text-secondary mb-3">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Supported File Types</h2>
+        <p className="text-muted-foreground mb-3">
           Gemini File Search supports various document formats:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">Text formats</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">Text formats</span>
+            <p className="text-sm text-muted-foreground mt-1">
               text/plain, text/markdown, text/html, text/csv
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">Document formats</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">Document formats</span>
+            <p className="text-sm text-muted-foreground mt-1">
               application/pdf, application/json
             </p>
           </div>
@@ -194,7 +194,7 @@ Sources: API Reference (Section 3.2), User Guide (Chapter 5)`,
                   href="https://aistudio.google.com/apikey"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-n2f-accent hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Google AI Studio
                 </a>
@@ -253,9 +253,9 @@ Sources: API Reference (Section 3.2), User Guide (Chapter 5)`,
                   <strong>gemini-2.5-pro</strong> - Highest quality answers
                 </li>
               </ul>
-              <p className="text-sm text-n2f-text-secondary">
-                Use the <code className="bg-n2f-elevated px-1 rounded">model</code> parameter in{' '}
-                <code className="bg-n2f-elevated px-1 rounded">gemini_rag_query</code> to choose.
+              <p className="text-sm text-muted-foreground">
+                Use the <code className="bg-muted px-1 rounded">model</code> parameter in{' '}
+                <code className="bg-muted px-1 rounded">gemini_rag_query</code> to choose.
               </p>
             </div>
           ),

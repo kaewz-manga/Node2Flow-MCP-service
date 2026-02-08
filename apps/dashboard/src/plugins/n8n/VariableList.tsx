@@ -3,6 +3,11 @@ import { listVariables, createVariable, updateVariable, deleteVariable } from '.
 import { useConnection } from '@node2flow/dashboard-core';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variable } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function VariableList() {
   const { activeConnection } = useConnection();
@@ -57,104 +62,106 @@ export default function VariableList() {
     else alert(res.error?.message || 'Failed');
   }
 
-  if (!activeConnection) return <div className="text-center py-12 text-n2f-text-secondary">No connection selected. Please select a connection from the sidebar.</div>;
+  if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-n2f-text">Variables</h1>
-          <p className="text-n2f-text-secondary mt-1">{activeConnection.name} - {variables.length} variables</p>
+          <h1 className="text-2xl font-bold text-foreground">Variables</h1>
+          <p className="text-muted-foreground mt-1">{activeConnection.name} - {variables.length} variables</p>
         </div>
-        <button onClick={fetch} className="p-2 border border-n2f-border rounded-lg hover:bg-n2f-elevated" title="Refresh">
+        <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
           <RefreshCw className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
 
       {/* Create variable */}
       <div className="flex gap-2">
-        <input
+        <Input
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
           placeholder="Key"
-          className="w-48 px-3 py-2 text-sm border border-n2f-border rounded-lg focus:ring-2 focus:ring-n2f-accent bg-n2f-card text-n2f-text"
+          className="w-48"
         />
-        <input
+        <Input
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
           placeholder="Value"
-          className="flex-1 px-3 py-2 text-sm border border-n2f-border rounded-lg focus:ring-2 focus:ring-n2f-accent bg-n2f-card text-n2f-text"
+          className="flex-1"
         />
-        <button onClick={handleCreate} disabled={creating || !newKey.trim()} className="flex items-center gap-2 px-4 py-2 text-sm bg-n2f-accent text-white rounded-lg hover:bg-n2f-accent/90 disabled:opacity-50">
-          {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add
-        </button>
+        <Button onClick={handleCreate} disabled={creating || !newKey.trim()}>
+          {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add
+        </Button>
       </div>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <span className="text-red-300 text-sm">{error}</span>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-n2f-accent" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
-        <div className="overflow-x-auto bg-n2f-card rounded-lg border border-n2f-border">
-          <table className="min-w-full divide-y divide-n2f-border">
-            <thead className="bg-n2f-elevated">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-n2f-text-secondary uppercase">Key</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-n2f-text-secondary uppercase">Value</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-n2f-text-secondary uppercase">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-n2f-text-secondary uppercase w-24">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-n2f-border">
-              {variables.map((v) => (
-                <tr key={v.id} className="hover:bg-n2f-elevated">
-                  {editingId === v.id ? (
-                    <>
-                      <td className="px-4 py-2">
-                        <input value={editKey} onChange={(e) => setEditKey(e.target.value)} className="w-full px-2 py-1 text-sm border border-n2f-border rounded bg-n2f-elevated text-n2f-text" />
-                      </td>
-                      <td className="px-4 py-2">
-                        <input value={editValue} onChange={(e) => setEditValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleUpdate(v.id); if (e.key === 'Escape') setEditingId(null); }} className="w-full px-2 py-1 text-sm border border-n2f-border rounded bg-n2f-elevated text-n2f-text" autoFocus />
-                      </td>
-                      <td className="px-4 py-2 text-xs text-n2f-text-muted font-mono">{v.id}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-1">
-                          <button onClick={() => handleUpdate(v.id)} className="p-1 text-emerald-400 hover:bg-emerald-900/30 rounded"><Check className="h-4 w-4" /></button>
-                          <button onClick={() => setEditingId(null)} className="p-1 text-n2f-text-muted hover:bg-n2f-elevated rounded"><X className="h-4 w-4" /></button>
-                        </div>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-4 py-3 text-sm font-medium text-n2f-text font-mono">{v.key}</td>
-                      <td className="px-4 py-3 text-sm text-n2f-text-secondary font-mono">{v.value}</td>
-                      <td className="px-4 py-3 text-xs text-n2f-text-muted font-mono">{v.id}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1">
-                          <button onClick={() => { setEditingId(v.id); setEditKey(v.key); setEditValue(v.value); }} className="p-1.5 text-n2f-text-muted hover:text-n2f-accent hover:bg-n2f-accent/10 rounded" title="Edit">
-                            <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button onClick={() => setDeleteTarget(v)} className="p-1.5 text-n2f-text-muted hover:text-red-400 hover:bg-red-900/30 rounded" title="Delete">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
-              {variables.length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-n2f-text-secondary">No variables found</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Key</TableHead>
+                  <TableHead>Value</TableHead>
+                  <TableHead>ID</TableHead>
+                  <TableHead className="w-24">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {variables.map((v) => (
+                  <TableRow key={v.id}>
+                    {editingId === v.id ? (
+                      <>
+                        <TableCell>
+                          <Input value={editKey} onChange={(e) => setEditKey(e.target.value)} className="h-8 text-sm" />
+                        </TableCell>
+                        <TableCell>
+                          <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleUpdate(v.id); if (e.key === 'Escape') setEditingId(null); }} className="h-8 text-sm" autoFocus />
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{v.id}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-400 hover:bg-emerald-900/30" onClick={() => handleUpdate(v.id)}><Check className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
+                          </div>
+                        </TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell className="font-mono font-medium">{v.key}</TableCell>
+                        <TableCell className="text-muted-foreground font-mono">{v.value}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{v.id}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(v.id); setEditKey(v.key); setEditValue(v.value); }} title="Edit">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-red-400 hover:bg-red-900/30" onClick={() => setDeleteTarget(v)} title="Delete">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                ))}
+                {variables.length === 0 && (
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No variables found</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog

@@ -1,5 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { Shield, Smartphone, Loader2, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Smartphone, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Alert, AlertDescription } from './ui/alert';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from './ui/input-otp';
 
 interface SudoModalProps {
   open: boolean;
@@ -23,57 +26,19 @@ export default function SudoModal({
   clearError,
 }: SudoModalProps) {
   const [step, setStep] = useState<Step>('verify');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [otpValue, setOtpValue] = useState('');
 
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
       setStep('verify');
-      setOtp(['', '', '', '', '', '']);
+      setOtpValue('');
       clearError();
-      // Focus first input when modal opens
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
     }
   }, [open, clearError]);
 
-  const handleOtpChange = (index: number, value: string) => {
-    // Only allow digits
-    if (value && !/^\d$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all digits entered
-    if (newOtp.every(d => d !== '')) {
-      handleVerify(newOtp.join(''));
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (pastedData.length === 6) {
-      const newOtp = pastedData.split('');
-      setOtp(newOtp);
-      handleVerify(pastedData);
-    }
-  };
-
-  const handleVerify = async (code: string) => {
-    const success = await onVerifyTOTP(code);
+  const handleOtpComplete = async (value: string) => {
+    const success = await onVerifyTOTP(value);
     if (success) {
       setStep('success');
       setTimeout(() => {
@@ -81,33 +46,27 @@ export default function SudoModal({
         onClose();
       }, 1000);
     } else {
-      // Clear OTP on error
-      setOtp(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
+      setOtpValue('');
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-card border border-border rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <DialogContent className="max-w-md">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 p-2 rounded-full">
               <Shield className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground">Security Verification</h3>
+            <div>
+              <DialogTitle>Security Verification</DialogTitle>
+              <DialogDescription>
+                Verify your identity to continue
+              </DialogDescription>
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground p-1"
-            disabled={loading}
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Step: Verify */}
         {step === 'verify' && (
@@ -118,28 +77,30 @@ export default function SudoModal({
             </div>
 
             {/* OTP Input */}
-            <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  disabled={loading}
-                  className="w-12 h-14 text-center text-2xl font-bold bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-                />
-              ))}
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otpValue}
+                onChange={setOtpValue}
+                onComplete={handleOtpComplete}
+                disabled={loading}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
 
             {error && (
-              <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
-                <span className="text-red-300 text-sm">{error}</span>
-              </div>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
 
             {loading && (
@@ -166,7 +127,7 @@ export default function SudoModal({
             </p>
           </div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

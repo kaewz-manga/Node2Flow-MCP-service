@@ -12,8 +12,14 @@ import {
   Lightbulb,
   MessageSquare,
   HelpCircle,
-  X,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const categoryConfig: Record<string, { label: string; icon: typeof Bug; color: string; badgeClass: string }> = {
   bug: { label: 'Bug', icon: Bug, color: 'text-red-400', badgeClass: 'bg-red-500/10 text-red-400' },
@@ -26,7 +32,7 @@ const statusConfig: Record<string, { label: string; badgeClass: string }> = {
   new: { label: 'New', badgeClass: 'bg-blue-500/10 text-blue-400' },
   reviewed: { label: 'Reviewed', badgeClass: 'bg-yellow-500/10 text-yellow-400' },
   resolved: { label: 'Resolved', badgeClass: 'bg-green-500/10 text-green-400' },
-  archived: { label: 'Archived', badgeClass: 'bg-n2f-text-muted/10 text-n2f-text-muted' },
+  archived: { label: 'Archived', badgeClass: 'bg-muted-foreground/10 text-muted-foreground' },
 };
 
 export default function AdminFeedback() {
@@ -93,8 +99,8 @@ export default function AdminFeedback() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-n2f-text">Feedback</h1>
-        <p className="text-n2f-text-secondary mt-1">User feedback and suggestions</p>
+        <h1 className="text-2xl font-bold text-foreground">Feedback</h1>
+        <p className="text-muted-foreground mt-1">User feedback and suggestions</p>
       </div>
 
       {/* Filters */}
@@ -102,7 +108,7 @@ export default function AdminFeedback() {
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setOffset(0); }}
-          className="px-3 py-2 text-sm bg-n2f-elevated border border-n2f-border rounded-lg text-n2f-text focus:outline-none focus:ring-2 focus:ring-n2f-accent"
+          className="px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">All Statuses</option>
           <option value="new">New</option>
@@ -113,7 +119,7 @@ export default function AdminFeedback() {
         <select
           value={categoryFilter}
           onChange={(e) => { setCategoryFilter(e.target.value); setOffset(0); }}
-          className="px-3 py-2 text-sm bg-n2f-elevated border border-n2f-border rounded-lg text-n2f-text focus:outline-none focus:ring-2 focus:ring-n2f-accent"
+          className="px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">All Categories</option>
           <option value="bug">Bug Report</option>
@@ -121,7 +127,7 @@ export default function AdminFeedback() {
           <option value="general">General</option>
           <option value="question">Question</option>
         </select>
-        <span className="px-3 py-2 text-sm text-n2f-text-secondary">
+        <span className="px-3 py-2 text-sm text-muted-foreground">
           {total} total
         </span>
       </div>
@@ -136,124 +142,125 @@ export default function AdminFeedback() {
       {/* Table */}
       {loading ? (
         <div className="flex items-center justify-center min-h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-n2f-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : feedback.length === 0 ? (
         <div className="text-center py-12">
-          <MessageSquare className="h-12 w-12 text-n2f-text-muted mx-auto mb-3" />
-          <p className="text-n2f-text-secondary">No feedback found</p>
+          <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No feedback found</p>
         </div>
       ) : (
-        <div className="bg-n2f-card border border-n2f-border rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-n2f-elevated">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-n2f-text-secondary">User</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-n2f-text-secondary">Category</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-n2f-text-secondary">Message</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-n2f-text-secondary">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-n2f-text-secondary">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-n2f-border">
-              {feedback.map((item) => {
-                const cat = categoryConfig[item.category] || categoryConfig.general;
-                const stat = statusConfig[item.status] || statusConfig.new;
-                const CatIcon = cat.icon;
-                return (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-n2f-elevated/50 cursor-pointer"
-                    onClick={() => openDetail(item)}
-                  >
-                    <td className="px-4 py-3 text-sm text-n2f-text">{item.user_email}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${cat.badgeClass}`}>
-                        <CatIcon className="h-3 w-3" />
-                        {cat.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-n2f-text-secondary max-w-xs truncate">{item.message}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${stat.badgeClass}`}>
-                        {stat.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-n2f-text-muted">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {feedback.map((item) => {
+                  const cat = categoryConfig[item.category] || categoryConfig.general;
+                  const stat = statusConfig[item.status] || statusConfig.new;
+                  const CatIcon = cat.icon;
+                  return (
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer"
+                      onClick={() => openDetail(item)}
+                    >
+                      <TableCell className="text-sm">{item.user_email}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={cat.badgeClass}>
+                          <CatIcon className="h-3 w-3 mr-1" />
+                          {cat.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{item.message}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={stat.badgeClass}>
+                          {stat.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
 
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-n2f-text-secondary">
+          <p className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </p>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => setOffset(Math.max(0, offset - limit))}
               disabled={offset === 0}
-              className="p-2 border border-n2f-border rounded-lg text-n2f-text-secondary hover:bg-n2f-elevated disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => setOffset(offset + limit)}
               disabled={offset + limit >= total}
-              className="p-2 border border-n2f-border rounded-lg text-n2f-text-secondary hover:bg-n2f-elevated disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* Detail Modal */}
-      {selected && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-6 max-w-lg w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-n2f-text">Feedback Detail</h2>
-              <button onClick={() => setSelected(null)} className="text-n2f-text-muted hover:text-n2f-text">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+      {/* Detail Dialog */}
+      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Feedback Detail</DialogTitle>
+          </DialogHeader>
 
+          {selected && (
             <div className="space-y-4">
               <div className="flex gap-4 text-sm">
                 <div>
-                  <span className="text-n2f-text-muted">From: </span>
-                  <span className="text-n2f-text">{selected.user_email}</span>
+                  <span className="text-muted-foreground">From: </span>
+                  <span className="text-foreground">{selected.user_email}</span>
                 </div>
                 <div>
-                  <span className="text-n2f-text-muted">Date: </span>
-                  <span className="text-n2f-text">{new Date(selected.created_at).toLocaleString()}</span>
+                  <span className="text-muted-foreground">Date: </span>
+                  <span className="text-foreground">{new Date(selected.created_at).toLocaleString()}</span>
                 </div>
               </div>
 
               <div>
-                <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${categoryConfig[selected.category]?.badgeClass || ''}`}>
+                <Badge variant="secondary" className={categoryConfig[selected.category]?.badgeClass || ''}>
                   {categoryConfig[selected.category]?.label || selected.category}
-                </span>
+                </Badge>
               </div>
 
-              <div className="bg-n2f-elevated border border-n2f-border rounded-lg p-4">
-                <p className="text-sm text-n2f-text whitespace-pre-wrap">{selected.message}</p>
+              <div className="bg-muted border border-border rounded-lg p-4">
+                <p className="text-sm text-foreground whitespace-pre-wrap">{selected.message}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-n2f-text mb-2">Status</label>
+                <Label>Status</Label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-n2f-elevated border border-n2f-border rounded-lg text-n2f-text focus:outline-none focus:ring-2 focus:ring-n2f-accent"
+                  className="w-full mt-1 px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="new">New</option>
                   <option value="reviewed">Reviewed</option>
@@ -263,36 +270,29 @@ export default function AdminFeedback() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-n2f-text mb-2">Admin Notes</label>
-                <textarea
+                <Label>Admin Notes</Label>
+                <Textarea
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   placeholder="Internal notes..."
                   rows={3}
-                  className="w-full px-3 py-2 text-sm bg-n2f-elevated border border-n2f-border rounded-lg text-n2f-text placeholder-n2f-text-muted focus:outline-none focus:ring-2 focus:ring-n2f-accent resize-none"
+                  className="mt-1"
                 />
               </div>
             </div>
+          )}
 
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setSelected(null)}
-                className="border border-n2f-border text-n2f-text hover:bg-n2f-elevated px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-n2f-accent hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {saving && <Loader2 className="h-3 w-3 animate-spin" />}
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelected(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving && <Loader2 className="h-3 w-3 animate-spin mr-2" />}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

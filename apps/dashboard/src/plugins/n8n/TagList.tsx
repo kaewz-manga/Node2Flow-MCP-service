@@ -3,6 +3,10 @@ import { listTags, createTag, updateTag, deleteTag } from '../../lib/gateway-api
 import { useConnection } from '@node2flow/dashboard-core';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function TagList() {
   const { activeConnection } = useConnection();
@@ -55,76 +59,78 @@ export default function TagList() {
     else alert(res.error?.message || 'Failed');
   }
 
-  if (!activeConnection) return <div className="text-center py-12 text-n2f-text-secondary">No connection selected. Please select a connection from the sidebar.</div>;
+  if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-n2f-text">Tags</h1>
-          <p className="text-n2f-text-secondary mt-1">{activeConnection.name} - {tags.length} tags</p>
+          <h1 className="text-2xl font-bold text-foreground">Tags</h1>
+          <p className="text-muted-foreground mt-1">{activeConnection.name} - {tags.length} tags</p>
         </div>
-        <button onClick={fetch} className="p-2 border border-n2f-border rounded-lg hover:bg-n2f-elevated" title="Refresh">
+        <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
           <RefreshCw className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
 
       {/* Create tag */}
       <div className="flex gap-2">
-        <input
+        <Input
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
           placeholder="New tag name..."
-          className="flex-1 px-3 py-2 text-sm border border-n2f-border rounded-lg focus:ring-2 focus:ring-n2f-accent bg-n2f-card text-n2f-text"
+          className="flex-1"
         />
-        <button onClick={handleCreate} disabled={creating || !newName.trim()} className="flex items-center gap-2 px-4 py-2 text-sm bg-n2f-accent text-white rounded-lg hover:bg-n2f-accent/90 disabled:opacity-50">
-          {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add Tag
-        </button>
+        <Button onClick={handleCreate} disabled={creating || !newName.trim()}>
+          {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add Tag
+        </Button>
       </div>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <span className="text-red-300 text-sm">{error}</span>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-n2f-accent" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {tags.map((tag) => (
-            <div key={tag.id} className="bg-n2f-card border border-n2f-border rounded-lg p-3 flex items-center gap-3">
-              <Tag className="h-4 w-4 text-n2f-accent shrink-0" />
-              {editingId === tag.id ? (
-                <div className="flex-1 flex gap-2">
-                  <input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleUpdate(tag.id); if (e.key === 'Escape') setEditingId(null); }}
-                    className="flex-1 px-2 py-1 text-sm border border-n2f-border rounded bg-n2f-elevated text-n2f-text"
-                    autoFocus
-                  />
-                  <button onClick={() => handleUpdate(tag.id)} className="p-1 text-emerald-400 hover:bg-emerald-900/30 rounded"><Check className="h-4 w-4" /></button>
-                  <button onClick={() => setEditingId(null)} className="p-1 text-n2f-text-muted hover:bg-n2f-elevated rounded"><X className="h-4 w-4" /></button>
-                </div>
-              ) : (
-                <>
-                  <span className="flex-1 text-sm font-medium text-n2f-text">{tag.name}</span>
-                  <span className="text-xs text-n2f-text-muted font-mono">{tag.id}</span>
-                  <button onClick={() => { setEditingId(tag.id); setEditName(tag.name); }} className="p-1 text-n2f-text-muted hover:text-n2f-accent hover:bg-n2f-accent/10 rounded" title="Edit">
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button onClick={() => setDeleteTarget(tag)} className="p-1 text-n2f-text-muted hover:text-red-400 hover:bg-red-900/30 rounded" title="Delete">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </>
-              )}
-            </div>
+            <Card key={tag.id}>
+              <CardContent className="p-3 flex items-center gap-3">
+                <Tag className="h-4 w-4 text-primary shrink-0" />
+                {editingId === tag.id ? (
+                  <div className="flex-1 flex gap-2">
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleUpdate(tag.id); if (e.key === 'Escape') setEditingId(null); }}
+                      className="h-8 text-sm"
+                      autoFocus
+                    />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400 hover:bg-emerald-900/30" onClick={() => handleUpdate(tag.id)}><Check className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
+                  </div>
+                ) : (
+                  <>
+                    <span className="flex-1 text-sm font-medium text-foreground">{tag.name}</span>
+                    <span className="text-xs text-muted-foreground font-mono">{tag.id}</span>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(tag.id); setEditName(tag.name); }} title="Edit">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-red-400 hover:bg-red-900/30" onClick={() => setDeleteTarget(tag)} title="Delete">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           ))}
           {tags.length === 0 && (
-            <div className="col-span-full text-center py-8 text-n2f-text-secondary">No tags found</div>
+            <div className="col-span-full text-center py-8 text-muted-foreground">No tags found</div>
           )}
         </div>
       )}

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { handleOAuthToken } from '@node2flow/dashboard-core';
 import { useAuth } from '@node2flow/dashboard-core';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -32,31 +33,28 @@ export default function AuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-n2f-bg px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="max-w-md w-full text-center">
           <div className="bg-red-900/30 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="h-8 w-8 text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-n2f-text mb-2">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
             Authentication Failed
           </h1>
-          <p className="text-n2f-text-secondary mb-6">{error}</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="btn-primary"
-          >
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button onClick={() => navigate('/login')}>
             Back to Login
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-n2f-bg">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <Loader2 className="h-12 w-12 animate-spin text-n2f-accent mx-auto mb-4" />
-        <p className="text-n2f-text-secondary">Completing sign in...</p>
+        <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+        <p className="text-muted-foreground">Completing sign in...</p>
       </div>
     </div>
   );

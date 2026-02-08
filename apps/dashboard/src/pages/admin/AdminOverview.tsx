@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, type AdminStats } from '../../lib/platform-api';
 import { Users, DollarSign, Activity, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function AdminOverview() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -19,7 +20,7 @@ export default function AdminOverview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-n2f-accent" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -32,7 +33,7 @@ export default function AdminOverview() {
   ];
 
   const colorMap: Record<string, { bg: string; icon: string }> = {
-    blue: { bg: 'bg-n2f-accent/10', icon: 'text-n2f-accent' },
+    blue: { bg: 'bg-primary/10', icon: 'text-primary' },
     green: { bg: 'bg-emerald-900/30', icon: 'text-emerald-400' },
     purple: { bg: 'bg-purple-900/30', icon: 'text-purple-400' },
     yellow: { bg: 'bg-amber-900/30', icon: 'text-amber-400' },
@@ -42,26 +43,30 @@ export default function AdminOverview() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-n2f-text">Admin Overview</h1>
-        <p className="text-n2f-text-secondary mt-1">Platform metrics at a glance</p>
+        <h1 className="text-2xl font-bold text-foreground">Admin Overview</h1>
+        <p className="text-muted-foreground mt-1">Platform metrics at a glance</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => {
           const colors = colorMap[card.color];
           return (
-            <Link key={card.label} to={card.link} className="card hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg ${colors.bg}`}>
-                  <card.icon className={`h-5 w-5 ${colors.icon}`} />
-                </div>
-                <span className="text-sm font-medium text-n2f-text-secondary">{card.label}</span>
-              </div>
-              <p className="text-2xl font-bold text-n2f-text">{card.value}</p>
-              <div className="flex items-center justify-between mt-1">
-                <p className="text-sm text-n2f-text-secondary">{card.sub}</p>
-                <ArrowRight className="h-4 w-4 text-n2f-text-muted" />
-              </div>
+            <Link key={card.label} to={card.link} className="block">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`p-2 rounded-lg ${colors.bg}`}>
+                      <card.icon className={`h-5 w-5 ${colors.icon}`} />
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{card.value}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-sm text-muted-foreground">{card.sub}</p>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </CardContent>
+              </Card>
             </Link>
           );
         })}

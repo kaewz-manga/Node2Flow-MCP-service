@@ -4,6 +4,11 @@ import { useConnection } from '@node2flow/dashboard-core';
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Trash2, Search, X, Pencil, Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function CredentialList() {
   const { activeConnection } = useConnection();
@@ -81,119 +86,127 @@ export default function CredentialList() {
     else alert(res.error?.message || 'Failed');
   }
 
-  if (!activeConnection) return <div className="text-center py-12 text-n2f-text-secondary">No connection selected. Please select a connection from the sidebar.</div>;
+  if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-n2f-text">Credentials</h1>
-          <p className="text-n2f-text-secondary mt-1">Create, update, delete credentials on {activeConnection.name}</p>
+          <h1 className="text-2xl font-bold text-foreground">Credentials</h1>
+          <p className="text-muted-foreground mt-1">Create, update, delete credentials on {activeConnection.name}</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => { setShowUpdate(!showUpdate); setShowCreate(false); }} className="flex items-center gap-2 px-4 py-2 text-sm border border-n2f-accent/30 text-n2f-accent rounded-lg hover:bg-n2f-accent/10">
-            <Pencil className="h-4 w-4" /> Update
-          </button>
-          <button onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }} className="flex items-center gap-2 px-4 py-2 text-sm bg-n2f-accent text-white rounded-lg hover:bg-n2f-accent/90">
-            <Plus className="h-4 w-4" /> Create
-          </button>
+          <Button variant="outline" onClick={() => { setShowUpdate(!showUpdate); setShowCreate(false); }}>
+            <Pencil className="h-4 w-4 mr-2" /> Update
+          </Button>
+          <Button onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }}>
+            <Plus className="h-4 w-4 mr-2" /> Create
+          </Button>
         </div>
       </div>
 
       {/* Create form */}
       {showCreate && (
-        <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-n2f-text">Create Credential</h3>
-            <button onClick={() => setShowCreate(false)} className="text-n2f-text-muted hover:text-n2f-text-secondary"><X className="h-4 w-4" /></button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-n2f-text-secondary mb-1">Name *</label>
-              <input value={createName} onChange={(e) => setCreateName(e.target.value)} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg bg-n2f-elevated text-n2f-text" placeholder="My API Key" />
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-foreground">Create Credential</h3>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowCreate(false)}><X className="h-4 w-4" /></Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Name *</Label>
+                <Input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder="My API Key" className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Type *</Label>
+                <Input value={createType} onChange={(e) => setCreateType(e.target.value)} placeholder="httpBasicAuth" className="mt-1" />
+              </div>
             </div>
             <div>
-              <label className="block text-xs text-n2f-text-secondary mb-1">Type *</label>
-              <input value={createType} onChange={(e) => setCreateType(e.target.value)} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg bg-n2f-elevated text-n2f-text" placeholder="httpBasicAuth" />
+              <Label className="text-xs">Data (JSON)</Label>
+              <Textarea value={createData} onChange={(e) => setCreateData(e.target.value)} rows={4} className="mt-1 font-mono text-sm" placeholder='{"user": "...", "password": "..."}' />
             </div>
-          </div>
-          <div>
-            <label className="block text-xs text-n2f-text-secondary mb-1">Data (JSON)</label>
-            <textarea value={createData} onChange={(e) => setCreateData(e.target.value)} rows={4} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg font-mono bg-n2f-elevated text-n2f-text" placeholder='{"user": "...", "password": "..."}' />
-          </div>
-          <button onClick={handleCreate} disabled={creating} className="flex items-center gap-2 px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50">
-            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Create
-          </button>
-        </div>
+            <Button variant="secondary" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating}>
+              {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Create
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* Update form */}
       {showUpdate && (
-        <div className="bg-n2f-card border border-n2f-accent/30 rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-n2f-text">Update Credential</h3>
-            <button onClick={() => setShowUpdate(false)} className="text-n2f-text-muted hover:text-n2f-text-secondary"><X className="h-4 w-4" /></button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs text-n2f-text-secondary mb-1">Credential ID *</label>
-              <input value={updateId} onChange={(e) => setUpdateId(e.target.value)} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg font-mono bg-n2f-elevated text-n2f-text" placeholder="123" />
+        <Card className="border-primary/30">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-foreground">Update Credential</h3>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowUpdate(false)}><X className="h-4 w-4" /></Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <Label className="text-xs">Credential ID *</Label>
+                <Input value={updateId} onChange={(e) => setUpdateId(e.target.value)} className="mt-1 font-mono" placeholder="123" />
+              </div>
+              <div>
+                <Label className="text-xs">New Name (optional)</Label>
+                <Input value={updateName} onChange={(e) => setUpdateName(e.target.value)} className="mt-1" placeholder="Updated Name" />
+              </div>
+              <div>
+                <Label className="text-xs">New Type (optional)</Label>
+                <Input value={updateType} onChange={(e) => setUpdateType(e.target.value)} className="mt-1" placeholder="httpBasicAuth" />
+              </div>
             </div>
             <div>
-              <label className="block text-xs text-n2f-text-secondary mb-1">New Name (optional)</label>
-              <input value={updateName} onChange={(e) => setUpdateName(e.target.value)} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg bg-n2f-elevated text-n2f-text" placeholder="Updated Name" />
+              <Label className="text-xs">New Data (JSON, optional)</Label>
+              <Textarea value={updateData} onChange={(e) => setUpdateData(e.target.value)} rows={4} className="mt-1 font-mono text-sm" placeholder='{"user": "new_user", "password": "new_pass"}' />
             </div>
-            <div>
-              <label className="block text-xs text-n2f-text-secondary mb-1">New Type (optional)</label>
-              <input value={updateType} onChange={(e) => setUpdateType(e.target.value)} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg bg-n2f-elevated text-n2f-text" placeholder="httpBasicAuth" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs text-n2f-text-secondary mb-1">New Data (JSON, optional)</label>
-            <textarea value={updateData} onChange={(e) => setUpdateData(e.target.value)} rows={4} className="w-full px-3 py-2 text-sm border border-n2f-border rounded-lg font-mono bg-n2f-elevated text-n2f-text" placeholder='{"user": "new_user", "password": "new_pass"}' />
-          </div>
-          <button onClick={handleUpdate} disabled={updating} className="flex items-center gap-2 px-4 py-2 text-sm bg-n2f-accent text-white rounded-lg hover:bg-n2f-accent/90 disabled:opacity-50">
-            {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Update
-          </button>
-        </div>
+            <Button onClick={handleUpdate} disabled={updating}>
+              {updating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Update
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* Schema lookup */}
-      <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 space-y-3">
-        <h3 className="font-medium text-n2f-text">Credential Schema Lookup</h3>
-        <div className="flex gap-2">
-          <input
-            value={schemaType}
-            onChange={(e) => setSchemaType(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSchemaLookup(); }}
-            placeholder="e.g. httpBasicAuth, slackApi, openAiApi"
-            className="flex-1 px-3 py-2 text-sm border border-n2f-border rounded-lg bg-n2f-elevated text-n2f-text"
-          />
-          <button onClick={handleSchemaLookup} disabled={loadingSchema} className="flex items-center gap-2 px-4 py-2 text-sm bg-n2f-elevated text-n2f-text rounded-lg hover:bg-n2f-card disabled:opacity-50">
-            {loadingSchema ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />} Lookup
-          </button>
-        </div>
-        {schema && <JsonViewer data={schema} title={`Schema: ${schemaType}`} />}
-      </div>
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-medium text-foreground">Credential Schema Lookup</h3>
+          <div className="flex gap-2">
+            <Input
+              value={schemaType}
+              onChange={(e) => setSchemaType(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSchemaLookup(); }}
+              placeholder="e.g. httpBasicAuth, slackApi, openAiApi"
+              className="flex-1"
+            />
+            <Button variant="secondary" onClick={handleSchemaLookup} disabled={loadingSchema}>
+              {loadingSchema ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Lookup
+            </Button>
+          </div>
+          {schema && <JsonViewer data={schema} title={`Schema: ${schemaType}`} />}
+        </CardContent>
+      </Card>
 
       {/* Delete by ID */}
-      <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 space-y-3">
-        <h3 className="font-medium text-n2f-text">Delete Credential by ID</h3>
-        <div className="flex gap-2">
-          <input
-            id="delete-cred-id"
-            placeholder="Credential ID"
-            className="flex-1 px-3 py-2 text-sm border border-n2f-border rounded-lg font-mono bg-n2f-elevated text-n2f-text"
-            onKeyDown={(e) => { if (e.key === 'Enter') setDeleteTarget((e.target as HTMLInputElement).value); }}
-          />
-          <button onClick={() => {
-            const input = document.getElementById('delete-cred-id') as HTMLInputElement;
-            if (input?.value) setDeleteTarget(input.value);
-          }} className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 border border-red-700 rounded-lg hover:bg-red-900/30">
-            <Trash2 className="h-4 w-4" /> Delete
-          </button>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-medium text-foreground">Delete Credential by ID</h3>
+          <div className="flex gap-2">
+            <Input
+              id="delete-cred-id"
+              placeholder="Credential ID"
+              className="flex-1 font-mono"
+              onKeyDown={(e) => { if (e.key === 'Enter') setDeleteTarget((e.target as HTMLInputElement).value); }}
+            />
+            <Button variant="outline" className="text-red-400 border-red-700 hover:bg-red-900/30" onClick={() => {
+              const input = document.getElementById('delete-cred-id') as HTMLInputElement;
+              if (input?.value) setDeleteTarget(input.value);
+            }}>
+              <Trash2 className="h-4 w-4 mr-2" /> Delete
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <ConfirmDialog
         open={!!deleteTarget}

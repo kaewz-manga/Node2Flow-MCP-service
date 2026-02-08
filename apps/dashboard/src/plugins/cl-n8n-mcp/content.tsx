@@ -87,25 +87,25 @@ Found 3 matching nodes:
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your cl-n8n-mcp server:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My Workflow Builder")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My Workflow Builder")
         </li>
         <li>
-          <strong className="text-n2f-text">MCP URL:</strong> Your cl-n8n-mcp server URL (e.g.,
+          <strong className="text-foreground">MCP URL:</strong> Your cl-n8n-mcp server URL (e.g.,
           https://cl-n8n-mcp.node2flow.net)
         </li>
         <li>
-          <strong className="text-n2f-text">Auth Token:</strong> Your cl-n8n-mcp authentication token or n2f_ API key
+          <strong className="text-foreground">Auth Token:</strong> Your cl-n8n-mcp authentication token or n2f_ API key
         </li>
         <li>
-          <strong className="text-n2f-text">n8n URL (optional):</strong> Your n8n instance URL for workflow management tools
+          <strong className="text-foreground">n8n URL (optional):</strong> Your n8n instance URL for workflow management tools
         </li>
         <li>
-          <strong className="text-n2f-text">n8n API Key (optional):</strong> Your n8n API key for workflow management tools
+          <strong className="text-foreground">n8n API Key (optional):</strong> Your n8n API key for workflow management tools
         </li>
       </ul>
     </>
@@ -123,36 +123,36 @@ Found 3 matching nodes:
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Documentation vs Management Tools</h2>
-        <p className="text-n2f-text-secondary mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Documentation vs Management Tools</h2>
+        <p className="text-muted-foreground mb-4">
           cl-n8n-mcp provides two types of tools:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Search className="h-4 w-4 text-blue-400" />
-              <span className="text-n2f-text font-medium">Documentation (7 tools)</span>
+              <span className="text-foreground font-medium">Documentation (7 tools)</span>
             </div>
-            <ul className="text-sm text-n2f-text-secondary space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li>Search 500+ n8n nodes</li>
               <li>Get node documentation</li>
               <li>Validate configurations</li>
               <li>Browse templates</li>
             </ul>
-            <p className="text-xs text-n2f-text-muted mt-2">No n8n instance required</p>
+            <p className="text-xs text-muted-foreground mt-2">No n8n instance required</p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Cpu className="h-4 w-4 text-purple-400" />
-              <span className="text-n2f-text font-medium">Management (13 tools)</span>
+              <span className="text-foreground font-medium">Management (13 tools)</span>
             </div>
-            <ul className="text-sm text-n2f-text-secondary space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li>Create/update workflows</li>
               <li>Test and execute workflows</li>
               <li>Auto-fix validation errors</li>
               <li>Deploy templates</li>
             </ul>
-            <p className="text-xs text-n2f-text-muted mt-2">Requires n8n URL + API key</p>
+            <p className="text-xs text-muted-foreground mt-2">Requires n8n URL + API key</p>
           </div>
         </div>
       </section>

@@ -84,24 +84,24 @@ Pending updates: 0`,
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your Telegram Bot:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My Telegram Bot")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My Telegram Bot")
         </li>
         <li>
-          <strong className="text-n2f-text">Bot Token:</strong> From{' '}
+          <strong className="text-foreground">Bot Token:</strong> From{' '}
           <a
             href="https://t.me/botfather"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-n2f-accent hover:underline"
+            className="text-primary hover:underline"
           >
             @BotFather
           </a>
-          {' '}&mdash; send <code className="bg-n2f-elevated px-1 rounded">/newbot</code> and follow the prompts
+          {' '}&mdash; send <code className="bg-muted px-1 rounded">/newbot</code> and follow the prompts
         </li>
       </ul>
     </>
@@ -119,20 +119,20 @@ Pending updates: 0`,
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Message Formatting</h2>
-        <p className="text-n2f-text-secondary mb-3">
-          Use <code className="bg-n2f-elevated px-1 rounded">parse_mode</code> to format messages:
+        <h2 className="text-xl font-semibold text-foreground mb-4">Message Formatting</h2>
+        <p className="text-muted-foreground mb-3">
+          Use <code className="bg-muted px-1 rounded">parse_mode</code> to format messages:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">HTML</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">HTML</span>
+            <p className="text-sm text-muted-foreground mt-1">
               {'<b>bold</b>, <i>italic</i>, <code>code</code>, <a href="...">link</a>'}
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">MarkdownV2</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">MarkdownV2</span>
+            <p className="text-sm text-muted-foreground mt-1">
               *bold*, _italic_, `code`, [link](url), ||spoiler||
             </p>
           </div>
@@ -140,25 +140,25 @@ Pending updates: 0`,
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Chat ID Types</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Chat ID Types</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Send className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">Private / Group</span>
+              <Send className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">Private / Group</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Numeric ID (e.g., <code className="bg-n2f-elevated px-1 rounded">123456789</code> for private,{' '}
-              <code className="bg-n2f-elevated px-1 rounded">-100123456789</code> for supergroup)
+            <p className="text-sm text-muted-foreground">
+              Numeric ID (e.g., <code className="bg-muted px-1 rounded">123456789</code> for private,{' '}
+              <code className="bg-muted px-1 rounded">-100123456789</code> for supergroup)
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Globe className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">Channel</span>
+              <Globe className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">Channel</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
-              Username format: <code className="bg-n2f-elevated px-1 rounded">@channelname</code> or numeric ID
+            <p className="text-sm text-muted-foreground">
+              Username format: <code className="bg-muted px-1 rounded">@channelname</code> or numeric ID
             </p>
           </div>
         </div>
@@ -185,14 +185,14 @@ Pending updates: 0`,
                   href="https://t.me/botfather"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-n2f-accent hover:underline"
+                  className="text-primary hover:underline"
                 >
                   @BotFather
                 </a>
               </li>
-              <li>Send <code className="bg-n2f-elevated px-1 rounded">/newbot</code> command</li>
+              <li>Send <code className="bg-muted px-1 rounded">/newbot</code> command</li>
               <li>Follow the prompts to choose a name and username</li>
-              <li>Copy the Bot Token provided (format: <code className="bg-n2f-elevated px-1 rounded">123456:ABC-DEF...</code>)</li>
+              <li>Copy the Bot Token provided (format: <code className="bg-muted px-1 rounded">123456:ABC-DEF...</code>)</li>
             </ol>
           ),
         },
@@ -235,9 +235,9 @@ Pending updates: 0`,
             <div className="space-y-2">
               <p>Several ways to find your chat ID:</p>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Send a message to your bot, then use <code className="bg-n2f-elevated px-1 rounded">tg_get_webhook_info</code> to check pending updates</li>
-                <li>For channels, use <code className="bg-n2f-elevated px-1 rounded">@channelname</code> as the chat_id</li>
-                <li>Forward a message from the chat to <code className="bg-n2f-elevated px-1 rounded">@userinfobot</code> on Telegram</li>
+                <li>Send a message to your bot, then use <code className="bg-muted px-1 rounded">tg_get_webhook_info</code> to check pending updates</li>
+                <li>For channels, use <code className="bg-muted px-1 rounded">@channelname</code> as the chat_id</li>
+                <li>Forward a message from the chat to <code className="bg-muted px-1 rounded">@userinfobot</code> on Telegram</li>
                 <li>Private chat IDs are positive numbers, group IDs are negative</li>
               </ul>
             </div>

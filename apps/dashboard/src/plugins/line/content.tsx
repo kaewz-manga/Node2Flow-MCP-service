@@ -82,20 +82,20 @@ Found 2 rich menus:
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your LINE Bot channel:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My LINE Bot")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My LINE Bot")
         </li>
         <li>
-          <strong className="text-n2f-text">Channel Access Token:</strong> From{' '}
+          <strong className="text-foreground">Channel Access Token:</strong> From{' '}
           <a
             href="https://developers.line.biz/console/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-n2f-accent hover:underline"
+            className="text-primary hover:underline"
           >
             LINE Developers Console
           </a>
@@ -117,21 +117,21 @@ Found 2 rich menus:
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Message Types</h2>
-        <p className="text-n2f-text-secondary mb-3">
-          LINE supports various message formats. Use <code className="bg-n2f-elevated px-1 rounded">line_push_message</code> or{' '}
-          <code className="bg-n2f-elevated px-1 rounded">line_broadcast_message</code> to send any type:
+        <h2 className="text-xl font-semibold text-foreground mb-4">Message Types</h2>
+        <p className="text-muted-foreground mb-3">
+          LINE supports various message formats. Use <code className="bg-muted px-1 rounded">line_push_message</code> or{' '}
+          <code className="bg-muted px-1 rounded">line_broadcast_message</code> to send any type:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">Basic types</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">Basic types</span>
+            <p className="text-sm text-muted-foreground mt-1">
               text, image, video, audio, file, location, sticker
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
-            <span className="text-n2f-text font-medium">Advanced types</span>
-            <p className="text-sm text-n2f-text-secondary mt-1">
+          <div className="bg-card border border-border rounded-lg p-3">
+            <span className="text-foreground font-medium">Advanced types</span>
+            <p className="text-sm text-muted-foreground mt-1">
               flex message, template (buttons, carousel, confirm), imagemap
             </p>
           </div>
@@ -139,26 +139,26 @@ Found 2 rich menus:
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Push vs Reply</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Push vs Reply</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Send className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">Push Message</span>
+              <Send className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">Push Message</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
+            <p className="text-sm text-muted-foreground">
               Send anytime to any user. Consumes message quota. Use{' '}
-              <code className="bg-n2f-elevated px-1 rounded">line_push_message</code>.
+              <code className="bg-muted px-1 rounded">line_push_message</code>.
             </p>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
-              <MessageCircle className="h-4 w-4 text-n2f-accent" />
-              <span className="text-n2f-text font-medium">Reply Message</span>
+              <MessageCircle className="h-4 w-4 text-primary" />
+              <span className="text-foreground font-medium">Reply Message</span>
             </div>
-            <p className="text-sm text-n2f-text-secondary">
+            <p className="text-sm text-muted-foreground">
               Respond to webhook events. Free (no quota). Token expires quickly. Use{' '}
-              <code className="bg-n2f-elevated px-1 rounded">line_reply_message</code>.
+              <code className="bg-muted px-1 rounded">line_reply_message</code>.
             </p>
           </div>
         </div>
@@ -185,7 +185,7 @@ Found 2 rich menus:
                   href="https://developers.line.biz/console/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-n2f-accent hover:underline"
+                  className="text-primary hover:underline"
                 >
                   LINE Developers Console
                 </a>

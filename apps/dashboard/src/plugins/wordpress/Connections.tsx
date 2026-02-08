@@ -13,10 +13,22 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  X,
   Shield,
   Globe,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function Connections() {
   const { withSudo, totpEnabled } = useSudoContext();
@@ -159,7 +171,7 @@ export default function Connections() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-n2f-accent" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -168,214 +180,219 @@ export default function Connections() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-n2f-text">WordPress Connections</h1>
-          <p className="text-n2f-text-secondary mt-1">Manage your WordPress site connections</p>
+          <h1 className="text-2xl font-bold text-foreground">WordPress Connections</h1>
+          <p className="text-muted-foreground mt-1">Manage your WordPress site connections</p>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="btn-primary">
+        <Button onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
-        </button>
+        </Button>
       </div>
 
-      <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-n2f-text-secondary">MCP Endpoint</p>
-          <code className="text-sm font-mono text-n2f-text break-all">{mcpUrl}</code>
-        </div>
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText(mcpUrl);
-            setCopiedMcp(true);
-            setTimeout(() => setCopiedMcp(false), 2000);
-          }}
-          className="btn-secondary shrink-0 py-2 px-3"
-        >
-          {copiedMcp ? (
-            <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
-          ) : (
-            <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
-          )}
-        </button>
-      </div>
+      <Card>
+        <CardContent className="p-4 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-muted-foreground">MCP Endpoint</p>
+            <code className="text-sm font-mono text-foreground break-all">{mcpUrl}</code>
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              navigator.clipboard.writeText(mcpUrl);
+              setCopiedMcp(true);
+              setTimeout(() => setCopiedMcp(false), 2000);
+            }}
+            className="shrink-0 py-2 px-3"
+          >
+            {copiedMcp ? (
+              <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
+            ) : (
+              <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
 
       {!totpEnabled && (
-        <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield className="h-5 w-5 text-amber-400" />
+        <Alert className="bg-amber-900/30 border-amber-700">
+          <Shield className="h-5 w-5 text-amber-400" />
+          <AlertDescription className="flex items-center justify-between w-full">
             <div>
               <p className="text-amber-300 font-medium">Enable Two-Factor Authentication</p>
               <p className="text-sm text-amber-300/80">
                 Set up 2FA to manage connections securely
               </p>
             </div>
-          </div>
-          <Link to="/settings" className="btn-secondary text-amber-400 border-amber-600 hover:bg-amber-900/30">
-            Enable 2FA
-          </Link>
-        </div>
+            <Button variant="outline" asChild className="text-amber-400 border-amber-600 hover:bg-amber-900/30">
+              <Link to="/settings">Enable 2FA</Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-4 flex items-center gap-3">
-          <AlertCircle className="h-5 w-5 text-red-400" />
-          <span className="text-red-300">{error}</span>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-5 w-5" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {connections.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="bg-n2f-elevated w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Globe className="h-8 w-8 text-n2f-text-muted" />
-          </div>
-          <h3 className="text-lg font-medium text-n2f-text mb-2">No connections yet</h3>
-          <p className="text-n2f-text-secondary mb-6 max-w-sm mx-auto">
-            Add your first WordPress site to start managing it with AI.
-          </p>
-          <button onClick={() => setShowAddModal(true)} className="btn-primary">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Connection
-          </button>
-        </div>
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Globe className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-2">No connections yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+              Add your first WordPress site to start managing it with AI.
+            </p>
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Connection
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-4">
           {connections.map((conn) => {
             const connKeys = getKeysForConnection(conn.id);
             return (
-              <div key={conn.id} className="card">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-3 h-3 rounded-full mt-1.5 ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-n2f-text-muted'}`} />
-                    <div>
-                      <h3 className="font-semibold text-n2f-text">{conn.name}</h3>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Globe className="h-3 w-3 text-n2f-text-muted" />
-                        <span className="text-sm text-n2f-text-secondary">{conn.product_type}</span>
+              <Card key={conn.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className={`w-3 h-3 rounded-full mt-1.5 ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+                      <div>
+                        <h3 className="font-semibold text-foreground">{conn.name}</h3>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Globe className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{conn.product_type}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Added {new Date(conn.created_at).toLocaleDateString()}
+                        </p>
                       </div>
-                      <p className="text-xs text-n2f-text-muted mt-1">
-                        Added {new Date(conn.created_at).toLocaleDateString()}
-                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)} className="text-xs">
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        New Key
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteConnection(conn.id)} className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => handleGenerateApiKey(conn.id)} className="btn-secondary text-xs py-1.5">
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                      New Key
-                    </button>
-                    <button onClick={() => handleDeleteConnection(conn.id)} className="p-2 text-n2f-text-muted hover:text-red-400 hover:bg-red-900/30 rounded-lg">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                {connKeys.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-n2f-border">
-                    <h4 className="text-sm font-medium text-n2f-text-secondary mb-2">API Keys</h4>
-                    <div className="space-y-2">
-                      {connKeys.map((key) => (
-                        <div key={key.id} className="flex items-center justify-between py-2 px-3 bg-n2f-card rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Key className="h-4 w-4 text-n2f-text-muted" />
-                            <div>
-                              <code className="text-sm font-mono text-n2f-text-secondary">{key.prefix}...</code>
-                              <span className="ml-2 text-xs text-n2f-text-secondary">{key.name}</span>
+                  {connKeys.length > 0 && (
+                    <div className="mt-4">
+                      <Separator className="mb-4" />
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">API Keys</h4>
+                      <div className="space-y-2">
+                        {connKeys.map((key) => (
+                          <div key={key.id} className="flex items-center justify-between py-2 px-3 bg-card rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <Key className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <code className="text-sm font-mono text-muted-foreground">{key.prefix}...</code>
+                                <span className="ml-2 text-xs text-muted-foreground">{key.name}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className={key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : ''}>
+                                {key.status}
+                              </Badge>
+                              {key.status === 'active' && (
+                                <Button variant="link" onClick={() => handleRevokeApiKey(key.id)} className="text-xs text-red-400 hover:text-red-300 p-0 h-auto">Revoke</Button>
+                              )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : 'bg-n2f-elevated text-n2f-text-secondary'}`}>
-                              {key.status}
-                            </span>
-                            {key.status === 'active' && (
-                              <button onClick={() => handleRevokeApiKey(key.id)} className="text-xs text-red-400 hover:text-red-300">Revoke</button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </CardContent>
+              </Card>
             );
           })}
         </div>
       )}
 
       {/* Add Connection Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-n2f-card rounded-xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-4 border-b border-n2f-border">
-              <h2 className="text-lg font-semibold text-n2f-text">Add WordPress Connection</h2>
-              <button onClick={() => setShowAddModal(false)} className="p-1 text-n2f-text-muted hover:text-n2f-text-secondary">
-                <X className="h-5 w-5" />
-              </button>
+      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add WordPress Connection</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddConnection} className="space-y-4">
+            {formError && (
+              <Alert variant="destructive">
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
+            )}
+            <div>
+              <Label>Connection Name</Label>
+              <Input type="text" placeholder="My WordPress Site" value={formName} onChange={(e) => setFormName(e.target.value)} required />
             </div>
-            <form onSubmit={handleAddConnection} className="p-4 space-y-4">
-              {formError && (
-                <div className="bg-red-900/30 border border-red-700 text-red-300 px-3 py-2 rounded-lg text-sm">{formError}</div>
-              )}
-              <div>
-                <label className="label">Connection Name</label>
-                <input type="text" className="input" placeholder="My WordPress Site" value={formName} onChange={(e) => setFormName(e.target.value)} required />
-              </div>
-              <div>
-                <label className="label">Site URL</label>
-                <input type="url" className="input" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
-                <p className="text-xs text-n2f-text-secondary mt-1">Your WordPress site URL (without /wp-admin)</p>
-              </div>
-              <div>
-                <label className="label">Username</label>
-                <input type="text" className="input" placeholder="admin" value={formUsername} onChange={(e) => setFormUsername(e.target.value)} required />
-                <p className="text-xs text-n2f-text-secondary mt-1">Your WordPress login username</p>
-              </div>
-              <div>
-                <label className="label">Application Password</label>
-                <input type="password" className="input" placeholder="xxxx xxxx xxxx xxxx" value={formAppPassword} onChange={(e) => setFormAppPassword(e.target.value)} required />
-                <p className="text-xs text-n2f-text-secondary mt-1">
-                  From Users &rarr; Profile &rarr; Application Passwords (spaces will be removed automatically)
-                </p>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" disabled={formLoading} className="btn-primary flex-1">
-                  {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div>
+              <Label>Site URL</Label>
+              <Input type="url" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
+              <p className="text-xs text-muted-foreground mt-1">Your WordPress site URL (without /wp-admin)</p>
+            </div>
+            <div>
+              <Label>Username</Label>
+              <Input type="text" placeholder="admin" value={formUsername} onChange={(e) => setFormUsername(e.target.value)} required />
+              <p className="text-xs text-muted-foreground mt-1">Your WordPress login username</p>
+            </div>
+            <div>
+              <Label>Application Password</Label>
+              <Input type="password" placeholder="xxxx xxxx xxxx xxxx" value={formAppPassword} onChange={(e) => setFormAppPassword(e.target.value)} required />
+              <p className="text-xs text-muted-foreground mt-1">
+                From Users &rarr; Profile &rarr; Application Passwords (spaces will be removed automatically)
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)} className="flex-1">Cancel</Button>
+              <Button type="submit" disabled={formLoading} className="flex-1">
+                {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* API Key Display Modal */}
-      {showApiKeyModal && (
-        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-n2f-card rounded-xl shadow-xl max-w-lg w-full">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-emerald-900/30 p-2 rounded-full">
-                  <Check className="h-6 w-6 text-emerald-400" />
-                </div>
-                <h2 className="text-lg font-semibold text-n2f-text">Your API Key</h2>
+      <Dialog open={showApiKeyModal} onOpenChange={(open) => { if (!open) { setShowApiKeyModal(false); setNewApiKey(''); } }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="bg-emerald-900/30 p-2 rounded-full">
+                <Check className="h-6 w-6 text-emerald-400" />
               </div>
-              <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4 mb-4">
-                <p className="text-sm text-yellow-300">
-                  <strong>Important:</strong> Copy this API key now. You won't be able to see it again!
-                </p>
-              </div>
-              <div className="bg-n2f-elevated rounded-lg p-3 flex items-center gap-2">
-                <code className="flex-1 text-sm font-mono break-all text-n2f-text">{newApiKey}</code>
-                <button onClick={() => copyToClipboard(newApiKey)} className="btn-secondary p-2">
-                  {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-                </button>
-              </div>
-              <button
-                onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}
-                className="btn-primary w-full mt-6"
-              >
-                I've saved my API key
-              </button>
+              <DialogTitle>Your API Key</DialogTitle>
             </div>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Alert className="bg-yellow-900/30 border-yellow-600">
+              <AlertDescription className="text-yellow-300">
+                <strong>Important:</strong> Copy this API key now. You won't be able to see it again!
+              </AlertDescription>
+            </Alert>
+            <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
+              <code className="flex-1 text-sm font-mono break-all text-foreground">{newApiKey}</code>
+              <Button variant="secondary" size="icon" onClick={() => copyToClipboard(newApiKey)}>
+                {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <Button
+              onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}
+              className="w-full"
+            >
+              I've saved my API key
+            </Button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

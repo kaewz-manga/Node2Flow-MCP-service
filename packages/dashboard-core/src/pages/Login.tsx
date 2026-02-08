@@ -3,7 +3,13 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { login, getOAuthProviders, getOAuthUrl } from '../lib/api';
 import type { OAuthProvider } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Zap, ArrowLeft } from 'lucide-react';
+import { Loader2, Zap, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Separator } from '../components/ui/separator';
 
 // GitHub Icon
 function GitHubIcon({ className }: { className?: string }) {
@@ -80,7 +86,6 @@ export default function Login() {
     const response = await getOAuthUrl(provider);
 
     if (response.success && response.data?.url) {
-      // Redirect to OAuth provider
       window.location.href = response.data.url;
     } else {
       setError(response.error?.message || 'Failed to initiate OAuth');
@@ -116,29 +121,28 @@ export default function Login() {
         {providers.length > 0 && (
           <div className="space-y-3">
             {providers.map((provider) => (
-              <button
+              <Button
                 key={provider.id}
                 type="button"
+                variant="outline"
                 onClick={() => handleOAuthLogin(provider.id)}
                 disabled={oauthLoading !== null}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg shadow-sm bg-card hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 gap-3"
               >
                 {oauthLoading === provider.id ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : provider.id === 'github' ? (
-                  <GitHubIcon className="h-5 w-5 text-foreground" />
+                  <GitHubIcon className="h-5 w-5" />
                 ) : (
                   <GoogleIcon className="h-5 w-5" />
                 )}
-                <span className="text-sm font-medium text-foreground">
-                  Continue with {provider.name}
-                </span>
-              </button>
+                <span>Continue with {provider.name}</span>
+              </Button>
             ))}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+                <Separator />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-background text-muted-foreground">Or continue with email</span>
@@ -149,40 +153,35 @@ export default function Login() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="label">
-                Email address
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="input"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="label">
-                Password
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="current-password"
                 required
-                className="input"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -190,22 +189,20 @@ export default function Login() {
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading || oauthLoading !== null}
-              className="btn-primary w-full py-3"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign in'
-              )}
-            </button>
-          </div>
+          <Button
+            type="submit"
+            disabled={loading || oauthLoading !== null}
+            className="w-full h-11"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin h-4 w-4" />
+                Signing in...
+              </>
+            ) : (
+              'Sign in'
+            )}
+          </Button>
         </form>
       </div>
     </div>

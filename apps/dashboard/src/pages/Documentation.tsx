@@ -23,6 +23,11 @@ import {
 } from 'lucide-react';
 import { plugins } from '../plugins/registry';
 import { getPluginTools } from '../lib/gateway-api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
 type TabId = 'quickstart' | 'tools' | 'api' | 'config' | 'errors';
 
@@ -58,17 +63,18 @@ function CodeBlock({ code, language = 'json' }: { code: string; language?: strin
       <pre className={`bg-black rounded-lg p-4 text-sm overflow-x-auto language-${language}`}>
         <code className="text-green-400">{code}</code>
       </pre>
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={handleCopy}
-        className="absolute top-2 right-2 p-2 bg-n2f-elevated rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-        title="Copy to clipboard"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
       >
         {copied ? (
           <Check className="h-4 w-4 text-green-400" />
         ) : (
-          <Copy className="h-4 w-4 text-n2f-text-muted" />
+          <Copy className="h-4 w-4 text-muted-foreground" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -81,17 +87,14 @@ function TabButton({ id, label, icon, active, onClick }: {
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
+      variant={active ? 'default' : 'ghost'}
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-        active
-          ? 'bg-n2f-accent text-gray-900'
-          : 'text-n2f-text-secondary hover:bg-n2f-elevated'
-      }`}
+      className="gap-2"
     >
       {icon}
       <span className="hidden sm:inline">{label}</span>
-    </button>
+    </Button>
   );
 }
 
@@ -163,12 +166,12 @@ export default function Documentation() {
   const content = (
     <>
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-n2f-accent/10 p-3 rounded-lg">
-            <Book className="h-6 w-6 text-n2f-accent" />
+          <div className="bg-primary/10 p-3 rounded-lg">
+            <Book className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-n2f-text">Documentation</h1>
-            <p className="text-n2f-text-secondary">Learn how to integrate Node2Flow with your AI assistant</p>
+            <h1 className="text-2xl font-bold text-foreground">Documentation</h1>
+            <p className="text-muted-foreground">Learn how to integrate Node2Flow with your AI assistant</p>
           </div>
         </div>
 
@@ -176,23 +179,20 @@ export default function Documentation() {
         {plugins.length > 1 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {plugins.map((plugin, idx) => (
-              <button
+              <Button
                 key={plugin.id}
+                variant={idx === selectedPluginIdx ? 'default' : 'secondary'}
+                size="sm"
                 onClick={() => setSelectedPluginIdx(idx)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  idx === selectedPluginIdx
-                    ? 'bg-n2f-accent text-gray-900'
-                    : 'bg-n2f-elevated text-n2f-text-secondary hover:text-n2f-text'
-                }`}
               >
                 {plugin.name}
-              </button>
+              </Button>
             ))}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-n2f-border">
+        <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-border">
           <TabButton
             id="quickstart"
             label="Quick Start"
@@ -236,13 +236,13 @@ export default function Documentation() {
           {activeTab === 'quickstart' && (
             <div className="space-y-8">
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
-                  <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
                   Create an Account
                 </h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <p className="text-muted-foreground mb-4">
                   Sign up at{' '}
-                  <Link to="/register" className="text-n2f-accent hover:underline">
+                  <Link to="/register" className="text-primary hover:underline">
                     app.node2flow.net/register
                   </Link>{' '}
                   using email or OAuth (GitHub/Google).
@@ -250,23 +250,23 @@ export default function Documentation() {
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
-                  <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
                   Add Your Connection
                 </h2>
                 {pc?.connectionGuide || (
-                  <p className="text-n2f-text-secondary mb-4">
+                  <p className="text-muted-foreground mb-4">
                     Go to <strong>Connections</strong> and add your service instance.
                   </p>
                 )}
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
-                  <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">3</span>
                   Generate a Service API Key
                 </h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <p className="text-muted-foreground mb-4">
                   On the Connections page, click <strong>"Generate API Key"</strong> for your connection.
                   Copy and save the key securely - it won't be shown again.
                 </p>
@@ -279,18 +279,18 @@ export default function Documentation() {
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
-                  <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">4</span>
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">4</span>
                   Configure Your MCP Client
                 </h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <p className="text-muted-foreground mb-4">
                   Add the MCP server to your client's configuration:
                 </p>
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-medium text-n2f-text mb-2">Claude Desktop (stdio proxy)</h3>
-                    <p className="text-sm text-n2f-text-muted mb-2">
+                    <h3 className="font-medium text-foreground mb-2">Claude Desktop (stdio proxy)</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
                       First, install the stdio server:
                     </p>
                     <CodeBlock
@@ -298,9 +298,9 @@ export default function Documentation() {
 cd n8n-management-mcp && npm install`}
                       language="bash"
                     />
-                    <p className="text-sm text-n2f-text-muted mt-3 mb-2">
-                      Then edit <code className="bg-n2f-elevated px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code> (Windows)
-                      or <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS):
+                    <p className="text-sm text-muted-foreground mt-3 mb-2">
+                      Then edit <code className="bg-muted px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code> (Windows)
+                      or <code className="bg-muted px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS):
                     </p>
                     <CodeBlock
                       code={`{
@@ -318,8 +318,8 @@ cd n8n-management-mcp && npm install`}
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-n2f-text mb-2">Cursor / Claude Code / Windsurf</h3>
-                    <p className="text-sm text-n2f-text-muted mb-2">
+                    <h3 className="font-medium text-foreground mb-2">Cursor / Claude Code / Windsurf</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
                       Clients that support HTTP transport can connect directly:
                     </p>
                     <CodeBlock
@@ -337,18 +337,20 @@ cd n8n-management-mcp && npm install`}
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4 flex items-center gap-2">
-                  <span className="bg-n2f-accent text-gray-900 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">5</span>
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">5</span>
                   Start Using
                 </h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <p className="text-muted-foreground mb-4">
                   Restart your MCP client and try asking:
                 </p>
-                <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
-                  {(pc?.examplePrompts || ['List all my workflows', 'Show me recent executions', 'Create a new workflow']).map((prompt, i) => (
-                    <p key={i} className={`text-n2f-text italic${i > 0 ? ' mt-2' : ''}`}>"{prompt}"</p>
-                  ))}
-                </div>
+                <Card>
+                  <CardContent className="p-4">
+                    {(pc?.examplePrompts || ['List all my workflows', 'Show me recent executions', 'Create a new workflow']).map((prompt, i) => (
+                      <p key={i} className={`text-foreground italic${i > 0 ? ' mt-2' : ''}`}>"{prompt}"</p>
+                    ))}
+                  </CardContent>
+                </Card>
               </section>
             </div>
           )}
@@ -357,37 +359,39 @@ cd n8n-management-mcp && npm install`}
           {activeTab === 'tools' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <p className="text-n2f-text-secondary">
+                <p className="text-muted-foreground">
                   {mcpTools.length} tools available across {Object.keys(toolsByCategory).length} categories
                 </p>
-                <input
+                <Input
                   type="text"
                   placeholder="Search tools..."
                   value={toolFilter}
                   onChange={(e) => setToolFilter(e.target.value)}
-                  className="px-3 py-2 bg-n2f-card border border-n2f-border rounded-lg text-n2f-text placeholder-n2f-text-muted text-sm focus:outline-none focus:ring-2 focus:ring-n2f-accent"
+                  className="w-auto max-w-xs"
                 />
               </div>
 
               {Object.entries(toolsByCategory).map(([category, tools]) => (
                 <section key={category}>
-                  <h3 className="text-lg font-semibold text-n2f-text mb-3 flex items-center gap-2">
-                    <span className="text-n2f-accent">{categoryIcons[category]}</span>
+                  <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <span className="text-primary">{categoryIcons[category]}</span>
                     {category}
-                    <span className="text-sm font-normal text-n2f-text-muted">({tools.length})</span>
+                    <span className="text-sm font-normal text-muted-foreground">({tools.length})</span>
                   </h3>
                   <div className="grid gap-2">
                     {tools.map((tool) => (
-                      <div
+                      <Card
                         key={tool.name}
-                        className="bg-n2f-card border border-n2f-border rounded-lg p-3 flex items-center justify-between hover:border-n2f-accent/30 transition-colors"
+                        className="hover:border-primary/30 transition-colors"
                       >
-                        <div>
-                          <code className="text-n2f-accent font-mono text-sm">{tool.name}</code>
-                          <p className="text-n2f-text-secondary text-sm mt-1">{tool.description}</p>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-n2f-text-muted" />
-                      </div>
+                        <CardContent className="p-3 flex items-center justify-between">
+                          <div>
+                            <code className="text-primary font-mono text-sm">{tool.name}</code>
+                            <p className="text-muted-foreground text-sm mt-1">{tool.description}</p>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </section>
@@ -395,13 +399,10 @@ cd n8n-management-mcp && npm install`}
 
               {filteredTools.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-n2f-text-secondary">No tools match "{toolFilter}"</p>
-                  <button
-                    onClick={() => setToolFilter('')}
-                    className="text-n2f-accent hover:underline mt-2"
-                  >
+                  <p className="text-muted-foreground">No tools match "{toolFilter}"</p>
+                  <Button variant="link" onClick={() => setToolFilter('')} className="mt-2">
                     Clear search
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -411,13 +412,13 @@ cd n8n-management-mcp && npm install`}
           {activeTab === 'api' && (
             <div className="space-y-8">
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Base URL</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Base URL</h2>
                 <CodeBlock code="https://mcp.node2flow.net" />
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Authentication</h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Authentication</h2>
+                <p className="text-muted-foreground mb-4">
                   All API requests require authentication via Bearer token:
                 </p>
                 <CodeBlock
@@ -426,17 +427,19 @@ cd n8n-management-mcp && npm install`}
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">MCP Endpoint</h2>
-                <div className="bg-n2f-card border border-n2f-border rounded-lg p-4 mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">POST</span>
-                    <code className="text-n2f-text">/mcp</code>
-                  </div>
-                  <p className="text-n2f-text-secondary text-sm">
-                    JSON-RPC 2.0 endpoint for MCP tool calls
-                  </p>
-                </div>
-                <h3 className="font-medium text-n2f-text mb-2">Request Example</h3>
+                <h2 className="text-xl font-semibold text-foreground mb-4">MCP Endpoint</h2>
+                <Card className="mb-4">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">POST</span>
+                      <code className="text-foreground">/mcp</code>
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      JSON-RPC 2.0 endpoint for MCP tool calls
+                    </p>
+                  </CardContent>
+                </Card>
+                <h3 className="font-medium text-foreground mb-2">Request Example</h3>
                 <CodeBlock
                   code={`{
   "jsonrpc": "2.0",
@@ -451,7 +454,7 @@ cd n8n-management-mcp && npm install`}
   }
 }`}
                 />
-                <h3 className="font-medium text-n2f-text mb-2 mt-4">Response Example</h3>
+                <h3 className="font-medium text-foreground mb-2 mt-4">Response Example</h3>
                 <CodeBlock
                   code={`{
   "jsonrpc": "2.0",
@@ -469,61 +472,67 @@ cd n8n-management-mcp && npm install`}
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">REST API Endpoints</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-4">REST API Endpoints</h2>
                 <div className="space-y-3">
-                  <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                      <code className="text-n2f-text">/api/connections</code>
-                    </div>
-                    <p className="text-n2f-text-secondary text-sm">List your n8n connections</p>
-                  </div>
-                  <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                      <code className="text-n2f-text">/api/usage</code>
-                    </div>
-                    <p className="text-n2f-text-secondary text-sm">Get usage statistics</p>
-                  </div>
-                  <div className="bg-n2f-card border border-n2f-border rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                      <code className="text-n2f-text">/api/plans</code>
-                    </div>
-                    <p className="text-n2f-text-secondary text-sm">Get available plans (public)</p>
-                  </div>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
+                        <code className="text-foreground">/api/connections</code>
+                      </div>
+                      <p className="text-muted-foreground text-sm">List your n8n connections</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
+                        <code className="text-foreground">/api/usage</code>
+                      </div>
+                      <p className="text-muted-foreground text-sm">Get usage statistics</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
+                        <code className="text-foreground">/api/plans</code>
+                      </div>
+                      <p className="text-muted-foreground text-sm">Get available plans (public)</p>
+                    </CardContent>
+                  </Card>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Rate Limits</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Rate Limits</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-n2f-border">
-                        <th className="text-left py-2 text-n2f-text">Plan</th>
-                        <th className="text-left py-2 text-n2f-text">Requests/Minute</th>
-                        <th className="text-left py-2 text-n2f-text">Requests/Day</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-n2f-border text-n2f-text-secondary">
-                      <tr>
-                        <td className="py-2">Free</td>
-                        <td className="py-2">50</td>
-                        <td className="py-2">100</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2">Pro</td>
-                        <td className="py-2">100</td>
-                        <td className="py-2">5,000</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2">Enterprise</td>
-                        <td className="py-2">Custom</td>
-                        <td className="py-2">Unlimited</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Plan</TableHead>
+                        <TableHead>Requests/Minute</TableHead>
+                        <TableHead>Requests/Day</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>Free</TableCell>
+                        <TableCell>50</TableCell>
+                        <TableCell>100</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Pro</TableCell>
+                        <TableCell>100</TableCell>
+                        <TableCell>5,000</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Enterprise</TableCell>
+                        <TableCell>Custom</TableCell>
+                        <TableCell>Unlimited</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </div>
               </section>
             </div>
@@ -533,18 +542,18 @@ cd n8n-management-mcp && npm install`}
           {activeTab === 'config' && (
             <div className="space-y-8">
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Claude Desktop Configuration</h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Claude Desktop Configuration</h2>
+                <p className="text-muted-foreground mb-4">
                   Config file location:
                 </p>
-                <ul className="list-disc pl-6 space-y-1 text-n2f-text-secondary mb-4">
-                  <li><strong className="text-n2f-text">Windows:</strong> <code className="bg-n2f-elevated px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code></li>
-                  <li><strong className="text-n2f-text">macOS:</strong> <code className="bg-n2f-elevated px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
-                  <li><strong className="text-n2f-text">Linux:</strong> <code className="bg-n2f-elevated px-1 rounded">~/.config/Claude/claude_desktop_config.json</code></li>
+                <ul className="list-disc pl-6 space-y-1 text-muted-foreground mb-4">
+                  <li><strong className="text-foreground">Windows:</strong> <code className="bg-muted px-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code></li>
+                  <li><strong className="text-foreground">macOS:</strong> <code className="bg-muted px-1 rounded">~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+                  <li><strong className="text-foreground">Linux:</strong> <code className="bg-muted px-1 rounded">~/.config/Claude/claude_desktop_config.json</code></li>
                 </ul>
-                <h3 className="font-medium text-n2f-text mb-2">stdio proxy (recommended)</h3>
-                <p className="text-sm text-n2f-text-muted mb-2">
-                  Install first: <code className="bg-n2f-elevated px-1 rounded">git clone https://github.com/kaewz-manga/n8n-management-mcp.git && cd n8n-management-mcp && npm install</code>
+                <h3 className="font-medium text-foreground mb-2">stdio proxy (recommended)</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Install first: <code className="bg-muted px-1 rounded">git clone https://github.com/kaewz-manga/n8n-management-mcp.git && cd n8n-management-mcp && npm install</code>
                 </p>
                 <CodeBlock
                   code={`{
@@ -559,7 +568,7 @@ cd n8n-management-mcp && npm install`}
   }
 }`}
                 />
-                <h3 className="font-medium text-n2f-text mt-4 mb-2">HTTP transport (Cursor / Claude Code / Windsurf)</h3>
+                <h3 className="font-medium text-foreground mt-4 mb-2">HTTP transport (Cursor / Claude Code / Windsurf)</h3>
                 <CodeBlock
                   code={`{
   "${mcpConfigName}": {
@@ -575,8 +584,8 @@ cd n8n-management-mcp && npm install`}
               {pc?.configSections}
 
               <section>
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Environment Variables</h2>
-                <p className="text-n2f-text-secondary mb-4">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Environment Variables</h2>
+                <p className="text-muted-foreground mb-4">
                   If you're self-hosting or contributing to the project:
                 </p>
                 <CodeBlock
@@ -601,39 +610,39 @@ STRIPE_WEBHOOK_SECRET=whsec_xxx`}
           {/* Error Codes */}
           {activeTab === 'errors' && (
             <div className="space-y-6">
-              <p className="text-n2f-text-secondary">
+              <p className="text-muted-foreground">
                 Common error codes and how to resolve them:
               </p>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-n2f-border">
-                      <th className="text-left py-3 text-n2f-text">Code</th>
-                      <th className="text-left py-3 text-n2f-text">Status</th>
-                      <th className="text-left py-3 text-n2f-text">Description</th>
-                      <th className="text-left py-3 text-n2f-text">Solution</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-n2f-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Solution</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {errorCodes.map((error) => (
-                      <tr key={error.code} className="text-n2f-text-secondary">
-                        <td className="py-3">
+                      <TableRow key={error.code}>
+                        <TableCell>
                           <code className="bg-red-900/30 text-red-400 px-2 py-1 rounded text-xs">
                             {error.code}
                           </code>
-                        </td>
-                        <td className="py-3">{error.status}</td>
-                        <td className="py-3">{error.description}</td>
-                        <td className="py-3">{error.solution}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell>{error.status}</TableCell>
+                        <TableCell>{error.description}</TableCell>
+                        <TableCell>{error.solution}</TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
 
               <section className="mt-8">
-                <h2 className="text-xl font-semibold text-n2f-text mb-4">Error Response Format</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Error Response Format</h2>
                 <CodeBlock
                   code={`{
   "jsonrpc": "2.0",
@@ -650,42 +659,47 @@ STRIPE_WEBHOOK_SECRET=whsec_xxx`}
                 />
               </section>
 
-              <section className="bg-n2f-card border border-n2f-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-n2f-text mb-2">Need Help?</h3>
-                <p className="text-n2f-text-secondary mb-4">
-                  If you're experiencing persistent errors:
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    to="/faq"
-                    className="inline-flex items-center gap-2 text-n2f-accent hover:underline"
-                  >
-                    Check the FAQ <ExternalLink className="h-4 w-4" />
-                  </Link>
-                  <a
-                    href="mailto:support@node2flow.net"
-                    className="inline-flex items-center gap-2 text-n2f-accent hover:underline"
-                  >
-                    Contact Support <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-              </section>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Need Help?</h3>
+                  <p className="text-muted-foreground mb-4">
+                    If you're experiencing persistent errors:
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      to="/faq"
+                      className="inline-flex items-center gap-2 text-primary hover:underline"
+                    >
+                      Check the FAQ <ExternalLink className="h-4 w-4" />
+                    </Link>
+                    <a
+                      href="mailto:support@node2flow.net"
+                      className="inline-flex items-center gap-2 text-primary hover:underline"
+                    >
+                      Contact Support <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
 
         {/* Footer navigation */}
         {!user && (
-          <div className="mt-12 pt-8 border-t border-n2f-border flex flex-wrap justify-between gap-4 text-sm">
-            <div className="flex gap-4">
-              <Link to="/faq" className="text-n2f-accent hover:underline">FAQ</Link>
-              <Link to="/terms" className="text-n2f-accent hover:underline">Terms</Link>
-              <Link to="/privacy" className="text-n2f-accent hover:underline">Privacy</Link>
+          <>
+            <Separator className="mt-12" />
+            <div className="mt-8 flex flex-wrap justify-between gap-4 text-sm">
+              <div className="flex gap-4">
+                <Link to="/faq" className="text-primary hover:underline">FAQ</Link>
+                <Link to="/terms" className="text-primary hover:underline">Terms</Link>
+                <Link to="/privacy" className="text-primary hover:underline">Privacy</Link>
+              </div>
+              <Link to="/" className="text-primary hover:underline">
+                Back to Home →
+              </Link>
             </div>
-            <Link to="/" className="text-n2f-accent hover:underline">
-              Back to Home →
-            </Link>
-          </div>
+          </>
         )}
     </>
   );
@@ -695,17 +709,17 @@ STRIPE_WEBHOOK_SECRET=whsec_xxx`}
   }
 
   return (
-    <div className="min-h-screen bg-n2f-bg">
-      <header className="border-b border-n2f-border sticky top-0 bg-n2f-bg/95 backdrop-blur z-10">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <div className="bg-n2f-accent p-2 rounded-lg">
-                <Zap className="h-5 w-5 text-gray-900" />
+              <div className="bg-primary p-2 rounded-lg">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
+              <span className="text-xl font-bold text-foreground">Node2Flow</span>
             </Link>
-            <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
+            <Link to="/" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Link>

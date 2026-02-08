@@ -10,6 +10,10 @@ import {
   Loader2, RefreshCw, Trash2, RotateCcw, AlertCircle, Filter,
   ChevronDown, ChevronRight,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function ExecutionList() {
   const { activeConnection } = useConnection();
@@ -75,34 +79,34 @@ export default function ExecutionList() {
     } else alert(res.error?.message || 'Failed');
   }
 
-  if (!activeConnection) return <div className="text-center py-12 text-n2f-text-secondary">No connection selected. Please select a connection from the sidebar.</div>;
+  if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-n2f-text">Executions</h1>
-          <p className="text-n2f-text-secondary mt-1">{activeConnection.name} - {executions.length} executions</p>
+          <h1 className="text-2xl font-bold text-foreground">Executions</h1>
+          <p className="text-muted-foreground mt-1">{activeConnection.name} - {executions.length} executions</p>
         </div>
-        <button onClick={fetchList} className="p-2 border border-n2f-border rounded-lg hover:bg-n2f-elevated" title="Refresh">
+        <Button variant="outline" size="icon" onClick={fetchList} title="Refresh">
           <RefreshCw className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3 items-center flex-wrap">
-        <Filter className="h-4 w-4 text-n2f-text-muted" />
-        <input
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <Input
           type="text"
           placeholder="Filter by Workflow ID..."
           value={filterWorkflow}
           onChange={(e) => setFilterWorkflow(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-n2f-border rounded-lg focus:ring-2 focus:ring-n2f-accent w-48 bg-n2f-card text-n2f-text"
+          className="w-48"
         />
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-n2f-border rounded-lg focus:ring-2 focus:ring-n2f-accent bg-n2f-card text-n2f-text"
+          className="px-3 py-1.5 text-sm border border-border rounded-lg bg-card text-foreground"
         >
           <option value="">All statuses</option>
           <option value="success">Success</option>
@@ -113,70 +117,54 @@ export default function ExecutionList() {
       </div>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <span className="text-red-300 text-sm">{error}</span>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-n2f-accent" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-2">
           {executions.map((ex) => {
             const status = ex.status || (ex.finished ? 'success' : 'running');
             return (
-              <div key={ex.id} className="bg-n2f-card border border-n2f-border rounded-lg overflow-hidden">
+              <Card key={ex.id} className="overflow-hidden">
                 {/* Row */}
-                <div className="flex items-center gap-3 px-4 py-3 hover:bg-n2f-elevated">
-                  <button onClick={() => loadDetail(ex.id)} className="text-n2f-text-muted">
+                <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => loadDetail(ex.id)}>
                     {expandedId === ex.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  </button>
-                  <button onClick={() => loadDetail(ex.id)} className="text-sm font-mono text-n2f-accent hover:underline">
+                  </Button>
+                  <button onClick={() => loadDetail(ex.id)} className="text-sm font-mono text-primary hover:underline">
                     #{ex.id}
                   </button>
-                  <span className="flex-1 text-sm text-n2f-text-secondary truncate">{ex.workflowData?.name || ex.workflowId || '-'}</span>
-                  <span className="text-xs text-n2f-text-muted hidden md:block">{ex.startedAt ? new Date(ex.startedAt).toLocaleString() : ''}</span>
+                  <span className="flex-1 text-sm text-muted-foreground truncate">{ex.workflowData?.name || ex.workflowId || '-'}</span>
+                  <span className="text-xs text-muted-foreground hidden md:block">{ex.startedAt ? new Date(ex.startedAt).toLocaleString() : ''}</span>
                   <StatusBadge status={status} />
                   {(status === 'error' || status === 'crashed') && (
-                    <button onClick={() => handleRetry(ex.id)} disabled={retrying === ex.id} className="p-1.5 text-n2f-accent hover:bg-n2f-accent/10 rounded" title="Retry">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:bg-primary/10" onClick={() => handleRetry(ex.id)} disabled={retrying === ex.id} title="Retry">
                       {retrying === ex.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}
-                    </button>
+                    </Button>
                   )}
-                  <button onClick={() => setDeleteTarget(ex)} className="p-1.5 text-red-400 hover:bg-red-900/30 rounded" title="Delete">
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:bg-red-900/30" onClick={() => setDeleteTarget(ex)} title="Delete">
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Expanded detail */}
                 {expandedId === ex.id && (
-                  <div className="border-t border-n2f-border bg-n2f-elevated p-4 space-y-4">
+                  <div className="border-t border-border bg-muted p-4 space-y-4">
                     {detailLoading ? (
-                      <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-n2f-accent" /></div>
+                      <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
                     ) : detail ? (
                       <>
                         {/* Info cards */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          <div className="bg-n2f-card rounded-lg border border-n2f-border p-3">
-                            <p className="text-xs text-n2f-text-secondary">Status</p>
-                            <StatusBadge status={detail.status || (detail.finished ? 'success' : 'running')} />
-                          </div>
-                          <div className="bg-n2f-card rounded-lg border border-n2f-border p-3">
-                            <p className="text-xs text-n2f-text-secondary">Started</p>
-                            <p className="text-sm font-medium text-n2f-text">{detail.startedAt ? new Date(detail.startedAt).toLocaleString() : '-'}</p>
-                          </div>
-                          <div className="bg-n2f-card rounded-lg border border-n2f-border p-3">
-                            <p className="text-xs text-n2f-text-secondary">Finished</p>
-                            <p className="text-sm font-medium text-n2f-text">{detail.stoppedAt ? new Date(detail.stoppedAt).toLocaleString() : '-'}</p>
-                          </div>
-                          <div className="bg-n2f-card rounded-lg border border-n2f-border p-3">
-                            <p className="text-xs text-n2f-text-secondary">Duration</p>
-                            <p className="text-sm font-medium text-n2f-text">
-                              {detail.startedAt && detail.stoppedAt
-                                ? `${((new Date(detail.stoppedAt).getTime() - new Date(detail.startedAt).getTime()) / 1000).toFixed(1)}s`
-                                : '-'}
-                            </p>
-                          </div>
+                          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Status</p><StatusBadge status={detail.status || (detail.finished ? 'success' : 'running')} /></CardContent></Card>
+                          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Started</p><p className="text-sm font-medium text-foreground">{detail.startedAt ? new Date(detail.startedAt).toLocaleString() : '-'}</p></CardContent></Card>
+                          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Finished</p><p className="text-sm font-medium text-foreground">{detail.stoppedAt ? new Date(detail.stoppedAt).toLocaleString() : '-'}</p></CardContent></Card>
+                          <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Duration</p><p className="text-sm font-medium text-foreground">{detail.startedAt && detail.stoppedAt ? `${((new Date(detail.stoppedAt).getTime() - new Date(detail.startedAt).getTime()) / 1000).toFixed(1)}s` : '-'}</p></CardContent></Card>
                         </div>
 
                         {/* Error */}
@@ -193,27 +181,27 @@ export default function ExecutionList() {
                         {/* Actions */}
                         <div className="flex gap-2">
                           {(detail.status === 'error' || detail.status === 'crashed') && (
-                            <button onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id} className="flex items-center gap-2 px-3 py-1.5 text-xs bg-n2f-accent text-white rounded-lg hover:bg-n2f-accent/90 disabled:opacity-50">
-                              {retrying === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                            <Button size="sm" onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id}>
+                              {retrying === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <RotateCcw className="h-3.5 w-3.5 mr-2" />}
                               Retry
-                            </button>
+                            </Button>
                           )}
-                          <button onClick={() => setDeleteTarget(detail)} className="flex items-center gap-2 px-3 py-1.5 text-xs text-red-400 border border-red-700 rounded-lg hover:bg-red-900/30">
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
-                          </button>
+                          <Button variant="outline" size="sm" className="text-red-400 border-red-700 hover:bg-red-900/30" onClick={() => setDeleteTarget(detail)}>
+                            <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
+                          </Button>
                         </div>
 
                         {/* Full data */}
                         <JsonViewer data={detail} title="Execution Data" />
                       </>
-                    ) : <div className="text-center text-n2f-text-muted text-sm">Failed to load detail</div>}
+                    ) : <div className="text-center text-muted-foreground text-sm">Failed to load detail</div>}
                   </div>
                 )}
-              </div>
+              </Card>
             );
           })}
           {executions.length === 0 && (
-            <div className="text-center py-8 text-n2f-text-secondary">No executions found</div>
+            <div className="text-center py-8 text-muted-foreground">No executions found</div>
           )}
         </div>
       )}

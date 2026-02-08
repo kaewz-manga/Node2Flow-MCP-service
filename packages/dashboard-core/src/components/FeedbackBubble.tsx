@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { MessageSquarePlus, X, CheckCircle, Loader2 } from 'lucide-react';
 import { submitFeedback } from '../lib/api';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
+import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 
 const categories = [
   { value: 'bug', label: 'Bug Report' },
@@ -44,9 +49,16 @@ export default function FeedbackBubble() {
 
   return (
     <div className="fixed bottom-6 right-6 z-40">
-      {/* Panel */}
-      {open && (
-        <div className="absolute bottom-16 right-0 w-80 bg-card border border-border rounded-lg shadow-2xl overflow-hidden">
+      <Popover open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) { setError(''); setSuccess(false); } }}>
+        <PopoverTrigger asChild>
+          <Button
+            size="icon"
+            className="h-14 w-14 rounded-full shadow-lg hover:scale-105 transition-all duration-200"
+          >
+            {open ? <X className="h-6 w-6" /> : <MessageSquarePlus className="h-6 w-6" />}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent side="top" align="end" className="w-80 p-0">
           {success ? (
             <div className="flex flex-col items-center justify-center p-8 gap-3">
               <CheckCircle className="h-10 w-10 text-green-400" />
@@ -59,57 +71,49 @@ export default function FeedbackBubble() {
                 <h3 className="text-sm font-semibold text-foreground">Send Feedback</h3>
               </div>
               <div className="p-4 space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Category</label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                  </select>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Category</Label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Message</label>
-                  <textarea
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Message</Label>
+                  <Textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tell us what's on your mind..."
                     rows={4}
                     maxLength={2000}
-                    className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
+                    className="resize-none"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">{message.length}/2000</p>
+                  <p className="text-xs text-muted-foreground">{message.length}/2000</p>
                 </div>
                 {error && (
                   <p className="text-xs text-red-400">{error}</p>
                 )}
               </div>
               <div className="px-4 py-3 border-t border-border flex justify-end">
-                <button
+                <Button
                   type="submit"
+                  size="sm"
                   disabled={submitting || message.length < 10}
-                  className="bg-primary hover:bg-primary/80 text-primary-foreground text-sm px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {submitting && <Loader2 className="h-3 w-3 animate-spin" />}
                   {submitting ? 'Sending...' : 'Submit'}
-                </button>
+                </Button>
               </div>
             </form>
           )}
-        </div>
-      )}
-
-      {/* Bubble button */}
-      <button
-        onClick={() => { setOpen(!open); setError(''); setSuccess(false); }}
-        className="h-14 w-14 rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-        title={open ? 'Close feedback' : 'Send feedback'}
-      >
-        {open ? <X className="h-6 w-6" /> : <MessageSquarePlus className="h-6 w-6" />}
-      </button>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

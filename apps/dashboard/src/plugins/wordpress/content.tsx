@@ -65,22 +65,22 @@ Would you like me to publish the Product Roadmap draft?`,
 
   connectionGuide: (
     <>
-      <p className="text-n2f-text-secondary mb-4">
+      <p className="text-muted-foreground mb-4">
         Go to <strong>Connections</strong> and add your WordPress site:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-n2f-text-secondary mb-4">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
         <li>
-          <strong className="text-n2f-text">Name:</strong> A friendly name (e.g., "My Blog")
+          <strong className="text-foreground">Name:</strong> A friendly name (e.g., "My Blog")
         </li>
         <li>
-          <strong className="text-n2f-text">Site URL:</strong> Your WordPress site URL (e.g.,
+          <strong className="text-foreground">Site URL:</strong> Your WordPress site URL (e.g.,
           https://example.com)
         </li>
         <li>
-          <strong className="text-n2f-text">Username:</strong> Your WordPress username
+          <strong className="text-foreground">Username:</strong> Your WordPress username
         </li>
         <li>
-          <strong className="text-n2f-text">Application Password:</strong> Generated from WordPress
+          <strong className="text-foreground">Application Password:</strong> Generated from WordPress
           Users &rarr; Profile &rarr; Application Passwords
         </li>
       </ul>
@@ -98,38 +98,38 @@ Would you like me to publish the Product Roadmap draft?`,
   configSections: (
     <>
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Multiple WordPress Sites</h2>
-        <p className="text-n2f-text-secondary mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Multiple WordPress Sites</h2>
+        <p className="text-muted-foreground mb-4">
           You can connect multiple WordPress sites. The MCP server will use the first one by default.
-          Use the <code className="bg-n2f-elevated px-1 rounded">switch_connection</code> tool to
+          Use the <code className="bg-muted px-1 rounded">switch_connection</code> tool to
           switch between sites.
         </p>
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-n2f-text mb-4">Application Password Setup</h2>
-        <p className="text-n2f-text-secondary mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Application Password Setup</h2>
+        <p className="text-muted-foreground mb-4">
           WordPress Application Passwords provide secure API access:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-green-400" />
-              <span className="text-n2f-text font-medium">How to create</span>
+              <span className="text-foreground font-medium">How to create</span>
             </div>
-            <ol className="text-sm text-n2f-text-secondary space-y-1 list-decimal pl-4">
+            <ol className="text-sm text-muted-foreground space-y-1 list-decimal pl-4">
               <li>Go to Users &rarr; Profile</li>
               <li>Scroll to Application Passwords</li>
               <li>Enter a name and click "Add New"</li>
               <li>Copy the password (remove spaces)</li>
             </ol>
           </div>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-3">
+          <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-yellow-400" />
-              <span className="text-n2f-text font-medium">Important</span>
+              <span className="text-foreground font-medium">Important</span>
             </div>
-            <ul className="text-sm text-n2f-text-secondary space-y-1">
+            <ul className="text-sm text-muted-foreground space-y-1">
               <li>Remove all spaces from the password</li>
               <li>Use an admin account for full access</li>
               <li>Requires WordPress 5.6 or later</li>

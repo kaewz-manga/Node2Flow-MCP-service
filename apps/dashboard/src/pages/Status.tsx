@@ -16,6 +16,9 @@ import {
   Activity,
   Loader2,
 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'maintenance' | 'unknown';
 
@@ -127,35 +130,32 @@ function IncidentCard({ incident }: { incident: Incident }) {
     <div className={`border rounded-lg p-4 ${severityColors[incident.severity]}`}>
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-medium text-n2f-text">{incident.title}</h3>
+          <h3 className="font-medium text-foreground">{incident.title}</h3>
           <p className={`text-sm ${statusColors[incident.status]} capitalize`}>
             {incident.status}
           </p>
         </div>
-        <span className="text-sm text-n2f-text-muted">
+        <span className="text-sm text-muted-foreground">
           {new Date(incident.updatedAt).toLocaleDateString()}
         </span>
       </div>
 
       {incident.updates.length > 0 && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-sm text-n2f-accent hover:underline mt-2"
-        >
+        <Button variant="link" size="sm" className="mt-2 p-0 h-auto" onClick={() => setExpanded(!expanded)}>
           {expanded ? 'Hide updates' : `Show ${incident.updates.length} update(s)`}
-        </button>
+        </Button>
       )}
 
       {expanded && (
-        <div className="mt-4 space-y-3 border-t border-n2f-border pt-4">
+        <div className="mt-4 space-y-3 border-t border-border pt-4">
           {incident.updates.map((update, index) => (
             <div key={index} className="text-sm">
-              <div className="flex items-center gap-2 text-n2f-text-muted">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <span className="capitalize font-medium">{update.status}</span>
                 <span>·</span>
                 <span>{new Date(update.timestamp).toLocaleString()}</span>
               </div>
-              <p className="text-n2f-text-secondary mt-1">{update.message}</p>
+              <p className="text-muted-foreground mt-1">{update.message}</p>
             </div>
           ))}
         </div>
@@ -276,7 +276,7 @@ export default function Status() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-n2f-accent" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -289,7 +289,7 @@ export default function Status() {
           overallStatus === 'degraded' ? 'bg-yellow-900/20 border border-yellow-800' :
           overallStatus === 'outage' ? 'bg-red-900/20 border border-red-800' :
           overallStatus === 'maintenance' ? 'bg-blue-900/20 border border-blue-800' :
-          'bg-n2f-card border border-n2f-border'
+          'bg-card border border-border'
         }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -303,69 +303,66 @@ export default function Status() {
                 <Activity className={`h-8 w-8 ${statusConfig[overallStatus].color}`} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-n2f-text">System Status</h1>
+                <h1 className="text-2xl font-bold text-foreground">System Status</h1>
                 <StatusBadge status={overallStatus} />
               </div>
             </div>
-            <button
-              onClick={checkStatus}
-              disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-n2f-elevated hover:bg-n2f-border rounded-lg text-n2f-text-secondary transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <Button variant="secondary" onClick={checkStatus} disabled={refreshing}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
-            </button>
+            </Button>
           </div>
-          <p className="text-sm text-n2f-text-muted mt-4">
+          <p className="text-sm text-muted-foreground mt-4">
             Last updated: {lastUpdated.toLocaleString()}
           </p>
         </div>
 
         {/* Uptime */}
-        <section className="bg-n2f-card border border-n2f-border rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-n2f-text">Uptime - Last 90 Days</h2>
-            <span className="text-2xl font-bold text-green-400">{calculateUptime()}%</span>
-          </div>
-          <UptimeBar days={uptimeHistory} />
-          <div className="flex justify-between text-xs text-n2f-text-muted mt-2">
-            <span>90 days ago</span>
-            <span>Today</span>
-          </div>
-        </section>
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Uptime - Last 90 Days</h2>
+              <span className="text-2xl font-bold text-green-400">{calculateUptime()}%</span>
+            </div>
+            <UptimeBar days={uptimeHistory} />
+            <div className="flex justify-between text-xs text-muted-foreground mt-2">
+              <span>90 days ago</span>
+              <span>Today</span>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Components */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-n2f-text mb-4">Service Components</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Service Components</h2>
           <div className="space-y-3">
             {components.map((component) => (
-              <div
-                key={component.name}
-                className="bg-n2f-card border border-n2f-border rounded-lg p-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-n2f-accent">{component.icon}</div>
-                  <div>
-                    <h3 className="font-medium text-n2f-text">{component.name}</h3>
-                    <p className="text-sm text-n2f-text-muted">{component.description}</p>
+              <Card key={component.name}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="text-primary">{component.icon}</div>
+                    <div>
+                      <h3 className="font-medium text-foreground">{component.name}</h3>
+                      <p className="text-sm text-muted-foreground">{component.description}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  {component.latency !== undefined && (
-                    <span className="text-sm text-n2f-text-muted">
-                      {component.latency}ms
-                    </span>
-                  )}
-                  <div className={`w-3 h-3 rounded-full ${statusConfig[component.status].bgColor}`} />
-                </div>
-              </div>
+                  <div className="flex items-center gap-4">
+                    {component.latency !== undefined && (
+                      <span className="text-sm text-muted-foreground">
+                        {component.latency}ms
+                      </span>
+                    )}
+                    <div className={`w-3 h-3 rounded-full ${statusConfig[component.status].bgColor}`} />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </section>
 
         {/* Current Incidents */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-n2f-text mb-4">Current Incidents</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Current Incidents</h2>
           {incidents.length > 0 ? (
             <div className="space-y-4">
               {incidents.map((incident) => (
@@ -373,58 +370,64 @@ export default function Status() {
               ))}
             </div>
           ) : (
-            <div className="bg-n2f-card border border-n2f-border rounded-lg p-8 text-center">
-              <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
-              <p className="text-n2f-text font-medium">No active incidents</p>
-              <p className="text-n2f-text-muted text-sm mt-1">
-                All systems are operating normally
-              </p>
-            </div>
+            <Card>
+              <CardContent className="p-8 text-center">
+                <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
+                <p className="text-foreground font-medium">No active incidents</p>
+                <p className="text-muted-foreground text-sm mt-1">
+                  All systems are operating normally
+                </p>
+              </CardContent>
+            </Card>
           )}
         </section>
 
         {/* Scheduled Maintenance */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-n2f-text mb-4">Scheduled Maintenance</h2>
-          <div className="bg-n2f-card border border-n2f-border rounded-lg p-8 text-center">
-            <Clock className="h-12 w-12 text-n2f-text-muted mx-auto mb-3" />
-            <p className="text-n2f-text font-medium">No scheduled maintenance</p>
-            <p className="text-n2f-text-muted text-sm mt-1">
-              We'll announce any planned maintenance here
-            </p>
-          </div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Scheduled Maintenance</h2>
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-foreground font-medium">No scheduled maintenance</p>
+              <p className="text-muted-foreground text-sm mt-1">
+                We'll announce any planned maintenance here
+              </p>
+            </CardContent>
+          </Card>
         </section>
 
         {/* Subscribe */}
-        <section className="bg-n2f-card border border-n2f-border rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-n2f-text mb-2">Stay Updated</h2>
-          <p className="text-n2f-text-secondary mb-4">
-            Get notified about service incidents and maintenance windows.
-          </p>
-          <div className="flex gap-3">
-            <a
-              href="mailto:status@node2flow.net?subject=Subscribe%20to%20Status%20Updates"
-              className="inline-flex items-center gap-2 bg-n2f-accent hover:bg-orange-600 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors"
-            >
-              Subscribe via Email
-            </a>
-          </div>
-        </section>
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-2">Stay Updated</h2>
+            <p className="text-muted-foreground mb-4">
+              Get notified about service incidents and maintenance windows.
+            </p>
+            <Button asChild>
+              <a href="mailto:status@node2flow.net?subject=Subscribe%20to%20Status%20Updates">
+                Subscribe via Email
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Footer */}
         {!user && (
-          <div className="mt-12 pt-8 border-t border-n2f-border flex flex-wrap justify-between gap-4 text-sm">
-            <div className="flex gap-4">
-              <Link to="/docs" className="text-n2f-accent hover:underline">Documentation</Link>
-              <Link to="/faq" className="text-n2f-accent hover:underline">FAQ</Link>
+          <>
+            <Separator className="mt-12" />
+            <div className="mt-8 flex flex-wrap justify-between gap-4 text-sm">
+              <div className="flex gap-4">
+                <Link to="/docs" className="text-primary hover:underline">Documentation</Link>
+                <Link to="/faq" className="text-primary hover:underline">FAQ</Link>
+              </div>
+              <a
+                href="mailto:support@node2flow.net"
+                className="text-primary hover:underline"
+              >
+                Report an Issue
+              </a>
             </div>
-            <a
-              href="mailto:support@node2flow.net"
-              className="text-n2f-accent hover:underline"
-            >
-              Report an Issue
-            </a>
-          </div>
+          </>
         )}
     </>
   );
@@ -434,17 +437,17 @@ export default function Status() {
   }
 
   return (
-    <div className="min-h-screen bg-n2f-bg">
-      <header className="border-b border-n2f-border sticky top-0 bg-n2f-bg/95 backdrop-blur z-10">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <div className="bg-n2f-accent p-2 rounded-lg">
-                <Zap className="h-5 w-5 text-gray-900" />
+              <div className="bg-primary p-2 rounded-lg">
+                <Zap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-n2f-text">Node2Flow</span>
+              <span className="text-xl font-bold text-foreground">Node2Flow</span>
             </Link>
-            <Link to="/" className="text-n2f-text-secondary hover:text-n2f-text flex items-center gap-2">
+            <Link to="/" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Link>
