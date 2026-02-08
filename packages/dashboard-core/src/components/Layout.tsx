@@ -77,14 +77,6 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Usage', href: '/usage', icon: BarChart3 },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
-
-const resourceNavigation = [
-  { name: 'Documentation', href: '/docs', icon: FileText },
-  { name: 'FAQ', href: '/faq', icon: HelpCircle },
-  { name: 'Status', href: '/status', icon: Activity },
 ];
 
 function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
@@ -202,47 +194,6 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Resources */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Resources</SidebarGroupLabel>
-          <SidebarMenu>
-            {resourceNavigation.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton
-                  tooltip={item.name}
-                  isActive={location.pathname === item.href}
-                  asChild
-                >
-                  <Link to={item.href}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        {/* Admin */}
-        {isAdmin && (
-          <SidebarGroup>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Admin Panel"
-                  isActive={location.pathname.startsWith('/admin')}
-                  className="text-red-400 hover:text-red-400 hover:bg-red-900/30"
-                  asChild
-                >
-                  <Link to="/admin">
-                    <Shield />
-                    <span>Admin Panel</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-        )}
       </SidebarContent>
 
       {/* Footer — User */}
@@ -280,18 +231,50 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link to="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link to="/usage">
                       <BarChart3 className="mr-2 h-4 w-4" />
                       Usage
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/docs">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Documentation
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/faq">
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      FAQ
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/status">
+                      <Activity className="mr-2 h-4 w-4" />
+                      Status
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="text-red-400">
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
