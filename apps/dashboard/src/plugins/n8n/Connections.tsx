@@ -44,6 +44,7 @@ export default function Connections() {
 
   // Copy state
   const [copied, setCopied] = useState(false);
+  const [copiedMcp, setCopiedMcp] = useState(false);
 
   // AlertDialog states
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -170,6 +171,8 @@ export default function Connections() {
     return apiKeys.filter((k) => k.connection_id === connectionId);
   };
 
+  const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -217,6 +220,28 @@ export default function Connections() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* MCP Endpoint */}
+      <Card>
+        <CardContent className="p-0">
+          <Item>
+            <ItemMedia variant="icon">
+              <Globe className="h-4 w-4 text-primary" />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>MCP Endpoint</ItemTitle>
+              <ItemDescription>
+                <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button variant="secondary" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+                {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
+              </Button>
+            </ItemActions>
+          </Item>
+        </CardContent>
+      </Card>
 
       {/* Connections List */}
       {connections.length === 0 ? (
