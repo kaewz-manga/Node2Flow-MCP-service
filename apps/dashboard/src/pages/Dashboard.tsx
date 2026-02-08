@@ -119,63 +119,67 @@ export default function Dashboard() {
 
       <Separator />
 
-      {/* Stat Cards — shadcn SectionCards pattern */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>Current Plan</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums capitalize">
-              {user?.plan}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 mr-1.5 text-primary" />
-            {usage?.requests.limit.toLocaleString()} requests/day
-          </CardFooter>
-        </Card>
+      {/* Plan + Rate Limit — Full Width */}
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left: Plan Info */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Zap className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Current Plan</p>
+                  <p className="text-xl font-semibold capitalize">{user?.plan}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-emerald-500" />
+                  {connectedServices}/{plugins.length} services
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  {usage?.monthly?.used.toLocaleString() || 0} this month
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <TrendingUp className="h-3.5 w-3.5 text-purple-500" />
+                  {usage?.success_rate || 100}% success
+                </span>
+              </div>
+            </div>
 
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>Connected Services</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {connectedServices}
-              <span className="text-base font-normal text-muted-foreground ml-1">
-                / {plugins.length}
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <Layers className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
-            {plugins.length - connectedServices} services available
-          </CardFooter>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>Requests This Month</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {usage?.monthly?.used.toLocaleString() || 0}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <Activity className="h-3.5 w-3.5 mr-1.5 text-primary" />
-            {usage?.requests.used || 0} used today
-          </CardFooter>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>Success Rate</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {usage?.success_rate || 100}%
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <TrendingUp className="h-3.5 w-3.5 mr-1.5 text-purple-500" />
-            All systems operational
-          </CardFooter>
-        </Card>
-      </div>
+            {/* Right: Rate Limit */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <Gauge className="h-3.5 w-3.5 text-primary" />
+                  Daily Rate Limit
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
+                </span>
+              </div>
+              <Progress
+                value={usagePercent}
+                indicatorClassName={
+                  usagePercent >= 90
+                    ? 'bg-red-500'
+                    : usagePercent >= 70
+                    ? 'bg-yellow-500'
+                    : undefined
+                }
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{usage?.requests.used.toLocaleString()} used</span>
+                <span>{usagePercent}% of {usage?.requests.limit.toLocaleString()}/day</span>
+                <span>{usage?.requests.remaining.toLocaleString()} left</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Platform Stats Strip */}
       {platformStats && (
@@ -197,10 +201,10 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Services Grid — Larger cards with tagline + tool count */}
+      {/* Services Grid — Compact cards */}
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-3">Services</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {plugins.map((plugin) => {
             const pluginConns = connections.filter(c => c.product_type === plugin.id);
             const isConnected = pluginConns.length > 0;
@@ -209,218 +213,139 @@ export default function Dashboard() {
             const toolCount = TOOL_COUNTS[plugin.id] || 0;
 
             return (
-              <Card
+              <Link
                 key={plugin.id}
-                className={`transition-all hover:shadow-md ${
-                  isConnected ? 'border-l-4 border-l-emerald-500' : ''
+                to={connectionsHref}
+                className={`block rounded-lg border bg-card p-3 transition-all hover:shadow-md hover:border-primary/30 ${
+                  isConnected ? 'border-l-[3px] border-l-emerald-500' : ''
                 }`}
               >
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-lg ${isConnected ? 'bg-emerald-900/30' : 'bg-muted'}`}>
-                        <PluginIcon className={`h-4 w-4 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
-                      </div>
-                      <CardTitle className="text-base">{plugin.name}</CardTitle>
-                    </div>
-                    {isConnected && (
-                      <Badge variant="outline" className="text-emerald-400 border-emerald-800">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Connected
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="pb-3">
-                  <p className="text-sm text-muted-foreground line-clamp-1">
-                    {plugin.content.tagline}
-                  </p>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    {toolCount} tools
-                    {isConnected && ` · ${pluginConns.length} connection${pluginConns.length > 1 ? 's' : ''}`}
-                  </span>
-                  <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
-                    <Link to={connectionsHref}>
-                      {isConnected ? 'Manage' : 'Connect'}
-                      <ArrowRight className="h-3 w-3 ml-1" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <PluginIcon className={`h-4 w-4 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                  <span className="text-sm font-medium truncate">{plugin.name}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{toolCount} tools</span>
+                  {isConnected ? (
+                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-emerald-400 border-emerald-800">
+                      {pluginConns.length} conn
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-primary">Connect</span>
+                  )}
+                </div>
+              </Link>
             );
           })}
         </div>
       </div>
 
-      {/* Two-column layout: Connections + Rate Limit / Quick Start */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left: Connections Table */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Your Connections</CardTitle>
-              <CardDescription>
-                {connections.length > 0
-                  ? `${connections.length} active connection${connections.length > 1 ? 's' : ''} across ${connectedServices} service${connectedServices > 1 ? 's' : ''}`
-                  : 'No connections yet. Choose a service above to get started.'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {connections.length > 0 ? (
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Service</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+      {/* Connections Table */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Your Connections</CardTitle>
+          <CardDescription>
+            {connections.length > 0
+              ? `${connections.length} active connection${connections.length > 1 ? 's' : ''} across ${connectedServices} service${connectedServices > 1 ? 's' : ''}`
+              : 'No connections yet. Choose a service above to get started.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {connections.length > 0 ? (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {connections.map((conn) => {
+                    const plugin = getPlugin(conn.product_type);
+                    const ConnIcon = plugin?.icon;
+                    const connHref = plugin?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
+                    return (
+                      <TableRow key={conn.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+                            {conn.name}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {ConnIcon && <ConnIcon className="h-3.5 w-3.5 text-muted-foreground" />}
+                            <Badge variant="secondary" className="text-xs">
+                              {plugin?.name || conn.product_type}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={conn.status === 'active' ? 'success' : 'secondary'}>
+                            {conn.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
+                            <Link to={connHref}>
+                              Manage
+                              <ArrowRight className="h-3 w-3 ml-1" />
+                            </Link>
+                          </Button>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {connections.map((conn) => {
-                        const plugin = getPlugin(conn.product_type);
-                        const ConnIcon = plugin?.icon;
-                        const connHref = plugin?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
-                        return (
-                          <TableRow key={conn.id}>
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
-                                {conn.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {ConnIcon && <ConnIcon className="h-3.5 w-3.5 text-muted-foreground" />}
-                                <Badge variant="secondary" className="text-xs">
-                                  {plugin?.name || conn.product_type}
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={conn.status === 'active' ? 'success' : 'secondary'}>
-                                {conn.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
-                                <Link to={connHref}>
-                                  Manage
-                                  <ArrowRight className="h-3 w-3 ml-1" />
-                                </Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-10 text-center">
-                  <Globe className="h-10 w-10 text-muted-foreground/40 mb-3" />
-                  <p className="text-sm text-muted-foreground">
-                    Connect your first service to start using AI-powered automation.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right: Rate Limit + Quick Start */}
-        <div className="space-y-4">
-          {/* Daily Rate Limit */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Gauge className="h-4 w-4 text-primary" />
-                  Daily Rate Limit
-                </CardTitle>
-                <span className="text-xs text-muted-foreground">
-                  Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Progress
-                  value={usagePercent}
-                  indicatorClassName={
-                    usagePercent >= 90
-                      ? 'bg-red-500'
-                      : usagePercent >= 70
-                      ? 'bg-yellow-500'
-                      : undefined
-                  }
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{usage?.requests.used.toLocaleString()} used</span>
-                  <span>{usage?.requests.remaining.toLocaleString()} left</span>
-                </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  {usagePercent}% of {usage?.requests.limit.toLocaleString()}/day limit
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Start Guide */}
-          {connections.length === 0 && (
-            <Card className="bg-gradient-to-t from-primary/10 to-card border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base text-primary">Quick Start</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ol className="space-y-2 text-sm text-muted-foreground">
-                  {[
-                    'Choose a service from the grid above',
-                    'Add your API credentials',
-                    'Copy the MCP endpoint URL and API key',
-                    'Configure your MCP client',
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary text-xs font-medium">
-                        {i + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </CardContent>
-              <CardFooter>
-                <Button size="sm" className="w-full" asChild>
-                  <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
-                    Get Started
-                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <Globe className="h-10 w-10 text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">
+                Connect your first service to start using AI-powered automation.
+              </p>
+            </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* MCP Endpoint Card (shown when has connections) */}
-          {connections.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">MCP Endpoint</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <code className="block text-xs bg-muted px-3 py-2 rounded-md break-all">
-                  https://mcp.node2flow.net/mcp
-                </code>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Use this URL with your API key in any MCP client.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
+      {/* Quick Start Guide */}
+      {connections.length === 0 && (
+        <Card className="bg-gradient-to-t from-primary/10 to-card border-primary/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-primary">Quick Start</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-2 text-sm text-muted-foreground">
+              {[
+                'Choose a service from the grid above',
+                'Add your API credentials',
+                'Copy the MCP endpoint URL and API key',
+                'Configure your MCP client',
+              ].map((step, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary text-xs font-medium">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+          <CardFooter>
+            <Button size="sm" className="w-full" asChild>
+              <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
+                Get Started
+                <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 }
