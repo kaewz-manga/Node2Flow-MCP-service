@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
+import { Toaster } from './ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useConnection } from '../contexts/ConnectionContext';
@@ -308,6 +309,7 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
         </SidebarInset>
       </SidebarProvider>
       <FeedbackBubble />
+      <Toaster />
     </TooltipProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import {
   listWorkflows, getWorkflow, createWorkflow, updateWorkflow, deleteWorkflow,
   activateWorkflow, deactivateWorkflow, executeWorkflow,
@@ -90,7 +91,7 @@ export default function WorkflowList() {
     const fn = wf.active ? deactivateWorkflow : activateWorkflow;
     const res = await fn(connectionId, wf.id);
     if (res.success) fetchList();
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   async function handleExecute(id: string) {
@@ -98,8 +99,8 @@ export default function WorkflowList() {
     setExecuting(id);
     const res = await executeWorkflow(connectionId, id);
     setExecuting(null);
-    if (res.success) alert('Executed successfully');
-    else alert(res.error?.message || 'Execution failed');
+    if (res.success) toast.success('Executed successfully');
+    else toast.error(res.error?.message || 'Execution failed');
   }
 
   async function handleDelete() {
@@ -109,7 +110,7 @@ export default function WorkflowList() {
       setDeleteTarget(null);
       if (expandedId === deleteTarget.id) setExpandedId(null);
       fetchList();
-    } else alert(res.error?.message || 'Failed');
+    } else toast.error(res.error?.message || 'Failed');
   }
 
   async function handleUpdate() {
@@ -124,8 +125,8 @@ export default function WorkflowList() {
         setExpandedId(null);
         setTimeout(() => loadDetail(detail.id), 100);
         fetchList();
-      } else alert(res.error?.message || 'Update failed');
-    } catch { alert('Invalid JSON'); }
+      } else toast.error(res.error?.message || 'Update failed');
+    } catch { toast.error('Invalid JSON'); }
     setSaving(false);
   }
 
@@ -139,8 +140,8 @@ export default function WorkflowList() {
         setShowCreate(false);
         setCreateJson('{\n  "name": "New Workflow",\n  "nodes": [],\n  "connections": {},\n  "settings": {\n    "executionOrder": "v1"\n  }\n}');
         fetchList();
-      } else alert(res.error?.message || 'Create failed');
-    } catch { alert('Invalid JSON'); }
+      } else toast.error(res.error?.message || 'Create failed');
+    } catch { toast.error('Invalid JSON'); }
     setCreating(false);
   }
 
@@ -166,7 +167,7 @@ export default function WorkflowList() {
         const d = tagRes.data as any;
         setDetailTags(Array.isArray(d) ? d : d.data || []);
       }
-    } else alert(res.error?.message || 'Failed');
+    } else toast.error(res.error?.message || 'Failed');
     setSavingTags(false);
   }
 

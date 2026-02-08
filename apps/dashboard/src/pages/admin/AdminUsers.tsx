@@ -6,7 +6,8 @@ import {
   deleteAdminUser,
   type AdminUser,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { toast } from 'sonner';
 
 import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield } from 'lucide-react';
 
@@ -55,28 +56,36 @@ export default function AdminUsers() {
     fetchUsers();
   }
 
+  // Delete confirmation dialog state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; email: string } | null>(null);
+
   async function handleChangePlan(userId: string, plan: string) {
     const res = await updateAdminUserPlan(userId, plan);
     if (res.success) fetchUsers();
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   async function handleChangeStatus(userId: string, status: string) {
     const res = await updateAdminUserStatus(userId, status);
     if (res.success) fetchUsers();
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
-  async function handleDelete(userId: string, email: string) {
+  function handleDelete(userId: string, email: string) {
     if (!totpEnabled) {
-      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
       return;
     }
-    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+    setDeleteTarget({ id: userId, email });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
     await withSudo(async () => {
-      const res = await deleteAdminUser(userId);
+      const res = await deleteAdminUser(deleteTarget.id);
       if (res.success) fetchUsers();
-      else alert(res.error?.message || 'Failed');
+      else toast.error(res.error?.message || 'Failed');
+      setDeleteTarget(null);
       return true;
     });
   }
@@ -104,19 +113,29 @@ export default function AdminUsers() {
           <Button type="submit" size="sm">Search</Button>
         </form>
 
-        <select value={planFilter} onChange={(e) => { setPlanFilter(e.target.value); setOffset(0); }} className="bg-card text-foreground border border-border rounded-lg text-sm px-3 py-2">
-          <option value="">All Plans</option>
-          <option value="free">Free</option>
-          <option value="pro">Pro</option>
-          <option value="enterprise">Enterprise</option>
-        </select>
+        <Select value={planFilter || 'all'} onValueChange={(value) => { setPlanFilter(value === 'all' ? '' : value); setOffset(0); }}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="All Plans" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Plans</SelectItem>
+            <SelectItem value="free">Free</SelectItem>
+            <SelectItem value="pro">Pro</SelectItem>
+            <SelectItem value="enterprise">Enterprise</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setOffset(0); }} className="bg-card text-foreground border border-border rounded-lg text-sm px-3 py-2">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="suspended">Suspended</option>
-          <option value="deleted">Deleted</option>
-        </select>
+        <Select value={statusFilter || 'all'} onValueChange={(value) => { setStatusFilter(value === 'all' ? '' : value); setOffset(0); }}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="suspended">Suspended</SelectItem>
+            <SelectItem value="deleted">Deleted</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {error && (
@@ -157,15 +176,16 @@ export default function AdminUsers() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <select
-                            value={u.plan}
-                            onChange={(e) => handleChangePlan(u.id, e.target.value)}
-                            className="bg-card text-foreground text-sm border border-border rounded px-2 py-1"
-                          >
-                            <option value="free">Free</option>
-                            <option value="pro">Pro</option>
-                            <option value="enterprise">Enterprise</option>
-                          </select>
+                          <Select value={u.plan} onValueChange={(value) => handleChangePlan(u.id, value)}>
+                            <SelectTrigger className="w-[130px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="free">Free</SelectItem>
+                              <SelectItem value="pro">Pro</SelectItem>
+                              <SelectItem value="enterprise">Enterprise</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell>
                           <Badge variant={
@@ -228,6 +248,24 @@ export default function AdminUsers() {
           </div>
         </>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Delete user {deleteTarget?.email}? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

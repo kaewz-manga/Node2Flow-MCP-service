@@ -71,6 +71,9 @@ export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './compon
 export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './components/ui/input-otp';
 export { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldContent } from './components/ui/field';
 export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton, InputGroupText } from './components/ui/input-group';
+export { Toaster } from './components/ui/sonner';
+export { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from './components/ui/alert-dialog';
+export { Switch } from './components/ui/switch';
 
 // Hooks
 export { useSudo } from './hooks/useSudo';

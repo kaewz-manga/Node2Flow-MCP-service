@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { listTags, createTag, updateTag, deleteTag } from '../../lib/gateway-api';
 import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription } from '@node2flow/dashboard-core';
 
@@ -42,7 +43,7 @@ export default function TagList() {
     setCreating(true);
     const res = await createTag(connectionId, newName.trim());
     if (res.success) { setNewName(''); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
     setCreating(false);
   }
 
@@ -50,14 +51,14 @@ export default function TagList() {
     if (!editName.trim() || !connectionId) return;
     const res = await updateTag(connectionId, id, editName.trim());
     if (res.success) { setEditingId(null); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   async function handleDelete() {
     if (!deleteTarget || !connectionId) return;
     const res = await deleteTag(connectionId, deleteTarget.id);
     if (res.success) { setDeleteTarget(null); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

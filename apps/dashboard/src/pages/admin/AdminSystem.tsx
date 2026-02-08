@@ -7,7 +7,7 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Label, Card, CardContent, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, Alert, AlertDescription, Badge, Switch } from '@node2flow/dashboard-core';
 
 import { Loader2, RotateCcw, Trash2, AlertTriangle, Power } from 'lucide-react';
 
@@ -196,15 +196,18 @@ export default function AdminSystem() {
                 className="mt-1"
               />
             </div>
-            <Button
-              onClick={handleMaintenanceToggle}
-              disabled={maintenanceLoading}
-              variant={maintenance.enabled ? 'default' : 'destructive'}
-              className={maintenance.enabled ? 'bg-green-600 hover:bg-green-700' : ''}
-            >
-              {maintenanceLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {maintenance.enabled ? 'Disable Maintenance' : 'Enable Maintenance'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Switch
+                id="maintenance-toggle"
+                checked={maintenance.enabled}
+                onCheckedChange={handleMaintenanceToggle}
+                disabled={maintenanceLoading}
+              />
+              <Label htmlFor="maintenance-toggle" className="cursor-pointer">
+                {maintenanceLoading && <Loader2 className="h-4 w-4 animate-spin inline mr-2" />}
+                {maintenance.enabled ? 'Maintenance Mode Enabled' : 'Maintenance Mode Disabled'}
+              </Label>
+            </div>
           </div>
 
           {maintenanceResult && (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { listN8nUsers, deleteN8nUser } from '../../lib/gateway-api';
 import { useConnection, Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
 
@@ -39,7 +40,7 @@ export default function N8nUserList() {
     if (!deleteTarget || !connectionId) return;
     const res = await deleteN8nUser(connectionId, deleteTarget.id);
     if (res.success) { setDeleteTarget(null); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

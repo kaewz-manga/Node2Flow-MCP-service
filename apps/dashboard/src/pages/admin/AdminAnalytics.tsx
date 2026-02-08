@@ -10,7 +10,7 @@ import {
   type ProductUsage,
 } from '../../lib/platform-api';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
 
 
 
@@ -74,15 +74,16 @@ export default function AdminAnalytics() {
           <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
           <p className="text-muted-foreground mt-1">Usage trends and tool popularity</p>
         </div>
-        <select
-          value={days}
-          onChange={(e) => setDays(Number(e.target.value))}
-          className="bg-card text-foreground border border-border rounded-lg text-sm px-3 py-2"
-        >
-          <option value={7}>Last 7 days</option>
-          <option value={30}>Last 30 days</option>
-          <option value={90}>Last 90 days</option>
-        </select>
+        <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="7">Last 7 days</SelectItem>
+            <SelectItem value="30">Last 30 days</SelectItem>
+            <SelectItem value="90">Last 90 days</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Usage by Product */}
@@ -176,16 +177,17 @@ export default function AdminAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Top Tools</h2>
-              <select
-                value={productFilter}
-                onChange={(e) => setProductFilter(e.target.value)}
-                className="bg-card text-foreground border border-border rounded-lg text-sm px-3 py-1.5"
-              >
-                <option value="">All Products</option>
-                <option value="n8n">n8n</option>
-                <option value="wordpress">WordPress</option>
-                <option value="cl-n8n-mcp">Workflow Builder</option>
-              </select>
+              <Select value={productFilter || 'all'} onValueChange={(value) => setProductFilter(value === 'all' ? '' : value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="All Products" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Products</SelectItem>
+                  <SelectItem value="n8n">n8n</SelectItem>
+                  <SelectItem value="wordpress">WordPress</SelectItem>
+                  <SelectItem value="cl-n8n-mcp">Workflow Builder</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {tools.length === 0 ? (
               <p className="text-muted-foreground text-sm py-4 text-center">No data yet</p>

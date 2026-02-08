@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { listVariables, createVariable, updateVariable, deleteVariable } from '../../lib/gateway-api';
 import { useConnection, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription } from '@node2flow/dashboard-core';
 
@@ -45,7 +46,7 @@ export default function VariableList() {
     setCreating(true);
     const res = await createVariable(connectionId, { key: newKey.trim(), value: newValue });
     if (res.success) { setNewKey(''); setNewValue(''); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
     setCreating(false);
   }
 
@@ -53,14 +54,14 @@ export default function VariableList() {
     if (!editKey.trim() || !connectionId) return;
     const res = await updateVariable(connectionId, id, { key: editKey.trim(), value: editValue });
     if (res.success) { setEditingId(null); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   async function handleDelete() {
     if (!deleteTarget || !connectionId) return;
     const res = await deleteVariable(connectionId, deleteTarget.id);
     if (res.success) { setDeleteTarget(null); fetch(); }
-    else alert(res.error?.message || 'Failed');
+    else toast.error(res.error?.message || 'Failed');
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

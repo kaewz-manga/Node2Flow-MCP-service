@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { createCredential, updateCredential, deleteCredential, getCredentialSchema } from '../../lib/gateway-api';
 import { useConnection, Button, Input, Label, Card, CardContent, Textarea } from '@node2flow/dashboard-core';
 
@@ -37,23 +38,23 @@ export default function CredentialList() {
   const [loadingSchema, setLoadingSchema] = useState(false);
 
   async function handleCreate() {
-    if (!createName || !createType) return alert('Name and type are required');
+    if (!createName || !createType) return toast.error('Name and type are required');
     if (!connectionId) return;
     setCreating(true);
     try {
       const data = JSON.parse(createData);
       const res = await createCredential(connectionId, { name: createName, type: createType, data });
       if (res.success) {
-        alert('Credential created');
+        toast.success('Credential created');
         setShowCreate(false);
         setCreateName(''); setCreateType(''); setCreateData('{}');
-      } else alert(res.error?.message || 'Failed');
-    } catch { alert('Invalid JSON in data field'); }
+      } else toast.error(res.error?.message || 'Failed');
+    } catch { toast.error('Invalid JSON in data field'); }
     setCreating(false);
   }
 
   async function handleUpdate() {
-    if (!updateId) return alert('Credential ID is required');
+    if (!updateId) return toast.error('Credential ID is required');
     if (!connectionId) return;
     setUpdating(true);
     try {
@@ -63,11 +64,11 @@ export default function CredentialList() {
       if (updateData && updateData !== '{}') data.data = JSON.parse(updateData);
       const res = await updateCredential(connectionId, updateId, data);
       if (res.success) {
-        alert('Credential updated');
+        toast.success('Credential updated');
         setShowUpdate(false);
         setUpdateId(''); setUpdateName(''); setUpdateType(''); setUpdateData('{}');
-      } else alert(res.error?.message || 'Failed');
-    } catch { alert('Invalid JSON in data field'); }
+      } else toast.error(res.error?.message || 'Failed');
+    } catch { toast.error('Invalid JSON in data field'); }
     setUpdating(false);
   }
 
@@ -76,15 +77,15 @@ export default function CredentialList() {
     setLoadingSchema(true);
     const res = await getCredentialSchema(connectionId, schemaType);
     if (res.success && res.data) setSchema(res.data);
-    else alert(res.error?.message || 'Schema not found');
+    else toast.error(res.error?.message || 'Schema not found');
     setLoadingSchema(false);
   }
 
   async function handleDelete() {
     if (!deleteTarget || !connectionId) return;
     const res = await deleteCredential(connectionId, deleteTarget);
-    if (res.success) { setDeleteTarget(null); alert('Credential deleted'); }
-    else alert(res.error?.message || 'Failed');
+    if (res.success) { setDeleteTarget(null); toast.success('Credential deleted'); }
+    else toast.error(res.error?.message || 'Failed');
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

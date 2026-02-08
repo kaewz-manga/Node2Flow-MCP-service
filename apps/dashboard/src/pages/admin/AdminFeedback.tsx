@@ -4,7 +4,8 @@ import {
   updateAdminFeedback,
   type AdminFeedbackItem,
 } from '../../lib/platform-api';
-import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea } from '@node2flow/dashboard-core';
+import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { toast } from 'sonner';
 import {
   Loader2,
   ChevronLeft,
@@ -90,7 +91,7 @@ export default function AdminFeedback() {
       setSelected(null);
       fetchFeedback();
     } else {
-      alert(res.error?.message || 'Failed to update');
+      toast.error(res.error?.message || 'Failed to update');
     }
   }
 
@@ -106,28 +107,30 @@ export default function AdminFeedback() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <select
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setOffset(0); }}
-          className="px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="">All Statuses</option>
-          <option value="new">New</option>
-          <option value="reviewed">Reviewed</option>
-          <option value="resolved">Resolved</option>
-          <option value="archived">Archived</option>
-        </select>
-        <select
-          value={categoryFilter}
-          onChange={(e) => { setCategoryFilter(e.target.value); setOffset(0); }}
-          className="px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="">All Categories</option>
-          <option value="bug">Bug Report</option>
-          <option value="feature">Feature Request</option>
-          <option value="general">General</option>
-          <option value="question">Question</option>
-        </select>
+        <Select value={statusFilter || 'all'} onValueChange={(value) => { setStatusFilter(value === 'all' ? '' : value); setOffset(0); }}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="new">New</SelectItem>
+            <SelectItem value="reviewed">Reviewed</SelectItem>
+            <SelectItem value="resolved">Resolved</SelectItem>
+            <SelectItem value="archived">Archived</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={categoryFilter || 'all'} onValueChange={(value) => { setCategoryFilter(value === 'all' ? '' : value); setOffset(0); }}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="bug">Bug Report</SelectItem>
+            <SelectItem value="feature">Feature Request</SelectItem>
+            <SelectItem value="general">General</SelectItem>
+            <SelectItem value="question">Question</SelectItem>
+          </SelectContent>
+        </Select>
         <span className="px-3 py-2 text-sm text-muted-foreground">
           {total} total
         </span>
@@ -258,16 +261,17 @@ export default function AdminFeedback() {
 
               <div>
                 <Label>Status</Label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 text-sm bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="new">New</option>
-                  <option value="reviewed">Reviewed</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="archived">Archived</option>
-                </select>
+                <Select value={editStatus} onValueChange={setEditStatus}>
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="reviewed">Reviewed</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

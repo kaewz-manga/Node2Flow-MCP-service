@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useAuth, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useAuth, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -50,6 +51,10 @@ export default function Connections() {
   // Copy state
   const [copied, setCopied] = useState(false);
   const [copiedMcp, setCopiedMcp] = useState(false);
+
+  // AlertDialog states
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
 
   const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
 
@@ -101,20 +106,22 @@ export default function Connections() {
 
   const handleDeleteConnection = async (id: string) => {
     if (!totpEnabled) {
-      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
       return;
     }
+    setDeleteTarget(id);
+  };
 
-    if (!confirm('Are you sure you want to delete this connection? All API keys will be revoked.')) {
-      return;
-    }
-
+  const confirmDeleteConnection = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
     await withSudo(async () => {
       const res = await deleteConnection(id);
       if (res.success) {
         fetchConnections();
       } else {
-        alert(res.error?.message || 'Failed to delete connection');
+        toast.error(res.error?.message || 'Failed to delete connection');
       }
       return true;
     });
@@ -122,7 +129,7 @@ export default function Connections() {
 
   const handleGenerateApiKey = async (connectionId: string) => {
     if (!totpEnabled) {
-      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
       return;
     }
 
@@ -133,7 +140,7 @@ export default function Connections() {
         setShowApiKeyModal(true);
         fetchConnections();
       } else {
-        alert(res.error?.message || 'Failed to generate API key');
+        toast.error(res.error?.message || 'Failed to generate API key');
       }
       return true;
     });
@@ -141,20 +148,22 @@ export default function Connections() {
 
   const handleRevokeApiKey = async (keyId: string) => {
     if (!totpEnabled) {
-      alert('Please enable Two-Factor Authentication in Settings to perform this action.');
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
       return;
     }
+    setRevokeTarget(keyId);
+  };
 
-    if (!confirm('Are you sure you want to revoke this API key?')) {
-      return;
-    }
-
+  const confirmRevokeApiKey = async () => {
+    if (!revokeTarget) return;
+    const keyId = revokeTarget;
+    setRevokeTarget(null);
     await withSudo(async () => {
       const res = await revokeApiKey(keyId);
       if (res.success) {
         fetchConnections();
       } else {
-        alert(res.error?.message || 'Failed to revoke API key');
+        toast.error(res.error?.message || 'Failed to revoke API key');
       }
       return true;
     });
@@ -508,6 +517,38 @@ export default function Connections() {
           </Button>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Connection Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Connection</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this connection? All API keys will be revoked. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteConnection}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Revoke API Key Confirmation */}
+      <AlertDialog open={!!revokeTarget} onOpenChange={(open) => !open && setRevokeTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to revoke this API key? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRevokeApiKey}>Revoke</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

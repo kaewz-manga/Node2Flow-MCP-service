@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import {
   listExecutions, getExecution, deleteExecution, retryExecution,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
@@ -66,8 +67,8 @@ export default function ExecutionList() {
     setRetrying(id);
     const res = await retryExecution(connectionId, id);
     setRetrying(null);
-    if (res.success) { alert('Retry queued'); fetchList(); }
-    else alert(res.error?.message || 'Retry failed');
+    if (res.success) { toast.success('Retry queued'); fetchList(); }
+    else toast.error(res.error?.message || 'Retry failed');
   }
 
   async function handleDelete() {
@@ -77,7 +78,7 @@ export default function ExecutionList() {
       setDeleteTarget(null);
       if (expandedId === deleteTarget.id) setExpandedId(null);
       fetchList();
-    } else alert(res.error?.message || 'Failed');
+    } else toast.error(res.error?.message || 'Failed');
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
@@ -104,17 +105,18 @@ export default function ExecutionList() {
           onChange={(e) => setFilterWorkflow(e.target.value)}
           className="w-48"
         />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-border rounded-lg bg-card text-foreground"
-        >
-          <option value="">All statuses</option>
-          <option value="success">Success</option>
-          <option value="error">Error</option>
-          <option value="waiting">Waiting</option>
-          <option value="running">Running</option>
-        </select>
+        <Select value={filterStatus || 'all'} onValueChange={(value) => setFilterStatus(value === 'all' ? '' : value)}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="success">Success</SelectItem>
+            <SelectItem value="error">Error</SelectItem>
+            <SelectItem value="waiting">Waiting</SelectItem>
+            <SelectItem value="running">Running</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {error && (
