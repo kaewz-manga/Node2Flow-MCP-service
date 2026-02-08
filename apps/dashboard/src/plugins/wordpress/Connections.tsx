@@ -337,11 +337,11 @@ export default function Connections() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {connKeys.filter(k => k.status === 'active').map(key => (
-                            <DropdownMenuItem key={key.id} className="text-destructive focus:text-destructive" onClick={() => handleRevokeApiKey(key.id)}>
+                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
                               <Key className="h-4 w-4" /> Revoke Key
                             </DropdownMenuItem>
                           ))}
-                          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteConnection(conn.id)}>
+                          <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteConnection(conn.id)}>
                             <Trash2 className="h-4 w-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
