@@ -300,6 +300,13 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
    - Input: `aria-invalid:border-destructive aria-invalid:ring-destructive/20`
    - InputGroup: `group-data-[invalid]/field:border-destructive group-data-[invalid]/field:ring-destructive/20`
 
+6. **UI component consolidation** (`e98373c`):
+   - Moved badge, progress, table, avatar from `apps/dashboard/src/components/ui/` to `packages/dashboard-core/src/components/ui/`
+   - Exported all 23 UI components from `dashboard-core/index.ts` (was only exporting Field + InputGroup)
+   - Rewrote imports across 52 files from `@/components/ui/*` to `@node2flow/dashboard-core`
+   - Deleted all 19 duplicate UI files from `apps/dashboard/src/components/ui/`
+   - Single source of truth: all UI components now live only in `packages/dashboard-core/`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -510,7 +517,7 @@ wrangler deploy                         # In each app/
 **Sessions 8-9**: WordPress + cl-n8n-mcp plugins (67 gateway tools)
 **Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
-**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 component refactor
+**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 refactor + UI consolidation
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
