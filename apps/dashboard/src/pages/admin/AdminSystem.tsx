@@ -7,9 +7,9 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Alert, AlertDescription, Badge, Switch, Separator } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Switch, Separator } from '@node2flow/dashboard-core';
 
-import { Loader2, RotateCcw, Trash2, AlertTriangle, Power } from 'lucide-react';
+import { Loader2, RotateCcw, Trash2, AlertTriangle, Power, Server, Shield, Wrench } from 'lucide-react';
 
 
 
@@ -150,6 +150,57 @@ export default function AdminSystem() {
       </div>
       <Separator />
 
+      {/* Status Overview Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className={`bg-gradient-to-t shadow-sm ${maintenance.enabled ? 'from-red-500/10 to-card border-red-500/20' : 'from-emerald-500/5 to-card'}`}>
+          <CardHeader className="pb-2">
+            <CardDescription>System Status</CardDescription>
+            <CardTitle className={`text-2xl font-semibold ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`}>
+              {maintenance.enabled ? 'Offline' : 'Online'}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Server className={`h-3.5 w-3.5 mr-1.5 ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`} />
+            {maintenance.enabled ? 'Maintenance mode' : 'All systems go'}
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Maintenance</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">
+              {maintenance.enabled ? 'Active' : 'Off'}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Wrench className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            503 for non-admin
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Tools</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-purple-400">3</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <RotateCcw className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
+            Available actions
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Protection</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-amber-400">TOTP</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Shield className="h-3.5 w-3.5 mr-1.5 text-amber-400" />
+            Required for actions
+          </CardFooter>
+        </Card>
+      </div>
+
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -157,10 +208,12 @@ export default function AdminSystem() {
       )}
 
       {/* Card 1: Maintenance Mode */}
-      <Card className={maintenance.enabled ? 'border-red-700' : ''}>
+      <Card className={`shadow-sm ${maintenance.enabled ? 'border-red-500/30 bg-gradient-to-br from-red-500/5 to-card' : ''}`}>
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Power className={`h-5 w-5 ${maintenance.enabled ? 'text-red-400' : 'text-green-400'}`} />
+            <div className={`p-2 rounded-lg ${maintenance.enabled ? 'bg-red-500/10' : 'bg-emerald-500/10'}`}>
+              <Power className={`h-5 w-5 ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`} />
+            </div>
             <h2 className="text-lg font-semibold text-foreground">Maintenance Mode</h2>
             <Badge
               variant="secondary"
@@ -220,10 +273,12 @@ export default function AdminSystem() {
       </Card>
 
       {/* Card 2: Recalculate Stats */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <RotateCcw className="h-4 w-4 text-primary" />
+            <div className="p-1.5 rounded-md bg-primary/10">
+              <RotateCcw className="h-4 w-4 text-primary" />
+            </div>
             Recalculate Stats
           </CardTitle>
         </CardHeader>
@@ -259,10 +314,12 @@ export default function AdminSystem() {
       </Card>
 
       {/* Card 3: Clear Logs */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Trash2 className="h-4 w-4 text-red-400" />
+            <div className="p-1.5 rounded-md bg-red-500/10">
+              <Trash2 className="h-4 w-4 text-red-400" />
+            </div>
             Clear All Logs
           </CardTitle>
         </CardHeader>
@@ -299,10 +356,12 @@ export default function AdminSystem() {
       </Card>
 
       {/* Card 4: Danger Zone - Full System Reset */}
-      <Card className="border-2 border-red-700">
+      <Card className="border-2 border-red-700 bg-gradient-to-br from-red-500/5 to-card shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2 text-red-400">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <div className="p-1.5 rounded-md bg-red-500/15">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </div>
             Danger Zone - Full System Reset
           </CardTitle>
         </CardHeader>

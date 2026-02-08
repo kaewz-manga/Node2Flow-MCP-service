@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listVariables, createVariable, updateVariable, deleteVariable } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from './components/ConfirmDialog';
-import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variable } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variable, Hash, Type } from 'lucide-react';
 
 
 
@@ -78,6 +78,44 @@ export default function VariableList() {
         </Button>
       </div>
 
+      {/* Stat Cards */}
+      {!loading && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Total Variables</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{variables.length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Variable className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              Key-value pairs
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>With Values</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{variables.filter(v => v.value && v.value.length > 0).length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Type className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              Non-empty values
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Unique Keys</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-amber-500">{new Set(variables.map(v => v.key)).size}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Hash className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+              Distinct identifiers
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
+      <Separator />
+
       {/* Create variable */}
       <div className="flex gap-2">
         <Input
@@ -108,7 +146,7 @@ export default function VariableList() {
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
-        <Card>
+        <Card className="hover:shadow-md transition-all">
           <CardContent className="p-0">
             <Table>
               <TableHeader>

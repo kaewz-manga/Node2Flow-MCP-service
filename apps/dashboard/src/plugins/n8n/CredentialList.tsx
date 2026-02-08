@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { createCredential, updateCredential, deleteCredential, getCredentialSchema } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Label, Card, CardContent, Textarea } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Separator } from '@node2flow/dashboard-core';
 
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
-import { Loader2, Plus, Trash2, Search, X, Pencil, Save } from 'lucide-react';
+import { Loader2, Plus, Trash2, Search, X, Pencil, Save, KeyRound, FileSearch, ShieldCheck } from 'lucide-react';
 
 
 
@@ -107,6 +107,42 @@ export default function CredentialList() {
         </div>
       </div>
 
+      {/* Action Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm cursor-pointer hover:shadow-md transition-all" onClick={() => { setShowCreate(true); setShowUpdate(false); }}>
+          <CardHeader className="pb-2">
+            <CardDescription>Create</CardDescription>
+            <CardTitle className="text-lg font-semibold">New Credential</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Plus className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+            Add API keys, tokens, passwords
+          </CardFooter>
+        </Card>
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm cursor-pointer hover:shadow-md transition-all" onClick={() => { setShowUpdate(true); setShowCreate(false); }}>
+          <CardHeader className="pb-2">
+            <CardDescription>Update</CardDescription>
+            <CardTitle className="text-lg font-semibold">Edit Credential</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Pencil className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            Modify existing credentials
+          </CardFooter>
+        </Card>
+        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Lookup</CardDescription>
+            <CardTitle className="text-lg font-semibold">Schema Browser</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <FileSearch className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+            Find credential type schemas
+          </CardFooter>
+        </Card>
+      </div>
+
+      <Separator />
+
       {/* Create form */}
       {showCreate && (
         <Card>
@@ -170,7 +206,7 @@ export default function CredentialList() {
       )}
 
       {/* Schema lookup */}
-      <Card>
+      <Card className="hover:shadow-md transition-all">
         <CardContent className="p-4 space-y-3">
           <h3 className="font-medium text-foreground">Credential Schema Lookup</h3>
           <div className="flex gap-2">
@@ -190,7 +226,7 @@ export default function CredentialList() {
       </Card>
 
       {/* Delete by ID */}
-      <Card>
+      <Card className="hover:shadow-md transition-all">
         <CardContent className="p-4 space-y-3">
           <h3 className="font-medium text-foreground">Delete Credential by ID</h3>
           <div className="flex gap-2">

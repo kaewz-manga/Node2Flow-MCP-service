@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -19,6 +19,7 @@ import {
   Database,
   Lock,
   Tag,
+  Server,
 } from 'lucide-react';
 
 
@@ -194,15 +195,42 @@ export default function Connections() {
         </Button>
       </div>
 
-      <Separator />
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Connections</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">
+              {connections.length}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Server className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            {connections.filter(c => c.status === 'active').length} active
+          </CardFooter>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">MCP Endpoint</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center justify-between gap-4">
-            <code className="text-sm font-mono text-foreground break-all">{mcpUrl}</code>
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>API Keys</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">
+              {apiKeys.length}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Key className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+            {apiKeys.filter(k => k.status === 'active').length} active
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>MCP Endpoint</CardDescription>
+            <CardTitle className="text-sm font-mono break-all">
+              {mcpUrl}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter>
             <Button
               variant="secondary"
               size="sm"
@@ -213,14 +241,16 @@ export default function Connections() {
               }}
             >
               {copiedMcp ? (
-                <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
+                <><Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Copied</>
               ) : (
-                <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
+                <><Copy className="h-3.5 w-3.5 mr-1.5" /> Copy URL</>
               )}
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardFooter>
+        </Card>
+      </div>
+
+      <Separator />
 
       {!totpEnabled && (
         <Alert className="bg-amber-900/30 border-amber-700">
@@ -267,7 +297,7 @@ export default function Connections() {
           {connections.map((conn) => {
             const connKeys = getKeysForConnection(conn.id);
             return (
-              <Card key={conn.id} className="transition-all hover:shadow-md">
+              <Card key={conn.id} className={`transition-all hover:shadow-md ${conn.status === 'active' ? 'border-l-4 border-l-emerald-500' : ''}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

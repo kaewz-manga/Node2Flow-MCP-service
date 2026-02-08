@@ -3,14 +3,14 @@ import { toast } from 'sonner';
 import {
   listExecutions, getExecution, deleteExecution, retryExecution,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
 import {
   Loader2, RefreshCw, Trash2, RotateCcw, AlertCircle, Filter,
-  ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight, Activity, CheckCircle2, XCircle, Clock,
 } from 'lucide-react';
 
 
@@ -95,6 +95,59 @@ export default function ExecutionList() {
         </Button>
       </div>
 
+      {/* Stat Cards */}
+      {!loading && (() => {
+        const successCount = executions.filter(e => e.status === 'success' || (!e.status && e.finished)).length;
+        const errorCount = executions.filter(e => e.status === 'error' || e.status === 'crashed').length;
+        const runningCount = executions.filter(e => e.status === 'running' || e.status === 'waiting').length;
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Total Executions</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums">{executions.length}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Activity className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                All runs
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Success</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{successCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+                {executions.length > 0 ? `${Math.round((successCount / executions.length) * 100)}%` : '0%'} success rate
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-red-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Errors</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-red-500">{errorCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <XCircle className="h-3.5 w-3.5 mr-1.5 text-red-500" />
+                Failed runs
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Running</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-amber-500">{runningCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Clock className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+                In progress
+              </CardFooter>
+            </Card>
+          </div>
+        );
+      })()}
+
+      <Separator />
+
       {/* Filters */}
       <div className="flex gap-3 items-center flex-wrap">
         <Filter className="h-4 w-4 text-muted-foreground" />
@@ -133,7 +186,7 @@ export default function ExecutionList() {
           {executions.map((ex) => {
             const status = ex.status || (ex.finished ? 'success' : 'running');
             return (
-              <Card key={ex.id} className="overflow-hidden">
+              <Card key={ex.id} className="overflow-hidden hover:shadow-md transition-all">
                 {/* Row */}
                 <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => loadDetail(ex.id)}>

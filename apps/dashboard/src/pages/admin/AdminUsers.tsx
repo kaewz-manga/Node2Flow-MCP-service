@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   getAdminUsers,
   updateAdminUserPlan,
@@ -6,10 +6,10 @@ import {
   deleteAdminUser,
   type AdminUser,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Separator } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Separator } from '@node2flow/dashboard-core';
 import { toast } from 'sonner';
 
-import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield } from 'lucide-react';
+import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield, Users, UserCheck, Crown, UserX } from 'lucide-react';
 
 
 
@@ -90,13 +90,105 @@ export default function AdminUsers() {
     });
   }
 
+  // Compute stat summaries from loaded users (current page + total)
+  const stats = useMemo(() => {
+    const active = users.filter(u => u.status === 'active').length;
+    const suspended = users.filter(u => u.status === 'suspended').length;
+    const admins = users.filter(u => u.is_admin === 1).length;
+    const planCounts: Record<string, number> = {};
+    users.forEach(u => { planCounts[u.plan] = (planCounts[u.plan] || 0) + 1; });
+    return { active, suspended, admins, planCounts };
+  }, [users]);
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Users</h1>
-        <p className="text-muted-foreground mt-1">{total} total users</p>
+        <p className="text-muted-foreground mt-1">Manage platform users, plans, and access</p>
       </div>
       <Separator />
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Total Users</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">{total}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Users className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            All registered accounts
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Active</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">{stats.active}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <UserCheck className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+            On this page
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Admins</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-purple-400">{stats.admins}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Crown className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
+            Admin privileges
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Suspended</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-amber-400">{stats.suspended}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <UserX className="h-3.5 w-3.5 mr-1.5 text-amber-400" />
+            Restricted access
+          </CardFooter>
+        </Card>
+      </div>
+
+      {/* Plan Distribution Bar */}
+      {users.length > 0 && (
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <p className="text-sm font-medium text-foreground">Plan Distribution</p>
+              <div className="flex gap-3 ml-auto text-xs text-muted-foreground">
+                {Object.entries(stats.planCounts).map(([plan, count]) => (
+                  <span key={plan} className="flex items-center gap-1.5">
+                    <span className={`w-2.5 h-2.5 rounded-full ${
+                      plan === 'enterprise' ? 'bg-purple-500' :
+                      plan === 'pro' ? 'bg-primary' : 'bg-muted-foreground'
+                    }`} />
+                    <span className="capitalize">{plan}</span>
+                    <span className="font-medium text-foreground">{count}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="h-2.5 bg-muted rounded-full overflow-hidden flex">
+              {Object.entries(stats.planCounts).map(([plan, count]) => (
+                <div
+                  key={plan}
+                  className={`h-full transition-all ${
+                    plan === 'enterprise' ? 'bg-purple-500' :
+                    plan === 'pro' ? 'bg-primary' : 'bg-muted-foreground/50'
+                  }`}
+                  style={{ width: `${(count / users.length) * 100}%` }}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">

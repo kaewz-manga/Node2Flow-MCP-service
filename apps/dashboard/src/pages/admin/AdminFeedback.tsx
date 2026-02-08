@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   getAdminFeedback,
   updateAdminFeedback,
   type AdminFeedbackItem,
 } from '../../lib/platform-api';
-import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Separator } from '@node2flow/dashboard-core';
+import { Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Separator } from '@node2flow/dashboard-core';
 import { toast } from 'sonner';
 import {
   Loader2,
@@ -14,6 +14,9 @@ import {
   Lightbulb,
   MessageSquare,
   HelpCircle,
+  Inbox,
+  CheckCircle,
+  Eye,
 } from 'lucide-react';
 
 
@@ -98,6 +101,16 @@ export default function AdminFeedback() {
   const totalPages = Math.ceil(total / limit);
   const currentPage = Math.floor(offset / limit) + 1;
 
+  // Compute stat summaries
+  const stats = useMemo(() => {
+    const newCount = feedback.filter(f => f.status === 'new').length;
+    const reviewedCount = feedback.filter(f => f.status === 'reviewed').length;
+    const resolvedCount = feedback.filter(f => f.status === 'resolved').length;
+    const bugCount = feedback.filter(f => f.category === 'bug').length;
+    const featureCount = feedback.filter(f => f.category === 'feature').length;
+    return { newCount, reviewedCount, resolvedCount, bugCount, featureCount };
+  }, [feedback]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -105,6 +118,76 @@ export default function AdminFeedback() {
         <p className="text-muted-foreground mt-1">User feedback and suggestions</p>
       </div>
       <Separator />
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Total Feedback</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">{total}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Inbox className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            All submissions
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-blue-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>New</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-blue-400">{stats.newCount}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Eye className="h-3.5 w-3.5 mr-1.5 text-blue-400" />
+            Awaiting review
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-red-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Bug Reports</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-red-400">{stats.bugCount}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Bug className="h-3.5 w-3.5 mr-1.5 text-red-400" />
+            Issues reported
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Resolved</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">{stats.resolvedCount}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+            Completed
+          </CardFooter>
+        </Card>
+      </div>
+
+      {/* Category Breakdown */}
+      {feedback.length > 0 && (
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-6 text-sm">
+              <span className="text-muted-foreground font-medium">Categories:</span>
+              {Object.entries(categoryConfig).map(([key, config]) => {
+                const count = feedback.filter(f => f.category === key).length;
+                if (count === 0) return null;
+                const Icon = config.icon;
+                return (
+                  <span key={key} className="flex items-center gap-1.5">
+                    <Icon className={`h-3.5 w-3.5 ${config.color}`} />
+                    <span className="text-muted-foreground">{config.label}</span>
+                    <span className="font-medium text-foreground">{count}</span>
+                  </span>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">

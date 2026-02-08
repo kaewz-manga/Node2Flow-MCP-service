@@ -59,9 +59,13 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-card to-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold text-foreground mb-6">Connect Your Tools with AI</h1>
+      <section className="py-24 bg-gradient-to-b from-primary/5 via-card to-background relative overflow-hidden">
+        {/* Decorative gradient orbs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm">Open Source MCP Gateway</Badge>
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">Connect Your Tools with AI</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             One MCP gateway for n8n, WordPress, and more. Let Claude, Cursor, or any MCP client manage your services through natural language.
           </p>
@@ -103,46 +107,65 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
 
       {/* Platform Stats */}
       {stats && (
-        <section className="py-12 border-b border-border">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div>
-                <div className="flex items-center justify-center mb-2"><Users className="h-5 w-5 text-blue-400" /></div>
-                <p className="text-3xl font-bold text-foreground">{stats.total_users.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Total Users</p>
-              </div>
-              <div>
-                <div className="flex items-center justify-center mb-2"><Activity className="h-5 w-5 text-primary" /></div>
-                <p className="text-3xl font-bold text-foreground">{stats.total_executions.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Tool Executions</p>
-              </div>
-              <div>
-                <div className="flex items-center justify-center mb-2"><CheckCircle className="h-5 w-5 text-emerald-400" /></div>
-                <p className="text-3xl font-bold text-foreground">{stats.total_successes.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Successful</p>
-              </div>
-              <div>
-                <div className="flex items-center justify-center mb-2"><TrendingUp className="h-5 w-5 text-purple-400" /></div>
-                <p className="text-3xl font-bold text-foreground">{stats.pass_rate}%</p>
-                <p className="text-sm text-muted-foreground">Pass Rate</p>
-              </div>
+        <section className="py-16 border-b border-border bg-gradient-to-b from-background to-card/50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">Trusted by developers worldwide</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-t from-blue-500/5 to-card shadow-sm text-center">
+                <CardContent className="p-6">
+                  <Users className="h-5 w-5 text-blue-400 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-foreground tabular-nums">{stats.total_users.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground mt-1">Total Users</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm text-center">
+                <CardContent className="p-6">
+                  <Activity className="h-5 w-5 text-primary mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-foreground tabular-nums">{stats.total_executions.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground mt-1">Tool Executions</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm text-center">
+                <CardContent className="p-6">
+                  <CheckCircle className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-foreground tabular-nums">{stats.total_successes.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground mt-1">Successful</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm text-center">
+                <CardContent className="p-6">
+                  <TrendingUp className="h-5 w-5 text-purple-400 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-foreground tabular-nums">{stats.pass_rate}%</p>
+                  <p className="text-sm text-muted-foreground mt-1">Pass Rate</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
       )}
 
       {/* Products Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-b from-background to-card/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
+            <Badge variant="secondary" className="mb-4 px-3 py-1">Integrations</Badge>
             <h2 className="text-3xl font-bold text-foreground mb-4">{plugins.length} Products, One Gateway</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Connect your AI assistant to multiple services through a single MCP endpoint.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {plugins.map((plugin) => {
+            {plugins.map((plugin, idx) => {
               const Icon = plugin.icon;
+              const gradients = [
+                'from-primary/5 to-card',
+                'from-purple-500/5 to-card',
+                'from-emerald-500/5 to-card',
+                'from-amber-500/5 to-card',
+                'from-blue-500/5 to-card',
+                'from-rose-500/5 to-card',
+                'from-cyan-500/5 to-card',
+              ];
               return (
-                <Card key={plugin.id} className="text-center hover:border-primary/30 hover:shadow-lg transition-all p-8">
+                <Card key={plugin.id} className={`text-center hover:border-primary/30 hover:shadow-xl transition-all p-8 bg-gradient-to-t ${gradients[idx % gradients.length]}`}>
                   <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
                     <Icon className="h-8 w-8" />
                   </div>
@@ -160,6 +183,7 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
+            <Badge variant="secondary" className="mb-4 px-3 py-1">Features</Badge>
             <h2 className="text-3xl font-bold text-foreground mb-4">Everything you need to automate with AI</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Our MCP server provides a complete interface between your AI assistant and your tools.</p>
           </div>
@@ -177,9 +201,10 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
       </section>
 
       {/* How It Works */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-b from-card/30 to-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
+            <Badge variant="secondary" className="mb-4 px-3 py-1">Quick Setup</Badge>
             <h2 className="text-3xl font-bold text-foreground mb-4">Get started in 3 steps</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -223,13 +248,19 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-card border-t border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Ready to automate with AI?</h2>
+      <section className="py-24 bg-gradient-to-t from-primary/5 via-card to-background border-t border-border relative overflow-hidden">
+        <div className="absolute top-0 right-1/3 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Ready to automate with AI?</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Join developers using Node2Flow to supercharge their automation workflows.</p>
-          <Button size="lg" asChild>
-            <Link to="/register">Get Started Free <ArrowRight className="h-5 w-5 ml-2" /></Link>
-          </Button>
+          <div className="flex items-center justify-center gap-4">
+            <Button size="lg" asChild>
+              <Link to="/register">Get Started Free <ArrowRight className="h-5 w-5 ml-2" /></Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/docs">Read the Docs</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

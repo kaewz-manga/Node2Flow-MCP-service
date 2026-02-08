@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAdminRevenueOverview, type PlanDist } from '../../lib/platform-api';
-import { Loader2, DollarSign } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Separator } from '@node2flow/dashboard-core';
+import { Loader2, DollarSign, Users, TrendingUp, CreditCard } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Separator, Badge } from '@node2flow/dashboard-core';
 
 
 
@@ -31,6 +31,9 @@ export default function AdminRevenue() {
   }
 
   const totalUsers = distribution.reduce((sum, d) => sum + d.count, 0);
+  const paidUsers = distribution.filter(d => d.price_monthly > 0).reduce((sum, d) => sum + d.count, 0);
+  const conversionRate = totalUsers > 0 ? Math.round((paidUsers / totalUsers) * 100) : 0;
+  const avgRevenuePerUser = totalUsers > 0 ? mrr / totalUsers : 0;
 
   return (
     <div className="space-y-8">
@@ -40,48 +43,85 @@ export default function AdminRevenue() {
       </div>
       <Separator />
 
-      {/* MRR Card */}
-      <Card className="bg-gradient-to-br from-green-500 to-green-700 text-white border-0">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-white/20 p-3 rounded-lg">
-              <DollarSign className="h-8 w-8" />
-            </div>
-            <div>
-              <p className="text-green-100 text-sm">Monthly Recurring Revenue</p>
-              <p className="text-4xl font-bold">${mrr.toFixed(2)}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-t from-emerald-500/10 to-card shadow-sm border-emerald-500/20">
+          <CardHeader className="pb-2">
+            <CardDescription>Monthly Revenue</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">${mrr.toFixed(2)}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <DollarSign className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+            MRR
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Total Users</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums">{totalUsers}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <Users className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            {paidUsers} paying
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>Conversion</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-purple-400">{conversionRate}%</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <TrendingUp className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
+            Free to paid
+          </CardFooter>
+        </Card>
+
+        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <CardHeader className="pb-2">
+            <CardDescription>ARPU</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-amber-400">${avgRevenuePerUser.toFixed(2)}</CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            <CreditCard className="h-3.5 w-3.5 mr-1.5 text-amber-400" />
+            Per user/month
+          </CardFooter>
+        </Card>
+      </div>
 
       {/* Plan Distribution */}
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Plan Distribution</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="space-y-4">
+          <div className="space-y-5">
             {distribution.map((d) => {
               const pct = totalUsers > 0 ? Math.round((d.count / totalUsers) * 100) : 0;
               const revenue = d.count * d.price_monthly;
               return (
                 <div key={d.plan} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground capitalize">{d.plan}</span>
-                    <div className="text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">{d.count}</span> users
-                      {' '}({pct}%)
-                      {' - '}
+                    <div className="flex items-center gap-2">
+                      <span className={`w-3 h-3 rounded-full ${
+                        d.plan === 'enterprise' ? 'bg-purple-500' :
+                        d.plan === 'pro' ? 'bg-blue-500' : 'bg-zinc-400'
+                      }`} />
+                      <span className="text-sm font-medium text-foreground capitalize">{d.plan}</span>
+                      <Badge variant="secondary" className="text-xs">{d.count} users</Badge>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground">{pct}%</span>
                       <span className="font-medium text-emerald-400">${revenue.toFixed(2)}/mo</span>
                     </div>
                   </div>
-                  <div className="h-3 bg-border rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${
-                        d.plan === 'enterprise' ? 'bg-purple-500' :
-                        d.plan === 'pro' ? 'bg-blue-500' :
-                        'bg-gray-400'
+                      className={`h-full rounded-full transition-all ${
+                        d.plan === 'enterprise' ? 'bg-gradient-to-r from-purple-500 to-purple-400' :
+                        d.plan === 'pro' ? 'bg-gradient-to-r from-blue-500 to-blue-400' :
+                        'bg-gradient-to-r from-zinc-400 to-zinc-300'
                       }`}
                       style={{ width: `${Math.max(pct, 2)}%` }}
                     />

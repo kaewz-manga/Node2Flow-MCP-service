@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listTags, createTag, updateTag, deleteTag } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, Alert, AlertDescription } from '@node2flow/dashboard-core';
+import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from './components/ConfirmDialog';
-import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag, Tags, Clock } from 'lucide-react';
 
 
 
@@ -75,6 +75,52 @@ export default function TagList() {
         </Button>
       </div>
 
+      {/* Stat Cards */}
+      {!loading && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Total Tags</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{tags.length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Tags className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              Workflow labels
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Latest Tag</CardDescription>
+              <CardTitle className="text-lg font-semibold truncate">
+                {tags.length > 0 ? tags[tags.length - 1]?.name || '-' : '-'}
+              </CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Tag className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              Most recently added
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Last Updated</CardDescription>
+              <CardTitle className="text-lg font-semibold tabular-nums">
+                {tags.length > 0 && tags.some(t => t.updatedAt)
+                  ? new Date(tags.reduce((a: any, b: any) =>
+                      (a.updatedAt || '') > (b.updatedAt || '') ? a : b
+                    ).updatedAt || '').toLocaleDateString()
+                  : '-'}
+              </CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+              Most recent change
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
+      <Separator />
+
       {/* Create tag */}
       <div className="flex gap-2">
         <Input
@@ -101,7 +147,7 @@ export default function TagList() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {tags.map((tag) => (
-            <Card key={tag.id}>
+            <Card key={tag.id} className="hover:shadow-md transition-all">
               <CardContent className="p-3 flex items-center gap-3">
                 <Tag className="h-4 w-4 text-primary shrink-0" />
                 {editingId === tag.id ? (

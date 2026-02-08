@@ -5,7 +5,7 @@ import {
   activateWorkflow, deactivateWorkflow, executeWorkflow,
   getWorkflowTags, updateWorkflowTags, listTags,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, Textarea, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
@@ -13,6 +13,7 @@ import ConfirmDialog from './components/ConfirmDialog';
 import {
   Loader2, Play, Trash2, RefreshCw, Plus, AlertCircle,
   Power, PowerOff, ChevronDown, ChevronRight, X, Save, Pencil, Tag,
+  Layers, Zap, ZapOff, Clock,
 } from 'lucide-react';
 
 
@@ -194,6 +195,58 @@ export default function WorkflowList() {
         </div>
       </div>
 
+      {/* Stat Cards */}
+      {!loading && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Total Workflows</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{workflows.length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Layers className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              All workflows
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Active</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{workflows.filter(w => w.active).length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Zap className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              Currently running
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Inactive</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-amber-500">{workflows.filter(w => !w.active).length}</CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <ZapOff className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+              Paused
+            </CardFooter>
+          </Card>
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <CardHeader className="pb-2">
+              <CardDescription>Last Updated</CardDescription>
+              <CardTitle className="text-lg font-semibold tabular-nums">
+                {workflows.length > 0
+                  ? new Date(workflows.reduce((a, b) =>
+                      (a.updatedAt || '') > (b.updatedAt || '') ? a : b
+                    ).updatedAt || '').toLocaleDateString()
+                  : '-'}
+              </CardTitle>
+            </CardHeader>
+            <CardFooter className="text-sm text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              Most recent change
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
       <Separator />
 
       {/* Create form */}
@@ -231,7 +284,7 @@ export default function WorkflowList() {
       ) : (
         <div className="space-y-2">
           {workflows.map((wf) => (
-            <Card key={wf.id} className="overflow-hidden">
+            <Card key={wf.id} className="overflow-hidden hover:shadow-md transition-all">
               {/* Row */}
               <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted">
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => loadDetail(wf.id)}>

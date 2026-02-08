@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listN8nUsers, deleteN8nUser } from '../../lib/gateway-api';
-import { useConnection, Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import ConfirmDialog from './components/ConfirmDialog';
-import { Loader2, RefreshCw, Trash2, AlertCircle, UserCog } from 'lucide-react';
+import { Loader2, RefreshCw, Trash2, AlertCircle, UserCog, Users, Crown, Shield, UserX } from 'lucide-react';
 
 
 
@@ -57,6 +57,60 @@ export default function N8nUserList() {
         </Button>
       </div>
 
+      {/* Stat Cards */}
+      {!loading && (() => {
+        const ownerCount = users.filter(u => u.role?.includes('owner')).length;
+        const adminCount = users.filter(u => u.role?.includes('admin')).length;
+        const activeCount = users.filter(u => !u.isPending && !u.disabled).length;
+        const pendingCount = users.filter(u => u.isPending).length;
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Total Users</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums">{users.length}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Users className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                All accounts
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Owners & Admins</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-purple-500">{ownerCount + adminCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Crown className="h-3.5 w-3.5 mr-1.5 text-purple-500" />
+                {ownerCount} owner, {adminCount} admin
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Active</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{activeCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Shield className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+                Verified accounts
+              </CardFooter>
+            </Card>
+            <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Pending</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-amber-500">{pendingCount}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <UserX className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+                Awaiting setup
+              </CardFooter>
+            </Card>
+          </div>
+        );
+      })()}
+
+      <Separator />
+
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -67,7 +121,7 @@ export default function N8nUserList() {
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
-        <Card>
+        <Card className="hover:shadow-md transition-all">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
