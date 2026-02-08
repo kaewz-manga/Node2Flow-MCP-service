@@ -293,6 +293,13 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
    - Added `data-slot="input"` to base Input component
    - All existing plugin imports remain compatible (additive exports only)
 
+5. **data-invalid support** (`6ac8c0e`):
+   - `<Field data-invalid>` triggers destructive (red) styling on all children automatically
+   - FieldLabel: `group-data-[invalid]/field:text-destructive`
+   - FieldDescription: `group-data-[invalid]/field:text-destructive`
+   - Input: `aria-invalid:border-destructive aria-invalid:ring-destructive/20`
+   - InputGroup: `group-data-[invalid]/field:border-destructive group-data-[invalid]/field:ring-destructive/20`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
