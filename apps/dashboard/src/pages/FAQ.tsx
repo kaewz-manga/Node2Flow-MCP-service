@@ -289,9 +289,10 @@ const faqData: FAQCategory[] = [...genericCategories, ...pluginCategories];
 function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) {
   return (
     <Card>
-      <button
+      <Button
+        variant="ghost"
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-muted transition-colors"
+        className="w-full flex items-center justify-between p-4 text-left h-auto hover:bg-muted"
       >
         <span className="font-medium text-foreground pr-4">{item.question}</span>
         <ChevronDown
@@ -299,7 +300,7 @@ function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boole
             isOpen ? 'rotate-180' : ''
           }`}
         />
-      </button>
+      </Button>
       {isOpen && (
         <CardContent className="pt-0 text-muted-foreground">
           {typeof item.answer === 'string' ? <p>{item.answer}</p> : item.answer}

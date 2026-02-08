@@ -233,14 +233,14 @@ export default function WorkflowList() {
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => loadDetail(wf.id)}>
                   {expandedId === wf.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </Button>
-                <button onClick={() => loadDetail(wf.id)} className="flex-1 text-left text-sm font-medium text-foreground hover:text-primary">
+                <Button variant="link" onClick={() => loadDetail(wf.id)} className="flex-1 justify-start text-left text-sm font-medium text-foreground hover:text-primary p-0 h-auto">
                   {wf.name}
-                </button>
+                </Button>
                 <span className="text-xs text-muted-foreground font-mono hidden sm:block">{wf.id}</span>
                 <span className="text-xs text-muted-foreground hidden md:block">{wf.updatedAt ? new Date(wf.updatedAt).toLocaleDateString() : ''}</span>
-                <button onClick={() => handleToggle(wf)} title={wf.active ? 'Deactivate' : 'Activate'}>
+                <Button variant="ghost" className="p-0 h-auto" onClick={() => handleToggle(wf)} title={wf.active ? 'Deactivate' : 'Activate'}>
                   <StatusBadge status={wf.active ? 'active' : 'inactive'} />
-                </button>
+                </Button>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-400 hover:bg-emerald-900/30" onClick={() => handleExecute(wf.id)} disabled={executing === wf.id} title="Execute">
                   {executing === wf.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                 </Button>
@@ -280,17 +280,19 @@ export default function WorkflowList() {
                             <div className="space-y-2">
                               <div className="flex flex-wrap gap-2">
                                 {allTags.map((t: any) => (
-                                  <button
+                                  <Button
                                     key={t.id}
+                                    variant="outline"
+                                    size="sm"
                                     onClick={() => toggleTagId(String(t.id))}
-                                    className={`px-2 py-1 text-xs rounded-full border transition-colors ${
+                                    className={`px-2 py-1 text-xs rounded-full h-auto ${
                                       selectedTagIds.includes(String(t.id))
                                         ? 'bg-primary/10 text-primary border-primary/30'
                                         : 'bg-muted text-muted-foreground border-border hover:border-primary/30'
                                     }`}
                                   >
                                     {t.name}
-                                  </button>
+                                  </Button>
                                 ))}
                                 {allTags.length === 0 && <span className="text-xs text-muted-foreground">No tags available</span>}
                               </div>

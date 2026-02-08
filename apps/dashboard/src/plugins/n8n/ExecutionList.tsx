@@ -139,9 +139,9 @@ export default function ExecutionList() {
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => loadDetail(ex.id)}>
                     {expandedId === ex.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                   </Button>
-                  <button onClick={() => loadDetail(ex.id)} className="text-sm font-mono text-primary hover:underline">
+                  <Button variant="link" onClick={() => loadDetail(ex.id)} className="text-sm font-mono text-primary hover:underline p-0 h-auto">
                     #{ex.id}
-                  </button>
+                  </Button>
                   <span className="flex-1 text-sm text-muted-foreground truncate">{ex.workflowData?.name || ex.workflowId || '-'}</span>
                   <span className="text-xs text-muted-foreground hidden md:block">{ex.startedAt ? new Date(ex.startedAt).toLocaleString() : ''}</span>
                   <StatusBadge status={status} />
