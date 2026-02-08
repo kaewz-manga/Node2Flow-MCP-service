@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { createConnection, deleteConnection } from '../../lib/gateway-api';
+import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -21,6 +21,8 @@ import {
   Tag,
   User,
   BadgeCheck,
+  MoreHorizontal,
+  Pencil,
 } from 'lucide-react';
 
 
@@ -49,6 +51,10 @@ export default function Connections() {
   // AlertDialog states
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+
+  // Edit connection states
+  const [editTarget, setEditTarget] = useState<{ id: string; name: string } | null>(null);
+  const [editName, setEditName] = useState('');
 
   const fetchConnections = async () => {
     setLoading(true);
@@ -163,6 +169,23 @@ export default function Connections() {
       }
       return true;
     });
+  };
+
+  const handleEditConnection = (conn: Connection) => {
+    setEditTarget({ id: conn.id, name: conn.name });
+    setEditName(conn.name);
+  };
+
+  const confirmEditConnection = async () => {
+    if (!editTarget || !editName.trim()) return;
+    const res = await updateConnection(editTarget.id, { name: editName.trim() });
+    if (res.success) {
+      toast.success('Connection renamed');
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to rename connection');
+    }
+    setEditTarget(null);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -298,19 +321,31 @@ export default function Connections() {
                       {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {connKeys.filter(k => k.status === 'active').map(key => (
-                          <Button key={key.id} variant="destructive" size="sm" onClick={() => handleRevokeApiKey(key.id)}>
-                            Revoke
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8">
+                            <MoreHorizontal />
+                            <span className="sr-only">Open menu</span>
                           </Button>
-                        ))}
-                        <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)}>
-                          <RefreshCw className="h-3 w-3" /> New Key
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30" onClick={() => handleDeleteConnection(conn.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditConnection(conn)}>
+                            <Pencil className="h-4 w-4" /> Edit Name
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleGenerateApiKey(conn.id)}>
+                            <RefreshCw className="h-4 w-4" /> New Key
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {connKeys.filter(k => k.status === 'active').map(key => (
+                            <DropdownMenuItem key={key.id} className="text-destructive focus:text-destructive" onClick={() => handleRevokeApiKey(key.id)}>
+                              <Key className="h-4 w-4" /> Revoke Key
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDeleteConnection(conn.id)}>
+                            <Trash2 className="h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 );
@@ -404,6 +439,31 @@ export default function Connections() {
             >
               I've saved my API key
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Connection Name Dialog */}
+      <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Connection Name</DialogTitle>
+          </DialogHeader>
+          <Field>
+            <FieldLabel>Connection Name</FieldLabel>
+            <InputGroup>
+              <InputGroupAddon><Tag /></InputGroupAddon>
+              <InputGroupInput
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Connection name"
+              />
+            </InputGroup>
+          </Field>
+          <div className="flex gap-3 pt-2">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
+            <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
           </div>
         </DialogContent>
       </Dialog>
