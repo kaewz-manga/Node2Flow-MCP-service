@@ -294,22 +294,17 @@ export default function Connections() {
                     </TableCell>
                     <TableCell>
                       {connKeys.map((key) => (
-                        <div key={key.id} className="flex items-center gap-2">
-                          <code className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
-                          <Badge variant="secondary" className={key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : ''}>
-                            {key.status}
-                          </Badge>
-                          {key.status === 'active' && (
-                            <Button variant="link" size="sm" className="text-red-400 p-0 h-auto" onClick={() => handleRevokeApiKey(key.id)}>
-                              Revoke
-                            </Button>
-                          )}
-                        </div>
+                        <code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
                       ))}
                       {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {connKeys.filter(k => k.status === 'active').map(key => (
+                          <Button key={key.id} variant="destructive" size="sm" onClick={() => handleRevokeApiKey(key.id)}>
+                            Revoke
+                          </Button>
+                        ))}
                         <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)}>
                           <RefreshCw className="h-3 w-3" /> New Key
                         </Button>

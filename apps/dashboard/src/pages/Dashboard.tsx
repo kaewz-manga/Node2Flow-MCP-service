@@ -38,6 +38,17 @@ const TOOL_COUNTS: Record<string, number> = {
   notion: 25,
 };
 
+// Real brand logos via SimpleIcons CDN
+const SERVICE_LOGOS: Record<string, string> = {
+  n8n: 'https://cdn.simpleicons.org/n8n/EA4B71',
+  wordpress: 'https://cdn.simpleicons.org/wordpress/21759B',
+  'cl-n8n-mcp': 'https://cdn.simpleicons.org/n8n/FF8C69',
+  'gemini-rag': 'https://cdn.simpleicons.org/googlegemini/8E75B2',
+  line: 'https://cdn.simpleicons.org/line/00C300',
+  telegram: 'https://cdn.simpleicons.org/telegram/26A5E4',
+  notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [usage, setUsage] = useState<Usage | null>(null);
@@ -212,6 +223,8 @@ export default function Dashboard() {
             const PluginIcon = plugin.icon;
             const toolCount = TOOL_COUNTS[plugin.id] || 0;
 
+            const logoUrl = SERVICE_LOGOS[plugin.id];
+
             return (
               <Link
                 key={plugin.id}
@@ -221,7 +234,11 @@ export default function Dashboard() {
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <PluginIcon className={`h-4 w-4 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                  {logoUrl ? (
+                    <img src={logoUrl} alt={plugin.name} className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <PluginIcon className={`h-4 w-4 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                  )}
                   <span className="text-sm font-medium truncate">{plugin.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -241,7 +258,7 @@ export default function Dashboard() {
       </div>
 
       {/* Connections Table */}
-      <Card>
+      <Card className="bg-black">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Your Connections</CardTitle>
           <CardDescription>
@@ -277,7 +294,11 @@ export default function Dashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {ConnIcon && <ConnIcon className="h-3.5 w-3.5 text-muted-foreground" />}
+                            {SERVICE_LOGOS[conn.product_type] ? (
+                              <img src={SERVICE_LOGOS[conn.product_type]} alt="" className="h-3.5 w-3.5" />
+                            ) : (
+                              ConnIcon && <ConnIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                            )}
                             <Badge variant="secondary" className="text-xs">
                               {plugin?.name || conn.product_type}
                             </Badge>
