@@ -1,10 +1,10 @@
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -20,6 +20,7 @@ import {
   Globe,
   Lock,
   Tag,
+  BadgeCheck,
 } from 'lucide-react';
 
 export default function Connections() {
@@ -189,18 +190,24 @@ export default function Connections() {
         </Button>
       </div>
 
-      {!totpEnabled && (
-        <Alert className="bg-amber-900/30 border-amber-700">
-          <Shield className="h-5 w-5 text-amber-400" />
-          <AlertDescription className="flex items-center justify-between w-full">
-            <div>
-              <p className="text-amber-300 font-medium">Enable Two-Factor Authentication</p>
-              <p className="text-sm text-amber-300/80">
-                Set up 2FA to manage connections securely
-              </p>
-            </div>
-            <Button variant="outline" asChild className="text-amber-400 border-amber-600 hover:bg-amber-900/30 shrink-0 ml-4">
-              <Link to="/settings">Enable 2FA</Link>
+      {/* 2FA Status */}
+      {totpEnabled ? (
+        <Item variant="outline" size="sm">
+          <ItemMedia>
+            <BadgeCheck className="h-5 w-5 text-emerald-400" />
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>Two-Factor Authentication enabled</ItemTitle>
+          </ItemContent>
+        </Item>
+      ) : (
+        <Alert variant="warning">
+          <Shield className="h-5 w-5" />
+          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>Set up 2FA to manage connections securely</span>
+            <Button variant="outline" size="sm" asChild className="shrink-0 ml-4">
+              <Link to="/settings">Enable</Link>
             </Button>
           </AlertDescription>
         </Alert>
@@ -214,26 +221,22 @@ export default function Connections() {
       )}
 
       {/* MCP Endpoint */}
-      <Card>
-        <CardContent className="p-0">
-          <Item>
-            <ItemMedia variant="icon">
-              <Globe className="h-4 w-4 text-primary" />
-            </ItemMedia>
-            <ItemContent>
-              <ItemTitle>MCP Endpoint</ItemTitle>
-              <ItemDescription>
-                <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
-              </ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Button variant="secondary" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
-                {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
-              </Button>
-            </ItemActions>
-          </Item>
-        </CardContent>
-      </Card>
+      <Item variant="outline">
+        <ItemMedia>
+          <Globe className="h-5 w-5 text-primary" />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>MCP Endpoint</ItemTitle>
+          <ItemDescription>
+            <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
+          </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
+          </Button>
+        </ItemActions>
+      </Item>
 
       {connections.length === 0 ? (
         <Card>
@@ -252,52 +255,37 @@ export default function Connections() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader className="pb-0">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Your Connections</CardTitle>
-              <span className="text-sm text-muted-foreground">{connections.length} connection{connections.length !== 1 ? 's' : ''}</span>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <ItemGroup>
-              {connections.map((conn, idx) => {
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>API Key</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {connections.map((conn) => {
                 const connKeys = getKeysForConnection(conn.id);
                 return (
-                  <Fragment key={conn.id}>
-                    {idx > 0 && <ItemSeparator />}
-                    <Item>
-                      <ItemMedia variant="icon">
-                        <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
-                      </ItemMedia>
-                      <ItemContent>
-                        <ItemTitle>{conn.name}</ItemTitle>
-                        <ItemDescription>
-                          {conn.product_type} · Added {new Date(conn.created_at).toLocaleDateString()}
-                        </ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)}>
-                          <RefreshCw className="h-3 w-3" /> New Key
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30" onClick={() => handleDeleteConnection(conn.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                    {connKeys.map((key) => (
-                      <Item key={key.id} size="sm" className="pl-16">
-                        <ItemMedia>
-                          <Key className="h-3.5 w-3.5 text-muted-foreground" />
-                        </ItemMedia>
-                        <ItemContent>
-                          <ItemTitle>
-                            <code className="font-mono text-xs text-muted-foreground">{key.prefix}...</code>
-                            <span className="text-xs text-muted-foreground font-normal">{key.name}</span>
-                          </ItemTitle>
-                        </ItemContent>
-                        <ItemActions>
-                          <Badge variant="secondary" className={key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : 'bg-muted text-muted-foreground'}>
+                  <TableRow key={conn.id}>
+                    <TableCell className="font-medium">
+                      {conn.name}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        {new Date(conn.created_at).toLocaleDateString()}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={conn.status === 'active' ? 'outline' : 'secondary'} className={conn.status === 'active' ? 'border-emerald-800 text-emerald-400' : ''}>
+                        {conn.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {connKeys.map((key) => (
+                        <div key={key.id} className="flex items-center gap-2">
+                          <code className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
+                          <Badge variant="secondary" className={key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : ''}>
                             {key.status}
                           </Badge>
                           {key.status === 'active' && (
@@ -305,15 +293,26 @@ export default function Connections() {
                               Revoke
                             </Button>
                           )}
-                        </ItemActions>
-                      </Item>
-                    ))}
-                  </Fragment>
+                        </div>
+                      ))}
+                      {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)}>
+                          <RefreshCw className="h-3 w-3" /> New Key
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30" onClick={() => handleDeleteConnection(conn.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </ItemGroup>
-          </CardContent>
-        </Card>
+            </TableBody>
+          </Table>
+        </div>
       )}
 
       {/* Add Connection Dialog */}
