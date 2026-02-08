@@ -7,7 +7,7 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Label, Card, CardContent, Alert, AlertDescription, Badge, Switch } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, Alert, AlertDescription, Badge, Switch, Separator } from '@node2flow/dashboard-core';
 
 import { Loader2, RotateCcw, Trash2, AlertTriangle, Power } from 'lucide-react';
 
@@ -148,6 +148,7 @@ export default function AdminSystem() {
         <h1 className="text-2xl font-bold text-foreground">System Controls</h1>
         <p className="text-muted-foreground mt-1">Maintenance, recalculation, and reset tools</p>
       </div>
+      <Separator />
 
       {error && (
         <Alert variant="destructive">
@@ -220,12 +221,13 @@ export default function AdminSystem() {
 
       {/* Card 2: Recalculate Stats */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <RotateCcw className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Recalculate Stats</h2>
-          </div>
-
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <RotateCcw className="h-4 w-4 text-primary" />
+            Recalculate Stats
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-4">
             Rebuild usage_monthly from usage_logs and recalculate platform statistics.
             This does not delete any data.
@@ -258,12 +260,13 @@ export default function AdminSystem() {
 
       {/* Card 3: Clear Logs */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Trash2 className="h-5 w-5 text-red-400" />
-            <h2 className="text-lg font-semibold text-foreground">Clear All Logs</h2>
-          </div>
-
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Trash2 className="h-4 w-4 text-red-400" />
+            Clear All Logs
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-4">
             Delete all usage_logs and usage_monthly records. Resets execution counters to zero.
             Requires TOTP verification.
@@ -297,12 +300,13 @@ export default function AdminSystem() {
 
       {/* Card 4: Danger Zone - Full System Reset */}
       <Card className="border-2 border-red-700">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
-            <h2 className="text-lg font-semibold text-red-400">Danger Zone - Full System Reset</h2>
-          </div>
-
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2 text-red-400">
+            <AlertTriangle className="h-4 w-4 text-red-500" />
+            Danger Zone - Full System Reset
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
             <p className="text-sm text-red-300">
               This will permanently delete all non-admin users, their connections, API keys,

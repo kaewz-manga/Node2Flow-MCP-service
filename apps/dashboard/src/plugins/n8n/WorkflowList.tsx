@@ -5,7 +5,7 @@ import {
   activateWorkflow, deactivateWorkflow, executeWorkflow,
   getWorkflowTags, updateWorkflowTags, listTags,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Card, CardContent, Textarea, Alert, AlertDescription, Badge } from '@node2flow/dashboard-core';
+import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, Textarea, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
@@ -194,14 +194,18 @@ export default function WorkflowList() {
         </div>
       </div>
 
+      <Separator />
+
       {/* Create form */}
       {showCreate && (
-        <Card>
-          <CardContent className="p-4 space-y-3">
+        <Card className="hover:shadow-md transition-all">
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-foreground">Create Workflow</h3>
+              <CardTitle className="text-base">Create Workflow</CardTitle>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowCreate(false)}><X className="h-4 w-4" /></Button>
             </div>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-3">
             <Textarea
               value={createJson}
               onChange={(e) => setCreateJson(e.target.value)}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, ArrowLeft, ChevronDown, Search, HelpCircle, Zap as Lightning, Shield, CreditCard, AlertTriangle } from 'lucide-react';
-import { useAuth, Card, CardContent, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
 
 import { plugins } from '../plugins/registry';
 
@@ -288,7 +288,7 @@ const faqData: FAQCategory[] = [...genericCategories, ...pluginCategories];
 
 function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) {
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-all">
       <Button
         variant="ghost"
         onClick={onToggle}
@@ -356,6 +356,8 @@ export default function FAQ() {
           </p>
         </div>
 
+        <Separator />
+
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -403,10 +405,12 @@ export default function FAQ() {
         )}
 
         {/* Still need help */}
-        <Card className="mt-12">
-          <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold text-foreground mb-2">Still have questions?</h3>
-            <p className="text-muted-foreground mb-4">
+        <Card className="mt-12 hover:shadow-md transition-all">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base text-center">Still have questions?</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 text-center">
+            <p className="text-muted-foreground mb-3">
               We're here to help. Reach out to our support team.
             </p>
             <Button asChild>

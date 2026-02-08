@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -194,27 +194,31 @@ export default function Connections() {
         </Button>
       </div>
 
+      <Separator />
+
       <Card>
-        <CardContent className="p-4 flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-muted-foreground">MCP Endpoint</p>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">MCP Endpoint</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex items-center justify-between gap-4">
             <code className="text-sm font-mono text-foreground break-all">{mcpUrl}</code>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(mcpUrl);
+                setCopiedMcp(true);
+                setTimeout(() => setCopiedMcp(false), 2000);
+              }}
+            >
+              {copiedMcp ? (
+                <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
+              ) : (
+                <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
+              )}
+            </Button>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(mcpUrl);
-              setCopiedMcp(true);
-              setTimeout(() => setCopiedMcp(false), 2000);
-            }}
-          >
-            {copiedMcp ? (
-              <><Check className="h-4 w-4 text-emerald-400 mr-1" /> Copied</>
-            ) : (
-              <><Copy className="h-4 w-4 mr-1" /> Copy URL</>
-            )}
-          </Button>
         </CardContent>
       </Card>
 
@@ -263,20 +267,19 @@ export default function Connections() {
           {connections.map((conn) => {
             const connKeys = getKeysForConnection(conn.id);
             return (
-              <Card key={conn.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className={`w-3 h-3 rounded-full mt-1.5 ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+              <Card key={conn.id} className="transition-all hover:shadow-md">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2.5 h-2.5 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
                       <div>
-                        <h3 className="font-semibold text-foreground">{conn.name}</h3>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <MessageCircle className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{conn.product_type}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <CardTitle className="text-base">{conn.name}</CardTitle>
+                        <CardDescription className="flex items-center gap-1.5 mt-0.5">
+                          <MessageCircle className="h-3 w-3" />
+                          {conn.product_type}
+                          <span className="mx-1">·</span>
                           Added {new Date(conn.created_at).toLocaleDateString()}
-                        </p>
+                        </CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -298,10 +301,11 @@ export default function Connections() {
                       </Button>
                     </div>
                   </div>
-
+                </CardHeader>
+                <CardContent className="pt-0">
                   {connKeys.length > 0 && (
                     <>
-                      <Separator className="my-4" />
+                      <Separator className="mb-4" />
                       <h4 className="text-sm font-medium text-muted-foreground mb-2">API Keys</h4>
                       <div className="space-y-2">
                         {connKeys.map((key) => (

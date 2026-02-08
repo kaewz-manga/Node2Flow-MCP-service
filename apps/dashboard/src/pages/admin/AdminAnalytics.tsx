@@ -10,7 +10,7 @@ import {
   type ProductUsage,
 } from '../../lib/platform-api';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -85,11 +85,14 @@ export default function AdminAnalytics() {
           </SelectContent>
         </Select>
       </div>
+      <Separator />
 
       {/* Usage by Product */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Usage by Product</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Usage by Product</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           {productUsage.length === 0 ? (
             <p className="text-muted-foreground text-sm py-4 text-center">No data yet</p>
           ) : (
@@ -138,8 +141,10 @@ export default function AdminAnalytics() {
 
       {/* Requests Chart */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Requests Over Time</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Requests Over Time</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           {timeseries.length === 0 ? (
             <p className="text-muted-foreground text-sm py-8 text-center">No data yet</p>
           ) : (
@@ -174,9 +179,9 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Tools */}
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Top Tools</h2>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Top Tools</CardTitle>
               <Select value={productFilter || 'all'} onValueChange={(value) => setProductFilter(value === 'all' ? '' : value)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Products" />
@@ -189,6 +194,8 @@ export default function AdminAnalytics() {
                 </SelectContent>
               </Select>
             </div>
+          </CardHeader>
+          <CardContent className="pt-0">
             {tools.length === 0 ? (
               <p className="text-muted-foreground text-sm py-4 text-center">No data yet</p>
             ) : (
@@ -222,8 +229,10 @@ export default function AdminAnalytics() {
 
         {/* Top Users */}
         <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Top Users</h2>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Top Users</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             {topUsers.length === 0 ? (
               <p className="text-muted-foreground text-sm py-4 text-center">No data yet</p>
             ) : (

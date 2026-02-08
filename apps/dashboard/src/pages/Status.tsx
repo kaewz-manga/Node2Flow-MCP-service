@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth, Card, CardContent, Button, Separator } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Separator } from '@node2flow/dashboard-core';
 
 import {
   Zap,
@@ -284,8 +284,15 @@ export default function Status() {
 
   const content = (
     <>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">System Status</h1>
+          <p className="text-muted-foreground mt-1">Real-time status of all Node2Flow services</p>
+        </div>
+
+        <Separator />
+
         {/* Overall Status */}
-        <div className={`rounded-xl p-8 mb-8 ${
+        <div className={`rounded-xl p-8 ${
           overallStatus === 'operational' ? 'bg-green-900/20 border border-green-800' :
           overallStatus === 'degraded' ? 'bg-yellow-900/20 border border-yellow-800' :
           overallStatus === 'outage' ? 'bg-red-900/20 border border-red-800' :
@@ -319,12 +326,14 @@ export default function Status() {
         </div>
 
         {/* Uptime */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Uptime - Last 90 Days</h2>
+        <Card className="hover:shadow-md transition-all">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Uptime - Last 90 Days</CardTitle>
               <span className="text-2xl font-bold text-green-400">{calculateUptime()}%</span>
             </div>
+          </CardHeader>
+          <CardContent className="pt-0">
             <UptimeBar days={uptimeHistory} />
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
               <span>90 days ago</span>
@@ -338,7 +347,7 @@ export default function Status() {
           <h2 className="text-lg font-semibold text-foreground mb-4">Service Components</h2>
           <div className="space-y-3">
             {components.map((component) => (
-              <Card key={component.name}>
+              <Card key={component.name} className="hover:shadow-md transition-all">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="text-primary">{component.icon}</div>
@@ -371,7 +380,7 @@ export default function Status() {
               ))}
             </div>
           ) : (
-            <Card>
+            <Card className="hover:shadow-md transition-all">
               <CardContent className="p-8 text-center">
                 <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
                 <p className="text-foreground font-medium">No active incidents</p>
@@ -386,7 +395,7 @@ export default function Status() {
         {/* Scheduled Maintenance */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-4">Scheduled Maintenance</h2>
-          <Card>
+          <Card className="hover:shadow-md transition-all">
             <CardContent className="p-8 text-center">
               <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
               <p className="text-foreground font-medium">No scheduled maintenance</p>
@@ -398,9 +407,11 @@ export default function Status() {
         </section>
 
         {/* Subscribe */}
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-2">Stay Updated</h2>
+        <Card className="hover:shadow-md transition-all">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Stay Updated</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <p className="text-muted-foreground mb-4">
               Get notified about service incidents and maintenance windows.
             </p>

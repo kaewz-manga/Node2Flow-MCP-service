@@ -1,5 +1,5 @@
 import { FileText } from 'lucide-react';
-import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -10,9 +10,8 @@ export default function PageList() {
     return (
       <Card>
         <CardContent className="text-center py-12">
-          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-muted-foreground">Add a Notion connection first to browse pages.</p>
+          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
         </CardContent>
       </Card>
     );
@@ -24,14 +23,18 @@ export default function PageList() {
         <h1 className="text-2xl font-bold text-foreground">Pages</h1>
         <p className="text-muted-foreground mt-1">Search and manage your Notion pages via MCP tools</p>
       </div>
-      <Card>
-        <CardContent className="p-8 text-center">
-          <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Use MCP to manage pages</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Ask your AI assistant: <em className="text-foreground">"Search for pages about Meeting Notes"</em> or{' '}
-            <em className="text-foreground">"Create a new page in my Projects database"</em>
-          </p>
+      <Separator />
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader>
+          <CardTitle className="text-base">Use MCP tools</CardTitle>
+          <CardDescription>Manage Notion pages through your AI assistant</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><em className="text-foreground">"Search for pages about Meeting Notes"</em></li>
+            <li><em className="text-foreground">"Create a new page in my Projects database"</em></li>
+            <li><em className="text-foreground">"Update the title of page [ID]"</em></li>
+          </ul>
         </CardContent>
       </Card>
     </div>

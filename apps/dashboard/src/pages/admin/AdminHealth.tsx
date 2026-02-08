@@ -5,7 +5,7 @@ import {
   type ErrorLog,
 } from '../../lib/platform-api';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -44,6 +44,7 @@ export default function AdminHealth() {
         <h1 className="text-2xl font-bold text-foreground">System Health</h1>
         <p className="text-muted-foreground mt-1">Error trends and recent failures</p>
       </div>
+      <Separator />
 
       {/* Summary */}
       <Card className="bg-gradient-to-br from-red-900/30 to-red-900/30 border-red-700">
@@ -60,8 +61,10 @@ export default function AdminHealth() {
 
       {/* Error Trend */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Error Trend (30 days)</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Error Trend (30 days)</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           {trend.length === 0 ? (
             <p className="text-muted-foreground text-sm py-4 text-center">No errors - system is healthy</p>
           ) : (
@@ -85,8 +88,10 @@ export default function AdminHealth() {
 
       {/* Recent Errors */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Recent Errors</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Recent Errors</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           {errors.length === 0 ? (
             <p className="text-muted-foreground text-sm py-4 text-center">No errors found</p>
           ) : (

@@ -55,6 +55,7 @@ export default function Landing() {
             </div>
           </div>
         </div>
+        <Separator />
       </header>
 
       {/* Hero Section */}

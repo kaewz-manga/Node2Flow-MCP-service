@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth, Card, CardContent, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
 
 import {
   Zap,
@@ -166,15 +166,12 @@ export default function Documentation() {
 
   const content = (
     <>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <Book className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Documentation</h1>
-            <p className="text-muted-foreground">Learn how to integrate Node2Flow with your AI assistant</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Documentation</h1>
+          <p className="text-muted-foreground mt-1">Learn how to integrate Node2Flow with your AI assistant</p>
         </div>
+
+        <Separator />
 
         {/* Product Selector */}
         {plugins.length > 1 && (
@@ -345,7 +342,7 @@ cd n8n-management-mcp && npm install`}
                 <p className="text-muted-foreground mb-4">
                   Restart your MCP client and try asking:
                 </p>
-                <Card>
+                <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
                   <CardContent className="p-4">
                     {(pc?.examplePrompts || ['List all my workflows', 'Show me recent executions', 'Create a new workflow']).map((prompt, i) => (
                       <p key={i} className={`text-foreground italic${i > 0 ? ' mt-2' : ''}`}>"{prompt}"</p>
@@ -383,7 +380,7 @@ cd n8n-management-mcp && npm install`}
                     {tools.map((tool) => (
                       <Card
                         key={tool.name}
-                        className="hover:border-primary/30 transition-colors"
+                        className="hover:border-primary/30 hover:shadow-md transition-all"
                       >
                         <CardContent className="p-3 flex items-center justify-between">
                           <div>
@@ -429,12 +426,14 @@ cd n8n-management-mcp && npm install`}
 
               <section>
                 <h2 className="text-xl font-semibold text-foreground mb-4">MCP Endpoint</h2>
-                <Card className="mb-4">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
+                <Card className="mb-4 hover:shadow-md transition-all">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
                       <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">POST</span>
-                      <code className="text-foreground">/mcp</code>
+                      <CardTitle className="text-base"><code>/mcp</code></CardTitle>
                     </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
                     <p className="text-muted-foreground text-sm">
                       JSON-RPC 2.0 endpoint for MCP tool calls
                     </p>
@@ -475,30 +474,36 @@ cd n8n-management-mcp && npm install`}
               <section>
                 <h2 className="text-xl font-semibold text-foreground mb-4">REST API Endpoints</h2>
                 <div className="space-y-3">
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
+                  <Card className="hover:shadow-md transition-all">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2">
                         <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code className="text-foreground">/api/connections</code>
+                        <CardTitle className="text-base"><code>/api/connections</code></CardTitle>
                       </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
                       <p className="text-muted-foreground text-sm">List your n8n connections</p>
                     </CardContent>
                   </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
+                  <Card className="hover:shadow-md transition-all">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2">
                         <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code className="text-foreground">/api/usage</code>
+                        <CardTitle className="text-base"><code>/api/usage</code></CardTitle>
                       </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
                       <p className="text-muted-foreground text-sm">Get usage statistics</p>
                     </CardContent>
                   </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
+                  <Card className="hover:shadow-md transition-all">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2">
                         <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code className="text-foreground">/api/plans</code>
+                        <CardTitle className="text-base"><code>/api/plans</code></CardTitle>
                       </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
                       <p className="text-muted-foreground text-sm">Get available plans (public)</p>
                     </CardContent>
                   </Card>
@@ -660,10 +665,12 @@ STRIPE_WEBHOOK_SECRET=whsec_xxx`}
                 />
               </section>
 
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Need Help?</h3>
-                  <p className="text-muted-foreground mb-4">
+              <Card className="hover:shadow-md transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Need Help?</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-muted-foreground mb-3">
                     If you're experiencing persistent errors:
                   </p>
                   <div className="flex flex-wrap gap-3">

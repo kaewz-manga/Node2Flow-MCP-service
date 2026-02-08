@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAdminRevenueOverview, type PlanDist } from '../../lib/platform-api';
 import { Loader2, DollarSign } from 'lucide-react';
-import { Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -38,6 +38,7 @@ export default function AdminRevenue() {
         <h1 className="text-2xl font-bold text-foreground">Revenue</h1>
         <p className="text-muted-foreground mt-1">Monthly recurring revenue and plan distribution</p>
       </div>
+      <Separator />
 
       {/* MRR Card */}
       <Card className="bg-gradient-to-br from-green-500 to-green-700 text-white border-0">
@@ -56,8 +57,10 @@ export default function AdminRevenue() {
 
       {/* Plan Distribution */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Plan Distribution</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Plan Distribution</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <div className="space-y-4">
             {distribution.map((d) => {
               const pct = totalUsers > 0 ? Math.round((d.count / totalUsers) * 100) : 0;
@@ -92,8 +95,10 @@ export default function AdminRevenue() {
 
       {/* Revenue per plan table */}
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Revenue Breakdown</h2>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Revenue Breakdown</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <Table>
             <TableHeader>
               <TableRow>

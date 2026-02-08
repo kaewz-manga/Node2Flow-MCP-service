@@ -24,6 +24,7 @@ export default function AccountDeleted() {
             Previous data cannot be recovered.
           </p>
         </div>
+        <Separator />
 
         <div className="space-y-3">
           <Button asChild className="w-full">

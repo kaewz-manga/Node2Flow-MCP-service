@@ -1,5 +1,5 @@
 import { FileCode } from 'lucide-react';
-import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -10,9 +10,8 @@ export default function Templates() {
     return (
       <Card>
         <CardContent className="text-center py-12">
-          <FileCode className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-muted-foreground">Add a cl-n8n-mcp connection first to browse templates.</p>
+          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
         </CardContent>
       </Card>
     );
@@ -24,14 +23,18 @@ export default function Templates() {
         <h1 className="text-2xl font-bold text-foreground">Workflow Templates</h1>
         <p className="text-muted-foreground mt-1">Browse and deploy n8n.io workflow templates</p>
       </div>
-      <Card>
-        <CardContent className="p-8 text-center">
-          <FileCode className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Use MCP to browse templates</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Ask your AI assistant: <em className="text-foreground">"Search for Slack integration templates"</em> or{' '}
-            <em className="text-foreground">"Deploy template #1234 to my n8n"</em>
-          </p>
+      <Separator />
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader>
+          <CardTitle className="text-base">Use MCP tools</CardTitle>
+          <CardDescription>Browse and deploy workflow templates through your AI assistant</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><em className="text-foreground">"Search for Slack integration templates"</em></li>
+            <li><em className="text-foreground">"Deploy template #1234 to my n8n"</em></li>
+            <li><em className="text-foreground">"Show me automation templates for email"</em></li>
+          </ul>
         </CardContent>
       </Card>
     </div>

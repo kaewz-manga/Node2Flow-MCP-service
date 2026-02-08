@@ -1,5 +1,5 @@
 import { Users } from 'lucide-react';
-import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -10,9 +10,8 @@ export default function ChatManagement() {
     return (
       <Card>
         <CardContent className="text-center py-12">
-          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-muted-foreground">Add a Telegram Bot connection first to manage chats.</p>
+          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
         </CardContent>
       </Card>
     );
@@ -24,14 +23,18 @@ export default function ChatManagement() {
         <h1 className="text-2xl font-bold text-foreground">Chat Management</h1>
         <p className="text-muted-foreground mt-1">Manage Telegram chats and members via MCP tools</p>
       </div>
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Use MCP to manage chats</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Ask your AI assistant: <em className="text-foreground">"Get info about chat -100123"</em> or{' '}
-            <em className="text-foreground">"Ban user 456 from the group"</em>
-          </p>
+      <Separator />
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader>
+          <CardTitle className="text-base">Use MCP tools</CardTitle>
+          <CardDescription>Manage Telegram chats and members through your AI assistant</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><em className="text-foreground">"Get info about chat -100123"</em></li>
+            <li><em className="text-foreground">"Ban user 456 from the group"</em></li>
+            <li><em className="text-foreground">"List administrators in my channel"</em></li>
+          </ul>
         </CardContent>
       </Card>
     </div>

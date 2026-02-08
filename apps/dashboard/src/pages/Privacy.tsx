@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Zap, ArrowLeft, Shield, Database, Lock, Globe, Trash2, Mail } from 'lucide-react';
-import { useAuth, Card, CardContent, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, CardHeader, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
 
 
 
@@ -15,14 +15,17 @@ export default function Privacy() {
           <h1 className="text-3xl font-bold text-foreground mb-2">Privacy Policy</h1>
           <p className="text-muted-foreground">Last updated: February 5, 2026</p>
         </div>
+        <Separator />
 
         {/* Quick Summary */}
         <Card className="mb-8">
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <CardHeader className="pb-3">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
               Privacy at a Glance
             </h2>
+          </CardHeader>
+          <CardContent className="pt-0">
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="flex items-start gap-3">
                 <Database className="h-4 w-4 text-green-400 mt-0.5" />

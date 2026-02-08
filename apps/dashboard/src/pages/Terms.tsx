@@ -15,6 +15,7 @@ export default function Terms() {
           <h1 className="text-3xl font-bold text-foreground mb-2">Terms of Service</h1>
           <p className="text-muted-foreground">Last updated: February 5, 2026</p>
         </div>
+        <Separator />
 
         {/* Important Notice */}
         <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-6 mb-8">

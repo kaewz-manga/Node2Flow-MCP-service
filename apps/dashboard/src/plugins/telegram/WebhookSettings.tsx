@@ -1,5 +1,5 @@
 import { Globe } from 'lucide-react';
-import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -10,9 +10,8 @@ export default function WebhookSettings() {
     return (
       <Card>
         <CardContent className="text-center py-12">
-          <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-muted-foreground">Add a Telegram Bot connection first to manage webhooks.</p>
+          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
         </CardContent>
       </Card>
     );
@@ -24,14 +23,18 @@ export default function WebhookSettings() {
         <h1 className="text-2xl font-bold text-foreground">Webhook Settings</h1>
         <p className="text-muted-foreground mt-1">Manage Telegram webhook endpoints via MCP tools</p>
       </div>
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Globe className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Use MCP to manage webhooks</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Ask your AI assistant: <em className="text-foreground">"Set webhook to https://myserver.com/webhook"</em> or{' '}
-            <em className="text-foreground">"Check my webhook status"</em>
-          </p>
+      <Separator />
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader>
+          <CardTitle className="text-base">Use MCP tools</CardTitle>
+          <CardDescription>Manage webhook endpoints through your AI assistant</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><em className="text-foreground">"Set webhook to https://myserver.com/webhook"</em></li>
+            <li><em className="text-foreground">"Check my webhook status"</em></li>
+            <li><em className="text-foreground">"Delete the current webhook"</em></li>
+          </ul>
         </CardContent>
       </Card>
     </div>

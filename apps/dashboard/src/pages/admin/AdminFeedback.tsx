@@ -4,7 +4,7 @@ import {
   updateAdminFeedback,
   type AdminFeedbackItem,
 } from '../../lib/platform-api';
-import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Separator } from '@node2flow/dashboard-core';
 import { toast } from 'sonner';
 import {
   Loader2,
@@ -104,6 +104,7 @@ export default function AdminFeedback() {
         <h1 className="text-2xl font-bold text-foreground">Feedback</h1>
         <p className="text-muted-foreground mt-1">User feedback and suggestions</p>
       </div>
+      <Separator />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">

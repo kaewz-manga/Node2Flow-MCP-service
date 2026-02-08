@@ -228,6 +228,8 @@ export default function Settings() {
         <p className="text-muted-foreground mt-1">Manage your account settings</p>
       </div>
 
+      <Separator />
+
       {/* Account Recovery Banner */}
       {isPendingDeletion && scheduledDeletionAt && (
         <Alert variant="warning">
@@ -439,9 +441,11 @@ export default function Settings() {
       </Card>
 
       {/* MCP Configuration Help */}
-      <Card>
-        <CardHeader><CardTitle>MCP Client Configuration</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">MCP Client Configuration</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-4">
             Use this configuration in your MCP client (Claude Desktop, Cursor, etc.)
           </p>

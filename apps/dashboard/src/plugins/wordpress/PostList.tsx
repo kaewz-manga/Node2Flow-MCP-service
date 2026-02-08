@@ -1,5 +1,5 @@
 import { FileText } from 'lucide-react';
-import { useConnection, Card, CardContent } from '@node2flow/dashboard-core';
+import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
 
 
 
@@ -10,9 +10,8 @@ export default function PostList() {
     return (
       <Card>
         <CardContent className="text-center py-12">
-          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-muted-foreground">Add a WordPress connection first to manage posts.</p>
+          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
         </CardContent>
       </Card>
     );
@@ -24,14 +23,18 @@ export default function PostList() {
         <h1 className="text-2xl font-bold text-foreground">Posts</h1>
         <p className="text-muted-foreground mt-1">Manage WordPress posts via MCP tools</p>
       </div>
-      <Card>
-        <CardContent className="p-8 text-center">
-          <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Use MCP to manage posts</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Ask your AI assistant: <em className="text-foreground">"List all my WordPress posts"</em> or{' '}
-            <em className="text-foreground">"Create a new draft post about Node2Flow"</em>
-          </p>
+      <Separator />
+      <Card className="hover:shadow-md transition-all">
+        <CardHeader>
+          <CardTitle className="text-base">Use MCP tools</CardTitle>
+          <CardDescription>Manage your WordPress posts through your AI assistant</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><em className="text-foreground">"List all my WordPress posts"</em></li>
+            <li><em className="text-foreground">"Create a new draft post about Node2Flow"</em></li>
+            <li><em className="text-foreground">"Update post #123 with new content"</em></li>
+          </ul>
         </CardContent>
       </Card>
     </div>

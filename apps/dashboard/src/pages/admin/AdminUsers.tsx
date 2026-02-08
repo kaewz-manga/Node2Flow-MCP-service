@@ -6,7 +6,7 @@ import {
   deleteAdminUser,
   type AdminUser,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Separator } from '@node2flow/dashboard-core';
 import { toast } from 'sonner';
 
 import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield } from 'lucide-react';
@@ -96,6 +96,7 @@ export default function AdminUsers() {
         <h1 className="text-2xl font-bold text-foreground">Users</h1>
         <p className="text-muted-foreground mt-1">{total} total users</p>
       </div>
+      <Separator />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Usage as UsageType, Plan } from '../lib/platform-api';
 import { getUsage, getPlans, createCheckoutSession } from '../lib/platform-api';
-import { useAuth, Card, CardContent, Button, Alert, AlertDescription, Progress, Badge } from '@node2flow/dashboard-core';
+import { useAuth, Card, CardContent, CardHeader, CardTitle, CardFooter, Button, Alert, AlertDescription, Progress, Badge, Separator } from '@node2flow/dashboard-core';
 
 import {
   Activity,
@@ -65,13 +65,17 @@ export default function Usage() {
         <p className="text-muted-foreground mt-1">Monitor your API usage and manage your subscription</p>
       </div>
 
+      <Separator />
+
       {/* Current Plan Card */}
-      <Card>
-        <CardContent className="p-6">
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm hover:shadow-md transition-all">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base text-muted-foreground font-normal">Current Plan</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Current Plan</p>
-              <h2 className="text-3xl font-bold capitalize mt-1 text-foreground">{currentPlan?.name || user?.plan}</h2>
+              <h2 className="text-3xl font-bold capitalize text-foreground">{currentPlan?.name || user?.plan}</h2>
               <p className="text-muted-foreground mt-2">
                 {minuteLimit === -1 ? 'Unlimited' : minuteLimit} req/min
                 {' \u2022 '}
@@ -95,12 +99,14 @@ export default function Usage() {
 
       {/* Usage Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-primary/10 rounded-lg"><Activity className="h-5 w-5 text-primary" /></div>
-              <span className="text-sm font-medium text-muted-foreground">Requests Today</span>
-            </div>
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm hover:shadow-md transition-all">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-muted-foreground font-normal flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              Requests Today
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             {isUnlimited ? (
               <>
                 <p className="text-3xl font-bold text-foreground">
@@ -125,28 +131,34 @@ export default function Usage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-emerald-900/30 rounded-lg"><TrendingUp className="h-5 w-5 text-emerald-400" /></div>
-              <span className="text-sm font-medium text-muted-foreground">Success Rate</span>
-            </div>
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm hover:shadow-md transition-all">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-muted-foreground font-normal flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-emerald-400" />
+              Success Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <p className="text-3xl font-bold text-foreground">{usage?.success_rate || 100}%</p>
-            <p className="text-sm text-muted-foreground mt-1">This month: {usage?.monthly?.used.toLocaleString() || 0} requests</p>
           </CardContent>
+          <CardFooter className="text-sm text-muted-foreground pt-0">
+            This month: {usage?.monthly?.used.toLocaleString() || 0} requests
+          </CardFooter>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-purple-900/30 rounded-lg"><Calendar className="h-5 w-5 text-purple-400" /></div>
-              <span className="text-sm font-medium text-muted-foreground">Daily Reset</span>
-            </div>
+        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm hover:shadow-md transition-all">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-muted-foreground font-normal flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-purple-400" />
+              Daily Reset
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <p className="text-xl font-semibold text-foreground">{usage?.period}</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'tomorrow'} (midnight UTC)
-            </p>
           </CardContent>
+          <CardFooter className="text-sm text-muted-foreground pt-0">
+            Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'tomorrow'} (midnight UTC)
+          </CardFooter>
         </Card>
       </div>
 
@@ -177,7 +189,7 @@ export default function Usage() {
             const isUpgrade = !isCurrent && ((isFree && (isPro || isEnterprise)) || (user?.plan === 'free' && !isFree));
 
             return (
-              <Card key={plan.id} className={`relative ${isCurrent ? 'border-primary border-2' : ''} ${isPro && !isCurrent ? 'border-primary/50' : ''}`}>
+              <Card key={plan.id} className={`relative hover:shadow-md transition-all ${isCurrent ? 'border-primary border-2' : ''} ${isPro && !isCurrent ? 'border-primary/50' : ''}`}>
                 <CardContent className="p-6">
                   {isCurrent && <Badge className="absolute -top-3 left-4">Current</Badge>}
                   {isPro && !isCurrent && <Badge variant="secondary" className="absolute -top-3 right-4">Recommended</Badge>}

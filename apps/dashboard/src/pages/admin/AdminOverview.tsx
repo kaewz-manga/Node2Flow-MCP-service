@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, type AdminStats } from '../../lib/platform-api';
 import { Users, DollarSign, Activity, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
-import { Card, CardContent } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Separator } from '@node2flow/dashboard-core';
 
 
 export default function AdminOverview() {
@@ -47,26 +47,30 @@ export default function AdminOverview() {
         <h1 className="text-2xl font-bold text-foreground">Admin Overview</h1>
         <p className="text-muted-foreground mt-1">Platform metrics at a glance</p>
       </div>
+      <Separator />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => {
           const colors = colorMap[card.color];
+          const Icon = card.icon;
           return (
             <Link key={card.label} to={card.link} className="block">
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`p-2 rounded-lg ${colors.bg}`}>
-                      <card.icon className={`h-5 w-5 ${colors.icon}`} />
+              <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm hover:shadow-md transition-all">
+                <CardHeader className="pb-2">
+                  <CardDescription className="flex items-center gap-2">
+                    <div className={`p-1.5 rounded-md ${colors.bg}`}>
+                      <Icon className={`h-3.5 w-3.5 ${colors.icon}`} />
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">{card.value}</p>
-                  <div className="flex items-center justify-between mt-1">
-                    <p className="text-sm text-muted-foreground">{card.sub}</p>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </CardContent>
+                    {card.label}
+                  </CardDescription>
+                  <CardTitle className="text-2xl font-semibold tabular-nums">{card.value}</CardTitle>
+                </CardHeader>
+                <CardFooter className="text-sm text-muted-foreground flex items-center justify-between pt-0">
+                  <span className="flex items-center gap-1.5">
+                    {card.sub}
+                  </span>
+                  <ArrowRight className="h-3.5 w-3.5 text-primary" />
+                </CardFooter>
               </Card>
             </Link>
           );
