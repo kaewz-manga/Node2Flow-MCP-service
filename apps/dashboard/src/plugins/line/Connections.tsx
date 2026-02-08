@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Separator, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, CardHeader, CardTitle, Alert, AlertDescription, Badge, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -19,14 +19,7 @@ import {
   MessageCircle,
   Lock,
   Tag,
-  Server,
 } from 'lucide-react';
-
-
-
-
-
-
 
 export default function Connections() {
   const { withSudo, totpEnabled } = useSudoContext();
@@ -46,13 +39,10 @@ export default function Connections() {
   const [formError, setFormError] = useState('');
 
   const [copied, setCopied] = useState(false);
-  const [copiedMcp, setCopiedMcp] = useState(false);
 
   // AlertDialog states
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
-
-  const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
 
   const fetchConnections = async () => {
     setLoading(true);
@@ -195,63 +185,6 @@ export default function Connections() {
         </Button>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>Connections</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {connections.length}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <Server className="h-3.5 w-3.5 mr-1.5 text-primary" />
-            {connections.filter(c => c.status === 'active').length} active
-          </CardFooter>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>API Keys</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {apiKeys.length}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
-            <Key className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
-            {apiKeys.filter(k => k.status === 'active').length} active
-          </CardFooter>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm">
-          <CardHeader className="pb-2">
-            <CardDescription>MCP Endpoint</CardDescription>
-            <CardTitle className="text-sm font-mono break-all">
-              {mcpUrl}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(mcpUrl);
-                setCopiedMcp(true);
-                setTimeout(() => setCopiedMcp(false), 2000);
-              }}
-            >
-              {copiedMcp ? (
-                <><Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Copied</>
-              ) : (
-                <><Copy className="h-3.5 w-3.5 mr-1.5" /> Copy URL</>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-
-      <Separator />
-
       {!totpEnabled && (
         <Alert className="bg-amber-900/30 border-amber-700">
           <Shield className="h-5 w-5 text-amber-400" />
@@ -293,89 +226,68 @@ export default function Connections() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {connections.map((conn) => {
-            const connKeys = getKeysForConnection(conn.id);
-            return (
-              <Card key={conn.id} className={`transition-all hover:shadow-md ${conn.status === 'active' ? 'border-l-4 border-l-emerald-500' : ''}`}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2.5 h-2.5 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
-                      <div>
-                        <CardTitle className="text-base">{conn.name}</CardTitle>
-                        <CardDescription className="flex items-center gap-1.5 mt-0.5">
-                          <MessageCircle className="h-3 w-3" />
-                          {conn.product_type}
-                          <span className="mx-1">·</span>
-                          Added {new Date(conn.created_at).toLocaleDateString()}
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleGenerateApiKey(conn.id)}
-                      >
-                        <RefreshCw className="h-3 w-3 mr-1" />
-                        New Key
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30"
-                        onClick={() => handleDeleteConnection(conn.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {connKeys.length > 0 && (
-                    <>
-                      <Separator className="mb-4" />
-                      <h4 className="text-sm font-medium text-muted-foreground mb-2">API Keys</h4>
-                      <div className="space-y-2">
-                        {connKeys.map((key) => (
-                          <div key={key.id} className="flex items-center justify-between py-2 px-3 bg-card rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <Key className="h-4 w-4 text-muted-foreground" />
-                              <div>
-                                <code className="text-sm font-mono text-muted-foreground">{key.prefix}...</code>
-                                <span className="ml-2 text-xs text-muted-foreground">{key.name}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className={
-                                key.status === 'active'
-                                  ? 'bg-emerald-900/30 text-emerald-400'
-                                  : 'bg-muted text-muted-foreground'
-                              }>
-                                {key.status}
-                              </Badge>
-                              {key.status === 'active' && (
-                                <Button
-                                  variant="link"
-                                  size="sm"
-                                  className="text-red-400 p-0 h-auto"
-                                  onClick={() => handleRevokeApiKey(key.id)}
-                                >
-                                  Revoke
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+        <Card>
+          <CardHeader className="pb-0">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Your Connections</CardTitle>
+              <span className="text-sm text-muted-foreground">{connections.length} connection{connections.length !== 1 ? 's' : ''}</span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ItemGroup>
+              {connections.map((conn, idx) => {
+                const connKeys = getKeysForConnection(conn.id);
+                return (
+                  <Fragment key={conn.id}>
+                    {idx > 0 && <ItemSeparator />}
+                    <Item>
+                      <ItemMedia variant="icon">
+                        <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemTitle>{conn.name}</ItemTitle>
+                        <ItemDescription>
+                          {conn.product_type} · Added {new Date(conn.created_at).toLocaleDateString()}
+                        </ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        <Button variant="secondary" size="sm" onClick={() => handleGenerateApiKey(conn.id)}>
+                          <RefreshCw className="h-3 w-3" /> New Key
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-400 hover:bg-red-900/30" onClick={() => handleDeleteConnection(conn.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </ItemActions>
+                    </Item>
+                    {connKeys.map((key) => (
+                      <Item key={key.id} size="sm" className="pl-16">
+                        <ItemMedia>
+                          <Key className="h-3.5 w-3.5 text-muted-foreground" />
+                        </ItemMedia>
+                        <ItemContent>
+                          <ItemTitle>
+                            <code className="font-mono text-xs text-muted-foreground">{key.prefix}...</code>
+                            <span className="text-xs text-muted-foreground font-normal">{key.name}</span>
+                          </ItemTitle>
+                        </ItemContent>
+                        <ItemActions>
+                          <Badge variant="secondary" className={key.status === 'active' ? 'bg-emerald-900/30 text-emerald-400' : 'bg-muted text-muted-foreground'}>
+                            {key.status}
+                          </Badge>
+                          {key.status === 'active' && (
+                            <Button variant="link" size="sm" className="text-red-400 p-0 h-auto" onClick={() => handleRevokeApiKey(key.id)}>
+                              Revoke
+                            </Button>
+                          )}
+                        </ItemActions>
+                      </Item>
+                    ))}
+                  </Fragment>
+                );
+              })}
+            </ItemGroup>
+          </CardContent>
+        </Card>
       )}
 
       {/* Add Connection Dialog */}
