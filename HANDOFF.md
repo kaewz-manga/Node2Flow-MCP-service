@@ -357,6 +357,16 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
 
 5. **1 file changed**: 290 insertions, 222 deletions
 
+6. **Full native HTML cleanup** (`31181dd`):
+   - Replaced last 5 native `<button>` → shadcn `Button` across 3 files:
+     - `FAQ.tsx` — accordion toggle → `Button variant="ghost"`
+     - `WorkflowList.tsx` — workflow name link, status toggle, tag selector → `Button`
+     - `ExecutionList.tsx` — execution ID link → `Button variant="link"`
+   - **Zero native HTML elements remaining in entire dashboard**:
+     - No `<button>`, `<input>`, `<textarea>`, `<select>`, `<label>`, `<table>`
+     - No `alert()`, `confirm()`
+     - Only semantic `<a href>` for mailto: and external links (correct usage)
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -570,7 +580,7 @@ wrangler deploy                         # In each app/
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
 **Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 refactor + UI consolidation
 **Session 17**: Toast/AlertDialog/Switch + replaced 68 alert(), 9 native select, confirm() across 25 files
-**Session 18**: Dashboard page visual redesign — SectionCards pattern, gradient stats, services grid, connections table
+**Session 18**: Dashboard visual redesign (SectionCards) + full native HTML cleanup (zero `<button>`/`<input>`/`<select>`/`alert()` remaining)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-08
