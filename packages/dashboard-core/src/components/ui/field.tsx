@@ -81,7 +81,10 @@ function FieldLabel({
   return (
     <Label
       data-slot="field-label"
-      className={cn("text-sm font-medium leading-snug", className)}
+      className={cn(
+        "text-sm font-medium leading-snug group-data-[invalid]/field:text-destructive",
+        className
+      )}
       {...props}
     >
       {children}
@@ -101,7 +104,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-xs text-muted-foreground leading-normal",
+        "text-xs text-muted-foreground leading-normal group-data-[invalid]/field:text-destructive",
         "[&>a]:text-primary [&>a:hover]:underline [&>a]:underline-offset-4",
         className
       )}
