@@ -171,11 +171,11 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (67 tools: n8n 27 + WP 20 + cl-n8n-mcp 20) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (156 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 25 + TG 27 + Notion 25) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
-| KV: RATE_LIMIT_KV | `45d5d994b649440ab34e4f0a3a5eaa66` | ✅ Reused |
+| KV: RATE_LIMIT_KV | `9a87f5a1d2a7413dba6f022976b7b874` | ✅ Dedicated (separated 2026-02-07) |
 | KV: OAUTH_STATE_KV | `a65a07688d774d56bb915cf9e961881a` | ✅ New |
 | OAuth (GitHub/Google) | redirect URIs updated | ✅ |
 | Secrets | JWT_SECRET, ENCRYPTION_KEY, OAuth, Resend | ✅ Fresh keys |
@@ -220,6 +220,41 @@ All infrastructure deployed and verified:
    - **Gateway total**: 67 tools (n8n 27 + WordPress 20 + cl-n8n-mcp 20)
 
 2. **Unique architecture**: Unlike n8n/WordPress plugins that call APIs directly, cl-n8n-mcp plugin PROXIES to an external MCP server. The `handleToolCall` strips `mcp_` prefix and forwards via JSON-RPC.
+
+### Session 10-14: Additional Plugins + Fixes (2026-02-07/08)
+
+- **Session 10**: Critical stats fix + per-product analytics (`9abdac6`)
+- **Session 11**: Gemini RAG File Search plugin — 12 tools (`7274981`)
+- **Session 12**: LINE Messaging API plugin — 25 tools (`1dccc89`)
+- **Session 13**: Telegram Bot API plugin — 27 tools (`457cfd8`)
+- **Session 14**: Notion REST API plugin — 25 tools (`ad6ef44`)
+- **Gateway total**: 156 tools (n8n 27 + WordPress 20 + cl-n8n-mcp 20 + Gemini RAG 12 + LINE 25 + Telegram 27 + Notion 25)
+
+### Session 15: shadcn/ui Dashboard Migration (2026-02-08)
+
+Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/ui components.
+
+1. **shadcn/ui migration** (`132e742` + `f67753a`):
+   - Cyan theme, medium radius — all 34+ plugin files + 11 platform pages + 7 admin pages
+   - New UI components in `packages/dashboard-core/src/components/ui/`: Button, Card, Input, Select, Badge, Table, Dialog, Alert, Tabs, Tooltip, Separator, Label, Textarea, Progress, Sheet, Skeleton, Sidebar, Collapsible, DropdownMenu
+   - Removed all custom `n2f-*` CSS classes from `index.css`
+
+2. **Icon-collapsible sidebar** (`cfca4e0` + `5e106c2`):
+   - `<Sidebar collapsible="icon">` — collapses to ~48px icon strip with tooltips
+   - `<SidebarRail />` — thin rail to toggle expand/collapse
+   - `<SidebarTrigger />` — header button + `Ctrl+B` keyboard shortcut
+   - Plugin sections as collapsible dropdowns under "Services" group
+   - User profile `<DropdownMenu>` in sidebar footer
+   - AdminLayout with same pattern (Shield branding, 7 nav items)
+
+3. **Bundle optimization** (part of `f67753a`):
+   - `React.lazy()` for all platform + admin + plugin pages
+   - `manualChunks` in Vite: vendor-react (36KB), vendor-radix (99KB), vendor-query (27KB), vendor-icons (46KB)
+   - Main bundle: 717KB → 364KB (-49%), zero build warnings
+
+4. **New dependencies**:
+   - `@radix-ui/react-collapsible`, `@radix-ui/react-dropdown-menu` in dashboard-core
+   - `use-mobile.tsx` hook for responsive sidebar behavior
 
 ### What's Left
 
@@ -319,9 +354,13 @@ Node2Flow-MCP-service/
 │   └── dashboard-core/                # @node2flow/dashboard-core
 │       └── src/
 │           ├── contexts/              # AuthContext, SudoContext, ConnectionContext
-│           ├── components/            # Layout, AdminRoute, SudoModal, etc.
+│           ├── components/            # Layout, AdminLayout, AdminRoute, SudoModal, FeedbackBubble
+│           │   └── ui/               # shadcn/ui: Button, Card, Input, Select, Badge, Table,
+│           │                          #   Dialog, Alert, Tabs, Tooltip, Separator, Label,
+│           │                          #   Textarea, Progress, Sheet, Skeleton, Sidebar,
+│           │                          #   Collapsible, DropdownMenu
 │           ├── pages/                 # Login, Register
-│           ├── hooks/                 # useSudo
+│           ├── hooks/                 # useSudo, use-mobile
 │           └── index.ts              # Barrel export
 │
 ├── apps/
@@ -345,6 +384,10 @@ Node2Flow-MCP-service/
 │   │   │       ├── n8n/              # 27 tools, HTTP client
 │   │   │       ├── wordpress/        # 20 tools, REST API client
 │   │   │       ├── cl-n8n-mcp/      # 20 tools, JSON-RPC proxy
+│   │   │       ├── gemini-rag/      # 12 tools, Gemini API client
+│   │   │       ├── line/            # 25 tools, LINE API client
+│   │   │       ├── telegram/        # 27 tools, Telegram Bot API client
+│   │   │       ├── notion/          # 25 tools, Notion API client
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -362,10 +405,14 @@ Node2Flow-MCP-service/
 │           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
 │           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
 │           ├── plugins/
-│           │   ├── registry.ts        # Plugin registration (n8n + WordPress + cl-n8n-mcp)
+│           │   ├── registry.ts        # Plugin registration (7 plugins)
 │           │   ├── n8n/               # n8n plugin (7 pages + content)
 │           │   ├── wordpress/         # WordPress plugin (6 pages + content)
-│           │   └── cl-n8n-mcp/        # cl-n8n-mcp plugin (5 pages + content)
+│           │   ├── cl-n8n-mcp/        # cl-n8n-mcp plugin (5 pages + content)
+│           │   ├── gemini-rag/        # Gemini RAG plugin (3 pages + content)
+│           │   ├── line/              # LINE plugin (4 pages + content)
+│           │   ├── telegram/          # Telegram plugin (4 pages + content)
+│           │   └── notion/            # Notion plugin (4 pages + content)
 │           └── pages/
 │               ├── Landing.tsx ... Status.tsx   # 11 platform pages
 │               └── admin/             # 7 admin pages
@@ -414,10 +461,11 @@ wrangler deploy                         # In each app/
 
 ---
 
-**Total code written**: ~100 files across 6 phases + 3 plugin sessions
+**Total code written**: ~200+ files across 6 phases + 10 sessions
 **Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
-**Session 8**: Multi-product refactor + WordPress plugin (2 commits)
-**Session 9**: cl-n8n-mcp proxy plugin (`f31c02a`) — 67 total gateway tools
+**Sessions 8-9**: WordPress + cl-n8n-mcp plugins (67 gateway tools)
+**Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
+**Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
-**Deployed**: 2026-02-07 — Platform + Gateway + Dashboard all live
-**Date**: 2026-02-07
+**Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
+**Date**: 2026-02-08
