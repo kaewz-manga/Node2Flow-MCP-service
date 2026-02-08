@@ -8,7 +8,7 @@ import { useAuth } from '@node2flow/dashboard-core';
 import { plugins } from '../plugins/registry';
 import {
   Zap,
-  Link as LinkIcon,
+  Layers,
   Activity,
   TrendingUp,
   ArrowRight,
@@ -31,8 +31,6 @@ export default function Dashboard() {
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const connectionsHref = plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
 
   useEffect(() => {
     async function fetchData() {
@@ -90,6 +88,13 @@ export default function Dashboard() {
     ? Math.round((usage.requests.used / usage.requests.limit) * 100)
     : 0;
 
+  // Count unique product types that have at least one connection
+  const connectedServices = new Set(connections.map(c => c.product_type)).size;
+
+  // Helper: find plugin for a connection's product_type
+  const getPlugin = (productType: string) =>
+    plugins.find(p => p.id === productType);
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -120,14 +125,14 @@ export default function Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-900/30 rounded-lg">
-                <LinkIcon className="h-5 w-5 text-emerald-400" />
+                <Layers className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Connections</p>
+                <p className="text-sm text-muted-foreground">Services</p>
                 <p className="text-3xl font-bold text-foreground">
-                  {usage?.connections.used || 0}
+                  {connectedServices}
                   <span className="text-lg font-normal text-muted-foreground">
-                    /{usage?.connections.limit === -1 ? '\u221e' : (usage?.connections.limit || 1)}
+                    /{plugins.length}
                   </span>
                 </p>
               </div>
@@ -164,6 +169,41 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Services Status Grid */}
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-3">Services</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {plugins.map((plugin) => {
+            const pluginConns = connections.filter(c => c.product_type === plugin.id);
+            const isConnected = pluginConns.length > 0;
+            const connectionsHref = plugin.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
+            const PluginIcon = plugin.icon;
+            return (
+              <Link to={connectionsHref} key={plugin.id} className="block">
+                <Card className={`transition-colors hover:border-primary/50 ${isConnected ? 'border-emerald-800/50' : ''}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${isConnected ? 'bg-emerald-900/30' : 'bg-muted'}`}>
+                        <PluginIcon className={`h-5 w-5 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate text-foreground">{plugin.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {isConnected
+                            ? `${pluginConns.length} connection${pluginConns.length > 1 ? 's' : ''}`
+                            : 'Not connected'}
+                        </p>
+                      </div>
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${isConnected ? 'bg-emerald-400' : 'bg-muted-foreground/30'}`} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* Daily Rate Limit */}
@@ -251,56 +291,44 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Connections List */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg">Your Connections</CardTitle>
-          <Link
-            to={connectionsHref}
-            className="text-sm text-primary hover:text-primary/80 flex items-center gap-1"
-          >
-            View all
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </CardHeader>
-        <CardContent>
-          {connections.length === 0 ? (
-            <div className="text-center py-8">
-              <LinkIcon className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground mb-4">No connections yet</p>
-              <Button asChild>
-                <Link to={connectionsHref}>
-                  {plugins[0]?.content.emptyConnectionCTA || 'Add your first connection'}
-                </Link>
-              </Button>
-            </div>
-          ) : (
+      {/* Your Connections */}
+      {connections.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Your Connections</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-3">
-              {connections.slice(0, 3).map((conn) => (
-                <div
-                  key={conn.id}
-                  className="flex items-center justify-between p-3 bg-card rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'
-                      }`}
-                    />
-                    <div>
-                      <p className="font-medium text-foreground">{conn.name}</p>
-                      <p className="text-sm text-muted-foreground">{conn.product_type}</p>
+              {connections.map((conn) => {
+                const plugin = getPlugin(conn.product_type);
+                const ConnIcon = plugin?.icon;
+                return (
+                  <div
+                    key={conn.id}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+                      {ConnIcon && <ConnIcon className="h-4 w-4 text-muted-foreground" />}
+                      <div>
+                        <p className="font-medium text-foreground">{conn.name}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {plugin?.name || conn.product_type}
+                      </Badge>
+                      <Badge variant={conn.status === 'active' ? 'success' : 'secondary'}>
+                        {conn.status}
+                      </Badge>
                     </div>
                   </div>
-                  <Badge variant={conn.status === 'active' ? 'success' : 'secondary'}>
-                    {conn.status}
-                  </Badge>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Start Guide */}
       {connections.length === 0 && (
@@ -310,12 +338,13 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ol className="list-decimal list-inside space-y-2 text-primary">
-              {(plugins[0]?.content.quickStartSteps || []).map((step, i) => (
-                <li key={i}>{step}</li>
-              ))}
+              <li>Choose a service from the grid above</li>
+              <li>Add your API credentials to create a connection</li>
+              <li>Copy the MCP endpoint URL and API key</li>
+              <li>Configure your MCP client (Claude Desktop, Cursor, etc.)</li>
             </ol>
             <Button className="mt-4" asChild>
-              <Link to={connectionsHref}>
+              <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
                 Get Started
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
