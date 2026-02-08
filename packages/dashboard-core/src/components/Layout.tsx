@@ -1,5 +1,4 @@
-import { useState, type ComponentType } from 'react';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useConnection } from '../contexts/ConnectionContext';
@@ -9,20 +8,42 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Menu,
-  X,
   Shield,
-  ChevronDown,
+  ChevronRight,
   FileText,
   HelpCircle,
   Activity,
+  ChevronsUpDown,
+  User,
 } from 'lucide-react';
 import FeedbackBubble from './FeedbackBubble';
 import { Button } from './ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
-import { Separator } from './ui/separator';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
-import { Sheet, SheetContent, SheetTitle } from './ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from './ui/sidebar';
+import { TooltipProvider } from './ui/tooltip';
 
 // ============================================
 // Plugin Types (shared with apps/dashboard)
@@ -63,245 +84,223 @@ const resourceNavigation = [
   { name: 'Status', href: '/status', icon: Activity },
 ];
 
-function SidebarContent({
-  plugins,
-  expandedPlugins,
-  togglePlugin,
-  onNavClick,
-}: {
-  plugins: DashboardPlugin[];
-  expandedPlugins: Record<string, boolean>;
-  togglePlugin: (id: string) => void;
-  onNavClick: () => void;
-}) {
+function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
   const { user, logout, isAdmin } = useAuth();
   const { connections, activeConnection, setActiveConnectionId } = useConnection();
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
-        <div className="bg-primary p-2 rounded-lg">
-          <Zap className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="font-semibold text-foreground">Node2Flow</span>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Button
-              key={item.name}
-              variant={isActive ? 'secondary' : 'ghost'}
-              className={`w-full justify-start gap-3 ${isActive ? 'bg-primary/10 text-primary hover:bg-primary/15' : ''}`}
-              asChild
-            >
-              <Link to={item.href} onClick={onNavClick}>
-                <item.icon className="h-5 w-5" />
-                {item.name}
+    <Sidebar collapsible="icon">
+      {/* Header — Logo */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" tooltip="Node2Flow" asChild>
+              <Link to="/dashboard">
+                <div className="bg-primary rounded-lg flex aspect-square size-8 items-center justify-center">
+                  <Zap className="size-4 text-primary-foreground" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Node2Flow</span>
+                  <span className="truncate text-xs text-muted-foreground">MCP Platform</span>
+                </div>
               </Link>
-            </Button>
-          );
-        })}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        {/* Dynamic Plugin Sections */}
+      <SidebarContent>
+        {/* Platform Nav */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarMenu>
+            {navigation.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  tooltip={item.name}
+                  isActive={location.pathname === item.href}
+                  asChild
+                >
+                  <Link to={item.href}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Plugin Sections */}
         {plugins.map((plugin) => (
-          <div key={plugin.id} className="pt-4 mt-4 border-t border-border">
-            <Button
-              variant="ghost"
-              onClick={() => togglePlugin(plugin.id)}
-              className="w-full justify-start gap-3"
-            >
-              <plugin.icon className="h-5 w-5" />
-              <span className="flex-1 text-left">{plugin.name}</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${expandedPlugins[plugin.id] ? 'rotate-180' : ''}`} />
-            </Button>
-            {expandedPlugins[plugin.id] && (
-              <div className="mt-1 space-y-0.5">
-                {/* Connection selector for plugins that need it */}
-                {plugin.requiresConnection && connections.length > 0 && (
-                  <div className="px-3 py-1.5">
-                    <Select
-                      value={activeConnection?.id || ''}
-                      onValueChange={(val) => setActiveConnectionId(val)}
-                    >
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {connections
-                          .filter(c => c.product_type === plugin.id)
-                          .map((c) => (
-                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                {plugin.sidebarItems.map((item) => {
-                  const isActive = location.pathname.startsWith(item.href);
-                  return (
-                    <Button
-                      key={item.name}
-                      variant={isActive ? 'secondary' : 'ghost'}
-                      size="sm"
-                      className={`w-full justify-start gap-3 ml-2 ${isActive ? 'bg-primary/10 text-primary hover:bg-primary/15' : ''}`}
-                      asChild
-                    >
-                      <Link to={item.href} onClick={onNavClick}>
-                        <item.icon className="h-4 w-4" />
-                        {item.name}
-                      </Link>
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <SidebarGroup key={plugin.id}>
+            <SidebarGroupLabel>
+              <plugin.icon className="mr-1.5" />
+              {plugin.name}
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {/* Connection selector — hidden in icon mode */}
+              {plugin.requiresConnection && connections.filter(c => c.product_type === plugin.id).length > 0 && (
+                <li className="px-2 py-1 group-data-[collapsible=icon]:hidden">
+                  <Select
+                    value={activeConnection?.id || ''}
+                    onValueChange={(val) => setActiveConnectionId(val)}
+                  >
+                    <SelectTrigger className="h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {connections
+                        .filter(c => c.product_type === plugin.id)
+                        .map((c) => (
+                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </li>
+              )}
+              {plugin.sidebarItems.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton
+                    tooltip={item.name}
+                    isActive={location.pathname.startsWith(item.href)}
+                    asChild
+                  >
+                    <Link to={item.href}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
         ))}
 
         {/* Resources */}
-        <div className="pt-4 mt-4 border-t border-border">
-          <p className="px-3 mb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</p>
-          {resourceNavigation.map((item) => {
-            const isActive = location.pathname === item.href;
-            return (
-              <Button
-                key={item.name}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={`w-full justify-start gap-3 ${isActive ? 'bg-primary/10 text-primary hover:bg-primary/15' : ''}`}
-                asChild
-              >
-                <Link to={item.href} onClick={onNavClick}>
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              </Button>
-            );
-          })}
-        </div>
-
-        {/* Admin Panel */}
-        {isAdmin && (
-          <div className="pt-4 mt-4 border-t border-border">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-red-400 hover:bg-red-900/30 hover:text-red-400"
-              asChild
-            >
-              <Link to="/admin" onClick={onNavClick}>
-                <Shield className="h-5 w-5" />
-                Admin Panel
-              </Link>
-            </Button>
-          </div>
-        )}
-      </nav>
-
-      {/* User section */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
-              {user?.email}
-            </p>
-            <p className="text-xs text-muted-foreground capitalize">
-              {user?.plan} plan
-            </p>
-          </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={logout}
+        <SidebarGroup>
+          <SidebarGroupLabel>Resources</SidebarGroupLabel>
+          <SidebarMenu>
+            {resourceNavigation.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  tooltip={item.name}
+                  isActive={location.pathname === item.href}
+                  asChild
                 >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Sign out</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </div>
-    </div>
+                  <Link to={item.href}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Admin */}
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Admin Panel"
+                  isActive={location.pathname.startsWith('/admin')}
+                  className="text-red-400 hover:text-red-400 hover:bg-red-900/30"
+                  asChild
+                >
+                  <Link to="/admin">
+                    <Shield />
+                    <span>Admin Panel</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      {/* Footer — User */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="bg-sidebar-accent rounded-lg flex aspect-square size-8 items-center justify-center">
+                    <User className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user?.email}</span>
+                    <span className="truncate text-xs capitalize">{user?.plan} plan</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                side="bottom"
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.email}</p>
+                    <p className="text-xs leading-none text-muted-foreground capitalize">{user?.plan} plan</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/usage">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      Usage
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }
 
 export default function Layout({ children, plugins = [] }: LayoutProps) {
-  const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedPlugins, setExpandedPlugins] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    for (const plugin of plugins) {
-      if (plugin.sidebarItems.some(item => location.pathname.startsWith(item.href.split('/').slice(0, 3).join('/')))) {
-        initial[plugin.id] = true;
-      }
-    }
-    return initial;
-  });
-
-  const togglePlugin = (pluginId: string) => {
-    setExpandedPlugins(prev => ({ ...prev, [pluginId]: !prev[pluginId] }));
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile sidebar (Sheet) */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <SidebarContent
-            plugins={plugins}
-            expandedPlugins={expandedPlugins}
-            togglePlugin={togglePlugin}
-            onNavClick={() => setSidebarOpen(false)}
-          />
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop sidebar */}
-      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border hidden lg:block">
-        <SidebarContent
-          plugins={plugins}
-          expandedPlugins={expandedPlugins}
-          togglePlugin={togglePlugin}
-          onNavClick={() => {}}
-        />
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Mobile header */}
-        <header className="sticky top-0 z-30 bg-card border-b border-border lg:hidden">
-          <div className="flex items-center gap-4 px-4 py-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-ml-2"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="bg-primary p-1.5 rounded-lg">
-                <Zap className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-foreground">Node2Flow</span>
+    <TooltipProvider delayDuration={0}>
+      <SidebarProvider>
+        <AppSidebar plugins={plugins} />
+        <SidebarInset>
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
             </div>
+          </header>
+          <div className="flex-1 p-4 lg:p-8">
+            {children}
           </div>
-        </header>
-
-        {/* Page content */}
-        <main className="p-4 lg:p-8">{children}</main>
-      </div>
-
-      {/* Feedback bubble */}
+        </SidebarInset>
+      </SidebarProvider>
       <FeedbackBubble />
-    </div>
+    </TooltipProvider>
   );
 }

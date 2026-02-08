@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,11 +11,35 @@ import {
   Wrench,
   ArrowLeft,
   LogOut,
-  Menu,
+  Settings,
+  ChevronsUpDown,
+  User,
 } from 'lucide-react';
-import { Button } from './ui/button';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './ui/tooltip';
-import { Sheet, SheetContent, SheetTitle } from './ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from './ui/sidebar';
+import { TooltipProvider } from './ui/tooltip';
 
 const adminNav = [
   { name: 'Overview', href: '/admin', icon: Shield },
@@ -28,113 +51,145 @@ const adminNav = [
   { name: 'System', href: '/admin/system', icon: Wrench },
 ];
 
-function AdminSidebarContent({ onNavClick }: { onNavClick: () => void }) {
+function AdminSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
-        <div className="bg-primary p-2 rounded-lg">
-          <Shield className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="font-semibold text-foreground">Admin Panel</span>
-      </div>
-
-      <nav className="flex-1 px-4 py-4 space-y-1">
-        {adminNav.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Button
-              key={item.name}
-              variant={isActive ? 'secondary' : 'ghost'}
-              className={`w-full justify-start gap-3 ${isActive ? 'bg-primary/10 text-primary hover:bg-primary/15' : ''}`}
-              asChild
-            >
-              <Link to={item.href} onClick={onNavClick}>
-                <item.icon className="h-5 w-5" />
-                {item.name}
+    <Sidebar collapsible="icon">
+      {/* Header — Admin branding */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" tooltip="Admin Panel" asChild>
+              <Link to="/admin">
+                <div className="bg-primary rounded-lg flex aspect-square size-8 items-center justify-center">
+                  <Shield className="size-4 text-primary-foreground" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Admin Panel</span>
+                  <span className="truncate text-xs text-muted-foreground">Node2Flow</span>
+                </div>
               </Link>
-            </Button>
-          );
-        })}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        <div className="pt-4 mt-4 border-t border-border">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-primary hover:bg-primary/10"
-            asChild
-          >
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-              Back to Dashboard
-            </Link>
-          </Button>
-        </div>
-      </nav>
+      <SidebarContent>
+        {/* Admin Nav */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarMenu>
+            {adminNav.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  tooltip={item.name}
+                  isActive={location.pathname === item.href}
+                  asChild
+                >
+                  <Link to={item.href}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
 
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{user?.email}</p>
-            <p className="text-xs text-primary font-medium">Admin</p>
-          </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={logout}>
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Sign out</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </div>
-    </div>
+        {/* Back to Dashboard */}
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Back to Dashboard"
+                className="text-primary hover:bg-primary/10"
+                asChild
+              >
+                <Link to="/dashboard">
+                  <ArrowLeft />
+                  <span>Back to Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      {/* Footer — User */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="bg-sidebar-accent rounded-lg flex aspect-square size-8 items-center justify-center">
+                    <User className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user?.email}</span>
+                    <span className="truncate text-xs text-primary font-medium">Admin</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                side="bottom"
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.email}</p>
+                    <p className="text-xs leading-none text-primary">Admin</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile sidebar (Sheet) */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
-          <AdminSidebarContent onNavClick={() => setSidebarOpen(false)} />
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop sidebar */}
-      <aside className="fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border hidden lg:block">
-        <AdminSidebarContent onNavClick={() => {}} />
-      </aside>
-
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-30 bg-card border-b border-border lg:hidden">
-          <div className="flex items-center gap-4 px-4 py-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-ml-2"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="bg-primary p-1.5 rounded-lg">
-                <Shield className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-foreground">Admin Panel</span>
+    <TooltipProvider delayDuration={0}>
+      <SidebarProvider>
+        <AdminSidebar />
+        <SidebarInset>
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
             </div>
+          </header>
+          <div className="flex-1 p-4 lg:p-8">
+            {children}
           </div>
-        </header>
-
-        <main className="p-4 lg:p-8">{children}</main>
-      </div>
-    </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
