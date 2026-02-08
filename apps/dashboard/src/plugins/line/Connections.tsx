@@ -207,7 +207,7 @@ export default function Connections() {
           <h1 className="text-2xl font-bold text-foreground">LINE Bot Connections</h1>
           <p className="text-muted-foreground mt-1">Manage your LINE Messaging API connections</p>
         </div>
-        <Button onClick={() => setShowAddModal(true)}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
@@ -224,12 +224,12 @@ export default function Connections() {
           </ItemContent>
         </Item>
       ) : (
-        <Alert variant="warning">
+        <Alert>
           <Shield className="h-5 w-5" />
           <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
           <AlertDescription className="flex items-center justify-between">
             <span>Set up 2FA to manage connections securely</span>
-            <Button variant="outline" size="sm" asChild className="shrink-0 ml-4">
+            <Button variant="outline" size="sm" asChild className="shrink-0 ml-4 text-white border-white/30 hover:bg-white/10">
               <Link to="/settings">Enable</Link>
             </Button>
           </AlertDescription>

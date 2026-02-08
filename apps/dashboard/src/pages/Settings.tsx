@@ -22,7 +22,6 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-  Separator,
   Switch,
   Item,
   ItemMedia,
@@ -32,6 +31,10 @@ import {
   ItemActions,
   ItemGroup,
   ItemSeparator,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 } from '@node2flow/dashboard-core';
 
 import {
@@ -48,7 +51,6 @@ import {
   type TOTPSetupData,
 } from '../lib/platform-api';
 import {
-  User,
   Mail,
   Shield,
   Trash2,
@@ -74,6 +76,11 @@ const SESSION_OPTIONS = [
   { value: '604800', label: '7 days' },
   { value: '2592000', label: '30 days' },
 ];
+
+const OAUTH_LOGOS: Record<string, string> = {
+  google: 'https://cdn.simpleicons.org/google',
+  github: 'https://cdn.simpleicons.org/github/white',
+};
 
 export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
@@ -265,13 +272,11 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your account settings</p>
       </div>
-
-      <Separator />
 
       {/* Account Recovery Banner */}
       {isPendingDeletion && scheduledDeletionAt && (
@@ -316,339 +321,324 @@ export default function Settings() {
         </Alert>
       )}
 
-      {/* Profile */}
-      <Card>
-        <CardHeader className="pb-0">
-          <CardTitle className="text-base">Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ItemGroup>
-            <Item>
-              <ItemMedia variant="icon">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Email</ItemTitle>
-                <ItemDescription>{user?.email}</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Badge variant="success" className="capitalize">{user?.status}</Badge>
-              </ItemActions>
-            </Item>
-            <ItemSeparator />
-            <Item>
-              <ItemMedia variant="icon">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Plan</ItemTitle>
-                <ItemDescription>Current subscription plan</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Badge className="capitalize">{user?.plan}</Badge>
-              </ItemActions>
-            </Item>
-            {isOAuthUser && (
-              <>
+      <Tabs defaultValue="profile">
+        <TabsList variant="line">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
+          <TabsTrigger value="danger">Danger Zone</TabsTrigger>
+        </TabsList>
+
+        {/* ── Profile Tab ── */}
+        <TabsContent value="profile">
+          <Card>
+            <CardContent className="p-0">
+              <ItemGroup>
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>Email</ItemTitle>
+                    <ItemDescription>{user?.email}</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Badge variant="success" className="capitalize font-bold">{user?.status}</Badge>
+                  </ItemActions>
+                </Item>
                 <ItemSeparator />
                 <Item>
                   <ItemMedia variant="icon">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                    <Shield className="h-4 w-4 text-muted-foreground" />
                   </ItemMedia>
                   <ItemContent>
-                    <ItemTitle>Login Method</ItemTitle>
-                    <ItemDescription>Authenticated via OAuth provider</ItemDescription>
+                    <ItemTitle>Plan</ItemTitle>
+                    <ItemDescription>Current subscription plan</ItemDescription>
                   </ItemContent>
                   <ItemActions>
-                    <Badge variant="secondary" className="capitalize">{user?.oauth_provider}</Badge>
+                    <Badge variant="success" className="capitalize font-bold">{user?.plan}</Badge>
                   </ItemActions>
                 </Item>
-              </>
-            )}
-          </ItemGroup>
-        </CardContent>
-      </Card>
-
-      {/* Security */}
-      <Card>
-        <CardHeader className="pb-0">
-          <CardTitle className="text-base">Security</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {totpSuccess && <Alert variant="success" className="mx-4 mt-4"><CheckCircle className="h-4 w-4" /><AlertDescription>{totpSuccess}</AlertDescription></Alert>}
-          {totpError && <Alert variant="destructive" className="mx-4 mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>{totpError}</AlertDescription></Alert>}
-
-          <ItemGroup>
-            {/* 2FA */}
-            <Item>
-              <ItemMedia variant="icon">
-                <Smartphone className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>
-                  Two-Factor Authentication
-                  {totpEnabled && <Badge variant="success" className="ml-1">Enabled</Badge>}
-                </ItemTitle>
-                <ItemDescription>Add an extra layer of security using an authenticator app</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                {totpEnabled ? (
-                  <Switch
-                    checked={true}
-                    onCheckedChange={() => setShowDisableConfirm(true)}
-                  />
-                ) : (
-                  <Button size="sm" onClick={handleSetupTOTP} disabled={totpLoading}>
-                    {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><QrCode className="h-4 w-4" /> Enable</>}
-                  </Button>
+                {isOAuthUser && (
+                  <>
+                    <ItemSeparator />
+                    <Item>
+                      <ItemMedia variant="icon">
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemTitle>Login Method</ItemTitle>
+                        <ItemDescription>Authenticated via {user?.oauth_provider}</ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        {user?.oauth_provider && OAUTH_LOGOS[user.oauth_provider] ? (
+                          <img src={OAUTH_LOGOS[user.oauth_provider]} alt={user.oauth_provider} className="h-5 w-5" />
+                        ) : (
+                          <Badge variant="secondary" className="capitalize">{user?.oauth_provider}</Badge>
+                        )}
+                      </ItemActions>
+                    </Item>
+                  </>
                 )}
-              </ItemActions>
-            </Item>
+              </ItemGroup>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            {/* 2FA Setup Flow */}
-            {!totpEnabled && totpSetupData && (
-              <div className="px-4 pb-4">
-                <Card>
-                  <CardContent className="p-4 space-y-4">
-                    <div className="text-center">
-                      <div className="bg-white p-4 rounded-lg inline-block mb-3">
-                        <img src={totpSetupData.qr_code_url} alt="TOTP QR Code" className="w-48 h-48" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Scan this QR code with your authenticator app</p>
-                    </div>
-                    <div>
-                      <Label>Or enter this code manually:</Label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <code className="flex-1 bg-black px-3 py-2 rounded font-mono text-sm text-foreground break-all">{totpSetupData.secret}</code>
-                        <Button variant="secondary" size="icon" onClick={handleCopySecret}>
-                          {secretCopied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </div>
-                    <form onSubmit={handleEnableTOTP}>
-                      <Label>Enter the 6-digit code from your app:</Label>
-                      <div className="flex gap-2 mt-1">
-                        <Input className="flex-1 text-center font-mono text-lg tracking-widest" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
-                        <Button type="submit" disabled={totpLoading || totpCode.length !== 6}>
-                          {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify'}
-                        </Button>
-                      </div>
-                    </form>
-                    <Button variant="link" className="text-muted-foreground" onClick={() => { setTotpSetupData(null); setTotpCode(''); setTotpError(''); }}>Cancel setup</Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+        {/* ── Security Tab ── */}
+        <TabsContent value="security">
+          <Card>
+            <CardContent className="p-0">
+              {totpSuccess && <Alert variant="success" className="mx-4 mt-4"><CheckCircle className="h-4 w-4" /><AlertDescription>{totpSuccess}</AlertDescription></Alert>}
+              {totpError && <Alert variant="destructive" className="mx-4 mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>{totpError}</AlertDescription></Alert>}
 
-            {/* 2FA Disable Confirm */}
-            {totpEnabled && showDisableConfirm && (
-              <div className="px-4 pb-4">
-                <Card className="border-red-700">
-                  <CardContent className="p-4 space-y-3">
-                    <p className="text-sm text-red-300">Are you sure you want to disable two-factor authentication?</p>
-                    {!isOAuthUser && (
-                      <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} /></div>
-                    )}
-                    <div className="flex gap-2">
-                      <Button variant="secondary" onClick={() => { setShowDisableConfirm(false); setDisablePassword(''); setTotpError(''); }}>Cancel</Button>
-                      <Button variant="destructive" onClick={handleDisableTOTP} disabled={totpLoading || (!isOAuthUser && !disablePassword)}>
-                        {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Disabling...</> : 'Disable 2FA'}
+              <ItemGroup>
+                {/* 2FA */}
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>
+                      Two-Factor Authentication
+                      {totpEnabled && <Badge variant="success" className="ml-1">Enabled</Badge>}
+                    </ItemTitle>
+                    <ItemDescription>Add an extra layer of security using an authenticator app</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    {totpEnabled ? (
+                      <Switch
+                        checked={true}
+                        onCheckedChange={() => setShowDisableConfirm(true)}
+                      />
+                    ) : (
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSetupTOTP} disabled={totpLoading}>
+                        {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><QrCode className="h-4 w-4" /> Enable</>}
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                    )}
+                  </ItemActions>
+                </Item>
 
-            <ItemSeparator />
-
-            {/* Password */}
-            <Item>
-              <ItemMedia variant="icon">
-                <Lock className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Password</ItemTitle>
-                <ItemDescription>
-                  {isOAuthUser
-                    ? `Managed by ${user?.oauth_provider}`
-                    : 'Change your password to keep your account secure'
-                  }
-                </ItemDescription>
-              </ItemContent>
-              {!isOAuthUser && (
-                <ItemActions>
-                  <Button variant="secondary" size="sm" onClick={() => setShowPasswordModal(true)}>Change</Button>
-                </ItemActions>
-              )}
-            </Item>
-            <ItemSeparator />
-
-            {/* Session Duration */}
-            <Item>
-              <ItemMedia variant="icon">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>
-                  Session Duration
-                  {sessionSuccess && <Check className="h-3.5 w-3.5 text-emerald-400" />}
-                </ItemTitle>
-                <ItemDescription>
-                  {sessionError || 'How long you stay logged in before needing to sign in again'}
-                </ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <div className="flex items-center gap-2">
-                  <Select value={String(user?.session_duration_seconds || 86400)} onValueChange={handleSessionDurationChange} disabled={sessionLoading}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SESSION_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {sessionLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                </div>
-              </ItemActions>
-            </Item>
-            <ItemSeparator />
-
-            {/* Sign Out */}
-            <Item>
-              <ItemMedia variant="icon">
-                <LogOut className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>Active Sessions</ItemTitle>
-                <ItemDescription>Sign out of all sessions on all devices</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Button variant="secondary" size="sm" onClick={logout}>Sign Out</Button>
-              </ItemActions>
-            </Item>
-          </ItemGroup>
-        </CardContent>
-      </Card>
-
-      {/* MCP Configuration */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">MCP Client Configuration</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <p className="text-sm text-muted-foreground mb-4">
-            Use this configuration in your MCP client (Claude Desktop, Cursor, etc.)
-          </p>
-          <div className="bg-black rounded-lg p-4 overflow-x-auto">
-            <pre className="text-sm text-green-400">
-{`{
-  "mcpServers": {
-    "node2flow": {
-      "url": "https://mcp.node2flow.net/mcp",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }
-  }
-}`}
-            </pre>
-          </div>
-          <p className="text-xs text-muted-foreground mt-3">Replace YOUR_API_KEY with the API key from your connection.</p>
-        </CardContent>
-      </Card>
-
-      {/* Data Export */}
-      <Card>
-        <CardHeader className="pb-0">
-          <CardTitle className="text-base">Export Your Data</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {exportSuccess && <Alert variant="success" className="mx-4 mt-4"><CheckCircle className="h-4 w-4" /><AlertDescription>{exportSuccess}</AlertDescription></Alert>}
-          {exportError && <Alert variant="destructive" className="mx-4 mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>{exportError}</AlertDescription></Alert>}
-          <ItemGroup>
-            <Item>
-              <ItemMedia variant="icon">
-                <FileJson className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>JSON Export</ItemTitle>
-                <ItemDescription>Download a full copy of your data (GDPR compliant)</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Button variant="secondary" size="sm" onClick={() => handleExport('json')} disabled={exportLoading !== null}>
-                  {exportLoading === 'json' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Download className="h-4 w-4" /> Export</>}
-                </Button>
-              </ItemActions>
-            </Item>
-            <ItemSeparator />
-            <Item>
-              <ItemMedia variant="icon">
-                <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>CSV Export</ItemTitle>
-                <ItemDescription>Download usage logs as a spreadsheet</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Button variant="secondary" size="sm" onClick={() => handleExport('csv')} disabled={exportLoading !== null}>
-                  {exportLoading === 'csv' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Download className="h-4 w-4" /> Export</>}
-                </Button>
-              </ItemActions>
-            </Item>
-          </ItemGroup>
-          <p className="text-xs text-muted-foreground px-4 pb-4">Encrypted credentials and API key secrets are not included for security.</p>
-        </CardContent>
-      </Card>
-
-      {/* Danger Zone */}
-      <Card className="border-red-900/50">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-base text-red-400">Danger Zone</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <ItemGroup>
-            <Item>
-              <ItemMedia variant="icon">
-                <Trash2 className="h-4 w-4 text-red-400" />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle className="text-red-400">Delete Account</ItemTitle>
-                <ItemDescription>Permanently delete your account and all associated data</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                {!showDeleteConfirm ? (
-                  <Button variant="destructive" size="sm" onClick={() => setShowDeleteConfirm(true)}>Delete</Button>
-                ) : null}
-              </ItemActions>
-            </Item>
-          </ItemGroup>
-
-          {showDeleteConfirm && (
-            <div className="px-4 pb-4">
-              <Card className="border-red-700">
-                <CardContent className="p-4 space-y-4">
-                  <p className="text-sm text-red-300">Are you sure? All your data, connections, and API keys will be permanently deleted.</p>
-                  {deleteError && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{deleteError}</AlertDescription></Alert>}
-                  {isOAuthUser ? (
-                    <div className="space-y-2"><Label className="text-red-300">Type "delete" to confirm</Label><Input placeholder="delete" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} /></div>
-                  ) : (
-                    <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} /></div>
-                  )}
-                  <div className="flex gap-3">
-                    <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); setDeleteConfirmText(''); setDeleteError(''); }}>Cancel</Button>
-                    <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || (isOAuthUser ? deleteConfirmText.toLowerCase() !== 'delete' : !deletePassword)}>
-                      {deleteLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : 'Yes, Delete My Account'}
-                    </Button>
+                {/* 2FA Setup Flow */}
+                {!totpEnabled && totpSetupData && (
+                  <div className="px-4 pb-4">
+                    <Card>
+                      <CardContent className="p-4 space-y-4">
+                        <div className="text-center">
+                          <div className="bg-white p-4 rounded-lg inline-block mb-3">
+                            <img src={totpSetupData.qr_code_url} alt="TOTP QR Code" className="w-48 h-48" />
+                          </div>
+                          <p className="text-sm text-muted-foreground">Scan this QR code with your authenticator app</p>
+                        </div>
+                        <div>
+                          <Label>Or enter this code manually:</Label>
+                          <div className="flex items-center gap-2 mt-1">
+                            <code className="flex-1 bg-black px-3 py-2 rounded font-mono text-sm text-foreground break-all">{totpSetupData.secret}</code>
+                            <Button variant="secondary" size="icon" onClick={handleCopySecret}>
+                              {secretCopied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        </div>
+                        <form onSubmit={handleEnableTOTP}>
+                          <Label>Enter the 6-digit code from your app:</Label>
+                          <div className="flex gap-2 mt-1">
+                            <Input className="flex-1 text-center font-mono text-lg tracking-widest" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
+                            <Button type="submit" disabled={totpLoading || totpCode.length !== 6}>
+                              {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify'}
+                            </Button>
+                          </div>
+                        </form>
+                        <Button variant="link" className="text-muted-foreground" onClick={() => { setTotpSetupData(null); setTotpCode(''); setTotpError(''); }}>Cancel setup</Button>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+
+                {/* 2FA Disable Confirm */}
+                {totpEnabled && showDisableConfirm && (
+                  <div className="px-4 pb-4">
+                    <Card className="border-red-700">
+                      <CardContent className="p-4 space-y-3">
+                        <p className="text-sm text-red-300">Are you sure you want to disable two-factor authentication?</p>
+                        {!isOAuthUser && (
+                          <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} /></div>
+                        )}
+                        <div className="flex gap-2">
+                          <Button variant="secondary" onClick={() => { setShowDisableConfirm(false); setDisablePassword(''); setTotpError(''); }}>Cancel</Button>
+                          <Button variant="destructive" onClick={handleDisableTOTP} disabled={totpLoading || (!isOAuthUser && !disablePassword)}>
+                            {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Disabling...</> : 'Disable 2FA'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                <ItemSeparator />
+
+                {/* Password */}
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>Password</ItemTitle>
+                    <ItemDescription>
+                      {isOAuthUser
+                        ? `Managed by ${user?.oauth_provider}`
+                        : 'Change your password to keep your account secure'
+                      }
+                    </ItemDescription>
+                  </ItemContent>
+                  {!isOAuthUser && (
+                    <ItemActions>
+                      <Button variant="secondary" size="sm" onClick={() => setShowPasswordModal(true)}>Change</Button>
+                    </ItemActions>
+                  )}
+                </Item>
+                <ItemSeparator />
+
+                {/* Session Duration */}
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>
+                      Session Duration
+                      {sessionSuccess && <Check className="h-3.5 w-3.5 text-emerald-400" />}
+                    </ItemTitle>
+                    <ItemDescription>
+                      {sessionError || 'How long you stay logged in before needing to sign in again'}
+                    </ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <div className="flex items-center gap-2">
+                      <Select value={String(user?.session_duration_seconds || 86400)} onValueChange={handleSessionDurationChange} disabled={sessionLoading}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SESSION_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {sessionLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                    </div>
+                  </ItemActions>
+                </Item>
+                <ItemSeparator />
+
+                {/* Sign Out */}
+                <Item>
+                  <ItemMedia variant="icon">
+                    <LogOut className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>Active Sessions</ItemTitle>
+                    <ItemDescription>Sign out of all sessions on all devices</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Button variant="destructive" size="sm" onClick={logout}>Sign Out</Button>
+                  </ItemActions>
+                </Item>
+              </ItemGroup>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ── Data Tab ── */}
+        <TabsContent value="data">
+          <Card>
+            <CardHeader className="pb-0">
+              <CardTitle className="text-base">Export Your Data</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {exportSuccess && <Alert variant="success" className="mx-4 mt-4"><CheckCircle className="h-4 w-4" /><AlertDescription>{exportSuccess}</AlertDescription></Alert>}
+              {exportError && <Alert variant="destructive" className="mx-4 mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>{exportError}</AlertDescription></Alert>}
+              <ItemGroup>
+                <Item>
+                  <ItemMedia variant="icon">
+                    <FileJson className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>JSON Export</ItemTitle>
+                    <ItemDescription>Download a full copy of your data (GDPR compliant)</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Button variant="outline" size="sm" onClick={() => handleExport('json')} disabled={exportLoading !== null}>
+                      {exportLoading === 'json' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Download className="h-4 w-4" /> Export</>}
+                    </Button>
+                  </ItemActions>
+                </Item>
+                <ItemSeparator />
+                <Item>
+                  <ItemMedia variant="icon">
+                    <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>CSV Export</ItemTitle>
+                    <ItemDescription>Download usage logs as a spreadsheet</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Button variant="outline" size="sm" onClick={() => handleExport('csv')} disabled={exportLoading !== null}>
+                      {exportLoading === 'csv' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Download className="h-4 w-4" /> Export</>}
+                    </Button>
+                  </ItemActions>
+                </Item>
+              </ItemGroup>
+              <p className="text-xs text-muted-foreground px-4 pb-4">Encrypted credentials and API key secrets are not included for security.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ── Danger Zone Tab ── */}
+        <TabsContent value="danger">
+          <Card className="border-red-900/50">
+            <CardContent className="p-0">
+              <ItemGroup>
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Trash2 className="h-4 w-4 text-red-400" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle className="text-red-400">Delete Account</ItemTitle>
+                    <ItemDescription>Permanently delete your account and all associated data</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    {!showDeleteConfirm ? (
+                      <Button variant="destructive" size="sm" onClick={() => setShowDeleteConfirm(true)}>Delete</Button>
+                    ) : null}
+                  </ItemActions>
+                </Item>
+              </ItemGroup>
+
+              {showDeleteConfirm && (
+                <div className="px-4 pb-4">
+                  <Card className="border-red-700">
+                    <CardContent className="p-4 space-y-4">
+                      <p className="text-sm text-red-300">Are you sure? All your data, connections, and API keys will be permanently deleted.</p>
+                      {deleteError && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{deleteError}</AlertDescription></Alert>}
+                      {isOAuthUser ? (
+                        <div className="space-y-2"><Label className="text-red-300">Type "delete" to confirm</Label><Input placeholder="delete" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} /></div>
+                      ) : (
+                        <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} /></div>
+                      )}
+                      <div className="flex gap-3">
+                        <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); setDeleteConfirmText(''); setDeleteError(''); }}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || (isOAuthUser ? deleteConfirmText.toLowerCase() !== 'delete' : !deletePassword)}>
+                          {deleteLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : 'Yes, Delete My Account'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Password Change Dialog */}
       <Dialog open={showPasswordModal} onOpenChange={(open) => { if (!open) { setShowPasswordModal(false); setPasswordError(''); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); } }}>

@@ -131,7 +131,7 @@ export default function Dashboard() {
       <Separator />
 
       {/* Plan + Rate Limit — Full Width */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm border-border/60">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left: Plan Info */}
@@ -141,21 +141,21 @@ export default function Dashboard() {
                   <Zap className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Current Plan</p>
+                  <p className="text-sm text-foreground/70">Current Plan</p>
                   <p className="text-xl font-semibold capitalize">{user?.plan}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-sm text-foreground/70">
                 <span className="flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5 text-emerald-500" />
+                  <Layers className="h-4 w-4 text-emerald-500" />
                   {connectedServices}/{plugins.length} services
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  <Activity className="h-4 w-4 text-primary" />
                   {usage?.monthly?.used.toLocaleString() || 0} this month
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <TrendingUp className="h-3.5 w-3.5 text-purple-500" />
+                  <TrendingUp className="h-4 w-4 text-purple-500" />
                   {usage?.success_rate || 100}% success
                 </span>
               </div>
@@ -164,11 +164,11 @@ export default function Dashboard() {
             {/* Right: Rate Limit */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Gauge className="h-3.5 w-3.5 text-primary" />
+                <span className="flex items-center gap-1.5 text-foreground/70">
+                  <Gauge className="h-4 w-4 text-primary" />
                   Daily Rate Limit
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-sm text-foreground/60">
                   Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
                 </span>
               </div>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     : undefined
                 }
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between text-sm text-foreground/60">
                 <span>{usage?.requests.used.toLocaleString()} used</span>
                 <span>{usagePercent}% of {usage?.requests.limit.toLocaleString()}/day</span>
                 <span>{usage?.requests.remaining.toLocaleString()} left</span>
@@ -229,15 +229,15 @@ export default function Dashboard() {
               <Link
                 key={plugin.id}
                 to={connectionsHref}
-                className={`block rounded-lg border bg-card p-3 transition-all hover:shadow-md hover:border-primary/30 ${
+                className={`block rounded-lg border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-primary/40 ${
                   isConnected ? 'border-l-[3px] border-l-emerald-500' : ''
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-3 mb-2">
                   {logoUrl ? (
-                    <img src={logoUrl} alt={plugin.name} className="h-4 w-4 shrink-0" />
+                    <img src={logoUrl} alt={plugin.name} className="h-8 w-8 shrink-0" />
                   ) : (
-                    <PluginIcon className={`h-4 w-4 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                    <PluginIcon className={`h-8 w-8 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
                   )}
                   <span className="text-sm font-medium truncate">{plugin.name}</span>
                 </div>
@@ -258,7 +258,7 @@ export default function Dashboard() {
       </div>
 
       {/* Connections Table */}
-      <Card className="bg-black">
+      <Card className="bg-black border-border/60">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Your Connections</CardTitle>
           <CardDescription>
@@ -269,14 +269,14 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           {connections.length > 0 ? (
-            <div className="rounded-md border">
+            <div className="rounded-md border border-border/60">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead className="w-[40%]">Name</TableHead>
                     <TableHead>Service</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="w-[1%] whitespace-nowrap">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -309,7 +309,7 @@ export default function Dashboard() {
                             {conn.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
                             <Link to={connHref}>
                               Manage
