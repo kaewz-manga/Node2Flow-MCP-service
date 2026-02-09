@@ -254,7 +254,7 @@ export default function Dashboard() {
       </div>
 
       {/* Connections Table */}
-      <Card className="bg-black border-border/60">
+      <Card className="bg-black border-border/60 max-w-4xl mx-auto">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Your Connections</CardTitle>
           <CardDescription>
