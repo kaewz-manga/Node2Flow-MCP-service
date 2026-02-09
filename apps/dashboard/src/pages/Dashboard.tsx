@@ -131,23 +131,23 @@ export default function Dashboard() {
       <Separator />
 
       {/* Plan + Rate Limit — Full Width */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm border-border/60">
+      <Card className="bg-gradient-to-br from-primary/15 via-card to-purple-500/10 shadow-lg border-primary/30">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left: Plan Info */}
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
+                <div className="p-2.5 rounded-lg bg-primary/20 shadow-sm shadow-primary/20">
                   <Zap className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-foreground/70">Current Plan</p>
-                  <p className="text-xl font-semibold capitalize">{user?.plan}</p>
+                  <p className="text-sm text-muted-foreground">Current Plan</p>
+                  <p className="text-2xl font-bold capitalize text-foreground">{user?.plan}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-foreground/70">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
-                  <Layers className="h-4 w-4 text-emerald-500" />
+                  <Layers className="h-4 w-4 text-emerald-400" />
                   {connectedServices}/{plugins.length} services
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -155,7 +155,7 @@ export default function Dashboard() {
                   {usage?.monthly?.used.toLocaleString() || 0} this month
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <TrendingUp className="h-4 w-4 text-purple-500" />
+                  <TrendingUp className="h-4 w-4 text-purple-400" />
                   {usage?.success_rate || 100}% success
                 </span>
               </div>
@@ -164,11 +164,11 @@ export default function Dashboard() {
             {/* Right: Rate Limit */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-foreground/70">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Gauge className="h-4 w-4 text-primary" />
                   Daily Rate Limit
                 </span>
-                <span className="text-sm text-foreground/60">
+                <span className="text-sm text-muted-foreground">
                   Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
                 </span>
               </div>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     : undefined
                 }
               />
-              <div className="flex justify-between text-sm text-foreground/60">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>{usage?.requests.used.toLocaleString()} used</span>
                 <span>{usagePercent}% of {usage?.requests.limit.toLocaleString()}/day</span>
                 <span>{usage?.requests.remaining.toLocaleString()} left</span>
