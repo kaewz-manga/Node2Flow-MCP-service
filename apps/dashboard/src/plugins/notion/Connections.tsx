@@ -269,13 +269,14 @@ export default function Connections() {
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-md border max-w-3xl mx-auto">
+        <div className="rounded-md border max-w-4xl mx-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>API Key</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -286,12 +287,9 @@ export default function Connections() {
                   <TableRow key={conn.id}>
                     <TableCell className="font-medium">
                       {conn.name}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        {new Date(conn.created_at).toLocaleDateString()}
-                      </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={conn.status === 'active' ? 'outline' : 'secondary'} className={conn.status === 'active' ? 'border-emerald-800 text-emerald-400' : ''}>
+                      <Badge variant={conn.status === 'active' ? 'success' : 'secondary'} className="capitalize">
                         {conn.status}
                       </Badge>
                     </TableCell>
@@ -300,6 +298,9 @@ export default function Connections() {
                         <code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
                       ))}
                       {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(conn.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

@@ -83,7 +83,7 @@ const SESSION_OPTIONS = [
 ];
 
 const OAUTH_LOGOS: Record<string, string> = {
-  google: 'https://cdn.simpleicons.org/google',
+  google: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
   github: 'https://cdn.simpleicons.org/github/white',
 };
 
@@ -121,7 +121,6 @@ export default function Settings() {
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
@@ -137,7 +136,6 @@ export default function Settings() {
   // Force delete state
   const [showForceDelete, setShowForceDelete] = useState(false);
   const [forceDeletePassword, setForceDeletePassword] = useState('');
-  const [forceDeleteConfirmText, setForceDeleteConfirmText] = useState('');
   const [forceDeleteLoading, setForceDeleteLoading] = useState(false);
   const [forceDeleteError, setForceDeleteError] = useState('');
 
@@ -222,16 +220,10 @@ export default function Settings() {
 
   const handleDeleteAccount = async () => {
     setDeleteError(''); setDeleteLoading(true);
-    if (isOAuthUser) {
-      if (deleteConfirmText.toLowerCase() !== 'delete') { setDeleteError('Please type "delete" to confirm'); setDeleteLoading(false); return; }
-      const res = await deleteAccount(undefined, true);
-      setDeleteLoading(false);
-      if (res.success) { setShowDeleteConfirm(false); await refreshUser(); }
-      else setDeleteError(res.error?.message || 'Failed to delete account');
-      return;
-    }
     await withSudo(async () => {
-      const res = await deleteAccount(deletePassword, undefined);
+      const res = isOAuthUser
+        ? await deleteAccount(undefined, true)
+        : await deleteAccount(deletePassword, undefined);
       setDeleteLoading(false);
       if (res.success) { setShowDeleteConfirm(false); await refreshUser(); }
       else setDeleteError(res.error?.message || 'Failed to delete account');
@@ -240,18 +232,14 @@ export default function Settings() {
 
   const handleForceDelete = async () => {
     setForceDeleteError(''); setForceDeleteLoading(true);
-    if (isOAuthUser) {
-      if (forceDeleteConfirmText.toLowerCase() !== 'delete') { setForceDeleteError('Please type "delete" to confirm'); setForceDeleteLoading(false); return; }
-      const res = await forceDeleteAccount(undefined, true);
+    await withSudo(async () => {
+      const res = isOAuthUser
+        ? await forceDeleteAccount(undefined, true)
+        : await forceDeleteAccount(forceDeletePassword, undefined);
       setForceDeleteLoading(false);
       if (res.success) { clearToken(); window.location.href = '/account-deleted'; }
       else setForceDeleteError(res.error?.message || 'Failed to delete account');
-      return;
-    }
-    const res = await forceDeleteAccount(forceDeletePassword, undefined);
-    setForceDeleteLoading(false);
-    if (res.success) { clearToken(); window.location.href = '/account-deleted'; }
-    else setForceDeleteError(res.error?.message || 'Failed to delete account');
+    });
   };
 
   const handleExport = async (format: 'json' | 'csv') => {
@@ -311,14 +299,12 @@ export default function Settings() {
                 <CardContent className="p-4 space-y-3">
                   <p className="text-sm text-red-300">This will <strong>permanently delete</strong> your account immediately.</p>
                   {forceDeleteError && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{forceDeleteError}</AlertDescription></Alert>}
-                  {isOAuthUser ? (
-                    <div className="space-y-2"><Label className="text-red-300">Type "delete" to confirm</Label><Input placeholder="delete" value={forceDeleteConfirmText} onChange={(e) => setForceDeleteConfirmText(e.target.value)} /></div>
-                  ) : (
+                  {!isOAuthUser && (
                     <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={forceDeletePassword} onChange={(e) => setForceDeletePassword(e.target.value)} /></div>
                   )}
                   <div className="flex gap-3">
-                    <Button variant="secondary" onClick={() => { setShowForceDelete(false); setForceDeletePassword(''); setForceDeleteConfirmText(''); setForceDeleteError(''); }}>Cancel</Button>
-                    <Button variant="destructive" onClick={handleForceDelete} disabled={forceDeleteLoading || (isOAuthUser ? forceDeleteConfirmText.toLowerCase() !== 'delete' : !forceDeletePassword)}>
+                    <Button variant="secondary" onClick={() => { setShowForceDelete(false); setForceDeletePassword(''); setForceDeleteError(''); }}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleForceDelete} disabled={forceDeleteLoading || (!isOAuthUser && !forceDeletePassword)}>
                       {forceDeleteLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : 'Permanently Delete Account'}
                     </Button>
                   </div>
@@ -648,14 +634,12 @@ export default function Settings() {
                     <CardContent className="p-4 space-y-4">
                       <p className="text-sm text-red-300">Are you sure? All your data, connections, and API keys will be permanently deleted.</p>
                       {deleteError && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{deleteError}</AlertDescription></Alert>}
-                      {isOAuthUser ? (
-                        <div className="space-y-2"><Label className="text-red-300">Type "delete" to confirm</Label><Input placeholder="delete" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} /></div>
-                      ) : (
+                      {!isOAuthUser && (
                         <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} /></div>
                       )}
                       <div className="flex gap-3">
-                        <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); setDeleteConfirmText(''); setDeleteError(''); }}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || (isOAuthUser ? deleteConfirmText.toLowerCase() !== 'delete' : !deletePassword)}>
+                        <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); setDeleteError(''); }}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || (!isOAuthUser && !deletePassword)}>
                           {deleteLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : 'Yes, Delete My Account'}
                         </Button>
                       </div>

@@ -299,7 +299,7 @@ export default function Connections() {
                       {conn.name}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={conn.status === 'active' ? 'outline' : 'secondary'} className={conn.status === 'active' ? 'border-emerald-800 text-emerald-400' : ''}>
+                      <Badge variant={conn.status === 'active' ? 'success' : 'secondary'} className="capitalize">
                         {conn.status}
                       </Badge>
                     </TableCell>
