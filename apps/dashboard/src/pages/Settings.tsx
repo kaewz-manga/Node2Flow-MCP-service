@@ -443,14 +443,26 @@ export default function Settings() {
                             </Button>
                           </div>
                         </div>
-                        <form onSubmit={handleEnableTOTP}>
+                        <form onSubmit={handleEnableTOTP} className="space-y-3">
                           <Label>Enter the 6-digit code from your app:</Label>
-                          <div className="flex gap-2 mt-1">
-                            <Input className="flex-1 text-center font-mono text-lg tracking-widest" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
-                            <Button type="submit" disabled={totpLoading || totpCode.length !== 6}>
-                              {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify'}
-                            </Button>
+                          <div className="flex justify-center">
+                            <InputOTP maxLength={6} value={totpCode} onChange={setTotpCode}>
+                              <InputOTPGroup>
+                                <InputOTPSlot index={0} />
+                                <InputOTPSlot index={1} />
+                                <InputOTPSlot index={2} />
+                              </InputOTPGroup>
+                              <InputOTPSeparator />
+                              <InputOTPGroup>
+                                <InputOTPSlot index={3} />
+                                <InputOTPSlot index={4} />
+                                <InputOTPSlot index={5} />
+                              </InputOTPGroup>
+                            </InputOTP>
                           </div>
+                          <Button type="submit" className="w-full" disabled={totpLoading || totpCode.length !== 6}>
+                            {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Verifying...</> : <><Check className="h-4 w-4" /> Verify & Enable</>}
+                          </Button>
                         </form>
                         <Button variant="link" className="text-muted-foreground" onClick={() => { setTotpSetupData(null); setTotpCode(''); setTotpError(''); }}>Cancel setup</Button>
                       </CardContent>
