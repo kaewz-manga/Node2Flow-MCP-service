@@ -17,7 +17,6 @@ import {
   RefreshCw,
   Shield,
   BookOpen,
-  Globe,
   Lock,
   Tag,
   BadgeCheck,
@@ -237,7 +236,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <Globe className="h-5 w-5 text-primary" />
+          <img src="https://cdn.simpleicons.org/notion/FFFFFF" alt="Notion" className="h-5 w-5" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>

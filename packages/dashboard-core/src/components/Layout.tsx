@@ -63,6 +63,7 @@ export interface DashboardPlugin {
   id: string;
   name: string;
   icon: ComponentType<{ className?: string }>;
+  logo?: string;
   sidebarItems: SidebarItem[];
   requiresConnection: boolean;
 }
@@ -146,7 +147,11 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton tooltip={plugin.name} isActive={isPluginActive}>
-                        <plugin.icon />
+                        {plugin.logo ? (
+                          <img src={plugin.logo} alt={plugin.name} className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <plugin.icon />
+                        )}
                         <span>{plugin.name}</span>
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>

@@ -82,6 +82,7 @@ const n8nPlugin: AppPlugin = {
   id: 'n8n',
   name: 'n8n Management',
   icon: Server,
+  logo: 'https://cdn.simpleicons.org/n8n/EA4B71',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/n8n/connections', icon: LinkIcon },
@@ -122,6 +123,7 @@ const wordpressPlugin: AppPlugin = {
   id: 'wordpress',
   name: 'WordPress',
   icon: Globe,
+  logo: 'https://cdn.simpleicons.org/wordpress/21759B',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/wordpress/connections', icon: WPLinkIcon },
@@ -157,6 +159,7 @@ const clN8nMcpPlugin: AppPlugin = {
   id: 'cl-n8n-mcp',
   name: 'Workflow Builder',
   icon: Cpu,
+  logo: 'https://cdn.simpleicons.org/n8n/FF8C69',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/cl-n8n-mcp/connections', icon: McpLinkIcon },
@@ -189,6 +192,7 @@ const geminiRagPlugin: AppPlugin = {
   id: 'gemini-rag',
   name: 'Gemini RAG',
   icon: Database,
+  logo: 'https://cdn.simpleicons.org/googlegemini/8E75B2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/gemini-rag/connections', icon: GeminiLinkIcon },
@@ -220,6 +224,7 @@ const linePlugin: AppPlugin = {
   id: 'line',
   name: 'LINE Bot',
   icon: LineIcon,
+  logo: 'https://cdn.simpleicons.org/line/00C300',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/line/connections', icon: LineLinkIcon },
@@ -253,6 +258,7 @@ const telegramPlugin: AppPlugin = {
   id: 'telegram',
   name: 'Telegram Bot',
   icon: TelegramIcon,
+  logo: 'https://cdn.simpleicons.org/telegram/26A5E4',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/telegram/connections', icon: TelegramLinkIcon },
@@ -286,6 +292,7 @@ const notionPlugin: AppPlugin = {
   id: 'notion',
   name: 'Notion',
   icon: NotionIcon,
+  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/notion/connections', icon: NotionLinkIcon },

@@ -16,7 +16,6 @@ import {
   AlertCircle,
   RefreshCw,
   Shield,
-  Globe,
   Lock,
   Tag,
   BadgeCheck,
@@ -245,7 +244,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <Globe className="h-5 w-5 text-primary" />
+          <img src="https://cdn.simpleicons.org/n8n/EA4B71" alt="n8n" className="h-5 w-5" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -379,7 +378,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>n8n URL</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/EA4B71" alt="n8n" className="h-4 w-4" /></InputGroupAddon>
                 <InputGroupInput
                   type="url"
                   placeholder="https://your-n8n.example.com"

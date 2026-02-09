@@ -16,7 +16,6 @@ import {
   AlertCircle,
   RefreshCw,
   Shield,
-  Globe,
   Lock,
   Tag,
   User,
@@ -244,7 +243,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <Globe className="h-5 w-5 text-primary" />
+          <img src="https://cdn.simpleicons.org/wordpress/21759B" alt="WordPress" className="h-5 w-5" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -264,7 +263,7 @@ export default function Connections() {
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <Globe />
+              <img src="https://cdn.simpleicons.org/wordpress/21759B" alt="WordPress" className="h-10 w-10" />
             </EmptyMedia>
             <EmptyTitle>No connections yet</EmptyTitle>
             <EmptyDescription>
@@ -369,7 +368,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>Site URL</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><Globe /></InputGroupAddon>
+                <InputGroupAddon><img src="https://cdn.simpleicons.org/wordpress/21759B" alt="WordPress" className="h-4 w-4" /></InputGroupAddon>
                 <InputGroupInput type="url" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
               </InputGroup>
               <FieldDescription>Your WordPress site URL (without /wp-admin)</FieldDescription>
