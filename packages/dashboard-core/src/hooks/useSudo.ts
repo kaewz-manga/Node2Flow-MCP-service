@@ -37,6 +37,7 @@ export function useSudo(): UseSudoReturn {
   const refreshStatus = useCallback(async () => {
     // Don't call API if not authenticated - prevents 401 redirect loop
     if (!isAuthenticated()) {
+      setStatusLoaded(true);
       return;
     }
     try {
@@ -45,12 +46,11 @@ export function useSudo(): UseSudoReturn {
         setHasSudo(res.data.active);
         setSudoExpiresAt(res.data.expires_at || null);
         setTotpEnabled(res.data.totp_enabled || false);
-        setStatusLoaded(true);
       }
     } catch (err) {
       console.error('Failed to get sudo status:', err);
-      setStatusLoaded(true);
     }
+    setStatusLoaded(true);
   }, []);
 
   // Check sudo status on mount and periodically
