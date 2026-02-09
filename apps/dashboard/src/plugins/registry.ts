@@ -310,7 +310,57 @@ const notionPlugin: AppPlugin = {
 };
 
 // ============================================
+// Notion Official Plugin
+// ============================================
+
+import { notionOfficialContent } from './notion-official/content';
+import {
+  BookOpen as NotionOffIcon,
+  Link as NotionOffLinkIcon,
+} from 'lucide-react';
+
+const notionOfficialPlugin: AppPlugin = {
+  id: 'notion-official',
+  name: 'Notion (Official)',
+  icon: NotionOffIcon,
+  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/notion-official/connections', icon: NotionOffLinkIcon },
+  ],
+  routes: [
+    { path: '/notion-official/connections', component: lazy(() => import('./notion-official/Connections')) },
+  ],
+  content: notionOfficialContent,
+};
+
+// ============================================
+// LINE Official Plugin
+// ============================================
+
+import { lineOfficialContent } from './line-official/content';
+import {
+  MessageCircle as LineOffIcon,
+  Link as LineOffLinkIcon,
+} from 'lucide-react';
+
+const lineOfficialPlugin: AppPlugin = {
+  id: 'line-official',
+  name: 'LINE (Official)',
+  icon: LineOffIcon,
+  logo: 'https://cdn.simpleicons.org/line/06C755',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/line-official/connections', icon: LineOffLinkIcon },
+  ],
+  routes: [
+    { path: '/line-official/connections', component: lazy(() => import('./line-official/Connections')) },
+  ],
+  content: lineOfficialContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin];
