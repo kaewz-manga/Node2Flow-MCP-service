@@ -74,6 +74,7 @@ export async function handleUserRoutes(
         session_duration_seconds: (user as any).session_duration_seconds || 86400,
         created_at: user.created_at, oauth_provider: user.oauth_provider || null,
         scheduled_deletion_at: user.scheduled_deletion_at || null,
+        avatar_url: (user as any).avatar_url || null,
       },
     });
   }

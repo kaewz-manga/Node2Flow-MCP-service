@@ -21,6 +21,7 @@ export interface User {
   totp_enabled?: number;
   totp_secret_encrypted?: string | null;
   scheduled_deletion_at?: string | null;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
 }

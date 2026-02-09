@@ -152,7 +152,7 @@ interface GitHubEmail {
   verified: boolean;
 }
 
-async function getGitHubUserInfo(accessToken: string): Promise<{ id: string; email: string; name: string | null } | null> {
+async function getGitHubUserInfo(accessToken: string): Promise<{ id: string; email: string; name: string | null; avatar_url: string | null } | null> {
   try {
     // Get user profile
     const userResponse = await fetch('https://api.github.com/user', {
@@ -195,6 +195,7 @@ async function getGitHubUserInfo(accessToken: string): Promise<{ id: string; ema
       id: String(user.id),
       email,
       name: user.name || user.login,
+      avatar_url: user.avatar_url || null,
     };
   } catch (error) {
     console.error('GitHub user info error:', error);
@@ -202,7 +203,7 @@ async function getGitHubUserInfo(accessToken: string): Promise<{ id: string; ema
   }
 }
 
-async function getGoogleUserInfo(accessToken: string): Promise<{ id: string; email: string; name: string | null } | null> {
+async function getGoogleUserInfo(accessToken: string): Promise<{ id: string; email: string; name: string | null; avatar_url: string | null } | null> {
   try {
     const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
@@ -224,6 +225,7 @@ async function getGoogleUserInfo(accessToken: string): Promise<{ id: string; ema
       id: user.id,
       email: user.email,
       name: user.name,
+      avatar_url: user.picture || null,
     };
   } catch (error) {
     console.error('Google user info error:', error);
@@ -280,7 +282,7 @@ export async function handleOAuthCallback(
 
     if (deletedUser) {
       // Reactivate the deleted user
-      await reactivateUser(env.DB, deletedUser.id, provider, userInfo.id);
+      await reactivateUser(env.DB, deletedUser.id, provider, userInfo.id, userInfo.avatar_url);
       user = {
         ...deletedUser,
         status: 'active',
@@ -292,17 +294,25 @@ export async function handleOAuthCallback(
       // Create new user (no password for OAuth users)
       // Generate a random "password hash" that can never be used for login
       const randomHash = `oauth_${provider}_${generateUUID()}`;
-      user = await createUser(env.DB, userInfo.email, randomHash, provider, userInfo.id);
+      user = await createUser(env.DB, userInfo.email, randomHash, provider, userInfo.id, userInfo.avatar_url);
       isNewUser = true;
     }
   } else if (!user.oauth_provider) {
     // Update existing user with OAuth info (for users who registered with email first)
     await env.DB
-      .prepare('UPDATE users SET oauth_provider = ?, oauth_id = ?, updated_at = ? WHERE id = ?')
-      .bind(provider, userInfo.id, new Date().toISOString(), user.id)
+      .prepare('UPDATE users SET oauth_provider = ?, oauth_id = ?, avatar_url = ?, updated_at = ? WHERE id = ?')
+      .bind(provider, userInfo.id, userInfo.avatar_url || null, new Date().toISOString(), user.id)
       .run();
     user.oauth_provider = provider;
     user.oauth_id = userInfo.id;
+  }
+
+  // Always update avatar_url on OAuth login to keep it fresh
+  if (userInfo.avatar_url) {
+    await env.DB
+      .prepare('UPDATE users SET avatar_url = ?, updated_at = ? WHERE id = ?')
+      .bind(userInfo.avatar_url, new Date().toISOString(), user.id)
+      .run();
   }
 
   // Check if user is suspended (not deleted, since we reactivate those)

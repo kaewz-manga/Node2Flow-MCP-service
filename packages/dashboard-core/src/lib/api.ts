@@ -19,6 +19,7 @@ export interface User {
   created_at: string;
   oauth_provider?: string | null;
   scheduled_deletion_at?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface Connection {

@@ -15,17 +15,18 @@ export async function createUser(
   email: string,
   passwordHash: string,
   oauthProvider?: string,
-  oauthId?: string
+  oauthId?: string,
+  avatarUrl?: string | null
 ): Promise<User> {
   const id = generateUUID();
   const now = new Date().toISOString();
 
   await db
     .prepare(
-      `INSERT INTO users (id, email, password_hash, oauth_provider, oauth_id, plan, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 'free', 'active', ?, ?)`
+      `INSERT INTO users (id, email, password_hash, oauth_provider, oauth_id, avatar_url, plan, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'free', 'active', ?, ?)`
     )
-    .bind(id, email.toLowerCase(), passwordHash, oauthProvider || null, oauthId || null, now, now)
+    .bind(id, email.toLowerCase(), passwordHash, oauthProvider || null, oauthId || null, avatarUrl || null, now, now)
     .run();
 
   return {
@@ -34,6 +35,7 @@ export async function createUser(
     password_hash: passwordHash,
     oauth_provider: oauthProvider,
     oauth_id: oauthId,
+    avatar_url: avatarUrl || null,
     plan: 'free',
     status: 'active',
     stripe_customer_id: null,
@@ -65,14 +67,15 @@ export async function reactivateUser(
   db: D1Database,
   userId: string,
   oauthProvider: string,
-  oauthId: string
+  oauthId: string,
+  avatarUrl?: string | null
 ): Promise<void> {
   await db
     .prepare(
-      `UPDATE users SET status = 'active', oauth_provider = ?, oauth_id = ?,
+      `UPDATE users SET status = 'active', oauth_provider = ?, oauth_id = ?, avatar_url = ?,
        scheduled_deletion_at = NULL, updated_at = ? WHERE id = ?`
     )
-    .bind(oauthProvider, oauthId, new Date().toISOString(), userId)
+    .bind(oauthProvider, oauthId, avatarUrl || null, new Date().toISOString(), userId)
     .run();
 }
 

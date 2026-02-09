@@ -213,7 +213,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
 function HeaderBar({ plugins: _plugins }: { plugins: DashboardPlugin[] }) {
   const { user, logout, isAdmin } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
-  const gravatarUrl = user?.email ? getGravatarUrl(user.email) : undefined;
+  const avatarUrl = user?.avatar_url || (user?.email ? getGravatarUrl(user.email) : undefined);
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -225,7 +225,7 @@ function HeaderBar({ plugins: _plugins }: { plugins: DashboardPlugin[] }) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                {gravatarUrl && <AvatarImage src={gravatarUrl} alt={user?.email || ''} />}
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.email || ''} />}
                 <AvatarFallback className="bg-sidebar-accent text-xs">{initials}</AvatarFallback>
               </Avatar>
             </Button>
