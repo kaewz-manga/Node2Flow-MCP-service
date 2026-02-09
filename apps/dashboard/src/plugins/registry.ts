@@ -385,7 +385,32 @@ const playwrightPlugin: AppPlugin = {
 };
 
 // ============================================
+// Google Workspace Plugin
+// ============================================
+
+import { googleWorkspaceContent } from './google-workspace/content';
+import {
+  HardDrive as GWSIcon,
+  Link as GWSLinkIcon,
+} from 'lucide-react';
+
+const googleWorkspacePlugin: AppPlugin = {
+  id: 'google-workspace',
+  name: 'Google Workspace',
+  icon: GWSIcon,
+  logo: 'https://cdn.simpleicons.org/google/4285F4',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/google-workspace/connections', icon: GWSLinkIcon },
+  ],
+  routes: [
+    { path: '/google-workspace/connections', component: lazy(() => import('./google-workspace/Connections')) },
+  ],
+  content: googleWorkspaceContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin];

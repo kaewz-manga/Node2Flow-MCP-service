@@ -1,0 +1,29 @@
+services:
+  google-workspace-mcp:
+    image: node:20-slim
+    container_name: google-workspace-mcp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3016:3000"
+    environment:
+      - PORT=3000
+      - AUTH_TOKEN=${AUTH_TOKEN}
+    mem_limit: 512m
+    mem_reservation: 256m
+    volumes:
+      - /root/mcp-tools/mcp-http-bridge.mjs:/app/mcp-http-bridge.mjs:ro
+      - gws-node-modules:/workspace/node_modules
+    working_dir: /app
+    command: >
+      sh -c "apt-get update && apt-get install -y git --no-install-recommends && rm -rf /var/lib/apt/lists/* &&
+             if [ ! -d /workspace/gemini-workspace ]; then
+               git clone --depth 1 https://github.com/gemini-cli-extensions/workspace.git /workspace/gemini-workspace;
+             fi &&
+             cd /workspace/gemini-workspace &&
+             npm install &&
+             npm run build &&
+             cd /app &&
+             node mcp-http-bridge.mjs node /workspace/gemini-workspace/workspace-server/dist/index.js"
+
+volumes:
+  gws-node-modules:
