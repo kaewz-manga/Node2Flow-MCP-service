@@ -171,7 +171,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (156 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 25 + TG 27 + Notion 25) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (131 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 25 + TG 27) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |

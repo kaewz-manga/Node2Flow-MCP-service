@@ -35,7 +35,6 @@ const TOOL_COUNTS: Record<string, number> = {
   'gemini-rag': 12,
   line: 25,
   telegram: 27,
-  notion: 25,
 };
 
 // Real brand logos via SimpleIcons CDN
@@ -46,7 +45,6 @@ const SERVICE_LOGOS: Record<string, string> = {
   'gemini-rag': 'https://cdn.simpleicons.org/googlegemini/8E75B2',
   line: 'https://cdn.simpleicons.org/line/00C300',
   telegram: 'https://cdn.simpleicons.org/telegram/26A5E4',
-  notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
 };
 
 export default function Dashboard() {
