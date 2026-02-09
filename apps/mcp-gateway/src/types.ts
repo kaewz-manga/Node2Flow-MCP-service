@@ -27,8 +27,8 @@ export interface MCPPlugin {
   version: string;
   /** MCP tool definitions for this plugin */
   tools: MCPToolDefinition[];
-  /** Create a client from decrypted connection config */
-  createClient(config: Record<string, unknown>): unknown;
+  /** Create a client from decrypted connection config + optional Worker env */
+  createClient(config: Record<string, unknown>, env?: Env): unknown;
   /** Execute a tool call */
   handleToolCall(
     toolName: string,
@@ -54,4 +54,5 @@ export interface Env {
   PLATFORM: Fetcher;
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
+  CL_N8N_MCP_AUTH_TOKEN?: string;
 }

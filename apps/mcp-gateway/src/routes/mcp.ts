@@ -127,7 +127,7 @@ export async function handleMcpRequest(
         }
 
         // Create client from decrypted connection config
-        const client = plugin.createClient(authContext.connection.config);
+        const client = plugin.createClient(authContext.connection.config, env);
 
         // Execute tool call through plugin
         const result: MCPToolResult = await plugin.handleToolCall(toolName, args || {}, client);
