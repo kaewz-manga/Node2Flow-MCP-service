@@ -235,20 +235,16 @@ export default function Dashboard() {
               >
                 <div className="flex items-center gap-3 mb-2">
                   {logoUrl ? (
-                    <img src={logoUrl} alt={plugin.name} className="h-8 w-8 shrink-0" />
+                    <img src={logoUrl} alt={plugin.name} className="h-10 w-10 shrink-0" />
                   ) : (
-                    <PluginIcon className={`h-8 w-8 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                    <PluginIcon className={`h-10 w-10 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
                   )}
                   <span className="text-sm font-medium truncate">{plugin.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{toolCount} tools</span>
-                  {isConnected ? (
-                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-emerald-400 border-emerald-800">
-                      {pluginConns.length} conn
-                    </Badge>
-                  ) : (
-                    <span className="text-xs text-primary">Connect</span>
+                  {isConnected && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   )}
                 </div>
               </Link>
@@ -273,10 +269,10 @@ export default function Dashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[40%]">Name</TableHead>
-                    <TableHead>Service</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[1%] whitespace-nowrap">Actions</TableHead>
+                    <TableHead className="w-[1%] text-center">Status</TableHead>
+                    <TableHead className="w-[40%] text-center">Name</TableHead>
+                    <TableHead className="text-center">Service</TableHead>
+                    <TableHead className="w-[1%] whitespace-nowrap text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -286,14 +282,14 @@ export default function Dashboard() {
                     const connHref = plugin?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
                     return (
                       <TableRow key={conn.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
-                            {conn.name}
-                          </div>
+                        <TableCell className="text-center">
+                          <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+                        <TableCell className="font-medium text-center">
+                          {conn.name}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-2">
                             {SERVICE_LOGOS[conn.product_type] ? (
                               <img src={SERVICE_LOGOS[conn.product_type]} alt="" className="h-3.5 w-3.5" />
                             ) : (
@@ -304,12 +300,7 @@ export default function Dashboard() {
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant={conn.status === 'active' ? 'success' : 'secondary'}>
-                            {conn.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
                             <Link to={connHref}>
                               Manage

@@ -14,9 +14,9 @@ import {
   FileText,
   HelpCircle,
   Activity,
-  ChevronsUpDown,
-  User,
 } from 'lucide-react';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Button } from './ui/button';
 import FeedbackBubble from './FeedbackBubble';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './ui/collapsible';
@@ -202,98 +202,94 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
 
       </SidebarContent>
 
-      {/* Footer — User */}
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <div className="bg-sidebar-accent rounded-lg flex aspect-square size-8 items-center justify-center">
-                    <User className="size-4" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.email}</span>
-                    <span className="truncate text-xs capitalize">{user?.plan} plan</span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
-                side="bottom"
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.email}</p>
-                    <p className="text-xs leading-none text-muted-foreground capitalize">{user?.plan} plan</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link to="/usage">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Usage
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link to="/docs">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Documentation
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/faq">
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      FAQ
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/status">
-                      <Activity className="mr-2 h-4 w-4" />
-                      Status
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin" className="text-red-400">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Admin Panel
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+      <SidebarFooter />
 
       <SidebarRail />
     </Sidebar>
+  );
+}
+
+function HeaderBar({ plugins: _plugins }: { plugins: DashboardPlugin[] }) {
+  const { user, logout, isAdmin } = useAuth();
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
+
+  return (
+    <header className="flex h-12 shrink-0 items-center justify-between border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+      <div className="flex items-center gap-2 px-4">
+        <SidebarTrigger className="-ml-1" />
+      </div>
+      <div className="flex items-center gap-2 px-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-sidebar-accent text-xs">{initials}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user?.email}</p>
+                <p className="text-xs leading-none text-muted-foreground capitalize">{user?.plan} plan</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link to="/usage">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link to="/docs">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/faq">
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  FAQ
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/status">
+                  <Activity className="mr-2 h-4 w-4" />
+                  Status
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            {isAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="text-red-400">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Panel
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
   );
 }
 
@@ -303,11 +299,7 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
       <SidebarProvider>
         <AppSidebar plugins={plugins} />
         <SidebarInset>
-          <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-            </div>
-          </header>
+          <HeaderBar plugins={plugins} />
           <div className="flex-1 p-4 lg:p-8">
             {children}
           </div>
