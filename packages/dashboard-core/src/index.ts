@@ -76,6 +76,7 @@ export { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger,
 export { Switch } from './components/ui/switch';
 export { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator, ItemHeader, ItemFooter } from './components/ui/item';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
+export { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from './components/ui/empty';
 
 // Hooks
 export { useSudo } from './hooks/useSudo';
