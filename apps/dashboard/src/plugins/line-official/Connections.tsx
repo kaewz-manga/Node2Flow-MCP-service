@@ -40,6 +40,8 @@ export default function Connections() {
   const [formName, setFormName] = useState('');
   const [formMcpUrl, setFormMcpUrl] = useState('');
   const [formAuthToken, setFormAuthToken] = useState('');
+  const [formChannelToken, setFormChannelToken] = useState('');
+  const [formDestUserId, setFormDestUserId] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -81,6 +83,8 @@ export default function Connections() {
     const res = await createConnection('line-official', formName, {
       mcp_url: formMcpUrl,
       auth_token: formAuthToken || undefined,
+      channel_access_token: formChannelToken || undefined,
+      destination_user_id: formDestUserId || undefined,
     });
 
     if (res.success && res.data) {
@@ -93,6 +97,8 @@ export default function Connections() {
       setFormName('');
       setFormMcpUrl('');
       setFormAuthToken('');
+      setFormChannelToken('');
+      setFormDestUserId('');
       fetchConnections();
     } else {
       setFormError(res.error?.message || 'Failed to add connection');
@@ -394,6 +400,35 @@ export default function Connections() {
                 />
               </InputGroup>
               <FieldDescription>Authentication token if your MCP server requires it</FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel>Channel Access Token</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Key /></InputGroupAddon>
+                <InputGroupInput
+                  type="password"
+                  placeholder="Your LINE Channel Access Token"
+                  value={formChannelToken}
+                  onChange={(e) => setFormChannelToken(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>From LINE Developers Console (developers.line.biz)</FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel>Destination User ID <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput
+                  type="text"
+                  placeholder="Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  value={formDestUserId}
+                  onChange={(e) => setFormDestUserId(e.target.value)}
+                />
+              </InputGroup>
+              <FieldDescription>Default destination user ID for push messages</FieldDescription>
             </Field>
 
             <div className="flex gap-3 pt-2">

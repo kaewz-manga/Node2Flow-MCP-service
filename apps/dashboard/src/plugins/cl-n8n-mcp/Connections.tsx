@@ -17,9 +17,7 @@ import {
   RefreshCw,
   Shield,
   Cpu,
-  Lock,
   Tag,
-  BadgeCheck,
   MoreHorizontal,
   Pencil,
 } from 'lucide-react';
@@ -38,8 +36,6 @@ export default function Connections() {
   const [newApiKey, setNewApiKey] = useState('');
 
   const [formName, setFormName] = useState('');
-  const [formMcpUrl, setFormMcpUrl] = useState('');
-  const [formAuthToken, setFormAuthToken] = useState('');
   const [formN8nUrl, setFormN8nUrl] = useState('');
   const [formN8nApiKey, setFormN8nApiKey] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -83,10 +79,9 @@ export default function Connections() {
     setFormLoading(true);
 
     const res = await createConnection('cl-n8n-mcp', formName, {
-      mcp_url: formMcpUrl,
-      auth_token: formAuthToken,
-      n8n_url: formN8nUrl || undefined,
-      n8n_api_key: formN8nApiKey || undefined,
+      mcp_url: 'https://n8n-mcp-remote.missmanga.org',
+      n8n_url: formN8nUrl,
+      n8n_api_key: formN8nApiKey,
     });
 
     if (res.success && res.data) {
@@ -97,8 +92,6 @@ export default function Connections() {
       }
       setShowAddModal(false);
       setFormName('');
-      setFormMcpUrl('');
-      setFormAuthToken('');
       setFormN8nUrl('');
       setFormN8nApiKey('');
       fetchConnections();
@@ -380,37 +373,7 @@ export default function Connections() {
             </Field>
 
             <Field>
-              <FieldLabel>MCP URL</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/FF8C69" alt="Workflow Builder" className="h-6 w-6" /></InputGroupAddon>
-                <InputGroupInput
-                  type="url"
-                  placeholder="https://cl-n8n-mcp.node2flow.net"
-                  value={formMcpUrl}
-                  onChange={(e) => setFormMcpUrl(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>Your cl-n8n-mcp server URL</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>Auth Token</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Lock /></InputGroupAddon>
-                <InputGroupInput
-                  type="password"
-                  placeholder="n2f_xxx or your auth token"
-                  value={formAuthToken}
-                  onChange={(e) => setFormAuthToken(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>Your cl-n8n-mcp authentication token or n2f_ API key</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>n8n URL <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
+              <FieldLabel>n8n URL</FieldLabel>
               <InputGroup>
                 <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/EA4B71" alt="n8n" className="h-6 w-6" /></InputGroupAddon>
                 <InputGroupInput
@@ -418,23 +381,25 @@ export default function Connections() {
                   placeholder="https://your-n8n.example.com"
                   value={formN8nUrl}
                   onChange={(e) => setFormN8nUrl(e.target.value)}
+                  required
                 />
               </InputGroup>
-              <FieldDescription>Your n8n instance URL for workflow management tools</FieldDescription>
+              <FieldDescription>Your n8n instance URL</FieldDescription>
             </Field>
 
             <Field>
-              <FieldLabel>n8n API Key <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
+              <FieldLabel>n8n API Key</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupAddon><Key /></InputGroupAddon>
                 <InputGroupInput
                   type="password"
                   placeholder="Your n8n REST API key"
                   value={formN8nApiKey}
                   onChange={(e) => setFormN8nApiKey(e.target.value)}
+                  required
                 />
               </InputGroup>
-              <FieldDescription>Required for workflow management tools (create, test, deploy)</FieldDescription>
+              <FieldDescription>From n8n Settings → API → Create API Key</FieldDescription>
             </Field>
 
             <div className="flex gap-3 pt-2">

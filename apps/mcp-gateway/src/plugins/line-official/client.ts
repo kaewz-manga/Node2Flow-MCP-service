@@ -19,6 +19,15 @@ export class LineOfficialClient {
       headers['Authorization'] = `Bearer ${this.config.authToken}`;
     }
 
+    // Pass user's LINE credentials per-request via headers
+    if (this.config.channelAccessToken) {
+      headers['x-service-token'] = this.config.channelAccessToken;
+      headers['x-service-token-env'] = 'CHANNEL_ACCESS_TOKEN';
+    }
+    if (this.config.destinationUserId) {
+      headers['x-service-extra-env'] = `DESTINATION_USER_ID=${this.config.destinationUserId}`;
+    }
+
     const response = await fetch(mcpEndpoint, {
       method: 'POST',
       headers,

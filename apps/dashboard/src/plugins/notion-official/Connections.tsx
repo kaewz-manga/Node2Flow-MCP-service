@@ -40,6 +40,7 @@ export default function Connections() {
   const [formName, setFormName] = useState('');
   const [formMcpUrl, setFormMcpUrl] = useState('');
   const [formAuthToken, setFormAuthToken] = useState('');
+  const [formNotionToken, setFormNotionToken] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -81,6 +82,7 @@ export default function Connections() {
     const res = await createConnection('notion-official', formName, {
       mcp_url: formMcpUrl,
       auth_token: formAuthToken || undefined,
+      notion_token: formNotionToken || undefined,
     });
 
     if (res.success && res.data) {
@@ -93,6 +95,7 @@ export default function Connections() {
       setFormName('');
       setFormMcpUrl('');
       setFormAuthToken('');
+      setFormNotionToken('');
       fetchConnections();
     } else {
       setFormError(res.error?.message || 'Failed to add connection');
@@ -394,6 +397,21 @@ export default function Connections() {
                 />
               </InputGroup>
               <FieldDescription>Authentication token if your MCP server requires it</FieldDescription>
+            </Field>
+
+            <Field>
+              <FieldLabel>Notion Token</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Key /></InputGroupAddon>
+                <InputGroupInput
+                  type="password"
+                  placeholder="secret_xxx"
+                  value={formNotionToken}
+                  onChange={(e) => setFormNotionToken(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <FieldDescription>Your Notion Integration Token from notion.so/my-integrations</FieldDescription>
             </Field>
 
             <div className="flex gap-3 pt-2">

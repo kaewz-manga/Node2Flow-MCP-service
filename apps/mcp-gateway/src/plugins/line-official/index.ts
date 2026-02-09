@@ -24,6 +24,8 @@ export const lineOfficialPlugin: MCPPlugin = {
     return new LineOfficialClient({
       mcpUrl: config.mcp_url as string,
       authToken: config.auth_token as string | undefined,
+      channelAccessToken: config.channel_access_token as string | undefined,
+      destinationUserId: config.destination_user_id as string | undefined,
     });
   },
 

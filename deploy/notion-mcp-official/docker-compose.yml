@@ -6,7 +6,6 @@ services:
     ports:
       - "127.0.0.1:3008:3000"
     environment:
-      - NOTION_TOKEN=${NOTION_TOKEN}
       - PORT=3000
       - AUTH_TOKEN=${AUTH_TOKEN}
     mem_limit: 512m

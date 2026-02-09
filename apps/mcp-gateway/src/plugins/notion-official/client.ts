@@ -19,6 +19,12 @@ export class NotionOfficialClient {
       headers['Authorization'] = `Bearer ${this.config.authToken}`;
     }
 
+    // Pass user's Notion token per-request via header
+    if (this.config.notionToken) {
+      headers['x-service-token'] = this.config.notionToken;
+      headers['x-service-token-env'] = 'NOTION_TOKEN';
+    }
+
     const response = await fetch(mcpEndpoint, {
       method: 'POST',
       headers,

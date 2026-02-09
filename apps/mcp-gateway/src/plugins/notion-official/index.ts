@@ -26,6 +26,7 @@ export const notionOfficialPlugin: MCPPlugin = {
     return new NotionOfficialClient({
       mcpUrl: config.mcp_url as string,
       authToken: config.auth_token as string | undefined,
+      notionToken: config.notion_token as string | undefined,
     });
   },
 
