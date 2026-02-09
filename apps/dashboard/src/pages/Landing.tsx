@@ -167,7 +167,11 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
               return (
                 <Card key={plugin.id} className={`text-center hover:border-primary/30 hover:shadow-xl transition-all p-8 bg-gradient-to-t ${gradients[idx % gradients.length]}`}>
                   <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
-                    <Icon className="h-8 w-8" />
+                    {plugin.logo ? (
+                      <img src={plugin.logo} alt={plugin.name} className="h-10 w-10" />
+                    ) : (
+                      <Icon className="h-8 w-8" />
+                    )}
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">{plugin.name}</h3>
                   <p className="text-muted-foreground mb-4">{plugin.content.tagline}</p>
