@@ -120,7 +120,7 @@ export default function Settings() {
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
@@ -219,11 +219,12 @@ export default function Settings() {
   };
 
   const handleDeleteAccount = async () => {
+    if (deleteConfirmText.toLowerCase() !== 'delete') return;
     setDeleteError(''); setDeleteLoading(true);
     await withSudo(async () => {
       const res = isOAuthUser
         ? await deleteAccount(undefined, true)
-        : await deleteAccount(deletePassword, undefined);
+        : await deleteAccount(undefined, true);
       setDeleteLoading(false);
       if (res.success) { setShowDeleteConfirm(false); await refreshUser(); }
       else setDeleteError(res.error?.message || 'Failed to delete account');
@@ -634,12 +635,10 @@ export default function Settings() {
                     <CardContent className="p-4 space-y-4">
                       <p className="text-sm text-red-300">Are you sure? All your data, connections, and API keys will be permanently deleted.</p>
                       {deleteError && <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{deleteError}</AlertDescription></Alert>}
-                      {!isOAuthUser && (
-                        <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} /></div>
-                      )}
+                      <div className="space-y-2"><Label className="text-red-300">Type <span className="font-mono font-bold">delete</span> to confirm</Label><Input placeholder="delete" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} /></div>
                       <div className="flex gap-3">
-                        <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); setDeleteError(''); }}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || (!isOAuthUser && !deletePassword)}>
+                        <Button variant="secondary" onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(''); }}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleteLoading || deleteConfirmText.toLowerCase() !== 'delete'}>
                           {deleteLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : 'Yes, Delete My Account'}
                         </Button>
                       </div>
