@@ -35,7 +35,7 @@ const TOOL_COUNTS: Record<string, number> = {
   'gemini-rag': 12,
   line: 25,
   telegram: 27,
-  notion: 25,
+  notion: 22,
 };
 
 // Real brand logos via SimpleIcons CDN

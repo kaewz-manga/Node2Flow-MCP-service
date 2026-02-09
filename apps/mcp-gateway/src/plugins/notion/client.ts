@@ -1,7 +1,7 @@
 /**
  * Notion REST API Client
+ * Matches official @notionhq/notion-mcp-server v2.1.0
  * API Version: 2025-09-03
- * Auth: Bearer token (Internal Integration Token)
  */
 
 import type {
@@ -13,7 +13,6 @@ import type {
   NotionComment,
   NotionUser,
   NotionList,
-  RichText,
 } from './types';
 
 export class NotionClient {
@@ -33,6 +32,7 @@ export class NotionClient {
         'Authorization': `Bearer ${this.config.apiKey}`,
         'Notion-Version': '2025-09-03',
         'Content-Type': 'application/json',
+        'User-Agent': 'notion-mcp-server',
         ...options.headers,
       },
     });
@@ -45,27 +45,10 @@ export class NotionClient {
     return response.json() as Promise<T>;
   }
 
-  /** Helper: build a simple rich text array from plain string */
-  static richText(content: string): RichText[] {
-    return [{ type: 'text', text: { content } }];
-  }
-
   // ========== Search ==========
 
-  async search(params?: {
-    query?: string;
-    filter_object?: 'page' | 'database';
-    sort_direction?: 'ascending' | 'descending';
-    start_cursor?: string;
-    page_size?: number;
-  }): Promise<NotionList<NotionPage | NotionDatabase>> {
-    const body: Record<string, unknown> = {};
-    if (params?.query) body.query = params.query;
-    if (params?.filter_object) body.filter = { property: 'object', value: params.filter_object };
-    if (params?.sort_direction) body.sort = { timestamp: 'last_edited_time', direction: params.sort_direction };
-    if (params?.start_cursor) body.start_cursor = params.start_cursor;
-    if (params?.page_size) body.page_size = params.page_size;
-    return this.request('/search', { method: 'POST', body: JSON.stringify(body) });
+  async search(params?: Record<string, unknown>): Promise<NotionList<NotionPage | NotionDatabase>> {
+    return this.request('/search', { method: 'POST', body: JSON.stringify(params || {}) });
   }
 
   // ========== Pages ==========
@@ -80,24 +63,21 @@ export class NotionClient {
     return this.request('/pages', { method: 'POST', body: JSON.stringify(params) });
   }
 
-  async getPage(pageId: string): Promise<NotionPage> {
-    return this.request(`/pages/${pageId}`);
+  async getPage(pageId: string, filterProperties?: string): Promise<NotionPage> {
+    const query = new URLSearchParams();
+    if (filterProperties) query.set('filter_properties', filterProperties);
+    const qs = query.toString();
+    return this.request(`/pages/${pageId}${qs ? `?${qs}` : ''}`);
   }
 
-  async updatePage(pageId: string, params: {
-    properties?: Record<string, unknown>;
-    icon?: unknown;
-    cover?: unknown;
-    archived?: boolean;
-    in_trash?: boolean;
-  }): Promise<NotionPage> {
+  async updatePage(pageId: string, params: Record<string, unknown>): Promise<NotionPage> {
     return this.request(`/pages/${pageId}`, { method: 'PATCH', body: JSON.stringify(params) });
   }
 
-  async movePage(pageId: string, newParent: Record<string, unknown>): Promise<NotionPage> {
+  async movePage(pageId: string, parent: Record<string, unknown>): Promise<NotionPage> {
     return this.request(`/pages/${pageId}/move`, {
       method: 'POST',
-      body: JSON.stringify({ parent: newParent }),
+      body: JSON.stringify({ parent }),
     });
   }
 
@@ -129,10 +109,12 @@ export class NotionClient {
     return this.request(`/blocks/${blockId}/children${qs ? `?${qs}` : ''}`);
   }
 
-  async appendBlocks(blockId: string, children: unknown[]): Promise<NotionList<NotionBlock>> {
+  async appendBlocks(blockId: string, children: unknown[], after?: string): Promise<NotionList<NotionBlock>> {
+    const body: Record<string, unknown> = { children };
+    if (after) body.after = after;
     return this.request(`/blocks/${blockId}/children`, {
       method: 'PATCH',
-      body: JSON.stringify({ children }),
+      body: JSON.stringify(body),
     });
   }
 
@@ -146,16 +128,14 @@ export class NotionClient {
 
   // ========== Data Sources (2025-09-03) ==========
 
-  async createDataSource(databaseId: string, params: {
-    title?: RichText[];
-    properties?: Record<string, unknown>;
+  async createDataSource(params: {
+    parent: Record<string, unknown>;
+    properties: Record<string, unknown>;
+    title?: unknown[];
   }): Promise<NotionDataSource> {
     return this.request('/data_sources', {
       method: 'POST',
-      body: JSON.stringify({
-        parent: { type: 'database', database_id: databaseId },
-        ...params,
-      }),
+      body: JSON.stringify(params),
     });
   }
 
@@ -163,30 +143,17 @@ export class NotionClient {
     return this.request(`/data_sources/${dataSourceId}`);
   }
 
-  async updateDataSource(dataSourceId: string, params: {
-    title?: RichText[];
-    properties?: Record<string, unknown>;
-  }): Promise<NotionDataSource> {
+  async updateDataSource(dataSourceId: string, params: Record<string, unknown>): Promise<NotionDataSource> {
     return this.request(`/data_sources/${dataSourceId}`, {
       method: 'PATCH',
       body: JSON.stringify(params),
     });
   }
 
-  async queryDataSource(dataSourceId: string, params?: {
-    filter?: Record<string, unknown>;
-    sorts?: unknown[];
-    start_cursor?: string;
-    page_size?: number;
-  }): Promise<NotionList<NotionPage>> {
-    const body: Record<string, unknown> = {};
-    if (params?.filter) body.filter = params.filter;
-    if (params?.sorts) body.sorts = params.sorts;
-    if (params?.start_cursor) body.start_cursor = params.start_cursor;
-    if (params?.page_size) body.page_size = params.page_size;
+  async queryDataSource(dataSourceId: string, params?: Record<string, unknown>): Promise<NotionList<NotionPage>> {
     return this.request(`/data_sources/${dataSourceId}/query`, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(params || {}),
     });
   }
 
@@ -201,43 +168,17 @@ export class NotionClient {
     return this.request(`/data_sources/${dataSourceId}/templates${qs ? `?${qs}` : ''}`);
   }
 
-  // ========== Databases (legacy) ==========
+  // ========== Database ==========
 
   async getDatabase(databaseId: string): Promise<NotionDatabase> {
     return this.request(`/databases/${databaseId}`);
   }
 
-  async queryDatabase(databaseId: string, params?: {
-    filter?: Record<string, unknown>;
-    sorts?: unknown[];
-    start_cursor?: string;
-    page_size?: number;
-  }): Promise<NotionList<NotionPage>> {
-    const body: Record<string, unknown> = {};
-    if (params?.filter) body.filter = params.filter;
-    if (params?.sorts) body.sorts = params.sorts;
-    if (params?.start_cursor) body.start_cursor = params.start_cursor;
-    if (params?.page_size) body.page_size = params.page_size;
-    return this.request(`/databases/${databaseId}/query`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-  }
-
-  async createDatabase(params: {
-    parent: Record<string, unknown>;
-    title: RichText[];
-    properties: Record<string, unknown>;
-  }): Promise<NotionDatabase> {
-    return this.request('/databases', { method: 'POST', body: JSON.stringify(params) });
-  }
-
   // ========== Comments ==========
 
   async createComment(params: {
-    parent?: { page_id: string };
-    discussion_id?: string;
-    rich_text: RichText[];
+    parent: { page_id: string };
+    rich_text: unknown[];
   }): Promise<NotionComment> {
     return this.request('/comments', { method: 'POST', body: JSON.stringify(params) });
   }
@@ -251,10 +192,6 @@ export class NotionClient {
     if (params?.start_cursor) query.set('start_cursor', params.start_cursor);
     if (params?.page_size) query.set('page_size', String(params.page_size));
     return this.request(`/comments?${query.toString()}`);
-  }
-
-  async getComment(commentId: string): Promise<NotionComment> {
-    return this.request(`/comments/${commentId}`);
   }
 
   // ========== Users ==========
