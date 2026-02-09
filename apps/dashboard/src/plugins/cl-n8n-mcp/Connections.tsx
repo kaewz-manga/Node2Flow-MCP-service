@@ -26,7 +26,7 @@ import {
 
 
 export default function Connections() {
-  const { withSudo, totpEnabled } = useSudoContext();
+  const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
   const { activeConnection, setActiveConnectionId } = useConnection();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
@@ -223,7 +223,7 @@ export default function Connections() {
       </div>
 
       {/* 2FA Warning - hidden when enabled */}
-      {!totpEnabled && (
+      {statusLoaded && !totpEnabled && (
         <Alert>
           <Shield className="h-5 w-5" />
           <AlertTitle>Enable Two-Factor Authentication</AlertTitle>

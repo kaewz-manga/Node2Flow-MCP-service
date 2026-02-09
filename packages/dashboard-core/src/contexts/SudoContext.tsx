@@ -9,6 +9,8 @@ interface SudoContextValue {
   sudoExpiresAt: string | null;
   /** Whether TOTP is enabled */
   totpEnabled: boolean;
+  /** Whether initial status has been loaded from API */
+  statusLoaded: boolean;
   /** Request sudo verification - shows modal if not already verified */
   requestSudo: () => Promise<boolean>;
   /** Wrap a sensitive action with sudo check */
@@ -73,6 +75,7 @@ export function SudoProvider({ children }: { children: ReactNode }) {
         hasSudo: sudo.hasSudo,
         sudoExpiresAt: sudo.sudoExpiresAt,
         totpEnabled: sudo.totpEnabled,
+        statusLoaded: sudo.statusLoaded,
         requestSudo,
         withSudo,
       }}

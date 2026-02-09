@@ -8,6 +8,8 @@ interface UseSudoReturn {
   sudoExpiresAt: string | null;
   /** Whether TOTP is enabled for this user */
   totpEnabled: boolean;
+  /** Whether initial status has been loaded from API */
+  statusLoaded: boolean;
   /** Loading state */
   loading: boolean;
   /** Error message */
@@ -28,6 +30,7 @@ export function useSudo(): UseSudoReturn {
   const [hasSudo, setHasSudo] = useState(false);
   const [sudoExpiresAt, setSudoExpiresAt] = useState<string | null>(null);
   const [totpEnabled, setTotpEnabled] = useState(false);
+  const [statusLoaded, setStatusLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,9 +45,11 @@ export function useSudo(): UseSudoReturn {
         setHasSudo(res.data.active);
         setSudoExpiresAt(res.data.expires_at || null);
         setTotpEnabled(res.data.totp_enabled || false);
+        setStatusLoaded(true);
       }
     } catch (err) {
       console.error('Failed to get sudo status:', err);
+      setStatusLoaded(true);
     }
   }, []);
 
@@ -103,6 +108,7 @@ export function useSudo(): UseSudoReturn {
     hasSudo,
     sudoExpiresAt,
     totpEnabled,
+    statusLoaded,
     loading,
     error,
     verifyTOTP,
