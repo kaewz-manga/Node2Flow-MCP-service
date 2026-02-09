@@ -309,6 +309,59 @@ const notionPlugin: AppPlugin = {
   content: notionContent,
 };
 
+// Notion Extended Plugin (25 tools)
+// ============================================
+
+import { notionExtendedContent } from './notion-extended/content';
+
+const notionExtendedPlugin: AppPlugin = {
+  id: 'notion-extended',
+  name: 'Notion Extended',
+  icon: NotionIcon,
+  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/notion-extended/connections', icon: NotionLinkIcon },
+    { name: 'Databases', href: '/notion-extended/databases', icon: NotionDB },
+    { name: 'Pages', href: '/notion-extended/pages', icon: NotionPages },
+    { name: 'Blocks', href: '/notion-extended/blocks', icon: LayoutList },
+  ],
+  routes: [
+    { path: '/notion-extended/connections', component: lazy(() => import('./notion-extended/Connections')) },
+    { path: '/notion-extended/databases', component: lazy(() => import('./notion/DatabaseList')) },
+    { path: '/notion-extended/pages', component: lazy(() => import('./notion/PageList')) },
+    { path: '/notion-extended/blocks', component: lazy(() => import('./notion/BlockList')) },
+  ],
+  content: notionExtendedContent,
+};
+
+// ============================================
+// LINE Extended Plugin (25 tools)
+// ============================================
+
+import { lineExtendedContent } from './line-extended/content';
+
+const lineExtendedPlugin: AppPlugin = {
+  id: 'line-extended',
+  name: 'LINE Extended',
+  icon: LineIcon,
+  logo: 'https://cdn.simpleicons.org/line/00C300',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/line-extended/connections', icon: LineLinkIcon },
+    { name: 'Messages', href: '/line-extended/messages', icon: Send },
+    { name: 'Rich Menus', href: '/line-extended/richmenus', icon: LineMenu },
+    { name: 'Users & Groups', href: '/line-extended/users', icon: LineUsers },
+  ],
+  routes: [
+    { path: '/line-extended/connections', component: lazy(() => import('./line-extended/Connections')) },
+    { path: '/line-extended/messages', component: lazy(() => import('./line/MessageTools')) },
+    { path: '/line-extended/richmenus', component: lazy(() => import('./line/RichMenuList')) },
+    { path: '/line-extended/users', component: lazy(() => import('./line/UserList')) },
+  ],
+  content: lineExtendedContent,
+};
+
 // ============================================
 // Bright Data Plugin
 // ============================================
@@ -363,4 +416,4 @@ const cloudflarePlugin: AppPlugin = {
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, brightdataPlugin, cloudflarePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin, brightdataPlugin, cloudflarePlugin];

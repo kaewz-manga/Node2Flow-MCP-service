@@ -6,6 +6,8 @@ import { geminiRagPlugin } from './plugins/gemini-rag';
 import { linePlugin } from './plugins/line';
 import { telegramPlugin } from './plugins/telegram';
 import { notionPlugin } from './plugins/notion';
+import { notionExtendedPlugin } from './plugins/notion-extended';
+import { lineExtendedPlugin } from './plugins/line-extended';
 import { brightdataPlugin } from './plugins/brightdata';
 import { cloudflarePlugin } from './plugins/cloudflare';
 
@@ -19,6 +21,8 @@ PLUGINS.set('gemini-rag', geminiRagPlugin);
 PLUGINS.set('line', linePlugin);
 PLUGINS.set('telegram', telegramPlugin);
 PLUGINS.set('notion', notionPlugin);
+PLUGINS.set('notion-extended', notionExtendedPlugin);
+PLUGINS.set('line-extended', lineExtendedPlugin);
 PLUGINS.set('brightdata', brightdataPlugin);
 PLUGINS.set('cloudflare', cloudflarePlugin);
 

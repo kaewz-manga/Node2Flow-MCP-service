@@ -1,11 +1,27 @@
 /**
  * Notion MCP Plugin - Type Definitions
- * Matches official @notionhq/notion-mcp-server v2.1.0
  * API Version: 2025-09-03
  */
 
 export interface NotionConfig {
   apiKey: string;
+}
+
+// --- Rich Text ---
+
+export interface RichText {
+  type: 'text' | 'mention' | 'equation';
+  text?: { content: string; link?: { url: string } | null };
+  annotations?: {
+    bold?: boolean;
+    italic?: boolean;
+    strikethrough?: boolean;
+    underline?: boolean;
+    code?: boolean;
+    color?: string;
+  };
+  plain_text?: string;
+  href?: string | null;
 }
 
 // --- Parent ---
@@ -55,19 +71,19 @@ export interface NotionBlock {
 export interface NotionDataSource {
   object: 'data_source';
   id: string;
-  title: unknown[];
+  title: RichText[];
   properties: Record<string, unknown>;
   created_time: string;
   last_edited_time: string;
   parent: { type: 'database'; database_id: string };
 }
 
-// --- Database ---
+// --- Database (legacy) ---
 
 export interface NotionDatabase {
   object: 'database';
   id: string;
-  title: unknown[];
+  title: RichText[];
   properties: Record<string, unknown>;
   created_time: string;
   last_edited_time: string;
@@ -82,7 +98,7 @@ export interface NotionComment {
   id: string;
   parent: NotionParent;
   discussion_id: string;
-  rich_text: unknown[];
+  rich_text: RichText[];
   created_time: string;
   created_by: { object: string; id: string };
 }

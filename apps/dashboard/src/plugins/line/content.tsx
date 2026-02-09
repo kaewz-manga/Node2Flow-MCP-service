@@ -119,8 +119,10 @@ Found 2 rich menus:
       <section>
         <h2 className="text-xl font-semibold text-foreground mb-4">Message Types</h2>
         <p className="text-muted-foreground mb-3">
-          LINE supports various message formats. Use <code className="bg-muted px-1 rounded">line_push_message</code> or{' '}
-          <code className="bg-muted px-1 rounded">line_broadcast_message</code> to send any type:
+          LINE supports various message formats. Use <code className="bg-muted px-1 rounded">push_text_message</code> /{' '}
+          <code className="bg-muted px-1 rounded">push_flex_message</code> or{' '}
+          <code className="bg-muted px-1 rounded">broadcast_text_message</code> /{' '}
+          <code className="bg-muted px-1 rounded">broadcast_flex_message</code> to send:
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="bg-card border border-border rounded-lg p-3">
@@ -139,7 +141,7 @@ Found 2 rich menus:
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-foreground mb-4">Push vs Reply</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Push vs Broadcast</h2>
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
@@ -148,17 +150,19 @@ Found 2 rich menus:
             </div>
             <p className="text-sm text-muted-foreground">
               Send anytime to any user. Consumes message quota. Use{' '}
-              <code className="bg-muted px-1 rounded">line_push_message</code>.
+              <code className="bg-muted px-1 rounded">push_text_message</code> or{' '}
+              <code className="bg-muted px-1 rounded">push_flex_message</code>.
             </p>
           </div>
           <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center gap-2 mb-2">
               <MessageCircle className="h-4 w-4 text-primary" />
-              <span className="text-foreground font-medium">Reply Message</span>
+              <span className="text-foreground font-medium">Broadcast Message</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Respond to webhook events. Free (no quota). Token expires quickly. Use{' '}
-              <code className="bg-muted px-1 rounded">line_reply_message</code>.
+              Broadcast to all followers. Consumes quota. Use{' '}
+              <code className="bg-muted px-1 rounded">broadcast_text_message</code> or{' '}
+              <code className="bg-muted px-1 rounded">broadcast_flex_message</code>.
             </p>
           </div>
         </div>
@@ -217,14 +221,12 @@ Found 2 rich menus:
           question: 'What LINE features can I access via MCP?',
           answer: (
             <div className="space-y-2">
-              <p>The LINE plugin provides 25 tools covering:</p>
+              <p>The LINE plugin provides 11 tools covering:</p>
               <ul className="list-disc pl-5 space-y-1">
-                <li><strong>Messages</strong> - Push, reply, multicast, broadcast, validate</li>
-                <li><strong>User & Bot</strong> - Profiles, follower IDs, bot info, loading animation</li>
-                <li><strong>Groups</strong> - Summary, member count, member IDs, member profiles</li>
-                <li><strong>Rich Menus</strong> - Create, list, get, delete, set default, link to user</li>
-                <li><strong>Quota & Insights</strong> - Message quota, consumption, follower stats</li>
-                <li><strong>Webhook</strong> - Set URL, get info, test connectivity</li>
+                <li><strong>Messages</strong> - Push text, push flex, broadcast text, broadcast flex</li>
+                <li><strong>Profile</strong> - Get user profile</li>
+                <li><strong>Quota</strong> - Message quota and consumption</li>
+                <li><strong>Rich Menus</strong> - Create, list, delete, set default, cancel default</li>
               </ul>
             </div>
           ),

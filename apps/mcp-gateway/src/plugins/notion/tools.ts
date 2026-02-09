@@ -1,6 +1,7 @@
 /**
- * Notion MCP Tool Definitions (25 tools)
- * All prefixed with notion_
+ * Notion MCP Tool Definitions (22 tools)
+ * Matches official @notionhq/notion-mcp-server v2.1.0
+ * API Version: 2025-09-03
  */
 
 import type { MCPToolDefinition } from '../../types';
@@ -8,324 +9,305 @@ import type { MCPToolDefinition } from '../../types';
 export const TOOLS: MCPToolDefinition[] = [
   // ========== Search (1) ==========
   {
-    name: 'notion_search',
-    description: 'Search pages and databases in your Notion workspace by title. Filter by object type and sort by last edited time.',
+    name: 'post-search',
+    description: 'Search by title. The text that the API compares page and database titles against.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Search text to match against titles' },
-        filter_object: { type: 'string', enum: ['page', 'database'], description: 'Limit results to pages or databases only' },
-        sort_direction: { type: 'string', enum: ['ascending', 'descending'], description: 'Sort by last_edited_time' },
-        start_cursor: { type: 'string', description: 'Pagination cursor from previous response' },
-        page_size: { type: 'number', description: 'Results per page (max 100)' },
+        query: { type: 'string', description: 'The text that the API compares page and database titles against.' },
+        sort: {
+          type: 'object',
+          description: 'A set of criteria, direction and timestamp keys, that orders the results.',
+          properties: {
+            direction: { type: 'string', description: 'The direction to sort. Possible values: ascending, descending' },
+            timestamp: { type: 'string', description: 'The name of the timestamp to sort against. Possible values: last_edited_time' },
+          },
+        },
+        filter: {
+          type: 'object',
+          description: 'Filter criteria limiting results to pages or data sources',
+          properties: {
+            value: { type: 'string', enum: ['page', 'data_source'], description: 'The value of the property to filter by' },
+            property: { type: 'string', description: "The name of the property to filter by (currently only 'object')" },
+          },
+        },
+        start_cursor: { type: 'string', description: 'Cursor value for pagination' },
+        page_size: { type: 'integer', description: 'The number of items to include in the response. Maximum: 100' },
       },
     },
   },
 
   // ========== Pages (5) ==========
   {
-    name: 'notion_create_page',
-    description: 'Create a new page in Notion. Set parent as a data source (data_source_id) or another page (page_id). Provide properties matching the parent schema. Optionally include initial content blocks.',
+    name: 'post-page',
+    description: 'Create a page. Creates a new page that is a child of an existing page or database.',
     inputSchema: {
       type: 'object',
       properties: {
-        parent: { type: 'object', description: 'Parent: { "data_source_id": "..." } for database pages, or { "page_id": "..." } for sub-pages' },
-        properties: { type: 'object', description: 'Page properties. For title: { "Name": { "title": [{ "text": { "content": "..." } }] } }' },
-        children: { type: 'array', description: 'Initial content blocks (optional)' },
-        icon: { type: 'object', description: 'Page icon: { "type": "emoji", "emoji": "..." }' },
-        cover: { type: 'object', description: 'Cover image: { "type": "external", "external": { "url": "..." } }' },
+        parent: { type: 'object', description: 'The parent page or database: { "page_id": "..." } or { "database_id": "..." }' },
+        properties: { type: 'object', description: 'The property values for the new page' },
+        children: { type: 'array', description: 'The content to be rendered on the new page as block objects' },
+        icon: { type: 'object', description: 'The icon of the new page: { "emoji": "..." }' },
+        cover: { type: 'object', description: 'The cover image of the new page' },
       },
       required: ['parent', 'properties'],
     },
   },
   {
-    name: 'notion_get_page',
-    description: 'Retrieve a Notion page by ID. Returns properties, parent, timestamps, and URL. Use notion_get_block_children to read the page content.',
+    name: 'retrieve-a-page',
+    description: 'Retrieve a page. Retrieves a Page object using the ID specified.',
     inputSchema: {
       type: 'object',
       properties: {
-        page_id: { type: 'string', description: 'Page ID (UUID, with or without dashes)' },
+        page_id: { type: 'string', description: 'Identifier for a Notion page' },
+        filter_properties: { type: 'string', description: 'A list of page property value IDs to limit the response' },
       },
       required: ['page_id'],
     },
   },
   {
-    name: 'notion_update_page',
-    description: 'Update a Notion page. Change properties, icon, cover, or archive/trash status. Use block tools to update page content.',
+    name: 'patch-page',
+    description: 'Update page properties. Updates the properties of a page in a database or updates the title of a child page.',
     inputSchema: {
       type: 'object',
       properties: {
-        page_id: { type: 'string', description: 'Page ID to update' },
-        properties: { type: 'object', description: 'Updated properties' },
-        icon: { type: 'object', description: 'New page icon' },
-        cover: { type: 'object', description: 'New cover image' },
-        archived: { type: 'boolean', description: 'Set true to archive' },
-        in_trash: { type: 'boolean', description: 'Set true to move to trash' },
+        page_id: { type: 'string', description: 'The identifier for the Notion page to be updated' },
+        properties: { type: 'object', description: 'The property values to update for the page' },
+        in_trash: { type: 'boolean', description: 'Set to true to delete a page. Set to false to restore a page.' },
+        archived: { type: 'boolean', description: 'Set to true to archive the page' },
+        icon: { type: 'object', description: 'A page icon: { "emoji": "..." }' },
+        cover: { type: 'object', description: 'A cover image' },
       },
       required: ['page_id'],
     },
   },
   {
-    name: 'notion_move_page',
-    description: 'Move a page to a new parent page or data source.',
+    name: 'retrieve-a-page-property',
+    description: 'Retrieve a page property item. Retrieves a property_item object for a given page_id and property_id.',
     inputSchema: {
       type: 'object',
       properties: {
-        page_id: { type: 'string', description: 'Page ID to move' },
-        new_parent: { type: 'object', description: 'New parent: { "page_id": "..." } or { "data_source_id": "..." }' },
-      },
-      required: ['page_id', 'new_parent'],
-    },
-  },
-  {
-    name: 'notion_get_page_property',
-    description: 'Retrieve a specific property value from a page. Useful for paginated properties like relations or rollups.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        page_id: { type: 'string', description: 'Page ID' },
-        property_id: { type: 'string', description: 'Property ID (from page properties response)' },
-        start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Items per page' },
+        page_id: { type: 'string', description: 'Identifier for a Notion page' },
+        property_id: { type: 'string', description: 'Identifier for a page property' },
+        page_size: { type: 'integer', description: 'For paginated properties. The max number of property item objects on a page.' },
+        start_cursor: { type: 'string', description: 'For paginated properties' },
       },
       required: ['page_id', 'property_id'],
+    },
+  },
+  {
+    name: 'move-page',
+    description: 'Move a page to a different parent location.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        page_id: { type: 'string', description: 'Identifier for a Notion page' },
+        parent: { type: 'object', description: 'The new parent: { "type": "page_id", "page_id": "..." } or { "type": "database_id", "database_id": "..." }' },
+      },
+      required: ['page_id', 'parent'],
     },
   },
 
   // ========== Blocks (5) ==========
   {
-    name: 'notion_get_block',
-    description: 'Retrieve a single block by ID. Returns block type, content, and whether it has children.',
+    name: 'retrieve-a-block',
+    description: 'Retrieve a block. Retrieves a Block object using the ID specified.',
     inputSchema: {
       type: 'object',
       properties: {
-        block_id: { type: 'string', description: 'Block ID (a page ID also works)' },
+        block_id: { type: 'string', description: 'Identifier for a Notion block' },
       },
       required: ['block_id'],
     },
   },
   {
-    name: 'notion_get_block_children',
-    description: 'Get child blocks of a page or block. This is how you read page content. Returns a paginated list of blocks.',
+    name: 'get-block-children',
+    description: 'Retrieve block children. Returns a paginated array of child block objects.',
     inputSchema: {
       type: 'object',
       properties: {
-        block_id: { type: 'string', description: 'Block or page ID' },
+        block_id: { type: 'string', description: 'Identifier for a block' },
         start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Blocks per page (max 100)' },
+        page_size: { type: 'integer', description: 'The number of items from the full list desired in the response. Maximum: 100' },
       },
       required: ['block_id'],
     },
   },
   {
-    name: 'notion_append_blocks',
-    description: 'Append content blocks to a page or block. Max 100 blocks, 2 levels of nesting. Common types: paragraph, heading_1/2/3, bulleted_list_item, numbered_list_item, to_do, code, quote, callout, divider, table.',
+    name: 'patch-block-children',
+    description: 'Append block children. Creates and appends new children blocks to the parent block_id specified.',
     inputSchema: {
       type: 'object',
       properties: {
-        block_id: { type: 'string', description: 'Page or block ID to append to' },
-        children: { type: 'array', description: 'Block objects. Example: { "type": "paragraph", "paragraph": { "rich_text": [{ "type": "text", "text": { "content": "Hello" } }] } }' },
+        block_id: { type: 'string', description: 'Identifier for a block or page to append children to' },
+        children: { type: 'array', description: 'Child content to append as an array of block objects' },
+        after: { type: 'string', description: 'The ID of the existing block that the new block should be appended after' },
       },
       required: ['block_id', 'children'],
     },
   },
   {
-    name: 'notion_update_block',
-    description: 'Update a block\'s content. Send the block type key with updated data, e.g. { "paragraph": { "rich_text": [...] } }.',
+    name: 'update-a-block',
+    description: 'Update a block. Updates the content for the specified block_id based on the block type.',
     inputSchema: {
       type: 'object',
       properties: {
-        block_id: { type: 'string', description: 'Block ID to update' },
-        data: { type: 'object', description: 'Block type key with content: { "paragraph": { "rich_text": [...] } }' },
-      },
-      required: ['block_id', 'data'],
-    },
-  },
-  {
-    name: 'notion_delete_block',
-    description: 'Delete (archive) a block. The block is moved to trash.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        block_id: { type: 'string', description: 'Block ID to delete' },
-      },
-      required: ['block_id'],
-    },
-  },
-
-  // ========== Data Sources - 2025-09-03 (5) ==========
-  {
-    name: 'notion_create_data_source',
-    description: 'Create a new data source (table) under an existing database. Data sources are individual tables within a database (API 2025-09-03).',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        database_id: { type: 'string', description: 'Parent database ID' },
-        title: { type: 'array', description: 'Title as rich text: [{ "type": "text", "text": { "content": "My Table" } }]' },
-        properties: { type: 'object', description: 'Property schema definitions' },
-      },
-      required: ['database_id'],
-    },
-  },
-  {
-    name: 'notion_get_data_source',
-    description: 'Retrieve a data source by ID. Returns title, property schema, and timestamps.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        data_source_id: { type: 'string', description: 'Data source ID' },
-      },
-      required: ['data_source_id'],
-    },
-  },
-  {
-    name: 'notion_update_data_source',
-    description: 'Update a data source title or property schema.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        data_source_id: { type: 'string', description: 'Data source ID' },
-        title: { type: 'array', description: 'New title as rich text' },
-        properties: { type: 'object', description: 'Updated property schema' },
-      },
-      required: ['data_source_id'],
-    },
-  },
-  {
-    name: 'notion_query_data_source',
-    description: 'Query pages in a data source with filters and sorts. For new API (2025-09-03). For legacy databases use notion_query_database.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        data_source_id: { type: 'string', description: 'Data source ID to query' },
-        filter: { type: 'object', description: 'Filter: { "property": "Status", "select": { "equals": "Done" } }' },
-        sorts: { type: 'array', description: 'Sorts: [{ "property": "Created", "direction": "descending" }]' },
-        start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Results per page (max 100)' },
-      },
-      required: ['data_source_id'],
-    },
-  },
-  {
-    name: 'notion_list_data_source_templates',
-    description: 'List page templates available in a data source.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        data_source_id: { type: 'string', description: 'Data source ID' },
-        start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Results per page' },
-      },
-      required: ['data_source_id'],
-    },
-  },
-
-  // ========== Databases - Legacy (3) ==========
-  {
-    name: 'notion_get_database',
-    description: 'Get a database by ID (legacy endpoint). Returns schema with properties and title. For new integrations prefer data source endpoints.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        database_id: { type: 'string', description: 'Database ID' },
-      },
-      required: ['database_id'],
-    },
-  },
-  {
-    name: 'notion_query_database',
-    description: 'Query a database with filters and sorts (legacy endpoint). For new integrations prefer notion_query_data_source.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        database_id: { type: 'string', description: 'Database ID to query' },
-        filter: { type: 'object', description: 'Filter object (Notion filter syntax)' },
-        sorts: { type: 'array', description: 'Sort criteria array' },
-        start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Results per page (max 100)' },
-      },
-      required: ['database_id'],
-    },
-  },
-  {
-    name: 'notion_create_database',
-    description: 'Create a new inline database inside a page (legacy). Must include at least one title property in the schema.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        parent: { type: 'object', description: 'Parent page: { "type": "page_id", "page_id": "..." }' },
-        title: { type: 'array', description: 'Database title as rich text' },
-        properties: { type: 'object', description: 'Property schema. Must include a title property.' },
-      },
-      required: ['parent', 'title', 'properties'],
-    },
-  },
-
-  // ========== Comments (3) ==========
-  {
-    name: 'notion_create_comment',
-    description: 'Create a comment on a page or reply in a discussion thread. Integration must have comment capabilities enabled.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        parent_page_id: { type: 'string', description: 'Page ID to comment on (use this OR discussion_id)' },
-        discussion_id: { type: 'string', description: 'Discussion thread ID to reply to' },
-        rich_text: { type: 'array', description: 'Comment content: [{ "type": "text", "text": { "content": "My comment" } }]' },
-      },
-      required: ['rich_text'],
-    },
-  },
-  {
-    name: 'notion_get_comments',
-    description: 'List unresolved comments on a page or block.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        block_id: { type: 'string', description: 'Page or block ID' },
-        start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Comments per page' },
+        block_id: { type: 'string', description: 'Identifier for a Notion block' },
+        type: { type: 'object', description: 'The block object type value with properties to be updated' },
+        archived: { type: 'boolean', description: 'Set to true to archive (delete) a block. Set to false to un-archive (restore) a block.' },
       },
       required: ['block_id'],
     },
   },
   {
-    name: 'notion_get_comment',
-    description: 'Retrieve a single comment by ID.',
+    name: 'delete-a-block',
+    description: 'Delete a block. Sets a Block object, including page blocks, to archived: true.',
     inputSchema: {
       type: 'object',
       properties: {
-        comment_id: { type: 'string', description: 'Comment ID' },
+        block_id: { type: 'string', description: 'Identifier for a Notion block' },
       },
-      required: ['comment_id'],
+      required: ['block_id'],
+    },
+  },
+
+  // ========== Data Sources (5) ==========
+  {
+    name: 'create-a-data-source',
+    description: 'Create a new data source (database). Creates a data source as a subitem of an existing Notion page.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        parent: { type: 'object', description: 'The parent page: { "page_id": "..." }' },
+        properties: { type: 'object', description: 'Property schema of data source' },
+        title: { type: 'array', description: 'The title as rich text: [{ "text": { "content": "..." }, "type": "text" }]' },
+      },
+      required: ['parent', 'properties'],
+    },
+  },
+  {
+    name: 'retrieve-a-data-source',
+    description: 'Retrieve metadata and schema for a data source.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data_source_id: { type: 'string', description: 'Identifier for a Notion data source' },
+      },
+      required: ['data_source_id'],
+    },
+  },
+  {
+    name: 'update-a-data-source',
+    description: 'Update properties of a data source.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data_source_id: { type: 'string', description: 'Identifier for a Notion data source' },
+        title: { type: 'array', description: 'The title as rich text' },
+        description: { type: 'array', description: 'The description as rich text' },
+        properties: { type: 'object', description: 'Property schema updates' },
+      },
+      required: ['data_source_id'],
+    },
+  },
+  {
+    name: 'query-data-source',
+    description: 'Query a data source (database) using filters and sorts.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data_source_id: { type: 'string', description: 'Identifier for a Notion data source (database)' },
+        filter: { type: 'object', description: 'Filter conditions for querying the data source' },
+        sorts: { type: 'array', description: 'Sort configuration: [{ "property": "...", "direction": "ascending" | "descending" }]' },
+        start_cursor: { type: 'string', description: 'Pagination cursor' },
+        page_size: { type: 'integer', description: 'Number of items to return. Maximum: 100' },
+        filter_properties: { type: 'array', description: 'A list of page property value IDs to limit the response' },
+        archived: { type: 'boolean', description: 'Include archived items' },
+        in_trash: { type: 'boolean', description: 'Include items in trash' },
+      },
+      required: ['data_source_id'],
+    },
+  },
+  {
+    name: 'list-data-source-templates',
+    description: 'List available templates for a data source.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        data_source_id: { type: 'string', description: 'Identifier for a Notion data source' },
+        start_cursor: { type: 'string', description: 'Pagination cursor' },
+        page_size: { type: 'integer', description: 'Number of items to return. Maximum: 100' },
+      },
+      required: ['data_source_id'],
+    },
+  },
+
+  // ========== Database (1) ==========
+  {
+    name: 'retrieve-a-database',
+    description: 'Retrieve a database. Returns database metadata including list of data source IDs.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        database_id: { type: 'string', description: 'Identifier for a Notion database' },
+      },
+      required: ['database_id'],
+    },
+  },
+
+  // ========== Comments (2) ==========
+  {
+    name: 'retrieve-a-comment',
+    description: 'Retrieve comments from a page or block.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        block_id: { type: 'string', description: 'Identifier for a Notion block or page' },
+        start_cursor: { type: 'string', description: 'Pagination cursor' },
+        page_size: { type: 'integer', description: 'The number of items from the full list desired in the response. Maximum: 100' },
+      },
+      required: ['block_id'],
+    },
+  },
+  {
+    name: 'create-a-comment',
+    description: 'Create a comment in a page or existing discussion thread.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        parent: { type: 'object', description: 'The page that contains the comment: { "page_id": "..." }' },
+        rich_text: { type: 'array', description: 'The comment text as rich text: [{ "text": { "content": "..." } }]' },
+      },
+      required: ['parent', 'rich_text'],
     },
   },
 
   // ========== Users (3) ==========
   {
-    name: 'notion_list_users',
-    description: 'List all users in the workspace. Returns names, types (person/bot), and avatars.',
+    name: 'get-users',
+    description: 'List all users. Returns a paginated list of Users for the workspace.',
     inputSchema: {
       type: 'object',
       properties: {
         start_cursor: { type: 'string', description: 'Pagination cursor' },
-        page_size: { type: 'number', description: 'Users per page' },
+        page_size: { type: 'integer', description: 'The number of items from the full list desired in the response. Maximum: 100' },
       },
     },
   },
   {
-    name: 'notion_get_user',
-    description: 'Get a user by ID.',
+    name: 'get-user',
+    description: 'Retrieve a user. Retrieves a User using the ID specified.',
     inputSchema: {
       type: 'object',
       properties: {
-        user_id: { type: 'string', description: 'User ID' },
+        user_id: { type: 'string', description: 'Identifier for a user' },
       },
       required: ['user_id'],
     },
   },
   {
-    name: 'notion_get_bot_user',
-    description: 'Get the bot user info for this integration. Useful for checking identity and permissions.',
+    name: 'get-self',
+    description: "Retrieve your token's bot user. Retrieves the bot User associated with the API token.",
     inputSchema: {
       type: 'object',
       properties: {},

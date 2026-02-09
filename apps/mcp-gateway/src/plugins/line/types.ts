@@ -1,19 +1,13 @@
 /**
- * LINE Messaging API Plugin - Type Definitions
+ * LINE Bot MCP Plugin - Type Definitions
+ * Matches official line-bot-mcp-server
  */
 
 export interface LineConfig {
   channelAccessToken: string;
 }
 
-// --- Message Types ---
-
-export interface LineMessage {
-  type: string;
-  [key: string]: unknown;
-}
-
-// --- Profile Types ---
+// --- Profile ---
 
 export interface LineProfile {
   userId: string;
@@ -23,34 +17,7 @@ export interface LineProfile {
   language?: string;
 }
 
-export interface LineBotInfo {
-  userId: string;
-  basicId: string;
-  premiumId?: string;
-  displayName: string;
-  pictureUrl?: string;
-  chatMode: string;
-  markAsReadMode: string;
-}
-
-// --- Group Types ---
-
-export interface LineGroupSummary {
-  groupId: string;
-  groupName: string;
-  pictureUrl?: string;
-}
-
-export interface LineGroupMembersCount {
-  count: number;
-}
-
-export interface LineMemberIds {
-  memberIds: string[];
-  next?: string;
-}
-
-// --- Rich Menu Types ---
+// --- Rich Menu ---
 
 export interface LineRichMenu {
   richMenuId: string;
@@ -68,7 +35,7 @@ export interface LineRichMenuList {
   richmenus: LineRichMenu[];
 }
 
-// --- Quota Types ---
+// --- Quota ---
 
 export interface LineQuota {
   type: string;
@@ -79,37 +46,8 @@ export interface LineQuotaConsumption {
   totalUsage: number;
 }
 
-export interface LineFollowersCount {
-  status: string;
-  followers?: number;
-  targetedReaches?: number;
-  blocks?: number;
-}
-
-// --- Webhook Types ---
-
-export interface LineWebhookInfo {
-  endpoint: string;
-  active: boolean;
-}
-
-export interface LineWebhookTestResult {
-  success: boolean;
-  timestamp: string;
-  statusCode: number;
-  reason: string;
-  detail: string;
-}
-
 // --- Send Message Response ---
 
 export interface LineSendMessageResponse {
   sentMessages: Array<{ id: string; quoteToken?: string }>;
-}
-
-// --- Follower IDs ---
-
-export interface LineFollowerIds {
-  userIds: string[];
-  next?: string;
 }

@@ -140,7 +140,7 @@ Comment created successfully.`,
               <span className="text-foreground font-medium">1. Create Pages</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Use <code className="bg-muted px-1 rounded">notion_create_page</code> to add
+              Use <code className="bg-muted px-1 rounded">post-page</code> to add
               pages to databases or as sub-pages.
             </p>
           </div>
@@ -150,7 +150,7 @@ Comment created successfully.`,
               <span className="text-foreground font-medium">2. Add Content</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Use <code className="bg-muted px-1 rounded">notion_append_blocks</code> to add
+              Use <code className="bg-muted px-1 rounded">patch-block-children</code> to add
               paragraphs, headings, lists, code blocks, and more.
             </p>
           </div>
@@ -161,7 +161,7 @@ Comment created successfully.`,
             </div>
             <p className="text-sm text-muted-foreground">
               Use{' '}
-              <code className="bg-muted px-1 rounded">notion_query_data_source</code> to
+              <code className="bg-muted px-1 rounded">query-data-source</code> to
               filter and sort database pages.
             </p>
           </div>
@@ -175,14 +175,14 @@ Comment created successfully.`,
             <span className="text-foreground font-medium">2025-09-03 (Latest)</span>
             <p className="text-sm text-muted-foreground mt-1">
               Data Sources API, move pages, improved search. Use{' '}
-              <code className="bg-muted px-1 rounded">notion_*_data_source</code> tools.
+              <code className="bg-muted px-1 rounded">*-data-source</code> tools.
             </p>
           </div>
           <div className="bg-card border border-border rounded-lg p-3">
             <span className="text-foreground font-medium">Legacy Database Endpoints</span>
             <p className="text-sm text-muted-foreground mt-1">
               Still available for backward compatibility. Use{' '}
-              <code className="bg-muted px-1 rounded">notion_*_database</code> tools.
+              <code className="bg-muted px-1 rounded">retrieve-a-database</code> tool.
             </p>
           </div>
         </div>
