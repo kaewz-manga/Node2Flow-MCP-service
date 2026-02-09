@@ -266,10 +266,10 @@ export async function getTOTPStatus(): Promise<ApiResponse<{ enabled: boolean }>
   return platformRequest('/api/auth/totp/status');
 }
 
-export async function disableTOTP(password?: string): Promise<ApiResponse<{ message: string }>> {
+export async function disableTOTP(totpCode: string): Promise<ApiResponse<{ message: string }>> {
   return platformRequest('/api/auth/totp/disable', {
     method: 'POST',
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ totp_code: totpCode }),
   });
 }
 

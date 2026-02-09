@@ -25,6 +25,8 @@ import {
   sendEmail,
   welcomeEmail,
   verifyPassword,
+  verifyTOTP,
+  decrypt,
 } from '@node2flow/platform-core';
 
 export async function handleAuthRoutes(
@@ -215,24 +217,27 @@ export async function handleAuthRoutes(
     if (!authUser) {
       return apiResponse({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } }, 401);
     }
-    const body = await request.json() as { password?: string };
+    const body = await request.json() as { totp_code?: string };
+    if (!body.totp_code || body.totp_code.length !== 6) {
+      return apiResponse({ success: false, error: { code: 'TOTP_REQUIRED', message: 'Please enter your 6-digit 2FA code' } }, 400);
+    }
     const user = await getUserById(env.DB, authUser.userId);
     if (!user) {
       return apiResponse({ success: false, error: { code: 'USER_NOT_FOUND', message: 'User not found' } }, 404);
     }
-    if (user.password_hash) {
-      if (!body.password) {
-        return apiResponse({ success: false, error: { code: 'PASSWORD_REQUIRED', message: 'Password is required to disable TOTP' } }, 400);
-      }
-      const validPassword = await verifyPassword(body.password, user.password_hash);
-      if (!validPassword) {
-        return apiResponse({ success: false, error: { code: 'INVALID_PASSWORD', message: 'Invalid password' } }, 401);
-      }
-    } else {
-      const sudoStatus = await hasSudoSession(env.RATE_LIMIT_KV, authUser.userId);
-      if (!sudoStatus.active) {
-        return apiResponse({ success: false, error: { code: 'SUDO_REQUIRED', message: 'Security verification required' } }, 403);
-      }
+    const userWithTOTP = user as any;
+    if (!userWithTOTP.totp_enabled || !userWithTOTP.totp_secret_encrypted) {
+      return apiResponse({ success: false, error: { code: 'TOTP_NOT_ENABLED', message: 'TOTP is not enabled' } }, 400);
+    }
+    let totpSecret: string;
+    try {
+      totpSecret = await decrypt(userWithTOTP.totp_secret_encrypted, env.ENCRYPTION_KEY);
+    } catch {
+      return apiResponse({ success: false, error: { code: 'VERIFICATION_FAILED', message: 'Failed to verify code' } }, 500);
+    }
+    const isValid = await verifyTOTP(totpSecret, body.totp_code);
+    if (!isValid) {
+      return apiResponse({ success: false, error: { code: 'INVALID_CODE', message: 'Invalid 2FA code. Please try again.' } }, 401);
     }
     await disableTOTP(env.DB, authUser.userId);
     return apiResponse({ success: true, data: { message: 'TOTP disabled successfully' } });

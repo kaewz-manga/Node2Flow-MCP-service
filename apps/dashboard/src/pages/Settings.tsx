@@ -36,6 +36,10 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  InputOTPSeparator,
 } from '@node2flow/dashboard-core';
 
 import {
@@ -98,7 +102,7 @@ export default function Settings() {
   const [totpSuccess, setTotpSuccess] = useState('');
   const [secretCopied, setSecretCopied] = useState(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
-  const [disablePassword, setDisablePassword] = useState('');
+  const [disableCode, setDisableCode] = useState('');
 
   // Password change state
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -171,12 +175,13 @@ export default function Settings() {
   };
 
   const handleDisableTOTP = async () => {
+    if (disableCode.length !== 6) { setTotpError('Please enter a 6-digit code'); return; }
     setTotpLoading(true); setTotpError('');
-    const res = await disableTOTP(isOAuthUser ? undefined : disablePassword);
+    const res = await disableTOTP(disableCode);
     setTotpLoading(false);
     if (res.success) {
       setTotpSuccess('Two-factor authentication disabled');
-      setTotpEnabled(false); setShowDisableConfirm(false); setDisablePassword('');
+      setTotpEnabled(false); setShowDisableConfirm(false); setDisableCode('');
       setTimeout(() => setTotpSuccess(''), 3000);
     } else setTotpError(res.error?.message || 'Failed to disable TOTP');
   };
@@ -413,7 +418,7 @@ export default function Settings() {
                       checked={totpEnabled}
                       onCheckedChange={(checked) => { if (checked) handleSetupTOTP(); else setShowDisableConfirm(true); }}
                       disabled={totpLoading}
-                      className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-orange-500"
+                      className="data-[state=checked]:bg-emerald-600"
                     />
                   </ItemActions>
                 </Item>
@@ -457,14 +462,26 @@ export default function Settings() {
                 {totpEnabled && showDisableConfirm && (
                   <div className="px-4 pb-4">
                     <Card className="border-red-700">
-                      <CardContent className="p-4 space-y-3">
-                        <p className="text-sm text-red-300">Are you sure you want to disable two-factor authentication?</p>
-                        {!isOAuthUser && (
-                          <div className="space-y-2"><Label className="text-red-300">Enter your password to confirm</Label><Input type="password" placeholder="Your password" value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} /></div>
-                        )}
+                      <CardContent className="p-4 space-y-4">
+                        <p className="text-sm text-red-300">Enter your 2FA code to confirm disabling two-factor authentication.</p>
+                        <div className="flex justify-center">
+                          <InputOTP maxLength={6} value={disableCode} onChange={setDisableCode}>
+                            <InputOTPGroup>
+                              <InputOTPSlot index={0} />
+                              <InputOTPSlot index={1} />
+                              <InputOTPSlot index={2} />
+                            </InputOTPGroup>
+                            <InputOTPSeparator />
+                            <InputOTPGroup>
+                              <InputOTPSlot index={3} />
+                              <InputOTPSlot index={4} />
+                              <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
                         <div className="flex gap-2">
-                          <Button variant="secondary" onClick={() => { setShowDisableConfirm(false); setDisablePassword(''); setTotpError(''); }}>Cancel</Button>
-                          <Button variant="destructive" onClick={handleDisableTOTP} disabled={totpLoading || (!isOAuthUser && !disablePassword)}>
+                          <Button variant="secondary" onClick={() => { setShowDisableConfirm(false); setDisableCode(''); setTotpError(''); }}>Cancel</Button>
+                          <Button variant="destructive" onClick={handleDisableTOTP} disabled={totpLoading || disableCode.length !== 6}>
                             {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Disabling...</> : 'Disable 2FA'}
                           </Button>
                         </div>
