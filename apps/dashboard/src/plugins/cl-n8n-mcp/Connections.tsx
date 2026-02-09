@@ -246,7 +246,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="https://cdn.simpleicons.org/n8n/FF8C69" alt="Workflow Builder" className="h-7 w-7" />
+          <img src="https://cdn.simpleicons.org/n8n/FF8C69" alt="Workflow Builder" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -379,7 +379,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>MCP URL</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/FF8C69" alt="Workflow Builder" className="h-5 w-5" /></InputGroupAddon>
+                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/FF8C69" alt="Workflow Builder" className="h-6 w-6" /></InputGroupAddon>
                 <InputGroupInput
                   type="url"
                   placeholder="https://cl-n8n-mcp.node2flow.net"
@@ -409,7 +409,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>n8n URL <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
               <InputGroup>
-                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/EA4B71" alt="n8n" className="h-5 w-5" /></InputGroupAddon>
+                <InputGroupAddon><img src="https://cdn.simpleicons.org/n8n/EA4B71" alt="n8n" className="h-6 w-6" /></InputGroupAddon>
                 <InputGroupInput
                   type="url"
                   placeholder="https://your-n8n.example.com"

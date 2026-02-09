@@ -236,7 +236,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini RAG" className="h-7 w-7" />
+          <img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini RAG" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
