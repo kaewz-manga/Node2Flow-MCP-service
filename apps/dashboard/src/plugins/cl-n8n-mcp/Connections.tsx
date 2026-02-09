@@ -79,7 +79,7 @@ export default function Connections() {
     setFormLoading(true);
 
     const res = await createConnection('cl-n8n-mcp', formName, {
-      mcp_url: 'https://n8n-mcp-remote.missmanga.org',
+      mcp_url: 'https://n8n-mcp-dynamic.missmanga.org',
       n8n_url: formN8nUrl,
       n8n_api_key: formN8nApiKey,
     });

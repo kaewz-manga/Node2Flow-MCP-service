@@ -24,7 +24,7 @@ export const clN8nMcpPlugin: MCPPlugin = {
   createClient(config: Record<string, unknown>) {
     return new ClN8nMcpClient({
       mcpUrl: config.mcp_url as string,
-      authToken: config.auth_token as string,
+      authToken: config.auth_token as string | undefined,
       n8nUrl: config.n8n_url as string | undefined,
       n8nApiKey: config.n8n_api_key as string | undefined,
     });
