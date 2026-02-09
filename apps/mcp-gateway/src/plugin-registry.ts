@@ -8,6 +8,7 @@ import { telegramPlugin } from './plugins/telegram';
 import { notionPlugin } from './plugins/notion';
 import { notionExtendedPlugin } from './plugins/notion-extended';
 import { lineExtendedPlugin } from './plugins/line-extended';
+import { winCliPlugin } from './plugins/win-cli';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -21,6 +22,7 @@ PLUGINS.set('telegram', telegramPlugin);
 PLUGINS.set('notion', notionPlugin);
 PLUGINS.set('notion-extended', notionExtendedPlugin);
 PLUGINS.set('line-extended', lineExtendedPlugin);
+PLUGINS.set('win-cli', winCliPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

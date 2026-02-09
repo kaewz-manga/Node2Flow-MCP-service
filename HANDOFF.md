@@ -102,6 +102,7 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugins/telegram/` | 4 files | Telegram Bot plugin: 27 tools, Bot API client |
 | `plugins/notion/` | 4 files | Notion plugin (official): 22 tools |
 | `plugins/notion-extended/` | 4 files | Notion Extended plugin: 25 tools, full Notion API |
+| `plugins/win-cli/` | 4 files | Windows CLI plugin: 9 tools, JSON-RPC proxy |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -177,7 +178,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (189 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 11 + TG 27 + Notion 22 + Notion Extended 25 + LINE Extended 25) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (198 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 11 + TG 27 + Notion 22 + Notion Ext 25 + LINE Ext 25 + Win CLI 9) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -508,6 +509,7 @@ Node2Flow-MCP-service/
 │   │   │       ├── telegram/        # 27 tools, Telegram Bot API client
 │   │   │       ├── notion/          # 22 tools, Notion (official)
 │   │   │       ├── notion-extended/ # 25 tools, Notion full API
+│   │   │       ├── win-cli/         # 9 tools, Windows CLI + SSH
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -590,6 +592,7 @@ wrangler deploy                         # In each app/
 **Session 17**: Toast/AlertDialog/Switch + replaced 68 alert(), 9 native select, confirm() across 25 files
 **Session 18**: Dashboard visual redesign (SectionCards) + full native HTML cleanup (zero `<button>`/`<input>`/`<select>`/`alert()` remaining)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
-**Session 19**: Official Notion (22 tools) + LINE (11 tools) MCP, added Extended variants (25+25 tools) — 189 gateway tools total
+**Session 19**: Official Notion (22 tools) + LINE (11 tools) MCP, added Extended variants (25+25 tools)
+**Session 20**: Windows CLI MCP plugin (9 tools) — 198 gateway tools total
 **Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-09

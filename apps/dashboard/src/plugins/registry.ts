@@ -368,7 +368,33 @@ const lineExtendedPlugin: AppPlugin = {
 };
 
 // ============================================
+// Windows CLI Plugin
+// ============================================
+
+import { winCliContent } from './win-cli/content';
+import {
+  Terminal,
+  Link as CliLinkIcon,
+  Server as CliServer,
+} from 'lucide-react';
+
+const winCliPlugin: AppPlugin = {
+  id: 'win-cli',
+  name: 'Windows CLI',
+  icon: Terminal,
+  logo: 'https://cdn.simpleicons.org/windowsterminal/4D4D4D',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/win-cli/connections', icon: CliLinkIcon },
+  ],
+  routes: [
+    { path: '/win-cli/connections', component: lazy(() => import('./win-cli/Connections')) },
+  ],
+  content: winCliContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin, winCliPlugin];

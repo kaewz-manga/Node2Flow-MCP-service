@@ -38,6 +38,7 @@ const TOOL_COUNTS: Record<string, number> = {
   notion: 22,
   'notion-extended': 25,
   'line-extended': 25,
+  'win-cli': 9,
 };
 
 // Real brand logos via SimpleIcons CDN
@@ -51,6 +52,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
   'notion-extended': 'https://cdn.simpleicons.org/notion/FFFFFF',
   'line-extended': 'https://cdn.simpleicons.org/line/00C300',
+  'win-cli': 'https://cdn.simpleicons.org/windowsterminal/4D4D4D',
 };
 
 export default function Dashboard() {
