@@ -130,7 +130,7 @@ export default function TagList() {
           placeholder="New tag name..."
           className="flex-1"
         />
-        <Button onClick={handleCreate} disabled={creating || !newName.trim()}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !newName.trim()}>
           {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add Tag
         </Button>
       </div>

@@ -237,7 +237,7 @@ export default function ExecutionList() {
                         {/* Actions */}
                         <div className="flex gap-2">
                           {(detail.status === 'error' || detail.status === 'crashed') && (
-                            <Button size="sm" onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id}>
+                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id}>
                               {retrying === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <RotateCcw className="h-3.5 w-3.5 mr-2" />}
                               Retry
                             </Button>

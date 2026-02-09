@@ -131,7 +131,7 @@ export default function VariableList() {
           placeholder="Value"
           className="flex-1"
         />
-        <Button onClick={handleCreate} disabled={creating || !newKey.trim()}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !newKey.trim()}>
           {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add
         </Button>
       </div>

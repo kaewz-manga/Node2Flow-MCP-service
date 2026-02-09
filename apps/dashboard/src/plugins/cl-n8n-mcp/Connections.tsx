@@ -273,7 +273,7 @@ export default function Connections() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button onClick={() => setShowAddModal(true)}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Connection
             </Button>
@@ -446,7 +446,7 @@ export default function Connections() {
               <Button
                 type="submit"
                 disabled={formLoading}
-                className="flex-1"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
               </Button>
@@ -486,7 +486,7 @@ export default function Connections() {
 
           <Button
             onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}
-            className="w-full"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             I've saved my API key
           </Button>
@@ -513,7 +513,7 @@ export default function Connections() {
           </Field>
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
-            <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -131,44 +131,44 @@ export default function Dashboard() {
       <Separator />
 
       {/* Plan + Rate Limit — Full Width */}
-      <Card className="bg-gradient-to-br from-primary/15 via-card to-purple-500/10 shadow-lg border-primary/30">
-        <CardContent className="pt-6">
+      <Card className="bg-gradient-to-br from-blue-500/15 via-card to-blue-400/10 shadow-lg border-blue-500/30">
+        <CardContent className="pt-5 pb-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left: Plan Info */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-primary/20 shadow-sm shadow-primary/20">
-                  <Zap className="h-5 w-5 text-primary" />
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3.5 rounded-lg bg-blue-500/20 shadow-sm shadow-blue-500/20">
+                  <Zap className="h-8 w-8 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Current Plan</p>
-                  <p className="text-2xl font-bold capitalize text-foreground">{user?.plan}</p>
+                  <p className="text-base text-white/80 font-medium">Current Plan</p>
+                  <p className="text-4xl font-bold capitalize text-white">{user?.plan}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Layers className="h-4 w-4 text-emerald-400" />
+              <div className="flex items-center gap-5 text-base text-white">
+                <span className="flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-emerald-400" />
                   {connectedServices}/{plugins.length} services
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Activity className="h-4 w-4 text-primary" />
+                <span className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-blue-400" />
                   {usage?.monthly?.used.toLocaleString() || 0} this month
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <TrendingUp className="h-4 w-4 text-purple-400" />
+                <span className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-purple-400" />
                   {usage?.success_rate || 100}% success
                 </span>
               </div>
             </div>
 
             {/* Right: Rate Limit */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Gauge className="h-4 w-4 text-primary" />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2 text-base text-white font-medium">
+                  <Gauge className="h-5 w-5 text-blue-400" />
                   Daily Rate Limit
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-white/70">
                   Resets {usage?.reset_at ? new Date(usage.reset_at).toLocaleDateString() : 'tomorrow'}
                 </span>
               </div>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     : undefined
                 }
               />
-              <div className="flex justify-between text-sm text-muted-foreground">
+              <div className="flex justify-between text-sm text-white/80">
                 <span>{usage?.requests.used.toLocaleString()} used</span>
                 <span>{usagePercent}% of {usage?.requests.limit.toLocaleString()}/day</span>
                 <span>{usage?.requests.remaining.toLocaleString()} left</span>
@@ -233,19 +233,19 @@ export default function Dashboard() {
                   isConnected ? 'border-l-[3px] border-l-emerald-500' : ''
                 }`}
               >
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex flex-col items-center text-center gap-2">
                   {logoUrl ? (
                     <img src={logoUrl} alt={plugin.name} className="h-10 w-10 shrink-0" />
                   ) : (
                     <PluginIcon className={`h-10 w-10 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
                   )}
-                  <span className="text-sm font-medium truncate">{plugin.name}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{toolCount} tools</span>
-                  {isConnected && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  )}
+                  <span className="text-sm font-medium truncate w-full">{plugin.name}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">{toolCount} tools</Badge>
+                    {isConnected && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    )}
+                  </div>
                 </div>
               </Link>
             );
@@ -301,7 +301,7 @@ export default function Dashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button variant="ghost" size="sm" asChild className="h-7 text-xs">
+                          <Button variant="outline" size="sm" asChild className="h-7 text-xs">
                             <Link to={connHref}>
                               Manage
                               <ArrowRight className="h-3 w-3 ml-1" />
@@ -349,7 +349,7 @@ export default function Dashboard() {
             </ol>
           </CardContent>
           <CardFooter>
-            <Button size="sm" className="w-full" asChild>
+            <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" asChild>
               <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
                 Get Started
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />

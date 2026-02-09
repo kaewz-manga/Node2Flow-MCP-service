@@ -186,7 +186,7 @@ export default function WorkflowList() {
           <p className="text-muted-foreground mt-1">{activeConnection.name} - {workflows.length} workflows</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setShowCreate(!showCreate)}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreate(!showCreate)}>
             <Plus className="h-4 w-4 mr-2" /> Create
           </Button>
           <Button variant="outline" size="icon" onClick={fetchList} title="Refresh">
@@ -354,7 +354,7 @@ export default function WorkflowList() {
                                 {allTags.length === 0 && <span className="text-xs text-muted-foreground">No tags available</span>}
                               </div>
                               <div className="flex gap-2">
-                                <Button size="sm" onClick={handleSaveTags} disabled={savingTags}>
+                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSaveTags} disabled={savingTags}>
                                   {savingTags ? 'Saving...' : 'Save Tags'}
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={() => setEditingTags(false)}>Cancel</Button>
@@ -394,7 +394,7 @@ export default function WorkflowList() {
                             rows={20}
                             className="font-mono text-xs"
                           />
-                          <Button onClick={handleUpdate} disabled={saving}>
+                          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleUpdate} disabled={saving}>
                             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Changes
                           </Button>
                         </div>

@@ -101,7 +101,7 @@ export default function CredentialList() {
           <Button variant="outline" onClick={() => { setShowUpdate(!showUpdate); setShowCreate(false); }}>
             <Pencil className="h-4 w-4 mr-2" /> Update
           </Button>
-          <Button onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }}>
             <Plus className="h-4 w-4 mr-2" /> Create
           </Button>
         </div>
@@ -198,7 +198,7 @@ export default function CredentialList() {
               <Label className="text-xs">New Data (JSON, optional)</Label>
               <Textarea value={updateData} onChange={(e) => setUpdateData(e.target.value)} rows={4} className="mt-1 font-mono text-sm" placeholder='{"user": "new_user", "password": "new_pass"}' />
             </div>
-            <Button onClick={handleUpdate} disabled={updating}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleUpdate} disabled={updating}>
               {updating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Update
             </Button>
           </CardContent>

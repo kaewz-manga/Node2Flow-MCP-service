@@ -220,7 +220,7 @@ export default function Usage() {
                   ) : isEnterprise ? (
                     <Button variant="secondary" className="w-full" asChild><a href="mailto:contact@node2flow.net?subject=Enterprise%20Inquiry">Contact Sales</a></Button>
                   ) : isUpgrade ? (
-                    <Button className="w-full" onClick={() => handleChangePlan(plan.id)} disabled={checkoutLoading === plan.id}>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleChangePlan(plan.id)} disabled={checkoutLoading === plan.id}>
                       {checkoutLoading === plan.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Upgrade <ArrowUpRight className="h-4 w-4" /></>}
                     </Button>
                   ) : (
