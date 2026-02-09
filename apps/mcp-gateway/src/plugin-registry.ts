@@ -7,6 +7,7 @@ import { linePlugin } from './plugins/line';
 import { telegramPlugin } from './plugins/telegram';
 import { notionPlugin } from './plugins/notion';
 import { brightdataPlugin } from './plugins/brightdata';
+import { cloudflarePlugin } from './plugins/cloudflare';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -19,6 +20,7 @@ PLUGINS.set('line', linePlugin);
 PLUGINS.set('telegram', telegramPlugin);
 PLUGINS.set('notion', notionPlugin);
 PLUGINS.set('brightdata', brightdataPlugin);
+PLUGINS.set('cloudflare', cloudflarePlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);
