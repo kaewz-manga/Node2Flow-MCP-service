@@ -408,7 +408,7 @@ export default function Connections() {
             </Field>
 
             <Field>
-              <FieldLabel optional>n8n URL</FieldLabel>
+              <FieldLabel>n8n URL <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
               <InputGroup>
                 <InputGroupAddon><Globe /></InputGroupAddon>
                 <InputGroupInput
@@ -422,7 +422,7 @@ export default function Connections() {
             </Field>
 
             <Field>
-              <FieldLabel optional>n8n API Key</FieldLabel>
+              <FieldLabel>n8n API Key <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
               <InputGroup>
                 <InputGroupAddon><Lock /></InputGroupAddon>
                 <InputGroupInput

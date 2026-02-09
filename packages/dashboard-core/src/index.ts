@@ -49,7 +49,7 @@ export { default as FeedbackBubble } from './components/FeedbackBubble';
 // UI Components
 export { Button, buttonVariants } from './components/ui/button';
 export type { ButtonProps } from './components/ui/button';
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/ui/card';
+export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent } from './components/ui/card';
 export { Input } from './components/ui/input';
 export { Label } from './components/ui/label';
 export { Badge, badgeVariants } from './components/ui/badge';
@@ -69,7 +69,7 @@ export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './component
 export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuRadioGroup } from './components/ui/dropdown-menu';
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './components/ui/popover';
 export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './components/ui/input-otp';
-export { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldContent } from './components/ui/field';
+export { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldContent, FieldSet, FieldLegend, FieldTitle, FieldSeparator } from './components/ui/field';
 export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton, InputGroupText } from './components/ui/input-group';
 export { Toaster } from './components/ui/sonner';
 export { AlertDialog, AlertDialogPortal, AlertDialogOverlay, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from './components/ui/alert-dialog';
