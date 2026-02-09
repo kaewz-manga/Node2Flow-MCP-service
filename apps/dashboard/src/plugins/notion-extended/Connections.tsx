@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -15,18 +15,15 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  Shield,
-  Terminal,
+  BookOpen,
   Lock,
   Tag,
+  BadgeCheck,
   MoreHorizontal,
   Pencil,
-  Globe,
 } from 'lucide-react';
 
-
 export default function Connections() {
-  const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
   const { activeConnection, setActiveConnectionId } = useConnection();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
@@ -38,24 +35,25 @@ export default function Connections() {
   const [newApiKey, setNewApiKey] = useState('');
 
   const [formName, setFormName] = useState('');
-  const [formMcpUrl, setFormMcpUrl] = useState('');
-  const [formAuthToken, setFormAuthToken] = useState('');
+  const [formToken, setFormToken] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
   const [copied, setCopied] = useState(false);
   const [copiedMcp, setCopiedMcp] = useState(false);
 
+  // AlertDialog states
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
 
+  // Edit connection states
   const [editTarget, setEditTarget] = useState<{ id: string; name: string } | null>(null);
   const [editName, setEditName] = useState('');
 
   const fetchConnections = async () => {
     setLoading(true);
     const [connRes, keysRes] = await Promise.all([
-      getConnections('win-cli'),
+      getConnections('notion-extended'),
       getApiKeys(),
     ]);
     if (connRes.success && connRes.data) {
@@ -78,9 +76,8 @@ export default function Connections() {
     setFormError('');
     setFormLoading(true);
 
-    const res = await createConnection('win-cli', formName, {
-      mcp_url: formMcpUrl,
-      auth_token: formAuthToken || undefined,
+    const res = await createConnection('notion-extended', formName, {
+      api_key: formToken.trim(),
     });
 
     if (res.success && res.data) {
@@ -91,8 +88,7 @@ export default function Connections() {
       }
       setShowAddModal(false);
       setFormName('');
-      setFormMcpUrl('');
-      setFormAuthToken('');
+      setFormToken('');
       fetchConnections();
     } else {
       setFormError(res.error?.message || 'Failed to add connection');
@@ -102,10 +98,6 @@ export default function Connections() {
   };
 
   const handleDeleteConnection = async (id: string) => {
-    if (!totpEnabled) {
-      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
-      return;
-    }
     setDeleteTarget(id);
   };
 
@@ -113,40 +105,26 @@ export default function Connections() {
     if (!deleteTarget) return;
     const id = deleteTarget;
     setDeleteTarget(null);
-    await withSudo(async () => {
-      const res = await deleteConnection(id);
-      if (res.success) {
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to delete connection');
-      }
-      return true;
-    });
+    const res = await deleteConnection(id);
+    if (res.success) {
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to delete connection');
+    }
   };
 
   const handleGenerateApiKey = async (connectionId: string) => {
-    if (!totpEnabled) {
-      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
-      return;
+    const res = await createApiKey(connectionId);
+    if (res.success && res.data) {
+      setNewApiKey(res.data.api_key);
+      setShowApiKeyModal(true);
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to generate API key');
     }
-    await withSudo(async () => {
-      const res = await createApiKey(connectionId);
-      if (res.success && res.data) {
-        setNewApiKey(res.data.api_key);
-        setShowApiKeyModal(true);
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to generate API key');
-      }
-      return true;
-    });
   };
 
   const handleRevokeApiKey = async (keyId: string) => {
-    if (!totpEnabled) {
-      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
-      return;
-    }
     setRevokeTarget(keyId);
   };
 
@@ -154,15 +132,12 @@ export default function Connections() {
     if (!revokeTarget) return;
     const keyId = revokeTarget;
     setRevokeTarget(null);
-    await withSudo(async () => {
-      const res = await revokeApiKey(keyId);
-      if (res.success) {
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to revoke API key');
-      }
-      return true;
-    });
+    const res = await revokeApiKey(keyId);
+    if (res.success) {
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to revoke API key');
+    }
   };
 
   const handleEditConnection = (conn: Connection) => {
@@ -205,27 +180,14 @@ export default function Connections() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Windows CLI Connections</h1>
-          <p className="text-muted-foreground mt-1">Manage your Windows CLI MCP server connections</p>
+          <h1 className="text-2xl font-bold text-foreground">Notion Extended Connections</h1>
+          <p className="text-muted-foreground mt-1">Manage your Notion Extended integration token connections</p>
         </div>
         <Button variant="outline" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
       </div>
-
-      {statusLoaded && !totpEnabled && (
-        <Alert>
-          <Shield className="h-5 w-5" />
-          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
-          <AlertDescription className="flex items-center justify-between">
-            <span>Set up 2FA to manage connections securely</span>
-            <Button size="sm" asChild className="shrink-0 ml-4 bg-emerald-600 hover:bg-emerald-700 text-white">
-              <Link to="/settings?tab=security">Enable</Link>
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {error && (
         <Alert variant="destructive">
@@ -234,9 +196,10 @@ export default function Connections() {
         </Alert>
       )}
 
+      {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <Terminal className="h-10 w-10 text-cyan-400" />
+          <img src="https://cdn.simpleicons.org/notion/FFFFFF" alt="Notion" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -255,11 +218,11 @@ export default function Connections() {
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <Terminal />
+              <BookOpen />
             </EmptyMedia>
             <EmptyTitle>No connections yet</EmptyTitle>
             <EmptyDescription>
-              Add your first Windows CLI MCP server to start executing commands with AI.
+              Add your Notion integration token to start managing pages, databases, and content with extended tools.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -343,9 +306,9 @@ export default function Connections() {
 
       {/* Add Connection Dialog */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Windows CLI Connection</DialogTitle>
+            <DialogTitle>Add Notion Extended Connection</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddConnection} className="space-y-4">
@@ -361,7 +324,7 @@ export default function Connections() {
                 <InputGroupAddon><Tag /></InputGroupAddon>
                 <InputGroupInput
                   type="text"
-                  placeholder="My Dev Machine"
+                  placeholder="My Workspace"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   required
@@ -370,32 +333,28 @@ export default function Connections() {
             </Field>
 
             <Field>
-              <FieldLabel>MCP URL</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Globe /></InputGroupAddon>
-                <InputGroupInput
-                  type="url"
-                  placeholder="http://localhost:3000"
-                  value={formMcpUrl}
-                  onChange={(e) => setFormMcpUrl(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>Your win-cli-mcp-server URL</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>Auth Token <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
+              <FieldLabel>Integration Token</FieldLabel>
               <InputGroup>
                 <InputGroupAddon><Lock /></InputGroupAddon>
                 <InputGroupInput
                   type="password"
-                  placeholder="Your auth token"
-                  value={formAuthToken}
-                  onChange={(e) => setFormAuthToken(e.target.value)}
+                  placeholder="secret_... or ntn_..."
+                  value={formToken}
+                  onChange={(e) => setFormToken(e.target.value)}
+                  required
                 />
               </InputGroup>
-              <FieldDescription>Authentication token if configured on the server</FieldDescription>
+              <FieldDescription>
+                Get your token from{' '}
+                <a
+                  href="https://www.notion.so/profile/integrations"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Notion Integrations
+                </a>
+              </FieldDescription>
             </Field>
 
             <div className="flex gap-3 pt-2">
@@ -412,7 +371,11 @@ export default function Connections() {
                 disabled={formLoading}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
+                {formLoading ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>
+                ) : (
+                  'Add Connection'
+                )}
               </Button>
             </div>
           </form>

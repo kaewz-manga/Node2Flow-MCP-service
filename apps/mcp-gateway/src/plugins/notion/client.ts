@@ -32,6 +32,7 @@ export class NotionClient {
         'Authorization': `Bearer ${this.config.apiKey}`,
         'Notion-Version': '2025-09-03',
         'Content-Type': 'application/json',
+        // Required by Notion API — matches official @notionhq/notion-mcp-server identifier
         'User-Agent': 'notion-mcp-server',
         ...options.headers,
       },

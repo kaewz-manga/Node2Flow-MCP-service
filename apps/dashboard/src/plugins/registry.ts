@@ -313,6 +313,8 @@ const notionPlugin: AppPlugin = {
 // Notion Extended Plugin (25 tools)
 // ============================================
 
+import { notionExtendedContent } from './notion-extended/content';
+
 const notionExtendedPlugin: AppPlugin = {
   id: 'notion-extended',
   name: 'Notion Extended',
@@ -326,75 +328,43 @@ const notionExtendedPlugin: AppPlugin = {
     { name: 'Blocks', href: '/notion-extended/blocks', icon: LayoutList },
   ],
   routes: [
-    { path: '/notion-extended/connections', component: lazy(() => import('./notion/Connections')) },
+    { path: '/notion-extended/connections', component: lazy(() => import('./notion-extended/Connections')) },
     { path: '/notion-extended/databases', component: lazy(() => import('./notion/DatabaseList')) },
     { path: '/notion-extended/pages', component: lazy(() => import('./notion/PageList')) },
     { path: '/notion-extended/blocks', component: lazy(() => import('./notion/BlockList')) },
   ],
-  content: notionContent,
+  content: notionExtendedContent,
 };
 
 // ============================================
 // LINE Extended Plugin (25 tools)
 // ============================================
 
-import {
-  MessageCircle as LineExtIcon,
-  Link as LineExtLinkIcon,
-  Send as LineExtSend,
-  Menu as LineExtMenu,
-  Users as LineExtUsers,
-} from 'lucide-react';
+import { lineExtendedContent } from './line-extended/content';
 
 const lineExtendedPlugin: AppPlugin = {
   id: 'line-extended',
   name: 'LINE Extended',
-  icon: LineExtIcon,
+  icon: LineIcon,
   logo: 'https://cdn.simpleicons.org/line/00C300',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/line-extended/connections', icon: LineExtLinkIcon },
-    { name: 'Messages', href: '/line-extended/messages', icon: LineExtSend },
-    { name: 'Rich Menus', href: '/line-extended/richmenus', icon: LineExtMenu },
-    { name: 'Users & Groups', href: '/line-extended/users', icon: LineExtUsers },
+    { name: 'Connections', href: '/line-extended/connections', icon: LineLinkIcon },
+    { name: 'Messages', href: '/line-extended/messages', icon: Send },
+    { name: 'Rich Menus', href: '/line-extended/richmenus', icon: LineMenu },
+    { name: 'Users & Groups', href: '/line-extended/users', icon: LineUsers },
   ],
   routes: [
-    { path: '/line-extended/connections', component: lazy(() => import('./line/Connections')) },
+    { path: '/line-extended/connections', component: lazy(() => import('./line-extended/Connections')) },
     { path: '/line-extended/messages', component: lazy(() => import('./line/MessageTools')) },
     { path: '/line-extended/richmenus', component: lazy(() => import('./line/RichMenuList')) },
     { path: '/line-extended/users', component: lazy(() => import('./line/UserList')) },
   ],
-  content: lineContent,
-};
-
-// ============================================
-// Windows CLI Plugin
-// ============================================
-
-import { winCliContent } from './win-cli/content';
-import {
-  Terminal,
-  Link as CliLinkIcon,
-  Server as CliServer,
-} from 'lucide-react';
-
-const winCliPlugin: AppPlugin = {
-  id: 'win-cli',
-  name: 'Windows CLI',
-  icon: Terminal,
-  logo: 'https://cdn.simpleicons.org/windowsterminal/4D4D4D',
-  requiresConnection: true,
-  sidebarItems: [
-    { name: 'Connections', href: '/win-cli/connections', icon: CliLinkIcon },
-  ],
-  routes: [
-    { path: '/win-cli/connections', component: lazy(() => import('./win-cli/Connections')) },
-  ],
-  content: winCliContent,
+  content: lineExtendedContent,
 };
 
 // ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin, winCliPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin];
