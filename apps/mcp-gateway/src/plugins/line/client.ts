@@ -1,25 +1,17 @@
 /**
  * LINE Messaging API Client
+ * Matches official line-bot-mcp-server
  * Uses Channel Access Token for Bearer authentication
  */
 
 import type {
   LineConfig,
-  LineMessage,
   LineProfile,
-  LineBotInfo,
-  LineGroupSummary,
-  LineGroupMembersCount,
-  LineMemberIds,
-  LineRichMenu,
-  LineRichMenuList,
   LineQuota,
   LineQuotaConsumption,
-  LineFollowersCount,
-  LineWebhookInfo,
-  LineWebhookTestResult,
+  LineRichMenu,
+  LineRichMenuList,
   LineSendMessageResponse,
-  LineFollowerIds,
 } from './types';
 
 export class LineClient {
@@ -53,180 +45,108 @@ export class LineClient {
 
   // ========== Messages ==========
 
-  async pushMessage(
-    to: string,
-    messages: LineMessage[],
-    notificationDisabled?: boolean
-  ): Promise<LineSendMessageResponse> {
-    const body: Record<string, unknown> = { to, messages };
-    if (notificationDisabled) body.notificationDisabled = true;
+  async pushTextMessage(userId: string, text: string): Promise<LineSendMessageResponse> {
     return this.request('/bot/message/push', {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        to: userId,
+        messages: [{ type: 'text', text }],
+      }),
     });
   }
 
-  async replyMessage(
-    replyToken: string,
-    messages: LineMessage[],
-    notificationDisabled?: boolean
-  ): Promise<LineSendMessageResponse> {
-    const body: Record<string, unknown> = { replyToken, messages };
-    if (notificationDisabled) body.notificationDisabled = true;
-    return this.request('/bot/message/reply', {
+  async pushFlexMessage(userId: string, altText: string, contents: Record<string, unknown>): Promise<LineSendMessageResponse> {
+    return this.request('/bot/message/push', {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        to: userId,
+        messages: [{ type: 'flex', altText, contents }],
+      }),
     });
   }
 
-  async multicastMessage(
-    to: string[],
-    messages: LineMessage[],
-    notificationDisabled?: boolean
-  ): Promise<LineSendMessageResponse> {
-    const body: Record<string, unknown> = { to, messages };
-    if (notificationDisabled) body.notificationDisabled = true;
-    return this.request('/bot/message/multicast', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-  }
-
-  async broadcastMessage(
-    messages: LineMessage[],
-    notificationDisabled?: boolean
-  ): Promise<LineSendMessageResponse> {
-    const body: Record<string, unknown> = { messages };
-    if (notificationDisabled) body.notificationDisabled = true;
+  async broadcastTextMessage(text: string): Promise<LineSendMessageResponse> {
     return this.request('/bot/message/broadcast', {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        messages: [{ type: 'text', text }],
+      }),
     });
   }
 
-  async validateMessage(messages: LineMessage[]): Promise<Record<string, unknown>> {
-    return this.request('/bot/message/validate/push', {
+  async broadcastFlexMessage(altText: string, contents: Record<string, unknown>): Promise<LineSendMessageResponse> {
+    return this.request('/bot/message/broadcast', {
       method: 'POST',
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({
+        messages: [{ type: 'flex', altText, contents }],
+      }),
     });
   }
 
-  // ========== User & Bot Info ==========
+  // ========== Profile ==========
 
   async getProfile(userId: string): Promise<LineProfile> {
     return this.request(`/bot/profile/${userId}`);
   }
 
-  async getFollowerIds(start?: string, limit?: number): Promise<LineFollowerIds> {
-    const query = new URLSearchParams();
-    if (start) query.set('start', start);
-    if (limit) query.set('limit', String(limit));
-    const qs = query.toString();
-    return this.request(`/bot/followers/ids${qs ? `?${qs}` : ''}`);
-  }
+  // ========== Quota ==========
 
-  async getBotInfo(): Promise<LineBotInfo> {
-    return this.request('/bot/info');
-  }
-
-  async displayLoadingAnimation(chatId: string, loadingSeconds?: number): Promise<Record<string, unknown>> {
-    const body: Record<string, unknown> = { chatId };
-    if (loadingSeconds) body.loadingSeconds = loadingSeconds;
-    return this.request('/bot/chat/loading/start', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-  }
-
-  // ========== Group Chat ==========
-
-  async getGroupSummary(groupId: string): Promise<LineGroupSummary> {
-    return this.request(`/bot/group/${groupId}/summary`);
-  }
-
-  async getGroupMembersCount(groupId: string): Promise<LineGroupMembersCount> {
-    return this.request(`/bot/group/${groupId}/members/count`);
-  }
-
-  async getGroupMemberIds(groupId: string, start?: string): Promise<LineMemberIds> {
-    const query = start ? `?start=${start}` : '';
-    return this.request(`/bot/group/${groupId}/members/ids${query}`);
-  }
-
-  async getGroupMemberProfile(groupId: string, userId: string): Promise<LineProfile> {
-    return this.request(`/bot/group/${groupId}/member/${userId}`);
+  async getMessageQuota(): Promise<{ quota: LineQuota; consumption: LineQuotaConsumption }> {
+    const [quota, consumption] = await Promise.all([
+      this.request<LineQuota>('/bot/message/quota'),
+      this.request<LineQuotaConsumption>('/bot/message/quota/consumption'),
+    ]);
+    return { quota, consumption };
   }
 
   // ========== Rich Menu ==========
 
-  async createRichMenu(data: {
-    size: { width: number; height: number };
-    selected: boolean;
-    name: string;
-    chatBarText: string;
-    areas: Array<{
-      bounds: { x: number; y: number; width: number; height: number };
-      action: Record<string, unknown>;
-    }>;
-  }): Promise<{ richMenuId: string }> {
-    return this.request('/bot/richmenu', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getRichMenus(): Promise<LineRichMenuList> {
+  async getRichMenuList(): Promise<LineRichMenuList> {
     return this.request('/bot/richmenu/list');
-  }
-
-  async getRichMenu(richMenuId: string): Promise<LineRichMenu> {
-    return this.request(`/bot/richmenu/${richMenuId}`);
   }
 
   async deleteRichMenu(richMenuId: string): Promise<Record<string, unknown>> {
     return this.request(`/bot/richmenu/${richMenuId}`, { method: 'DELETE' });
   }
 
-  async setDefaultRichMenu(richMenuId: string): Promise<Record<string, unknown>> {
+  async setRichMenuDefault(richMenuId: string): Promise<Record<string, unknown>> {
     return this.request(`/bot/user/all/richmenu/${richMenuId}`, { method: 'POST' });
   }
 
-  async linkRichMenuToUser(userId: string, richMenuId: string): Promise<Record<string, unknown>> {
-    return this.request(`/bot/user/${userId}/richmenu/${richMenuId}`, { method: 'POST' });
+  async cancelRichMenuDefault(): Promise<Record<string, unknown>> {
+    return this.request('/bot/user/all/richmenu', { method: 'DELETE' });
   }
 
-  // ========== Quota & Insights ==========
+  async createRichMenu(chatBarText: string, actions: Record<string, unknown>[]): Promise<{ richMenuId: string }> {
+    const numActions = actions.length;
+    const cols = Math.min(numActions, 3);
+    const rows = Math.ceil(numActions / 3);
+    const cellWidth = Math.floor(2500 / cols);
+    const cellHeight = rows === 1 ? 843 : Math.floor(1686 / rows);
 
-  async getQuota(): Promise<LineQuota> {
-    return this.request('/bot/message/quota');
-  }
-
-  async getQuotaConsumption(): Promise<LineQuotaConsumption> {
-    return this.request('/bot/message/quota/consumption');
-  }
-
-  async getFollowersCount(date: string): Promise<LineFollowersCount> {
-    return this.request(`/bot/insight/followers?date=${date}`);
-  }
-
-  // ========== Webhook ==========
-
-  async setWebhookUrl(endpoint: string): Promise<Record<string, unknown>> {
-    return this.request('/bot/channel/webhook/endpoint', {
-      method: 'PUT',
-      body: JSON.stringify({ endpoint }),
+    const areas = actions.map((action, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      return {
+        bounds: {
+          x: col * cellWidth,
+          y: row * cellHeight,
+          width: cellWidth,
+          height: cellHeight,
+        },
+        action,
+      };
     });
-  }
 
-  async getWebhookInfo(): Promise<LineWebhookInfo> {
-    return this.request('/bot/channel/webhook/endpoint');
-  }
-
-  async testWebhook(endpoint?: string): Promise<LineWebhookTestResult> {
-    const body = endpoint ? JSON.stringify({ endpoint }) : undefined;
-    return this.request('/bot/channel/webhook/test', {
+    return this.request('/bot/richmenu', {
       method: 'POST',
-      ...(body ? { body } : {}),
+      body: JSON.stringify({
+        size: { width: 2500, height: rows === 1 ? 843 : 1686 },
+        selected: true,
+        name: 'Rich Menu',
+        chatBarText,
+        areas,
+      }),
     });
   }
 }

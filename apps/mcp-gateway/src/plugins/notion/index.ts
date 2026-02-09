@@ -1,7 +1,7 @@
 /**
  * Notion Plugin - MCP Gateway
- * Manages Notion workspaces via REST API (version 2025-09-03)
- * 25 tools: Search, Pages, Blocks, Data Sources, Databases, Comments, Users
+ * Matches official @notionhq/notion-mcp-server v2.1.0
+ * 22 tools: Search, Pages, Blocks, Data Sources, Database, Comments, Users
  */
 
 import type { MCPPlugin } from '../../types';
@@ -11,7 +11,7 @@ import { NotionClient } from './client';
 export const notionPlugin: MCPPlugin = {
   id: 'notion',
   name: 'Notion Manager',
-  version: '1.0.0',
+  version: '2.1.0',
   tools: TOOLS,
 
   createClient(config: Record<string, unknown>) {
@@ -28,101 +28,90 @@ export const notionPlugin: MCPPlugin = {
 
       switch (toolName) {
         // ========== Search ==========
-        case 'notion_search':
-          result = await notion.search(args as any);
+        case 'post-search':
+          result = await notion.search(args);
           break;
 
         // ========== Pages ==========
-        case 'notion_create_page':
+        case 'post-page':
           result = await notion.createPage(args as any);
           break;
-        case 'notion_get_page':
-          result = await notion.getPage(args.page_id as string);
+        case 'retrieve-a-page':
+          result = await notion.getPage(args.page_id as string, args.filter_properties as string | undefined);
           break;
-        case 'notion_update_page':
-          result = await notion.updatePage(args.page_id as string, args as any);
+        case 'patch-page': {
+          const { page_id, ...patchData } = args;
+          result = await notion.updatePage(page_id as string, patchData);
           break;
-        case 'notion_move_page':
-          result = await notion.movePage(args.page_id as string, args.new_parent as Record<string, unknown>);
-          break;
-        case 'notion_get_page_property':
+        }
+        case 'retrieve-a-page-property':
           result = await notion.getPageProperty(args.page_id as string, args.property_id as string, args as any);
+          break;
+        case 'move-page':
+          result = await notion.movePage(args.page_id as string, args.parent as Record<string, unknown>);
           break;
 
         // ========== Blocks ==========
-        case 'notion_get_block':
+        case 'retrieve-a-block':
           result = await notion.getBlock(args.block_id as string);
           break;
-        case 'notion_get_block_children':
+        case 'get-block-children':
           result = await notion.getBlockChildren(args.block_id as string, args as any);
           break;
-        case 'notion_append_blocks':
-          result = await notion.appendBlocks(args.block_id as string, args.children as unknown[]);
+        case 'patch-block-children':
+          result = await notion.appendBlocks(args.block_id as string, args.children as unknown[], args.after as string | undefined);
           break;
-        case 'notion_update_block':
-          result = await notion.updateBlock(args.block_id as string, args.data as Record<string, unknown>);
+        case 'update-a-block': {
+          const { block_id, ...blockData } = args;
+          result = await notion.updateBlock(block_id as string, blockData);
           break;
-        case 'notion_delete_block':
+        }
+        case 'delete-a-block':
           result = await notion.deleteBlock(args.block_id as string);
           break;
 
         // ========== Data Sources ==========
-        case 'notion_create_data_source':
-          result = await notion.createDataSource(args.database_id as string, {
-            title: args.title as any,
-            properties: args.properties as Record<string, unknown> | undefined,
-          });
+        case 'create-a-data-source':
+          result = await notion.createDataSource(args as any);
           break;
-        case 'notion_get_data_source':
+        case 'retrieve-a-data-source':
           result = await notion.getDataSource(args.data_source_id as string);
           break;
-        case 'notion_update_data_source':
-          result = await notion.updateDataSource(args.data_source_id as string, {
-            title: args.title as any,
-            properties: args.properties as Record<string, unknown> | undefined,
-          });
+        case 'update-a-data-source': {
+          const { data_source_id, ...dsData } = args;
+          result = await notion.updateDataSource(data_source_id as string, dsData);
           break;
-        case 'notion_query_data_source':
-          result = await notion.queryDataSource(args.data_source_id as string, args as any);
+        }
+        case 'query-data-source': {
+          const { data_source_id, ...queryParams } = args;
+          result = await notion.queryDataSource(data_source_id as string, queryParams);
           break;
-        case 'notion_list_data_source_templates':
+        }
+        case 'list-data-source-templates':
           result = await notion.listDataSourceTemplates(args.data_source_id as string, args as any);
           break;
 
-        // ========== Databases (legacy) ==========
-        case 'notion_get_database':
+        // ========== Database ==========
+        case 'retrieve-a-database':
           result = await notion.getDatabase(args.database_id as string);
-          break;
-        case 'notion_query_database':
-          result = await notion.queryDatabase(args.database_id as string, args as any);
-          break;
-        case 'notion_create_database':
-          result = await notion.createDatabase(args as any);
           break;
 
         // ========== Comments ==========
-        case 'notion_create_comment': {
-          const commentParams: any = { rich_text: args.rich_text };
-          if (args.parent_page_id) commentParams.parent = { page_id: args.parent_page_id };
-          if (args.discussion_id) commentParams.discussion_id = args.discussion_id;
-          result = await notion.createComment(commentParams);
-          break;
-        }
-        case 'notion_get_comments':
+        case 'retrieve-a-comment':
           result = await notion.getComments(args.block_id as string, args as any);
           break;
-        case 'notion_get_comment':
-          result = await notion.getComment(args.comment_id as string);
+        case 'create-a-comment':
+          result = await notion.createComment(args as any);
           break;
 
         // ========== Users ==========
-        case 'notion_list_users':
+        case 'get-users':
           result = await notion.listUsers(args as any);
           break;
-        case 'notion_get_user':
+        case 'get-user':
           result = await notion.getUser(args.user_id as string);
           break;
-        case 'notion_get_bot_user':
+        case 'get-self':
           result = await notion.getBotUser();
           break;
 
