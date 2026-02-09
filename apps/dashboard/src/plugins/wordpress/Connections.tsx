@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Switch, Label } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -28,7 +28,6 @@ import {
 
 export default function Connections() {
   const { withSudo, totpEnabled } = useSudoContext();
-  const navigate = useNavigate();
   const { activeConnection, setActiveConnectionId } = useConnection();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
@@ -221,11 +220,19 @@ export default function Connections() {
         </Button>
       </div>
 
-      {/* 2FA Status */}
-      <div className="flex items-center space-x-2">
-        <Switch id="2fa" checked={totpEnabled} onCheckedChange={() => navigate('/settings')} />
-        <Label htmlFor="2fa">Two-Factor Authentication</Label>
-      </div>
+      {/* 2FA Warning - hidden when enabled */}
+      {!totpEnabled && (
+        <Alert>
+          <Shield className="h-5 w-5" />
+          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>Set up 2FA to manage connections securely</span>
+            <Button size="sm" asChild className="shrink-0 ml-4 bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Link to="/settings?tab=security">Enable</Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {error && (
         <Alert variant="destructive">
@@ -272,13 +279,14 @@ export default function Connections() {
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-md border max-w-3xl mx-auto">
+        <div className="rounded-md border max-w-4xl mx-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>API Key</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -289,9 +297,6 @@ export default function Connections() {
                   <TableRow key={conn.id}>
                     <TableCell className="font-medium">
                       {conn.name}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        {new Date(conn.created_at).toLocaleDateString()}
-                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge variant={conn.status === 'active' ? 'outline' : 'secondary'} className={conn.status === 'active' ? 'border-emerald-800 text-emerald-400' : ''}>
@@ -303,6 +308,9 @@ export default function Connections() {
                         <code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
                       ))}
                       {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(conn.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

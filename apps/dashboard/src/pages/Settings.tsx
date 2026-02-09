@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   useAuth,
   useSudoContext,
@@ -85,6 +86,8 @@ const OAUTH_LOGOS: Record<string, string> = {
 export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const { withSudo, totpEnabled: contextTotpEnabled } = useSudoContext();
+  const [searchParams] = useSearchParams();
+  const defaultTab = useMemo(() => searchParams.get('tab') || 'profile', []);
 
   // TOTP state
   const [totpEnabled, setTotpEnabled] = useState(false);
@@ -321,7 +324,7 @@ export default function Settings() {
         </Alert>
       )}
 
-      <Tabs defaultValue="profile">
+      <Tabs defaultValue={defaultTab}>
         <TabsList variant="line">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
@@ -406,16 +409,12 @@ export default function Settings() {
                     <ItemDescription>Add an extra layer of security using an authenticator app</ItemDescription>
                   </ItemContent>
                   <ItemActions>
-                    {totpEnabled ? (
-                      <Switch
-                        checked={true}
-                        onCheckedChange={() => setShowDisableConfirm(true)}
-                      />
-                    ) : (
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSetupTOTP} disabled={totpLoading}>
-                        {totpLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><QrCode className="h-4 w-4" /> Enable</>}
-                      </Button>
-                    )}
+                    <Switch
+                      checked={totpEnabled}
+                      onCheckedChange={(checked) => { if (checked) handleSetupTOTP(); else setShowDisableConfirm(true); }}
+                      disabled={totpLoading}
+                      className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-orange-500"
+                    />
                   </ItemActions>
                 </Item>
 
