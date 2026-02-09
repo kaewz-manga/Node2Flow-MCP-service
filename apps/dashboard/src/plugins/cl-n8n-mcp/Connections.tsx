@@ -216,7 +216,7 @@ export default function Connections() {
           <h1 className="text-2xl font-bold text-foreground">cl-n8n-mcp Connections</h1>
           <p className="text-muted-foreground mt-1">Manage your n8n Workflow Builder connections</p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
@@ -273,7 +273,7 @@ export default function Connections() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
+            <Button variant="outline" onClick={() => setShowAddModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Connection
             </Button>

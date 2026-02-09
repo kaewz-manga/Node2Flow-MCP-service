@@ -214,7 +214,7 @@ export default function Connections() {
             Manage your n8n instance connections
           </p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
@@ -272,7 +272,7 @@ export default function Connections() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
+            <Button variant="outline" onClick={() => setShowAddModal(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Connection
             </Button>
