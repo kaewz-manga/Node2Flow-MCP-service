@@ -8,8 +8,19 @@ import type { CloudflareConfig } from './types';
 import { SERVICE_ENDPOINTS } from './types';
 import { TOOL_SERVICE_MAP } from './tools';
 
+interface MCPResponse {
+  jsonrpc: '2.0';
+  id: number;
+  result?: unknown;
+  error?: { code: number; message: string };
+}
+
 export class CloudflareClient {
-  constructor(private config: CloudflareConfig) {}
+  constructor(private config: CloudflareConfig) {
+    if (!config.apiToken || config.apiToken.trim() === '') {
+      throw new Error('Cloudflare API token is required');
+    }
+  }
 
   async callTool(toolName: string, args: Record<string, unknown>): Promise<unknown> {
     const service = TOOL_SERVICE_MAP[toolName];
@@ -46,7 +57,7 @@ export class CloudflareClient {
       throw new Error(`Cloudflare ${service} MCP returned ${response.status}: ${text}`);
     }
 
-    const data = await response.json() as any;
+    const data: MCPResponse = await response.json();
 
     if (data.error) {
       throw new Error(data.error.message || `Unknown error from Cloudflare ${service} MCP`);

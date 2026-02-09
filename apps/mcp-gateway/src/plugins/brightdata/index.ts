@@ -43,9 +43,10 @@ export const brightdataPlugin: MCPPlugin = {
       const result = await brightdata.callTool(originalName, args);
 
       // Brightdata MCP returns { content: [...] } format
-      if (result && typeof result === 'object' && 'content' in (result as any)) {
+      const resultObj = result as Record<string, unknown>;
+      if (result && typeof result === 'object' && 'content' in resultObj) {
         return {
-          content: (result as any).content,
+          content: resultObj.content as { type: string; text: string }[],
           isError: false,
         };
       }

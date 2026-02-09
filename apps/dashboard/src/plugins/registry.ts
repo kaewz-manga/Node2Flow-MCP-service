@@ -310,7 +310,57 @@ const notionPlugin: AppPlugin = {
 };
 
 // ============================================
+// Bright Data Plugin
+// ============================================
+
+import { brightdataContent } from './brightdata/content';
+import {
+  Globe as BrightdataIcon,
+  Link as BrightdataLinkIcon,
+} from 'lucide-react';
+
+const brightdataPlugin: AppPlugin = {
+  id: 'brightdata',
+  name: 'Bright Data',
+  icon: BrightdataIcon,
+  logo: 'https://cdn.simpleicons.org/brightdata/0A7DFF',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/brightdata/connections', icon: BrightdataLinkIcon },
+  ],
+  routes: [
+    { path: '/brightdata/connections', component: lazy(() => import('./brightdata/Connections')) },
+  ],
+  content: brightdataContent,
+};
+
+// ============================================
+// Cloudflare Plugin
+// ============================================
+
+import { cloudflareContent } from './cloudflare/content';
+import {
+  Cloud as CloudflareIcon,
+  Link as CloudflareLinkIcon,
+} from 'lucide-react';
+
+const cloudflarePlugin: AppPlugin = {
+  id: 'cloudflare',
+  name: 'Cloudflare',
+  icon: CloudflareIcon,
+  logo: 'https://cdn.simpleicons.org/cloudflare/F38020',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/cloudflare/connections', icon: CloudflareLinkIcon },
+  ],
+  routes: [
+    { path: '/cloudflare/connections', component: lazy(() => import('./cloudflare/Connections')) },
+  ],
+  content: cloudflareContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, brightdataPlugin, cloudflarePlugin];

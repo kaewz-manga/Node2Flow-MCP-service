@@ -38,9 +38,10 @@ export const cloudflarePlugin: MCPPlugin = {
       const result = await cf.callTool(originalName, args);
 
       // Cloudflare MCP returns { content: [...] } format
-      if (result && typeof result === 'object' && 'content' in (result as any)) {
+      const resultObj = result as Record<string, unknown>;
+      if (result && typeof result === 'object' && 'content' in resultObj) {
         return {
-          content: (result as any).content,
+          content: resultObj.content as { type: string; text: string }[],
           isError: false,
         };
       }
