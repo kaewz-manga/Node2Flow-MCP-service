@@ -1,12 +1,12 @@
 services:
   line-mcp:
-    image: node:20-alpine
+    image: node:20-slim
     container_name: line-mcp-official
     restart: unless-stopped
     ports:
       - "127.0.0.1:3014:3000"
     environment:
-      - PUPPETEER_SKIP_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
       - PORT=3000
       - AUTH_TOKEN=${AUTH_TOKEN}
     mem_limit: 512m
@@ -15,5 +15,6 @@ services:
       - ../mcp-http-bridge.mjs:/app/mcp-http-bridge.mjs:ro
     working_dir: /app
     command: >
-      sh -c "npm install -g @line/line-bot-mcp-server &&
+      sh -c "apt-get update && apt-get install -y chromium --no-install-recommends && rm -rf /var/lib/apt/lists/* &&
+             npm install -g @line/line-bot-mcp-server &&
              node mcp-http-bridge.mjs npx line-bot-mcp-server"
