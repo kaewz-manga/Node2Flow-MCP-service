@@ -36,6 +36,8 @@ const TOOL_COUNTS: Record<string, number> = {
   line: 11,
   telegram: 27,
   notion: 22,
+  'notion-extended': 25,
+  'line-extended': 25,
 };
 
 // Real brand logos via SimpleIcons CDN
@@ -47,6 +49,8 @@ const SERVICE_LOGOS: Record<string, string> = {
   line: 'https://cdn.simpleicons.org/line/00C300',
   telegram: 'https://cdn.simpleicons.org/telegram/26A5E4',
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  'notion-extended': 'https://cdn.simpleicons.org/notion/FFFFFF',
+  'line-extended': 'https://cdn.simpleicons.org/line/00C300',
 };
 
 export default function Dashboard() {

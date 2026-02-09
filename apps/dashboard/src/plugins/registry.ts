@@ -310,7 +310,65 @@ const notionPlugin: AppPlugin = {
 };
 
 // ============================================
+// Notion Extended Plugin (25 tools)
+// ============================================
+
+const notionExtendedPlugin: AppPlugin = {
+  id: 'notion-extended',
+  name: 'Notion Extended',
+  icon: NotionIcon,
+  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/notion-extended/connections', icon: NotionLinkIcon },
+    { name: 'Databases', href: '/notion-extended/databases', icon: NotionDB },
+    { name: 'Pages', href: '/notion-extended/pages', icon: NotionPages },
+    { name: 'Blocks', href: '/notion-extended/blocks', icon: LayoutList },
+  ],
+  routes: [
+    { path: '/notion-extended/connections', component: lazy(() => import('./notion/Connections')) },
+    { path: '/notion-extended/databases', component: lazy(() => import('./notion/DatabaseList')) },
+    { path: '/notion-extended/pages', component: lazy(() => import('./notion/PageList')) },
+    { path: '/notion-extended/blocks', component: lazy(() => import('./notion/BlockList')) },
+  ],
+  content: notionContent,
+};
+
+// ============================================
+// LINE Extended Plugin (25 tools)
+// ============================================
+
+import {
+  MessageCircle as LineExtIcon,
+  Link as LineExtLinkIcon,
+  Send as LineExtSend,
+  Menu as LineExtMenu,
+  Users as LineExtUsers,
+} from 'lucide-react';
+
+const lineExtendedPlugin: AppPlugin = {
+  id: 'line-extended',
+  name: 'LINE Extended',
+  icon: LineExtIcon,
+  logo: 'https://cdn.simpleicons.org/line/00C300',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/line-extended/connections', icon: LineExtLinkIcon },
+    { name: 'Messages', href: '/line-extended/messages', icon: LineExtSend },
+    { name: 'Rich Menus', href: '/line-extended/richmenus', icon: LineExtMenu },
+    { name: 'Users & Groups', href: '/line-extended/users', icon: LineExtUsers },
+  ],
+  routes: [
+    { path: '/line-extended/connections', component: lazy(() => import('./line/Connections')) },
+    { path: '/line-extended/messages', component: lazy(() => import('./line/MessageTools')) },
+    { path: '/line-extended/richmenus', component: lazy(() => import('./line/RichMenuList')) },
+    { path: '/line-extended/users', component: lazy(() => import('./line/UserList')) },
+  ],
+  content: lineContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionExtendedPlugin, lineExtendedPlugin];

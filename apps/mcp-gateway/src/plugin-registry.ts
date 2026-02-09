@@ -6,6 +6,8 @@ import { geminiRagPlugin } from './plugins/gemini-rag';
 import { linePlugin } from './plugins/line';
 import { telegramPlugin } from './plugins/telegram';
 import { notionPlugin } from './plugins/notion';
+import { notionExtendedPlugin } from './plugins/notion-extended';
+import { lineExtendedPlugin } from './plugins/line-extended';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -17,6 +19,8 @@ PLUGINS.set('gemini-rag', geminiRagPlugin);
 PLUGINS.set('line', linePlugin);
 PLUGINS.set('telegram', telegramPlugin);
 PLUGINS.set('notion', notionPlugin);
+PLUGINS.set('notion-extended', notionExtendedPlugin);
+PLUGINS.set('line-extended', lineExtendedPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);
