@@ -38,6 +38,7 @@ const TOOL_COUNTS: Record<string, number> = {
   notion: 25,
   'notion-official': 22,
   'line-official': 12,
+  playwright: 22,
 };
 
 // Real brand logos via SimpleIcons CDN
@@ -49,6 +50,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   line: 'https://cdn.simpleicons.org/line/00C300',
   telegram: 'https://cdn.simpleicons.org/telegram/26A5E4',
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  playwright: 'https://cdn.simpleicons.org/playwright/2EAD33',
 };
 
 export default function Dashboard() {

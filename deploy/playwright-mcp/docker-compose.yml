@@ -1,0 +1,19 @@
+services:
+  playwright-mcp:
+    image: node:20-slim
+    container_name: playwright-mcp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3015:3000"
+    environment:
+      - PORT=3000
+      - AUTH_TOKEN=${AUTH_TOKEN}
+    mem_limit: 512m
+    mem_reservation: 256m
+    volumes:
+      - /root/mcp-tools/mcp-http-bridge.mjs:/app/mcp-http-bridge.mjs:ro
+    working_dir: /app
+    command: >
+      sh -c "apt-get update && apt-get install -y chromium --no-install-recommends && rm -rf /var/lib/apt/lists/* &&
+             npm install -g @playwright/mcp &&
+             node mcp-http-bridge.mjs npx @playwright/mcp --headless"

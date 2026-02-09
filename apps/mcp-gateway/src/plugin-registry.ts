@@ -8,6 +8,7 @@ import { telegramPlugin } from './plugins/telegram';
 import { notionPlugin } from './plugins/notion';
 import { notionOfficialPlugin } from './plugins/notion-official';
 import { lineOfficialPlugin } from './plugins/line-official';
+import { playwrightPlugin } from './plugins/playwright';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -21,6 +22,7 @@ PLUGINS.set('telegram', telegramPlugin);
 PLUGINS.set('notion', notionPlugin);
 PLUGINS.set('notion-official', notionOfficialPlugin);
 PLUGINS.set('line-official', lineOfficialPlugin);
+PLUGINS.set('playwright', playwrightPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

@@ -360,7 +360,32 @@ const lineOfficialPlugin: AppPlugin = {
 };
 
 // ============================================
+// Playwright Plugin (Browser Automation)
+// ============================================
+
+import { playwrightContent } from './playwright/content';
+import {
+  Globe as PlaywrightIcon,
+  Link as PlaywrightLinkIcon,
+} from 'lucide-react';
+
+const playwrightPlugin: AppPlugin = {
+  id: 'playwright',
+  name: 'Browser Automation',
+  icon: PlaywrightIcon,
+  logo: 'https://cdn.simpleicons.org/playwright/2EAD33',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/playwright/connections', icon: PlaywrightLinkIcon },
+  ],
+  routes: [
+    { path: '/playwright/connections', component: lazy(() => import('./playwright/Connections')) },
+  ],
+  content: playwrightContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin];
