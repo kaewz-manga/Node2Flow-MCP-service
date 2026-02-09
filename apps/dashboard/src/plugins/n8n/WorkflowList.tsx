@@ -376,7 +376,7 @@ export default function WorkflowList() {
                           {detail.active ? <PowerOff className="h-3.5 w-3.5 mr-2" /> : <Power className="h-3.5 w-3.5 mr-2" />}
                           {detail.active ? 'Deactivate' : 'Activate'}
                         </Button>
-                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleExecute(detail.id)} disabled={executing === detail.id}>
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleExecute(detail.id)} disabled={executing === detail.id}>
                           {executing === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <Play className="h-3.5 w-3.5 mr-2" />}
                           Execute
                         </Button>

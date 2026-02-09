@@ -446,7 +446,7 @@ export default function Settings() {
                               </InputOTPGroup>
                             </InputOTP>
                           </div>
-                          <Button type="submit" className="w-full" disabled={totpLoading || totpCode.length !== 6}>
+                          <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" disabled={totpLoading || totpCode.length !== 6}>
                             {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Verifying...</> : <><Check className="h-4 w-4" /> Verify & Enable</>}
                           </Button>
                         </form>
@@ -672,7 +672,7 @@ export default function Settings() {
               <div className="space-y-2"><Label>Confirm New Password</Label><Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required /></div>
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="secondary" className="flex-1" onClick={() => { setShowPasswordModal(false); setPasswordError(''); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }}>Cancel</Button>
-                <Button type="submit" className="flex-1" disabled={passwordLoading}>
+                <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" disabled={passwordLoading}>
                   {passwordLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Updating...</> : 'Update Password'}
                 </Button>
               </div>

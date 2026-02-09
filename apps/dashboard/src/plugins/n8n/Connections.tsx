@@ -214,7 +214,7 @@ export default function Connections() {
             Manage your n8n instance connections
           </p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setShowAddModal(true)}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
@@ -276,6 +276,9 @@ export default function Connections() {
               <Plus className="h-4 w-4 mr-2" />
               Add Connection
             </Button>
+            <p className="text-xs text-muted-foreground">
+              By connecting, you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms</Link> and <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
+            </p>
           </EmptyContent>
         </Empty>
       ) : (

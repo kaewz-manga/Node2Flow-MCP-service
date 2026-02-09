@@ -206,7 +206,7 @@ export default function Connections() {
           <h1 className="text-2xl font-bold text-foreground">LINE Bot Connections</h1>
           <p className="text-muted-foreground mt-1">Manage your LINE Messaging API connections</p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setShowAddModal(true)}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowAddModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Connection
         </Button>
@@ -268,6 +268,9 @@ export default function Connections() {
               <Plus className="h-4 w-4 mr-2" />
               Add Connection
             </Button>
+            <p className="text-xs text-muted-foreground">
+              By connecting, you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms</Link> and <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
+            </p>
           </EmptyContent>
         </Empty>
       ) : (
