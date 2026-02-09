@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Switch, Label } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -27,6 +27,7 @@ import {
 
 export default function Connections() {
   const { withSudo, totpEnabled } = useSudoContext();
+  const navigate = useNavigate();
   const { activeConnection, setActiveConnectionId } = useConnection();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
@@ -214,27 +215,10 @@ export default function Connections() {
       </div>
 
       {/* 2FA Status */}
-      {totpEnabled ? (
-        <Item variant="outline" size="sm">
-          <ItemMedia>
-            <BadgeCheck className="h-5 w-5 text-emerald-400" />
-          </ItemMedia>
-          <ItemContent>
-            <ItemTitle>Two-Factor Authentication enabled</ItemTitle>
-          </ItemContent>
-        </Item>
-      ) : (
-        <Alert>
-          <Shield className="h-5 w-5" />
-          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
-          <AlertDescription className="flex items-center justify-between">
-            <span>Set up 2FA to manage connections securely</span>
-            <Button variant="outline" size="sm" asChild className="shrink-0 ml-4 text-white border-white/30 hover:bg-white/10">
-              <Link to="/settings">Enable</Link>
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="flex items-center space-x-2">
+        <Switch id="2fa" checked={totpEnabled} onCheckedChange={() => navigate('/settings')} />
+        <Label htmlFor="2fa">Two-Factor Authentication</Label>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -281,7 +265,7 @@ export default function Connections() {
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border max-w-3xl mx-auto">
           <Table>
             <TableHeader>
               <TableRow>
