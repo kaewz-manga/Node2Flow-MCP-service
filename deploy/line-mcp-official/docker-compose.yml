@@ -4,7 +4,7 @@ services:
     container_name: line-mcp-official
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3009:3000"
+      - "127.0.0.1:3014:3000"
     environment:
       - PUPPETEER_SKIP_DOWNLOAD=true
       - PORT=3000
