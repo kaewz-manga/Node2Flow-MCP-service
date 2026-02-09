@@ -36,6 +36,8 @@ const TOOL_COUNTS: Record<string, number> = {
   line: 25,
   telegram: 27,
   notion: 25,
+  'notion-official': 22,
+  'line-official': 12,
 };
 
 // Real brand logos via SimpleIcons CDN
