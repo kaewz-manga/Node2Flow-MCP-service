@@ -33,7 +33,7 @@ const TOOL_COUNTS: Record<string, number> = {
   wordpress: 20,
   'cl-n8n-mcp': 20,
   'gemini-rag': 12,
-  line: 25,
+  line: 11,
   telegram: 27,
   notion: 22,
 };

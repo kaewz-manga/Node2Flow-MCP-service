@@ -1,12 +1,12 @@
 /**
- * LINE Messaging API Plugin - MCP Gateway
- * Manages LINE bots via Messaging API
+ * LINE Bot MCP Plugin - MCP Gateway
+ * Matches official line-bot-mcp-server
+ * 11 tools: Messages, Profile, Quota, Rich Menu
  */
 
 import type { MCPPlugin } from '../../types';
 import { TOOLS } from './tools';
 import { LineClient } from './client';
-import type { LineMessage } from './types';
 
 export const linePlugin: MCPPlugin = {
   id: 'line',
@@ -25,129 +25,58 @@ export const linePlugin: MCPPlugin = {
 
     try {
       let result: unknown;
+      const message = args.message as Record<string, unknown> | undefined;
 
       switch (toolName) {
         // ========== Messages ==========
-        case 'line_push_message':
-          result = await line.pushMessage(
-            args.to as string,
-            args.messages as LineMessage[],
-            args.notification_disabled as boolean | undefined
+        case 'push_text_message':
+          result = await line.pushTextMessage(args.userId as string, message!.text as string);
+          break;
+        case 'push_flex_message':
+          result = await line.pushFlexMessage(
+            args.userId as string,
+            message!.altText as string,
+            message!.contents as Record<string, unknown>,
           );
           break;
-        case 'line_reply_message':
-          result = await line.replyMessage(
-            args.reply_token as string,
-            args.messages as LineMessage[],
-            args.notification_disabled as boolean | undefined
-          );
+        case 'broadcast_text_message':
+          result = await line.broadcastTextMessage(message!.text as string);
           break;
-        case 'line_multicast_message':
-          result = await line.multicastMessage(
-            args.to as string[],
-            args.messages as LineMessage[],
-            args.notification_disabled as boolean | undefined
-          );
-          break;
-        case 'line_broadcast_message':
-          result = await line.broadcastMessage(
-            args.messages as LineMessage[],
-            args.notification_disabled as boolean | undefined
-          );
-          break;
-        case 'line_validate_message':
-          result = await line.validateMessage(args.messages as LineMessage[]);
-          break;
-
-        // ========== User & Bot Info ==========
-        case 'line_get_profile':
-          result = await line.getProfile(args.user_id as string);
-          break;
-        case 'line_get_follower_ids':
-          result = await line.getFollowerIds(
-            args.start as string | undefined,
-            args.limit as number | undefined
-          );
-          break;
-        case 'line_get_bot_info':
-          result = await line.getBotInfo();
-          break;
-        case 'line_display_loading':
-          result = await line.displayLoadingAnimation(
-            args.chat_id as string,
-            args.loading_seconds as number | undefined
+        case 'broadcast_flex_message':
+          result = await line.broadcastFlexMessage(
+            message!.altText as string,
+            message!.contents as Record<string, unknown>,
           );
           break;
 
-        // ========== Group Chat ==========
-        case 'line_get_group_summary':
-          result = await line.getGroupSummary(args.group_id as string);
+        // ========== Profile ==========
+        case 'get_profile':
+          result = await line.getProfile(args.userId as string);
           break;
-        case 'line_get_group_members_count':
-          result = await line.getGroupMembersCount(args.group_id as string);
-          break;
-        case 'line_get_group_member_ids':
-          result = await line.getGroupMemberIds(
-            args.group_id as string,
-            args.start as string | undefined
-          );
-          break;
-        case 'line_get_group_member_profile':
-          result = await line.getGroupMemberProfile(
-            args.group_id as string,
-            args.user_id as string
-          );
+
+        // ========== Quota ==========
+        case 'get_message_quota':
+          result = await line.getMessageQuota();
           break;
 
         // ========== Rich Menu ==========
-        case 'line_create_rich_menu':
-          result = await line.createRichMenu({
-            size: args.size as { width: number; height: number },
-            selected: args.selected as boolean,
-            name: args.name as string,
-            chatBarText: args.chat_bar_text as string,
-            areas: args.areas as any[],
-          });
+        case 'get_rich_menu_list':
+          result = await line.getRichMenuList();
           break;
-        case 'line_get_rich_menus':
-          result = await line.getRichMenus();
+        case 'delete_rich_menu':
+          result = await line.deleteRichMenu(args.richMenuId as string);
           break;
-        case 'line_get_rich_menu':
-          result = await line.getRichMenu(args.rich_menu_id as string);
+        case 'set_rich_menu_default':
+          result = await line.setRichMenuDefault(args.richMenuId as string);
           break;
-        case 'line_delete_rich_menu':
-          result = await line.deleteRichMenu(args.rich_menu_id as string);
+        case 'cancel_rich_menu_default':
+          result = await line.cancelRichMenuDefault();
           break;
-        case 'line_set_default_rich_menu':
-          result = await line.setDefaultRichMenu(args.rich_menu_id as string);
-          break;
-        case 'line_link_rich_menu_to_user':
-          result = await line.linkRichMenuToUser(
-            args.user_id as string,
-            args.rich_menu_id as string
+        case 'create_rich_menu':
+          result = await line.createRichMenu(
+            args.chatBarText as string,
+            args.actions as Record<string, unknown>[],
           );
-          break;
-
-        // ========== Quota & Insights ==========
-        case 'line_get_quota':
-          result = await line.getQuota();
-          break;
-        case 'line_get_quota_consumption':
-          result = await line.getQuotaConsumption();
-          break;
-        case 'line_get_followers_count':
-          result = await line.getFollowersCount(args.date as string);
-          break;
-
-        // ========== Webhook ==========
-        case 'line_set_webhook_url':
-          result = await line.setWebhookUrl(args.endpoint as string);
-          break;
-        case 'line_get_webhook_info':
-          result = await line.getWebhookInfo();
-          break;
-        case 'line_test_webhook':
-          result = await line.testWebhook(args.endpoint as string | undefined);
           break;
 
         default:
