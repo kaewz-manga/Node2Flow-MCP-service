@@ -115,7 +115,7 @@ export default function PostList() {
   }
 
   function getTitle(post: any) {
-    return post.title?.rendered || post.title || 'Untitled';
+    return post?.title?.rendered || post?.title || 'Untitled';
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

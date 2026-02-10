@@ -54,6 +54,7 @@ export interface Env {
   PLATFORM: Fetcher;
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
+  CL_N8N_MCP_URL?: string;
   CL_N8N_MCP_AUTH_TOKEN?: string;
   NOTION_OFFICIAL_MCP_AUTH_TOKEN?: string;
   LINE_OFFICIAL_MCP_AUTH_TOKEN?: string;

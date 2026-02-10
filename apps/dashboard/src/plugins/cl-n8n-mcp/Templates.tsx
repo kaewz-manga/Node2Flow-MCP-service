@@ -39,7 +39,7 @@ export default function Templates() {
     const res = await searchMcpTemplates(connectionId, query.trim());
     if (res.success && res.data) {
       const data = res.data as any;
-      const templates = data.templates || data.results || data.workflows || (Array.isArray(data) ? data : []);
+      const templates = data.templates || data.items || data.results || data.workflows || (Array.isArray(data) ? data : []);
       setResults(templates);
     } else {
       setError(res.error?.message || 'Search failed');
@@ -84,7 +84,7 @@ export default function Templates() {
   }
 
   function getTemplateName(t: any) {
-    return t.name || t.title || 'Untitled Template';
+    return t?.name || t?.title || 'Untitled Template';
   }
 
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;

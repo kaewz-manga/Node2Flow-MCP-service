@@ -23,7 +23,7 @@ export const clN8nMcpPlugin: MCPPlugin = {
 
   createClient(config: Record<string, unknown>, env?: Env) {
     return new ClN8nMcpClient({
-      mcpUrl: config.mcp_url as string,
+      mcpUrl: config.mcp_url as string || env?.CL_N8N_MCP_URL || 'https://n8n-mcp-dynamic.node2flow.net',
       authToken: env?.CL_N8N_MCP_AUTH_TOKEN || config.auth_token as string | undefined,
       n8nUrl: config.n8n_url as string | undefined,
       n8nApiKey: config.n8n_api_key as string | undefined,

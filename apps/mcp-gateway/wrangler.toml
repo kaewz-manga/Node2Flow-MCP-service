@@ -20,6 +20,7 @@ service = "node2flow-platform"
 
 # VPS MCP server URLs
 [vars]
+CL_N8N_MCP_URL = "https://n8n-mcp-dynamic.node2flow.net"
 NOTION_OFFICIAL_MCP_URL = "https://notion-mcp-official.node2flow.net"
 LINE_OFFICIAL_MCP_URL = "https://line-mcp-official.node2flow.net"
 PLAYWRIGHT_MCP_URL = "https://playwright-mcp.node2flow.net"
