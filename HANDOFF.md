@@ -490,6 +490,48 @@ Tested all 7 new pages (Session 32) with Playwright browser automation. Found an
 
 Commit: `5bdb1dd`
 
+### Session 34: Fix n8n "Unknown Tool" + Variable Tools (2026-02-10)
+
+n8n dashboard pages (workflows, executions, tags, variables, users) all showed "Unknown tool" errors.
+
+**Root cause**: `n8nProxy()` used legacy path-based proxy that generated tool names like `n8n_workflows` instead of the correct `n8n_list_workflows`. The n8n plugin was the first plugin built — before `toolProxy()` existed — so it still used the old pattern.
+
+**Fix**: Replaced `n8nProxy()` with `n8nCall()` using `toolProxy()` with explicit tool names (same pattern as `wpCall()`/`mcpCall()`).
+
+**New tools**: Added 4 variable tools to gateway: `n8n_list_variables`, `n8n_create_variable`, `n8n_update_variable`, `n8n_delete_variable` (tools.ts + client.ts + index.ts). n8n total: 27 → 31 tools.
+
+**Note**: n8n/variables returns 403 on Community Edition (requires paid license) — not our bug.
+
+**Audit**: Checked all 11 plugins — only n8n had the legacy proxy issue.
+
+Commit: `1c2de6c`
+
+### Session 35: Fix Cross-Plugin Connection Scoping (2026-02-10)
+
+All sidebar sub-pages showed errors when navigating between plugins because `useConnection()` returned a global active connection regardless of plugin type.
+
+**Root cause**: `useConnection()` in ConnectionContext.tsx returns `activeConnection` without product_type filtering. When user has an n8n connection active and navigates to WordPress pages, WordPress code uses the n8n connection config (which has no `site_url`) → `Invalid URL: undefined/wp-json/wp/v2/posts`.
+
+**Fix**: Created `usePluginConnection(productType)` hook:
+```typescript
+export function usePluginConnection(productType: string) {
+  const { connections, activeConnection } = useConnection();
+  if (activeConnection?.product_type === productType) return activeConnection;
+  return connections.find(c => c.product_type === productType) || null;
+}
+```
+
+**Files changed (29)**:
+- `packages/dashboard-core/src/contexts/ConnectionContext.tsx` — new hook
+- `packages/dashboard-core/src/index.ts` — export
+- 24 sub-pages across all 11 plugins → `usePluginConnection` instead of `useConnection`
+- 3 Playwright logo URLs → `playwright.dev/img/playwright-logo.svg` (was 404 from SimpleIcons)
+- Dashboard.tsx TOOL_COUNTS n8n: 27 → 31
+
+**Verification**: 28 pages tested via Playwright — 12 OK, 15 "No connection selected" (correct), 1 expected n8n 403. Zero errors.
+
+Commit: `2ff48fb`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
@@ -497,6 +539,8 @@ Commit: `5bdb1dd`
 3. ~~**WordPress pages**~~ - Done (Session 32): PostList, PageList, MediaList, CommentList with full CRUD
 4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32): NodeExplorer, Templates, WorkflowTools with data fetching
 5. ~~**Playwright testing**~~ - Done (Session 33): All 7 pages tested + 4 bugs fixed
+6. ~~**n8n unknown tool**~~ - Done (Session 34): Legacy proxy replaced + 4 variable tools added
+7. ~~**Cross-plugin errors**~~ - Done (Session 35): Plugin-scoped connection hook + 24 pages fixed
 
 ---
 
@@ -716,7 +760,9 @@ wrangler deploy                         # In each app/
 **Sessions 29-31**: 4 Docker/VPS plugins (Notion Official + LINE Official + Playwright + Google Workspace)
 **Session 32**: WordPress + cl-n8n-mcp dashboard pages (7 pages rewritten with full CRUD + proxy fix)
 **Session 33**: Playwright testing of all 7 new pages + 4 bug fixes (null-safety + URL fallback + API parsing)
-**Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
+**Session 34**: Fix n8n "Unknown tool" errors + add 4 variable tools (n8n 27→31 tools)
+**Session 35**: Fix cross-plugin connection scoping (`usePluginConnection` hook) + Playwright logo 404 fix
+**Gateway**: 270 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-10 — Platform + Gateway + Dashboard all live
