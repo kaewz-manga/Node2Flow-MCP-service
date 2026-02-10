@@ -39,7 +39,7 @@ export default function DocumentList() {
       const res = await listStores(connectionId);
       if (res.success && res.data) {
         const d = res.data as any;
-        const storeList = Array.isArray(d) ? d : d.stores || [];
+        const storeList = Array.isArray(d) ? d : d.fileSearchStores || d.stores || [];
         setStores(storeList);
         if (storeList.length > 0) {
           setSelectedStore(storeList[0].name); // Auto-select first store

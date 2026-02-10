@@ -27,7 +27,7 @@ export default function StoreList() {
     const res = await listStores(connectionId);
     if (res.success && res.data) {
       const d = res.data as any;
-      setStores(Array.isArray(d) ? d : d.stores || []);
+      setStores(Array.isArray(d) ? d : d.fileSearchStores || d.stores || []);
     } else {
       setError(res.error?.message || 'Failed to load stores');
     }
