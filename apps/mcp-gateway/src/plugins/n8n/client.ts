@@ -170,6 +170,29 @@ export class N8nClient {
     return this.request(`/api/v1/tags/${id}`, { method: 'DELETE' });
   }
 
+  // Variable Methods
+  async listVariables() {
+    return this.request('/api/v1/variables', { method: 'GET' });
+  }
+
+  async createVariable(data: { key: string; value: string }) {
+    return this.request('/api/v1/variables', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateVariable(id: string, data: { key?: string; value?: string }) {
+    return this.request(`/api/v1/variables/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteVariable(id: string) {
+    return this.request(`/api/v1/variables/${id}`, { method: 'DELETE' });
+  }
+
   // User Methods (requires owner permissions)
   async listUsers() {
     return this.request('/api/v1/users', { method: 'GET' });

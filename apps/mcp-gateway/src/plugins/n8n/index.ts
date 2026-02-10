@@ -104,6 +104,20 @@ export const n8nPlugin: MCPPlugin = {
           result = await n8n.deleteTag(args.id as string);
           break;
 
+        // ========== Variable Operations ==========
+        case 'n8n_list_variables':
+          result = await n8n.listVariables();
+          break;
+        case 'n8n_create_variable':
+          result = await n8n.createVariable({ key: args.key as string, value: args.value as string });
+          break;
+        case 'n8n_update_variable':
+          result = await n8n.updateVariable(args.id as string, args);
+          break;
+        case 'n8n_delete_variable':
+          result = await n8n.deleteVariable(args.id as string);
+          break;
+
         // ========== User Operations ==========
         case 'n8n_list_users':
           result = await n8n.listUsers();
