@@ -1,117 +1,235 @@
-import { Globe, Link, Shield, RefreshCw, Lightbulb } from 'lucide-react';
-import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { tgGetWebhookInfo, tgSetWebhook, tgDeleteWebhook } from '../../lib/gateway-api';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import ConfirmDialog from '../n8n/components/ConfirmDialog';
+import JsonViewer from '../n8n/components/JsonViewer';
+import { Loader2, RefreshCw, AlertCircle, Webhook, CheckCircle2, XCircle, Trash2 } from 'lucide-react';
 
 export default function WebhookSettings() {
   const activeConnection = usePluginConnection('telegram');
+  const connectionId = activeConnection?.id;
+  const [webhookInfo, setWebhookInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(false);
+
+  // Set Webhook form
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [setting, setSetting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function fetchWebhookInfo() {
+    if (!connectionId) return;
+    setLoading(true);
+    setError('');
+    const res = await tgGetWebhookInfo(connectionId);
+    if (res.success && res.data) {
+      const d = res.data as any;
+      setWebhookInfo(d);
+      if (d.url) {
+        setWebhookUrl(d.url);
+      }
+    } else {
+      setError(res.error?.message || 'Failed to fetch webhook info');
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (connectionId) fetchWebhookInfo();
+  }, [connectionId]);
+
+  async function handleSetWebhook() {
+    if (!webhookUrl.trim() || !connectionId) return;
+    setSetting(true);
+    const res = await tgSetWebhook(connectionId, webhookUrl.trim());
+    if (res.success) {
+      toast.success('Webhook set successfully');
+      fetchWebhookInfo();
+    } else {
+      toast.error(res.error?.message || 'Failed to set webhook');
+    }
+    setSetting(false);
+  }
+
+  async function handleDeleteWebhook() {
+    if (!connectionId) return;
+    setDeleting(true);
+    const res = await tgDeleteWebhook(connectionId, true);
+    if (res.success) {
+      toast.success('Webhook deleted successfully');
+      setDeleteTarget(false);
+      setWebhookUrl('');
+      fetchWebhookInfo();
+    } else {
+      toast.error(res.error?.message || 'Failed to delete webhook');
+    }
+    setDeleting(false);
+  }
 
   if (!activeConnection) {
-    return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
-        </CardContent>
-      </Card>
-    );
+    return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
   }
+
+  const hasWebhook = webhookInfo?.url && webhookInfo.url !== '';
+  const pendingUpdates = webhookInfo?.pending_update_count || 0;
 
   return (
     <div className="space-y-6">
-      {/* Hero Section */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Webhook Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage Telegram webhook endpoints <Badge variant="secondary" className="ml-1">3 tools</Badge>
-          </p>
+          <p className="text-muted-foreground mt-1">{activeConnection.name} - Configure Telegram webhooks</p>
         </div>
+        <Button variant="outline" size="icon" onClick={fetchWebhookInfo} title="Refresh">
+          <RefreshCw className="h-4 w-4" />
+        </Button>
       </div>
 
-      <Separator />
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-      {/* Feature Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Link className="h-4 w-4 text-primary" />
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : (
+        <>
+          {/* Stat Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Webhook Status</CardDescription>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  {hasWebhook ? (
+                    <>
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                      <span>Active</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-5 w-5 text-muted-foreground" />
+                      <span>Not Set</span>
+                    </>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Webhook className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                {hasWebhook ? 'Receiving updates' : 'Using long polling'}
+              </CardFooter>
+            </Card>
+
+            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Pending Updates</CardDescription>
+                <CardTitle className="text-2xl font-semibold tabular-nums">{pendingUpdates}</CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <AlertCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+                Unprocessed messages
+              </CardFooter>
+            </Card>
+
+            <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+              <CardHeader className="pb-2">
+                <CardDescription>Current URL</CardDescription>
+                <CardTitle className="text-base font-semibold truncate">
+                  {hasWebhook ? webhookInfo.url : 'Not configured'}
+                </CardTitle>
+              </CardHeader>
+              <CardFooter className="text-sm text-muted-foreground">
+                <Webhook className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+                Webhook endpoint
+              </CardFooter>
+            </Card>
+          </div>
+
+          {webhookInfo?.last_error_message && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="font-semibold">Last Error:</div>
+                <div className="text-sm mt-1">{webhookInfo.last_error_message}</div>
+                {webhookInfo.last_error_date && (
+                  <div className="text-xs mt-1 opacity-80">
+                    {new Date(webhookInfo.last_error_date * 1000).toLocaleString()}
+                  </div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Separator />
+
+          {/* Set Webhook Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Webhook className="h-5 w-5 text-primary" />
+                Set Webhook
+              </CardTitle>
+              <CardDescription>
+                Configure the HTTPS URL where Telegram will send updates
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Webhook URL</label>
+                <Input
+                  value={webhookUrl}
+                  onChange={(e) => setWebhookUrl(e.target.value)}
+                  placeholder="https://your-domain.com/webhook/telegram"
+                  className="font-mono"
+                />
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  Must be HTTPS. Telegram will POST updates to this URL.
+                </p>
               </div>
-              <CardTitle className="text-base">Set Webhook</CardTitle>
-            </div>
-            <CardDescription>Configure a webhook URL to receive bot updates in real time</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Set webhook to https://myserver.com/webhook"
-            </code>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <Globe className="h-4 w-4 text-emerald-500" />
+              <div className="flex gap-3">
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={handleSetWebhook}
+                  disabled={setting || !webhookUrl.trim()}
+                >
+                  {setting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Webhook className="h-4 w-4 mr-2" />}
+                  Set Webhook
+                </Button>
+                {hasWebhook && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setDeleteTarget(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Webhook
+                  </Button>
+                )}
               </div>
-              <CardTitle className="text-base">Check Status</CardTitle>
-            </div>
-            <CardDescription>View current webhook URL, pending updates, and error information</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Check my webhook status"
-            </code>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Shield className="h-4 w-4 text-purple-500" />
-              </div>
-              <CardTitle className="text-base">Secure Webhook</CardTitle>
+          {/* Full Webhook Info */}
+          {webhookInfo && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-foreground">Full Webhook Information</h3>
+              <JsonViewer data={webhookInfo} title="Webhook Data" />
             </div>
-            <CardDescription>Set a secret token for webhook verification and IP whitelisting</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Set webhook with secret token my-secret-123"
-            </code>
-          </CardContent>
-        </Card>
+          )}
+        </>
+      )}
 
-        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <RefreshCw className="h-4 w-4 text-amber-500" />
-              </div>
-              <CardTitle className="text-base">Delete Webhook</CardTitle>
-            </div>
-            <CardDescription>Remove the webhook to switch back to polling mode</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Delete the current webhook"
-            </code>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Start */}
-      <Card className="bg-gradient-to-t from-emerald-500/5 to-card border-emerald-500/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base text-emerald-400 flex items-center gap-2">
-            <Lightbulb className="h-4 w-4" />
-            How to use
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 text-sm text-muted-foreground">
-          <p>Use these tools through your MCP-compatible AI assistant. Simply describe what you want to do in natural language.</p>
-        </CardContent>
-      </Card>
+      <ConfirmDialog
+        open={deleteTarget}
+        title="Delete Webhook"
+        message="Delete the current webhook configuration? The bot will switch to long polling mode. Pending updates will be dropped."
+        onConfirm={handleDeleteWebhook}
+        onCancel={() => setDeleteTarget(false)}
+      />
     </div>
   );
 }

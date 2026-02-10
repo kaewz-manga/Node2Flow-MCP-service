@@ -296,3 +296,158 @@ export function autofixMcpWorkflow(connectionId: string, id: string, applyFixes?
 export function testMcpWorkflow(connectionId: string, workflowId: string, data?: Record<string, unknown>) {
   return mcpCall(connectionId, 'mcp_n8n_test_workflow', { workflowId, data });
 }
+
+// ============================================
+// Gemini RAG Proxy
+// ============================================
+
+function geminiCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('gemini-rag', connectionId, tool, args);
+}
+
+// Stores
+export function listStores(connectionId: string) {
+  return geminiCall(connectionId, 'gemini_list_stores');
+}
+export function createStore(connectionId: string, displayName: string) {
+  return geminiCall(connectionId, 'gemini_create_store', { displayName });
+}
+export function getStore(connectionId: string, storeName: string) {
+  return geminiCall(connectionId, 'gemini_get_store', { storeName });
+}
+export function deleteStore(connectionId: string, storeName: string, force?: boolean) {
+  return geminiCall(connectionId, 'gemini_delete_store', { storeName, force: force || false });
+}
+
+// Documents
+export function listDocuments(connectionId: string, storeName: string) {
+  return geminiCall(connectionId, 'gemini_list_documents', { storeName });
+}
+export function deleteDocument(connectionId: string, documentName: string, force?: boolean) {
+  return geminiCall(connectionId, 'gemini_delete_document', { documentName, force: force || false });
+}
+export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string }) {
+  return geminiCall(connectionId, 'gemini_upload_to_store', { storeName, ...data });
+}
+
+// RAG Query
+export function ragQuery(connectionId: string, query: string, storeNames: string[], model?: string) {
+  return geminiCall(connectionId, 'gemini_rag_query', { query, storeNames, model });
+}
+
+// ============================================
+// Telegram Proxy
+// ============================================
+
+function tgCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('telegram', connectionId, tool, args);
+}
+
+// Bot
+export function tgGetMe(connectionId: string) {
+  return tgCall(connectionId, 'tg_get_me');
+}
+export function tgSetMyCommands(connectionId: string, commands: { command: string; description: string }[]) {
+  return tgCall(connectionId, 'tg_set_my_commands', { commands });
+}
+
+// Messages
+export function tgSendMessage(connectionId: string, chatId: string, text: string, opts?: Record<string, unknown>) {
+  return tgCall(connectionId, 'tg_send_message', { chat_id: chatId, text, ...opts });
+}
+export function tgSendPhoto(connectionId: string, chatId: string, photo: string, opts?: Record<string, unknown>) {
+  return tgCall(connectionId, 'tg_send_photo', { chat_id: chatId, photo, ...opts });
+}
+export function tgEditMessageText(connectionId: string, chatId: string, messageId: number, text: string) {
+  return tgCall(connectionId, 'tg_edit_message_text', { chat_id: chatId, message_id: messageId, text });
+}
+export function tgDeleteMessage(connectionId: string, chatId: string, messageId: number) {
+  return tgCall(connectionId, 'tg_delete_message', { chat_id: chatId, message_id: messageId });
+}
+
+// Chat
+export function tgGetChat(connectionId: string, chatId: string) {
+  return tgCall(connectionId, 'tg_get_chat', { chat_id: chatId });
+}
+export function tgGetChatMemberCount(connectionId: string, chatId: string) {
+  return tgCall(connectionId, 'tg_get_chat_member_count', { chat_id: chatId });
+}
+export function tgGetChatMember(connectionId: string, chatId: string, userId: number) {
+  return tgCall(connectionId, 'tg_get_chat_member', { chat_id: chatId, user_id: userId });
+}
+export function tgBanChatMember(connectionId: string, chatId: string, userId: number) {
+  return tgCall(connectionId, 'tg_ban_chat_member', { chat_id: chatId, user_id: userId });
+}
+export function tgUnbanChatMember(connectionId: string, chatId: string, userId: number) {
+  return tgCall(connectionId, 'tg_unban_chat_member', { chat_id: chatId, user_id: userId });
+}
+export function tgCreateChatInviteLink(connectionId: string, chatId: string, opts?: Record<string, unknown>) {
+  return tgCall(connectionId, 'tg_create_chat_invite_link', { chat_id: chatId, ...opts });
+}
+
+// Webhooks
+export function tgGetWebhookInfo(connectionId: string) {
+  return tgCall(connectionId, 'tg_get_webhook_info');
+}
+export function tgSetWebhook(connectionId: string, url: string, opts?: Record<string, unknown>) {
+  return tgCall(connectionId, 'tg_set_webhook', { url, ...opts });
+}
+export function tgDeleteWebhook(connectionId: string, dropPending?: boolean) {
+  return tgCall(connectionId, 'tg_delete_webhook', { drop_pending_updates: dropPending || false });
+}
+
+// ============================================
+// Notion Proxy
+// ============================================
+
+function notionCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('notion', connectionId, tool, args);
+}
+
+// Search
+export function notionSearch(connectionId: string, query?: string, filterObject?: string) {
+  return notionCall(connectionId, 'notion_search', { query, filter_object: filterObject });
+}
+
+// Pages
+export function notionGetPage(connectionId: string, pageId: string) {
+  return notionCall(connectionId, 'notion_get_page', { page_id: pageId });
+}
+export function notionCreatePage(connectionId: string, parent: Record<string, unknown>, properties: Record<string, unknown>) {
+  return notionCall(connectionId, 'notion_create_page', { parent, properties });
+}
+export function notionUpdatePage(connectionId: string, pageId: string, properties: Record<string, unknown>) {
+  return notionCall(connectionId, 'notion_update_page', { page_id: pageId, properties });
+}
+
+// Databases
+export function notionGetDatabase(connectionId: string, databaseId: string) {
+  return notionCall(connectionId, 'notion_get_database', { database_id: databaseId });
+}
+export function notionQueryDatabase(connectionId: string, databaseId: string, filter?: Record<string, unknown>) {
+  return notionCall(connectionId, 'notion_query_database', { database_id: databaseId, filter });
+}
+
+// Blocks
+export function notionGetBlockChildren(connectionId: string, blockId: string) {
+  return notionCall(connectionId, 'notion_get_block_children', { block_id: blockId });
+}
+export function notionAppendBlocks(connectionId: string, blockId: string, children: unknown[]) {
+  return notionCall(connectionId, 'notion_append_blocks', { block_id: blockId, children });
+}
+export function notionDeleteBlock(connectionId: string, blockId: string) {
+  return notionCall(connectionId, 'notion_delete_block', { block_id: blockId });
+}
+
+// Comments
+export function notionGetComments(connectionId: string, blockId: string) {
+  return notionCall(connectionId, 'notion_get_comments', { block_id: blockId });
+}
+export function notionCreateComment(connectionId: string, pageId: string, richText: unknown[]) {
+  return notionCall(connectionId, 'notion_create_comment', { parent: { page_id: pageId }, rich_text: richText });
+}
+
+// Users
+export function notionListUsers(connectionId: string) {
+  return notionCall(connectionId, 'notion_list_users');
+}
