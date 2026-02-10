@@ -298,6 +298,83 @@ export function testMcpWorkflow(connectionId: string, workflowId: string, data?:
 }
 
 // ============================================
+// LINE Proxy
+// ============================================
+
+function lineCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('line', connectionId, tool, args);
+}
+
+// Messages
+export function linePushMessage(connectionId: string, to: string, messages: unknown[]) {
+  return lineCall(connectionId, 'line_push_message', { to, messages });
+}
+export function lineBroadcastMessage(connectionId: string, messages: unknown[]) {
+  return lineCall(connectionId, 'line_broadcast_message', { messages });
+}
+export function lineValidateMessage(connectionId: string, messages: unknown[]) {
+  return lineCall(connectionId, 'line_validate_message', { messages });
+}
+
+// User & Bot
+export function lineGetProfile(connectionId: string, userId: string) {
+  return lineCall(connectionId, 'line_get_profile', { userId });
+}
+export function lineGetFollowerIds(connectionId: string) {
+  return lineCall(connectionId, 'line_get_follower_ids');
+}
+export function lineGetBotInfo(connectionId: string) {
+  return lineCall(connectionId, 'line_get_bot_info');
+}
+
+// Group
+export function lineGetGroupSummary(connectionId: string, groupId: string) {
+  return lineCall(connectionId, 'line_get_group_summary', { groupId });
+}
+export function lineGetGroupMembersCount(connectionId: string, groupId: string) {
+  return lineCall(connectionId, 'line_get_group_members_count', { groupId });
+}
+export function lineGetGroupMemberIds(connectionId: string, groupId: string) {
+  return lineCall(connectionId, 'line_get_group_member_ids', { groupId });
+}
+
+// Rich Menus
+export function lineGetRichMenus(connectionId: string) {
+  return lineCall(connectionId, 'line_get_rich_menus');
+}
+export function lineGetRichMenu(connectionId: string, richMenuId: string) {
+  return lineCall(connectionId, 'line_get_rich_menu', { richMenuId });
+}
+export function lineDeleteRichMenu(connectionId: string, richMenuId: string) {
+  return lineCall(connectionId, 'line_delete_rich_menu', { richMenuId });
+}
+export function lineSetDefaultRichMenu(connectionId: string, richMenuId: string) {
+  return lineCall(connectionId, 'line_set_default_rich_menu', { richMenuId });
+}
+export function lineLinkRichMenuToUser(connectionId: string, userId: string, richMenuId: string) {
+  return lineCall(connectionId, 'line_link_rich_menu_to_user', { userId, richMenuId });
+}
+
+// Quota & Insights
+export function lineGetQuota(connectionId: string) {
+  return lineCall(connectionId, 'line_get_quota');
+}
+export function lineGetQuotaConsumption(connectionId: string) {
+  return lineCall(connectionId, 'line_get_quota_consumption');
+}
+
+// Webhook
+export function lineGetWebhookInfo(connectionId: string) {
+  return lineCall(connectionId, 'line_get_webhook_info');
+}
+export function lineSetWebhookUrl(connectionId: string, endpoint: string) {
+  return lineCall(connectionId, 'line_set_webhook_url', { endpoint });
+}
+export function lineTestWebhook(connectionId: string) {
+  return lineCall(connectionId, 'line_test_webhook');
+}
+
+// ============================================
 // Gemini RAG Proxy
 // ============================================
 
