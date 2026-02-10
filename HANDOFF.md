@@ -93,9 +93,17 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `routes/mcp.ts` | 168 | JSON-RPC 2.0 handler: initialize, tools/list, tools/call, ping |
 | `routes/connections.ts` | 226 | Unified connection CRUD with AES-256-GCM encryption |
 | `plugin-registry.ts` | 41 | Plugin registration + tool discovery |
-| `plugins/n8n/` | 4 files | Full n8n plugin: 27 tools, HTTP client, types |
-| `plugins/wordpress/` | 4 files | WordPress plugin: 20 tools, REST API client |
-| `plugins/cl-n8n-mcp/` | 4 files | cl-n8n-mcp proxy plugin: 20 tools, JSON-RPC client |
+| `plugins/n8n/` | 4 files | n8n plugin: 27 tools, HTTP client |
+| `plugins/wordpress/` | 4 files | WordPress plugin: 20 tools, REST API |
+| `plugins/cl-n8n-mcp/` | 4 files | cl-n8n-mcp proxy: 20 tools, JSON-RPC |
+| `plugins/gemini-rag/` | 4 files | Gemini RAG: 12 tools, Gemini API |
+| `plugins/line/` | 4 files | LINE: 25 tools, LINE Messaging API |
+| `plugins/telegram/` | 4 files | Telegram: 27 tools, Bot API |
+| `plugins/notion/` | 4 files | Notion: 25 tools, Notion REST API |
+| `plugins/notion-official/` | 4 files | Notion Official: 22 tools, VPS proxy |
+| `plugins/line-official/` | 4 files | LINE Official: 12 tools, VPS proxy |
+| `plugins/playwright/` | 4 files | Playwright: 22 tools, VPS proxy |
+| `plugins/google-workspace/` | 4 files | Google Workspace: 54 tools, VPS proxy |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -171,7 +179,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (156 tools: n8n 27 + WP 20 + cl-n8n-mcp 20 + Gemini 12 + LINE 25 + TG 27 + Notion 25) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (266 tools across 11 plugins) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -367,13 +375,75 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
      - No `alert()`, `confirm()`
      - Only semantic `<a href>` for mailto: and external links (correct usage)
 
+### Sessions 19-22: Visual Redesign + Color Polish (2026-02-08)
+
+- **Session 19**: Complete visual redesign of ALL 37 pages (gradient stat cards, feature grids)
+- **Session 20**: Connections Table+Alert+Item redesign + real brand logos (SimpleIcons CDN)
+- **Session 21**: 3-dot DropdownMenu actions + Edit Connection Name dialog on all 7 plugins
+- **Session 22**: Color polish (green buttons, gray 2FA card, white Enable button) + Settings Tabs + OAuth provider logos
+
+### Sessions 23-28: 2FA UX + Button Polish + Delete Account (2026-02-09)
+
+- **Sessions 23-24**: 2FA complete overhaul — Switch toggle, InputOTP, disable verifies TOTP code
+- **Session 25**: shadcn v4 component update (7 components) + admin test accounts
+- **Session 26**: Brand logos in sidebar + all connection pages (SimpleIcons CDN)
+- **Session 27**: OAuth avatar (Google picture/GitHub avatar_url + Gravatar fallback) + dashboard blue gradient card + green buttons everywhere (14 files)
+- **Session 28**: 2FA alert `statusLoaded` fix + outline Add Connection buttons + Terms links + type "delete" to confirm account deletion
+
+### Sessions 29-31: Docker/VPS Plugins + Domain Migration + Google Workspace (2026-02-09/10)
+
+- **Session 29**: Notion Official (22 tools, `noff_` prefix) + LINE Official (12 tools, `loff_` prefix)
+  - Plugin types: In-Worker vs Docker/VPS (mcp-http-bridge v2)
+  - Multi-tenant: per-request tokens via `x-service-token` headers
+  - Worker secret auth for cl-n8n-mcp: `CL_N8N_MCP_AUTH_TOKEN`
+- **Session 30**: Playwright plugin (22 tools, `pw_` prefix) + VPS domain migration to node2flow.net
+  - SaaS services: `*.node2flow.net` (old missmanga.org routes kept)
+- **Session 31**: Google Workspace plugin (54 tools, `gws_` prefix) via gemini-cli-extensions/workspace
+  - 9 services: Docs(8), Drive(4), Calendar(7), Gmail(9), Chat(8), Sheets(4), Slides(5), People(3), Time(3)
+  - Docker: port 3016, git clone + build (private npm, Apache 2.0)
+  - **Connections UX fix**: Removed MCP URL + Auth Token fields from all 4 Docker/VPS plugins
+    - Gateway hardcodes VPS URLs, auth tokens stored as Worker secrets
+    - Users only provide: Name (all), Notion Token, LINE Channel Token + User ID
+  - **Total**: 266 tools across 11 plugins
+
+### VPS MCP Servers (Docker/VPS plugins)
+
+| Container | Port | URL | Type |
+|-----------|------|-----|------|
+| n8n-mcp-dynamic | 3011 | n8n-mcp-dynamic.node2flow.net | Streamable HTTP |
+| notion-mcp-official | 3013 | notion-mcp-official.node2flow.net | HTTP bridge |
+| line-mcp-official | 3014 | line-mcp-official.node2flow.net | HTTP bridge + chromium |
+| playwright-mcp | 3015 | playwright-mcp.node2flow.net | HTTP bridge + chromium |
+| google-workspace-mcp | 3016 | google-workspace-mcp.node2flow.net | HTTP bridge (git clone + build) |
+
+All containers: 512MB mem_limit, mcp-http-bridge.mjs, AUTH_TOKEN env.
+
+### Gateway Worker Secrets
+
+| Secret | Purpose |
+|--------|---------|
+| JWT_SECRET | JWT verification |
+| ENCRYPTION_KEY | AES-256-GCM config encryption |
+| CL_N8N_MCP_AUTH_TOKEN | cl-n8n-mcp VPS auth |
+| NOTION_OFFICIAL_MCP_AUTH_TOKEN | Notion Official VPS auth |
+| LINE_OFFICIAL_MCP_AUTH_TOKEN | LINE Official VPS auth |
+| PLAYWRIGHT_MCP_AUTH_TOKEN | Playwright VPS auth |
+| GOOGLE_WORKSPACE_MCP_AUTH_TOKEN | Google Workspace VPS auth |
+
+### Plugin Architecture
+
+| Type | Plugins | How it works |
+|------|---------|-------------|
+| **In-Worker** (7) | n8n, wordpress, cl-n8n-mcp, gemini-rag, line, telegram, notion | Custom code calls REST API directly |
+| **Docker/VPS** (4) | notion-official, line-official, playwright, google-workspace | Proxy to MCP packages via mcp-http-bridge |
+| **Hybrid** | cl-n8n-mcp | In-Worker code but proxies to VPS MCP server |
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
-3. **Custom domain for old system** - `n8n-management-mcp.node2flow.net` still live separately
-4. **WordPress pages** - PostList/PageList/MediaList/CommentList are placeholder pages (MCP tool guidance only)
-5. **cl-n8n-mcp pages** - NodeExplorer/Templates/WorkflowTools are placeholder pages
+3. **WordPress pages** - PostList/PageList/MediaList/CommentList are placeholder pages
+4. **cl-n8n-mcp pages** - NodeExplorer/Templates/WorkflowTools are placeholder pages
 
 ---
 
@@ -500,6 +570,10 @@ Node2Flow-MCP-service/
 │   │   │       ├── line/            # 25 tools, LINE API client
 │   │   │       ├── telegram/        # 27 tools, Telegram Bot API client
 │   │   │       ├── notion/          # 25 tools, Notion API client
+│   │   │       ├── notion-official/ # 22 tools, VPS proxy (Docker)
+│   │   │       ├── line-official/   # 12 tools, VPS proxy (Docker)
+│   │   │       ├── playwright/     # 22 tools, VPS proxy (Docker)
+│   │   │       ├── google-workspace/ # 54 tools, VPS proxy (Docker)
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -517,14 +591,18 @@ Node2Flow-MCP-service/
 │           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
 │           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
 │           ├── plugins/
-│           │   ├── registry.ts        # Plugin registration (7 plugins)
+│           │   ├── registry.ts        # Plugin registration (11 plugins)
 │           │   ├── n8n/               # n8n plugin (7 pages + content)
 │           │   ├── wordpress/         # WordPress plugin (6 pages + content)
 │           │   ├── cl-n8n-mcp/        # cl-n8n-mcp plugin (5 pages + content)
 │           │   ├── gemini-rag/        # Gemini RAG plugin (3 pages + content)
 │           │   ├── line/              # LINE plugin (4 pages + content)
 │           │   ├── telegram/          # Telegram plugin (4 pages + content)
-│           │   └── notion/            # Notion plugin (4 pages + content)
+│           │   ├── notion/            # Notion plugin (4 pages + content)
+│           │   ├── notion-official/   # Notion Official (Connections + content)
+│           │   ├── line-official/     # LINE Official (Connections + content)
+│           │   ├── playwright/        # Playwright (Connections + content)
+│           │   └── google-workspace/  # Google Workspace (Connections + content)
 │           └── pages/
 │               ├── Landing.tsx ... Status.tsx   # 11 platform pages
 │               └── admin/             # 7 admin pages
@@ -573,14 +651,18 @@ wrangler deploy                         # In each app/
 
 ---
 
-**Total code written**: ~200+ files across 6 phases + 10 sessions
+**Total code written**: ~300+ files across 6 phases + 31 sessions
 **Phase 6 added**: 34 new files (1 lib, 7 build configs, 2 API layers, 1 registry, 10 n8n plugin, 11 platform pages, 7 admin pages)
-**Sessions 8-9**: WordPress + cl-n8n-mcp plugins (67 gateway tools)
+**Sessions 8-10**: WordPress + cl-n8n-mcp plugins + critical stats fix (67 gateway tools)
 **Sessions 11-14**: Gemini RAG + LINE + Telegram + Notion plugins (156 gateway tools total)
 **Session 15**: Full shadcn/ui migration + icon-collapsible sidebar + bundle optimization
-**Session 16**: Sidebar reorg + Field/InputGroup forms + Services Status Grid + shadcn v4 refactor + UI consolidation
-**Session 17**: Toast/AlertDialog/Switch + replaced 68 alert(), 9 native select, confirm() across 25 files
-**Session 18**: Dashboard visual redesign (SectionCards) + full native HTML cleanup (zero `<button>`/`<input>`/`<select>`/`alert()` remaining)
+**Sessions 16-18**: Sidebar reorg + Field/InputGroup + Toast/AlertDialog/Switch + SectionCards + zero native HTML
+**Sessions 19-22**: Complete visual redesign (37 pages) + brand logos + DropdownMenu + Settings Tabs
+**Sessions 23-25**: 2FA UX overhaul (InputOTP, Switch toggle, deep linking) + shadcn v4 components
+**Sessions 26-28**: Brand logos in sidebar + OAuth avatar + green buttons + 2FA alert fix + terms links
+**Sessions 29-31**: 4 Docker/VPS plugins (Notion Official + LINE Official + Playwright + Google Workspace)
+**Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
+**VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
-**Deployed**: 2026-02-08 — Platform + Gateway + Dashboard all live
-**Date**: 2026-02-08
+**Deployed**: 2026-02-10 — Platform + Gateway + Dashboard all live
+**Date**: 2026-02-10
