@@ -406,6 +406,34 @@ Complete UI overhaul of the dashboard from custom `n2f-*` CSS classes to shadcn/
     - Users only provide: Name (all), Notion Token, LINE Channel Token + User ID
   - **Total**: 266 tools across 11 plugins
 
+### Session 32: WordPress + cl-n8n-mcp Dashboard Pages (2026-02-10)
+
+1. **Gateway proxy fix** (`744626f`):
+   - Added `POST /api/proxy/:product/:conn/tool` handler for explicit tool calls
+   - Body: `{ tool: "wp_list_posts", args: { per_page: 10 } }` — explicit tool name instead of path-based guessing
+   - Added MCP result unwrapping: parses `content[0].text` JSON → returns clean data to dashboard
+   - Fixed `createClient(config)` → `createClient(config, env)` to pass env for VPS URL vars
+
+2. **Dashboard API layer** (`gateway-api.ts`):
+   - New `toolProxy()` generic helper: `POST /api/proxy/:product/:conn/tool`
+   - `wpCall()` + 16 WordPress functions: listPosts, getPost, createPost, updatePost, deletePost, listPages, getPage, createPage, updatePage, deletePage, listMedia, deleteMedia, listComments, createComment, updateComment, deleteComment + listWpCategories, listWpTags, listWpUsers, getWpSiteInfo
+   - `mcpCall()` + 9 cl-n8n-mcp functions: searchMcpNodes, getMcpNode, validateMcpNode, searchMcpTemplates, getMcpTemplate, deployMcpTemplate, validateMcpWorkflow, autofixMcpWorkflow, testMcpWorkflow
+
+3. **4 WordPress pages** (full rewrite from placeholders):
+   - **PostList**: Stat cards (Total/Published/Drafts/Last Modified), expand/collapse list, create dialog (title+content+status), edit dialog, delete with ConfirmDialog
+   - **PageList**: Same CRUD pattern, status badges (publish/draft), parent page display
+   - **MediaList**: Media type icons (image/video/audio/file), image preview on expand, file size display, delete
+   - **CommentList**: Approve/Hold/Spam status actions, create comment (post ID + content + author), author/email display
+
+4. **3 cl-n8n-mcp pages** (full rewrite from placeholders):
+   - **NodeExplorer**: Search input → results list → expand for full node details (version, group, properties, credentials) + JsonViewer
+   - **Templates**: Search → template list → expand for details (nodes used, views, author) → Deploy dialog with custom name
+   - **WorkflowTools**: 3 sections — Validate (paste JSON), Auto-Fix (by workflow ID), Test (by ID + optional data JSON)
+
+5. **Shared components**: All 7 pages import `JsonViewer` and `ConfirmDialog` from n8n plugin's components
+
+6. **wrangler update**: v3.105.0 → v4.63.0 across all 3 apps + VPS MCP URLs moved to `[vars]` in wrangler.toml (`fbce152`)
+
 ### VPS MCP Servers (Docker/VPS plugins)
 
 | Container | Port | URL | Type |
@@ -442,8 +470,8 @@ All containers: 512MB mem_limit, mcp-http-bridge.mjs, AUTH_TOKEN env.
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
-3. **WordPress pages** - PostList/PageList/MediaList/CommentList are placeholder pages
-4. **cl-n8n-mcp pages** - NodeExplorer/Templates/WorkflowTools are placeholder pages
+3. ~~**WordPress pages**~~ - Done (Session 32): PostList, PageList, MediaList, CommentList with full CRUD
+4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32): NodeExplorer, Templates, WorkflowTools with data fetching
 
 ---
 
@@ -661,6 +689,7 @@ wrangler deploy                         # In each app/
 **Sessions 23-25**: 2FA UX overhaul (InputOTP, Switch toggle, deep linking) + shadcn v4 components
 **Sessions 26-28**: Brand logos in sidebar + OAuth avatar + green buttons + 2FA alert fix + terms links
 **Sessions 29-31**: 4 Docker/VPS plugins (Notion Official + LINE Official + Playwright + Google Workspace)
+**Session 32**: WordPress + cl-n8n-mcp dashboard pages (7 pages rewritten with full CRUD + proxy fix)
 **Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
