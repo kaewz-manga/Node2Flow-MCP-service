@@ -12,18 +12,20 @@ services:
     mem_reservation: 256m
     volumes:
       - /root/mcp-tools/mcp-http-bridge.mjs:/app/mcp-http-bridge.mjs:ro
-      - gws-node-modules:/workspace/node_modules
+      - gws-workspace:/workspace
     working_dir: /app
     command: >
-      sh -c "apt-get update && apt-get install -y git --no-install-recommends && rm -rf /var/lib/apt/lists/* &&
-             if [ ! -d /workspace/gemini-workspace ]; then
-               git clone --depth 1 https://github.com/gemini-cli-extensions/workspace.git /workspace/gemini-workspace;
+      sh -c "apt-get update && apt-get install -y git ca-certificates --no-install-recommends && rm -rf /var/lib/apt/lists/* &&
+             if [ ! -f /workspace/gemini-workspace/.built ]; then
+               rm -rf /workspace/gemini-workspace &&
+               git clone --depth 1 https://github.com/gemini-cli-extensions/workspace.git /workspace/gemini-workspace &&
+               cd /workspace/gemini-workspace &&
+               npm install &&
+               npm run build &&
+               touch /workspace/gemini-workspace/.built;
              fi &&
-             cd /workspace/gemini-workspace &&
-             npm install &&
-             npm run build &&
              cd /app &&
              node mcp-http-bridge.mjs node /workspace/gemini-workspace/workspace-server/dist/index.js"
 
 volumes:
-  gws-node-modules:
+  gws-workspace:
