@@ -38,8 +38,6 @@ export default function Connections() {
   const [newApiKey, setNewApiKey] = useState('');
 
   const [formName, setFormName] = useState('');
-  const [formMcpUrl, setFormMcpUrl] = useState('');
-  const [formAuthToken, setFormAuthToken] = useState('');
   const [formNotionToken, setFormNotionToken] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -80,8 +78,6 @@ export default function Connections() {
     setFormLoading(true);
 
     const res = await createConnection('notion-official', formName, {
-      mcp_url: formMcpUrl,
-      auth_token: formAuthToken || undefined,
       notion_token: formNotionToken || undefined,
     });
 
@@ -93,8 +89,6 @@ export default function Connections() {
       }
       setShowAddModal(false);
       setFormName('');
-      setFormMcpUrl('');
-      setFormAuthToken('');
       setFormNotionToken('');
       fetchConnections();
     } else {
@@ -368,35 +362,6 @@ export default function Connections() {
                   required
                 />
               </InputGroup>
-            </Field>
-
-            <Field>
-              <FieldLabel>MCP Server URL</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><img src={LOGO} alt="Notion" className="h-6 w-6" /></InputGroupAddon>
-                <InputGroupInput
-                  type="url"
-                  placeholder="https://notion-mcp.missmanga.org"
-                  value={formMcpUrl}
-                  onChange={(e) => setFormMcpUrl(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>URL of your deployed @notionhq/notion-mcp-server</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>Auth Token <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Lock /></InputGroupAddon>
-                <InputGroupInput
-                  type="password"
-                  placeholder="Server auth token"
-                  value={formAuthToken}
-                  onChange={(e) => setFormAuthToken(e.target.value)}
-                />
-              </InputGroup>
-              <FieldDescription>Authentication token if your MCP server requires it</FieldDescription>
             </Field>
 
             <Field>

@@ -3,7 +3,7 @@
  * Proxies tool calls to deployed @line/line-bot-mcp-server instance
  */
 
-import type { MCPPlugin } from '../../types';
+import type { MCPPlugin, Env } from '../../types';
 import { TOOLS } from './tools';
 import { LineOfficialClient } from './client';
 
@@ -20,10 +20,10 @@ export const lineOfficialPlugin: MCPPlugin = {
   version: '0.4.2',
   tools: TOOLS,
 
-  createClient(config: Record<string, unknown>) {
+  createClient(config: Record<string, unknown>, env?: Env) {
     return new LineOfficialClient({
-      mcpUrl: config.mcp_url as string,
-      authToken: config.auth_token as string | undefined,
+      mcpUrl: 'https://line-mcp-official.node2flow.net',
+      authToken: env?.LINE_OFFICIAL_MCP_AUTH_TOKEN,
       channelAccessToken: config.channel_access_token as string | undefined,
       destinationUserId: config.destination_user_id as string | undefined,
     });

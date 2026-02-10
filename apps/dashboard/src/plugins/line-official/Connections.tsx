@@ -38,8 +38,6 @@ export default function Connections() {
   const [newApiKey, setNewApiKey] = useState('');
 
   const [formName, setFormName] = useState('');
-  const [formMcpUrl, setFormMcpUrl] = useState('');
-  const [formAuthToken, setFormAuthToken] = useState('');
   const [formChannelToken, setFormChannelToken] = useState('');
   const [formDestUserId, setFormDestUserId] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -81,8 +79,6 @@ export default function Connections() {
     setFormLoading(true);
 
     const res = await createConnection('line-official', formName, {
-      mcp_url: formMcpUrl,
-      auth_token: formAuthToken || undefined,
       channel_access_token: formChannelToken || undefined,
       destination_user_id: formDestUserId || undefined,
     });
@@ -95,8 +91,6 @@ export default function Connections() {
       }
       setShowAddModal(false);
       setFormName('');
-      setFormMcpUrl('');
-      setFormAuthToken('');
       setFormChannelToken('');
       setFormDestUserId('');
       fetchConnections();
@@ -371,35 +365,6 @@ export default function Connections() {
                   required
                 />
               </InputGroup>
-            </Field>
-
-            <Field>
-              <FieldLabel>MCP Server URL</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><img src={LOGO} alt="LINE" className="h-6 w-6" /></InputGroupAddon>
-                <InputGroupInput
-                  type="url"
-                  placeholder="https://line-mcp-official.missmanga.org"
-                  value={formMcpUrl}
-                  onChange={(e) => setFormMcpUrl(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>URL of your deployed @line/line-bot-mcp-server</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>Auth Token <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Lock /></InputGroupAddon>
-                <InputGroupInput
-                  type="password"
-                  placeholder="Server auth token"
-                  value={formAuthToken}
-                  onChange={(e) => setFormAuthToken(e.target.value)}
-                />
-              </InputGroup>
-              <FieldDescription>Authentication token if your MCP server requires it</FieldDescription>
             </Field>
 
             <Field>

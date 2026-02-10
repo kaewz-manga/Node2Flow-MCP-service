@@ -55,4 +55,8 @@ export interface Env {
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
   CL_N8N_MCP_AUTH_TOKEN?: string;
+  NOTION_OFFICIAL_MCP_AUTH_TOKEN?: string;
+  LINE_OFFICIAL_MCP_AUTH_TOKEN?: string;
+  PLAYWRIGHT_MCP_AUTH_TOKEN?: string;
+  GOOGLE_WORKSPACE_MCP_AUTH_TOKEN?: string;
 }

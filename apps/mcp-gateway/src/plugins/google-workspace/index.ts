@@ -3,7 +3,7 @@
  * Proxies tool calls to deployed google-workspace-server instance
  */
 
-import type { MCPPlugin } from '../../types';
+import type { MCPPlugin, Env } from '../../types';
 import { TOOLS } from './tools';
 import { GoogleWorkspaceClient } from './client';
 
@@ -20,10 +20,10 @@ export const googleWorkspacePlugin: MCPPlugin = {
   version: '1.0.0',
   tools: TOOLS,
 
-  createClient(config: Record<string, unknown>) {
+  createClient(_config: Record<string, unknown>, env?: Env) {
     return new GoogleWorkspaceClient({
-      mcpUrl: config.mcp_url as string,
-      authToken: config.auth_token as string | undefined,
+      mcpUrl: 'https://google-workspace-mcp.node2flow.net',
+      authToken: env?.GOOGLE_WORKSPACE_MCP_AUTH_TOKEN,
     });
   },
 

@@ -16,7 +16,6 @@ import {
   AlertCircle,
   RefreshCw,
   Shield,
-  Lock,
   Tag,
   MoreHorizontal,
   Pencil,
@@ -38,8 +37,6 @@ export default function Connections() {
   const [newApiKey, setNewApiKey] = useState('');
 
   const [formName, setFormName] = useState('');
-  const [formMcpUrl, setFormMcpUrl] = useState('');
-  const [formAuthToken, setFormAuthToken] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -78,10 +75,7 @@ export default function Connections() {
     setFormError('');
     setFormLoading(true);
 
-    const res = await createConnection('playwright', formName, {
-      mcp_url: formMcpUrl,
-      auth_token: formAuthToken || undefined,
-    });
+    const res = await createConnection('playwright', formName, {});
 
     if (res.success && res.data) {
       const keyRes = await createApiKey((res.data as any).id || (res.data as any).connection?.id);
@@ -91,8 +85,6 @@ export default function Connections() {
       }
       setShowAddModal(false);
       setFormName('');
-      setFormMcpUrl('');
-      setFormAuthToken('');
       fetchConnections();
     } else {
       setFormError(res.error?.message || 'Failed to add connection');
@@ -365,35 +357,6 @@ export default function Connections() {
                   required
                 />
               </InputGroup>
-            </Field>
-
-            <Field>
-              <FieldLabel>MCP Server URL</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><img src={LOGO} alt="Playwright" className="h-6 w-6" /></InputGroupAddon>
-                <InputGroupInput
-                  type="url"
-                  placeholder="https://playwright-mcp.example.com"
-                  value={formMcpUrl}
-                  onChange={(e) => setFormMcpUrl(e.target.value)}
-                  required
-                />
-              </InputGroup>
-              <FieldDescription>URL of your deployed @playwright/mcp server</FieldDescription>
-            </Field>
-
-            <Field>
-              <FieldLabel>Auth Token <span className="text-muted-foreground font-normal">(optional)</span></FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Lock /></InputGroupAddon>
-                <InputGroupInput
-                  type="password"
-                  placeholder="Server auth token"
-                  value={formAuthToken}
-                  onChange={(e) => setFormAuthToken(e.target.value)}
-                />
-              </InputGroup>
-              <FieldDescription>Authentication token if your MCP server requires it</FieldDescription>
             </Field>
 
             <div className="flex gap-3 pt-2">

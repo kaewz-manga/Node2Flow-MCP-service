@@ -3,7 +3,7 @@
  * Proxies tool calls to deployed @notionhq/notion-mcp-server instance
  */
 
-import type { MCPPlugin } from '../../types';
+import type { MCPPlugin, Env } from '../../types';
 import { TOOLS } from './tools';
 import { NotionOfficialClient } from './client';
 
@@ -22,10 +22,10 @@ export const notionOfficialPlugin: MCPPlugin = {
   version: '2.1.0',
   tools: TOOLS,
 
-  createClient(config: Record<string, unknown>) {
+  createClient(config: Record<string, unknown>, env?: Env) {
     return new NotionOfficialClient({
-      mcpUrl: config.mcp_url as string,
-      authToken: config.auth_token as string | undefined,
+      mcpUrl: 'https://notion-mcp-official.node2flow.net',
+      authToken: env?.NOTION_OFFICIAL_MCP_AUTH_TOKEN,
       notionToken: config.notion_token as string | undefined,
     });
   },
