@@ -29,7 +29,7 @@ import {
 
 // Tool count per plugin (from gateway)
 const TOOL_COUNTS: Record<string, number> = {
-  n8n: 31,
+  n8n: 27,
   wordpress: 20,
   'cl-n8n-mcp': 20,
   'gemini-rag': 12,

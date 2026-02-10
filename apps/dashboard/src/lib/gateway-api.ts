@@ -164,20 +164,6 @@ export function deleteTag(connectionId: string, id: string) {
   return n8nCall(connectionId, 'n8n_delete_tag', { id });
 }
 
-// Variables
-export function listVariables(connectionId: string) {
-  return n8nCall(connectionId, 'n8n_list_variables');
-}
-export function createVariable(connectionId: string, data: { key: string; value: string }) {
-  return n8nCall(connectionId, 'n8n_create_variable', data);
-}
-export function updateVariable(connectionId: string, id: string, data: { key?: string; value?: string }) {
-  return n8nCall(connectionId, 'n8n_update_variable', { id, ...data });
-}
-export function deleteVariable(connectionId: string, id: string) {
-  return n8nCall(connectionId, 'n8n_delete_variable', { id });
-}
-
 // Users
 export function listN8nUsers(connectionId: string) {
   return n8nCall(connectionId, 'n8n_list_users');

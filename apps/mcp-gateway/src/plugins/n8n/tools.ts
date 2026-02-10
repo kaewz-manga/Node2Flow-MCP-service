@@ -275,52 +275,6 @@ export const TOOLS = [
     },
   },
 
-  // ========== Variable Tools (4) ==========
-  {
-    name: 'n8n_list_variables',
-    description: 'Retrieve all environment variables configured in the n8n instance. Variables provide shared values accessible across all workflows. Returns variable key, value, and type.',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-    },
-  },
-  {
-    name: 'n8n_create_variable',
-    description: 'Create a new environment variable accessible to all workflows. Use for shared configuration like API endpoints, feature flags, or environment-specific values.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name (unique, case-sensitive)' },
-        value: { type: 'string', description: 'Variable value' },
-      },
-      required: ['key', 'value'],
-    },
-  },
-  {
-    name: 'n8n_update_variable',
-    description: 'Update an existing environment variable value or key. Changes take effect immediately for all workflows using this variable.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Variable ID to update' },
-        key: { type: 'string', description: 'New variable name (optional)' },
-        value: { type: 'string', description: 'New variable value (optional)' },
-      },
-      required: ['id'],
-    },
-  },
-  {
-    name: 'n8n_delete_variable',
-    description: 'Permanently delete an environment variable. Workflows referencing this variable may fail. Verify no workflows depend on it before deleting.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Variable ID to permanently delete' },
-      },
-      required: ['id'],
-    },
-  },
-
   // ========== User Tools (4) - Requires owner permissions ==========
   {
     name: 'n8n_list_users',

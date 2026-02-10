@@ -74,7 +74,6 @@ import {
   PlayCircle,
   Key,
   Tag,
-  Variable,
   Users,
 } from 'lucide-react';
 
@@ -90,7 +89,6 @@ const n8nPlugin: AppPlugin = {
     { name: 'Executions', href: '/n8n/executions', icon: PlayCircle },
     { name: 'Credentials', href: '/n8n/credentials', icon: Key },
     { name: 'Tags', href: '/n8n/tags', icon: Tag },
-    { name: 'Variables', href: '/n8n/variables', icon: Variable },
     { name: 'Users', href: '/n8n/users', icon: Users },
   ],
   routes: [
@@ -99,7 +97,6 @@ const n8nPlugin: AppPlugin = {
     { path: '/n8n/executions', component: lazy(() => import('./n8n/ExecutionList')) },
     { path: '/n8n/credentials', component: lazy(() => import('./n8n/CredentialList')) },
     { path: '/n8n/tags', component: lazy(() => import('./n8n/TagList')) },
-    { path: '/n8n/variables', component: lazy(() => import('./n8n/VariableList')) },
     { path: '/n8n/users', component: lazy(() => import('./n8n/N8nUserList')) },
   ],
   content: n8nContent,
