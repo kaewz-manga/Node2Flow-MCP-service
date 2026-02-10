@@ -466,12 +466,37 @@ All containers: 512MB mem_limit, mcp-http-bridge.mjs, AUTH_TOKEN env.
 | **Docker/VPS** (4) | notion-official, line-official, playwright, google-workspace | Proxy to MCP packages via mcp-http-bridge |
 | **Hybrid** | cl-n8n-mcp | In-Worker code but proxies to VPS MCP server |
 
+### Session 33: Playwright Testing + Bug Fixes (2026-02-10)
+
+Tested all 7 new pages (Session 32) with Playwright browser automation. Found and fixed 4 bugs:
+
+1. **cl-n8n-mcp `mcpUrl` undefined** — `createClient()` had no env fallback for connection configs missing `mcp_url`
+   - Fix: Added `CL_N8N_MCP_URL` to wrangler.toml `[vars]` + types.ts + index.ts fallback chain: `config.mcp_url || env.CL_N8N_MCP_URL || hardcoded`
+
+2. **Templates crash on load** — `getTemplateName(null)` called by Dialog content (renders even when `open=false`)
+   - Fix: `t.name` → `t?.name` null safety
+
+3. **Templates empty search results** — API returns `{items: [...]}` but code checked `templates/results/workflows`
+   - Fix: Added `data.items` to parse chain
+
+4. **PostList crash on load** — Same Dialog null pattern: `getTitle(null)` called by ConfirmDialog
+   - Fix: `post.title` → `post?.title` null safety
+
+**Test Results**: All 7 pages verified working (NodeExplorer search+detail, Templates search+deploy, WorkflowTools 3 sections, PostList/PageList/MediaList/CommentList all render with stat cards). WordPress pages show "Invalid URL" error because no WordPress connection exists for test user — expected behavior.
+
+**Known**: Playwright logo 404 from SimpleIcons CDN (`cdn.simpleicons.org/playwright/2EAD33`) — cosmetic only.
+
+**Lesson**: Dialog/ConfirmDialog content renders even when `open={false}`. Always use `?.` for helper functions that receive nullable state from Dialog props.
+
+Commit: `5bdb1dd`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
 3. ~~**WordPress pages**~~ - Done (Session 32): PostList, PageList, MediaList, CommentList with full CRUD
 4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32): NodeExplorer, Templates, WorkflowTools with data fetching
+5. ~~**Playwright testing**~~ - Done (Session 33): All 7 pages tested + 4 bugs fixed
 
 ---
 
@@ -690,6 +715,7 @@ wrangler deploy                         # In each app/
 **Sessions 26-28**: Brand logos in sidebar + OAuth avatar + green buttons + 2FA alert fix + terms links
 **Sessions 29-31**: 4 Docker/VPS plugins (Notion Official + LINE Official + Playwright + Google Workspace)
 **Session 32**: WordPress + cl-n8n-mcp dashboard pages (7 pages rewritten with full CRUD + proxy fix)
+**Session 33**: Playwright testing of all 7 new pages + 4 bug fixes (null-safety + URL fallback + API parsing)
 **Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
