@@ -142,7 +142,7 @@ export default {
 
       // --- Proxy Routes (per product) ---
 
-      // GET /api/proxy/:product_type/:connection_id/*
+      // /api/proxy/:product_type/:connection_id/*
       const proxyMatch = path.match(/^\/api\/proxy\/([^/]+)\/([^/]+)\/(.+)$/);
       if (proxyMatch) {
         const [, productType, connectionId, subPath] = proxyMatch;
@@ -159,16 +159,41 @@ export default {
         }
 
         // Create client and proxy the request
-        const client = plugin.createClient(conn.config);
+        const client = plugin.createClient(conn.config, env);
 
-        // For proxy, we execute the tool based on the path
-        // This allows dashboard to call n8n API through the gateway
         try {
-          const result = await plugin.handleToolCall(
-            `${productType}_${subPath.replace(/\//g, '_')}`,
-            Object.fromEntries(url.searchParams),
-            client
-          );
+          let toolName: string;
+          let args: Record<string, unknown>;
+
+          if (method === 'POST' && subPath === 'tool') {
+            // Explicit tool call: POST /api/proxy/:product/:conn/tool
+            // Body: { tool: "wp_list_posts", args: { per_page: 10 } }
+            const body = await request.json() as { tool: string; args?: Record<string, unknown> };
+            toolName = body.tool;
+            args = body.args || {};
+          } else {
+            // Legacy path-based mapping
+            toolName = `${productType}_${subPath.replace(/\//g, '_')}`;
+            args = Object.fromEntries(url.searchParams);
+          }
+
+          const result = await plugin.handleToolCall(toolName, args, client);
+
+          // Unwrap MCP result format → return clean data for dashboard
+          if (result && !result.isError && result.content?.[0]?.text) {
+            try {
+              const parsed = JSON.parse(result.content[0].text);
+              return json({ success: true, data: parsed });
+            } catch {
+              return json({ success: true, data: result });
+            }
+          }
+
+          if (result?.isError) {
+            const msg = result.content?.[0]?.text || 'Tool call failed';
+            return json({ success: false, error: { code: 'TOOL_ERROR', message: msg } }, 400);
+          }
+
           return json({ success: true, data: result });
         } catch (err) {
           return json({ success: false, error: { code: 'PROXY_ERROR', message: err instanceof Error ? err.message : String(err) } }, 500);

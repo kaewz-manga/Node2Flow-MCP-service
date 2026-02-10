@@ -179,3 +179,138 @@ export function deleteN8nUser(connectionId: string, id: string) {
 export function updateN8nUserRole(connectionId: string, id: string, role: string) {
   return n8nProxy(connectionId, `users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) });
 }
+
+// ============================================
+// Tool Proxy (explicit tool name + args)
+// ============================================
+
+async function toolProxy<T>(
+  productType: string,
+  connectionId: string,
+  tool: string,
+  args: Record<string, unknown> = {}
+): Promise<ApiResponse<T>> {
+  return gatewayRequest(`/api/proxy/${productType}/${connectionId}/tool`, {
+    method: 'POST',
+    body: JSON.stringify({ tool, args }),
+  });
+}
+
+// ============================================
+// WordPress Proxy
+// ============================================
+
+function wpCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('wordpress', connectionId, tool, args);
+}
+
+// Posts
+export function listPosts(connectionId: string, params?: { per_page?: number; status?: string; search?: string }) {
+  return wpCall(connectionId, 'wp_list_posts', params || {});
+}
+export function getPost(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_get_post', { id });
+}
+export function createPost(connectionId: string, data: { title: string; content: string; status?: string }) {
+  return wpCall(connectionId, 'wp_create_post', data);
+}
+export function updatePost(connectionId: string, id: number, data: { title?: string; content?: string; status?: string }) {
+  return wpCall(connectionId, 'wp_update_post', { id, ...data });
+}
+export function deletePost(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_delete_post', { id });
+}
+
+// Pages
+export function listPages(connectionId: string, params?: { per_page?: number; status?: string }) {
+  return wpCall(connectionId, 'wp_list_pages', params || {});
+}
+export function getPage(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_get_page', { id });
+}
+export function createPage(connectionId: string, data: { title: string; content: string; status?: string; parent?: number }) {
+  return wpCall(connectionId, 'wp_create_page', data);
+}
+export function updatePage(connectionId: string, id: number, data: { title?: string; content?: string; status?: string }) {
+  return wpCall(connectionId, 'wp_update_page', { id, ...data });
+}
+export function deletePage(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_delete_page', { id });
+}
+
+// Media
+export function listMedia(connectionId: string, params?: { per_page?: number; media_type?: string }) {
+  return wpCall(connectionId, 'wp_list_media', params || {});
+}
+export function deleteMedia(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_delete_media', { id });
+}
+
+// Comments
+export function listComments(connectionId: string, params?: { post?: number; per_page?: number }) {
+  return wpCall(connectionId, 'wp_list_comments', params || {});
+}
+export function createComment(connectionId: string, data: { post: number; content: string; author_name?: string; author_email?: string }) {
+  return wpCall(connectionId, 'wp_create_comment', data);
+}
+export function updateComment(connectionId: string, id: number, data: { content?: string; status?: string }) {
+  return wpCall(connectionId, 'wp_update_comment', { id, ...data });
+}
+export function deleteComment(connectionId: string, id: number) {
+  return wpCall(connectionId, 'wp_delete_comment', { id });
+}
+
+// Taxonomy & Site
+export function listWpCategories(connectionId: string) {
+  return wpCall(connectionId, 'wp_list_categories');
+}
+export function listWpTags(connectionId: string) {
+  return wpCall(connectionId, 'wp_list_tags');
+}
+export function listWpUsers(connectionId: string) {
+  return wpCall(connectionId, 'wp_list_users');
+}
+export function getWpSiteInfo(connectionId: string) {
+  return wpCall(connectionId, 'wp_get_site_info');
+}
+
+// ============================================
+// cl-n8n-mcp Proxy
+// ============================================
+
+function mcpCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('cl-n8n-mcp', connectionId, tool, args);
+}
+
+// Node Documentation
+export function searchMcpNodes(connectionId: string, query: string, limit?: number) {
+  return mcpCall(connectionId, 'mcp_search_nodes', { query, limit: limit || 20 });
+}
+export function getMcpNode(connectionId: string, nodeType: string, detail?: string) {
+  return mcpCall(connectionId, 'mcp_get_node', { nodeType, detail: detail || 'standard' });
+}
+export function validateMcpNode(connectionId: string, nodeType: string, config: Record<string, unknown>) {
+  return mcpCall(connectionId, 'mcp_validate_node', { nodeType, config });
+}
+
+// Templates
+export function searchMcpTemplates(connectionId: string, query: string, limit?: number) {
+  return mcpCall(connectionId, 'mcp_search_templates', { query, limit: limit || 20, searchMode: 'keyword' });
+}
+export function getMcpTemplate(connectionId: string, templateId: number) {
+  return mcpCall(connectionId, 'mcp_get_template', { templateId });
+}
+export function deployMcpTemplate(connectionId: string, templateId: number, name?: string) {
+  return mcpCall(connectionId, 'mcp_n8n_deploy_template', { templateId, name });
+}
+
+// Workflow Tools
+export function validateMcpWorkflow(connectionId: string, workflow: Record<string, unknown>) {
+  return mcpCall(connectionId, 'mcp_validate_workflow', { workflow });
+}
+export function autofixMcpWorkflow(connectionId: string, id: string, applyFixes?: boolean) {
+  return mcpCall(connectionId, 'mcp_n8n_autofix_workflow', { id, applyFixes: applyFixes || false });
+}
+export function testMcpWorkflow(connectionId: string, workflowId: string, data?: Record<string, unknown>) {
+  return mcpCall(connectionId, 'mcp_n8n_test_workflow', { workflowId, data });
+}

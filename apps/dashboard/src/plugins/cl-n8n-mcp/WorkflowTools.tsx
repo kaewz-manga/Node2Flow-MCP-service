@@ -1,115 +1,200 @@
-import { Cog, Play, RefreshCw, Wrench, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { validateMcpWorkflow, autofixMcpWorkflow, testMcpWorkflow } from '../../lib/gateway-api';
+import {
+  useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
+  Input, Textarea, Badge, Separator, Alert, AlertDescription,
+} from '@node2flow/dashboard-core';
+import JsonViewer from '../n8n/components/JsonViewer';
+import {
+  Loader2, AlertCircle, CheckCircle, Wrench, Play, ShieldCheck, AlertTriangle,
+} from 'lucide-react';
 
 export default function WorkflowTools() {
   const { activeConnection } = useConnection();
+  const connectionId = activeConnection?.id;
 
-  if (!activeConnection) {
-    return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <h3 className="text-lg font-medium text-foreground mb-2">No connection selected</h3>
-          <p className="text-sm text-muted-foreground">Select a connection from the sidebar to continue.</p>
-        </CardContent>
-      </Card>
-    );
+  // Validate
+  const [validateJson, setValidateJson] = useState('');
+  const [validating, setValidating] = useState(false);
+  const [validateResult, setValidateResult] = useState<any>(null);
+
+  // Auto-fix
+  const [fixWorkflowId, setFixWorkflowId] = useState('');
+  const [fixing, setFixing] = useState(false);
+  const [fixResult, setFixResult] = useState<any>(null);
+
+  // Test
+  const [testWorkflowId, setTestWorkflowId] = useState('');
+  const [testDataJson, setTestDataJson] = useState('');
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<any>(null);
+
+  async function handleValidate() {
+    if (!connectionId || !validateJson.trim()) return;
+    setValidating(true);
+    setValidateResult(null);
+    try {
+      const workflow = JSON.parse(validateJson);
+      const res = await validateMcpWorkflow(connectionId, workflow);
+      if (res.success && res.data) {
+        setValidateResult(res.data);
+      } else {
+        toast.error(res.error?.message || 'Validation failed');
+      }
+    } catch {
+      toast.error('Invalid JSON. Please check your workflow JSON.');
+    }
+    setValidating(false);
   }
+
+  async function handleAutofix() {
+    if (!connectionId || !fixWorkflowId.trim()) return;
+    setFixing(true);
+    setFixResult(null);
+    const res = await autofixMcpWorkflow(connectionId, fixWorkflowId.trim(), true);
+    if (res.success && res.data) {
+      setFixResult(res.data);
+      toast.success('Auto-fix complete');
+    } else {
+      toast.error(res.error?.message || 'Auto-fix failed');
+    }
+    setFixing(false);
+  }
+
+  async function handleTest() {
+    if (!connectionId || !testWorkflowId.trim()) return;
+    setTesting(true);
+    setTestResult(null);
+    let data: Record<string, unknown> | undefined;
+    if (testDataJson.trim()) {
+      try {
+        data = JSON.parse(testDataJson);
+      } catch {
+        toast.error('Invalid test data JSON');
+        setTesting(false);
+        return;
+      }
+    }
+    const res = await testMcpWorkflow(connectionId, testWorkflowId.trim(), data);
+    if (res.success && res.data) {
+      setTestResult(res.data);
+    } else {
+      toast.error(res.error?.message || 'Test failed');
+    }
+    setTesting(false);
+  }
+
+  if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   return (
     <div className="space-y-6">
-      {/* Hero Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Workflow Tools</h1>
-          <p className="text-muted-foreground mt-1">
-            Create, validate, and fix n8n workflows <Badge variant="secondary" className="ml-1">6 tools</Badge>
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Workflow Tools</h1>
+        <p className="text-muted-foreground mt-1">Validate, auto-fix, and test n8n workflows</p>
       </div>
 
       <Separator />
 
-      {/* Feature Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Cog className="h-4 w-4 text-primary" />
-              </div>
-              <CardTitle className="text-base">Create Workflows</CardTitle>
+      {/* Validate Workflow */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <ShieldCheck className="h-4 w-4 text-primary" />
             </div>
-            <CardDescription>Build new workflows from scratch with AI-assisted node configuration</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Create a webhook workflow that sends Slack notifications"
-            </code>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <Play className="h-4 w-4 text-emerald-500" />
-              </div>
-              <CardTitle className="text-base">Test & Execute</CardTitle>
+            <div>
+              <CardTitle className="text-base">Validate Workflow</CardTitle>
+              <CardDescription>Paste workflow JSON to check for configuration errors</CardDescription>
             </div>
-            <CardDescription>Run workflows and inspect execution results in real time</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Test workflow #123 and show the output"
-            </code>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-purple-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <RefreshCw className="h-4 w-4 text-purple-500" />
-              </div>
-              <CardTitle className="text-base">Validate & Fix</CardTitle>
-            </div>
-            <CardDescription>Detect configuration errors and automatically fix them</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Validate and fix workflow #123"
-            </code>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Wrench className="h-4 w-4 text-amber-500" />
-              </div>
-              <CardTitle className="text-base">Auto-Fix Errors</CardTitle>
-            </div>
-            <CardDescription>Automatically repair broken workflows with intelligent error resolution</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <code className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">
-              "Auto-fix all errors in my workflow"
-            </code>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Start */}
-      <Card className="bg-gradient-to-t from-emerald-500/5 to-card border-emerald-500/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base text-emerald-400 flex items-center gap-2">
-            <Lightbulb className="h-4 w-4" />
-            How to use
-          </CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="pt-0 text-sm text-muted-foreground">
-          <p>Use these tools through your MCP-compatible AI assistant. Simply describe what you want to do in natural language.</p>
+        <CardContent className="space-y-3">
+          <Textarea
+            placeholder='Paste workflow JSON here...\n{\n  "name": "My Workflow",\n  "nodes": [...],\n  "connections": {...}\n}'
+            value={validateJson}
+            onChange={(e) => setValidateJson(e.target.value)}
+            rows={8}
+            className="font-mono text-sm"
+          />
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleValidate} disabled={validating || !validateJson.trim()}>
+            {validating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />} Validate
+          </Button>
+
+          {validateResult && (
+            <div className="space-y-2">
+              {validateResult.valid !== undefined && (
+                <Alert variant={validateResult.valid ? 'default' : 'destructive'}>
+                  {validateResult.valid ? <CheckCircle className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                  <AlertDescription>
+                    {validateResult.valid ? 'Workflow is valid' : `Found ${validateResult.errors?.length || 0} error(s)`}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <JsonViewer data={validateResult} title="Validation Result" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Auto-fix Workflow */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <Wrench className="h-4 w-4 text-amber-500" />
+            </div>
+            <div>
+              <CardTitle className="text-base">Auto-Fix Workflow</CardTitle>
+              <CardDescription>Automatically detect and fix errors in a workflow by ID</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Input
+            placeholder="Workflow ID (e.g., abc123)"
+            value={fixWorkflowId}
+            onChange={(e) => setFixWorkflowId(e.target.value)}
+          />
+          <Button className="bg-amber-600 hover:bg-amber-700 text-white" onClick={handleAutofix} disabled={fixing || !fixWorkflowId.trim()}>
+            {fixing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Wrench className="h-4 w-4 mr-2" />} Auto-Fix
+          </Button>
+
+          {fixResult && <JsonViewer data={fixResult} title="Auto-Fix Result" />}
+        </CardContent>
+      </Card>
+
+      {/* Test Workflow */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-emerald-500/10">
+              <Play className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div>
+              <CardTitle className="text-base">Test Workflow</CardTitle>
+              <CardDescription>Execute a workflow and inspect the results</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Input
+            placeholder="Workflow ID (e.g., abc123)"
+            value={testWorkflowId}
+            onChange={(e) => setTestWorkflowId(e.target.value)}
+          />
+          <Textarea
+            placeholder='Test data JSON (optional)\n{\n  "key": "value"\n}'
+            value={testDataJson}
+            onChange={(e) => setTestDataJson(e.target.value)}
+            rows={4}
+            className="font-mono text-sm"
+          />
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleTest} disabled={testing || !testWorkflowId.trim()}>
+            {testing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Play className="h-4 w-4 mr-2" />} Test
+          </Button>
+
+          {testResult && <JsonViewer data={testResult} title="Test Result" />}
         </CardContent>
       </Card>
     </div>
