@@ -31,7 +31,7 @@ export class NotionClient {
       ...options,
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'Notion-Version': '2025-09-03',
+        'Notion-Version': '2022-06-28',
         'Content-Type': 'application/json',
         ...options.headers,
       },

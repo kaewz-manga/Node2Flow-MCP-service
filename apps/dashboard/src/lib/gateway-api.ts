@@ -387,29 +387,29 @@ export function listStores(connectionId: string) {
   return geminiCall(connectionId, 'gemini_list_stores');
 }
 export function createStore(connectionId: string, displayName: string) {
-  return geminiCall(connectionId, 'gemini_create_store', { displayName });
+  return geminiCall(connectionId, 'gemini_create_store', { display_name: displayName });
 }
 export function getStore(connectionId: string, storeName: string) {
-  return geminiCall(connectionId, 'gemini_get_store', { storeName });
+  return geminiCall(connectionId, 'gemini_get_store', { store_name: storeName });
 }
 export function deleteStore(connectionId: string, storeName: string, force?: boolean) {
-  return geminiCall(connectionId, 'gemini_delete_store', { storeName, force: force || false });
+  return geminiCall(connectionId, 'gemini_delete_store', { store_name: storeName, force: force || false });
 }
 
 // Documents
 export function listDocuments(connectionId: string, storeName: string) {
-  return geminiCall(connectionId, 'gemini_list_documents', { storeName });
+  return geminiCall(connectionId, 'gemini_list_documents', { store_name: storeName });
 }
 export function deleteDocument(connectionId: string, documentName: string, force?: boolean) {
-  return geminiCall(connectionId, 'gemini_delete_document', { documentName, force: force || false });
+  return geminiCall(connectionId, 'gemini_delete_document', { document_name: documentName, force: force || false });
 }
 export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string }) {
-  return geminiCall(connectionId, 'gemini_upload_to_store', { storeName, ...data });
+  return geminiCall(connectionId, 'gemini_upload_to_store', { store_name: storeName, mime_type: data.mimeType, content: data.content, display_name: data.displayName });
 }
 
 // RAG Query
 export function ragQuery(connectionId: string, query: string, storeNames: string[], model?: string) {
-  return geminiCall(connectionId, 'gemini_rag_query', { query, storeNames, model });
+  return geminiCall(connectionId, 'gemini_rag_query', { query, store_names: storeNames, model });
 }
 
 // ============================================
