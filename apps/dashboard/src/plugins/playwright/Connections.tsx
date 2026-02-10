@@ -22,7 +22,7 @@ import {
   Globe,
 } from 'lucide-react';
 
-const LOGO = 'https://cdn.simpleicons.org/playwright/2EAD33';
+const LOGO = 'https://playwright.dev/img/playwright-logo.svg';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

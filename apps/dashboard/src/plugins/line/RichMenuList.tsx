@@ -1,8 +1,8 @@
 import { Menu, Image, Link, Settings, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 export default function RichMenuList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('line');
 
   if (!activeConnection) {
     return (

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import {
   listExecutions, getExecution, deleteExecution, retryExecution,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
@@ -18,7 +18,7 @@ import {
 
 
 export default function ExecutionList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [executions, setExecutions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

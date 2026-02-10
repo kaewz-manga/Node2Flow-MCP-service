@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { searchMcpNodes, getMcpNode } from '../../lib/gateway-api';
 import {
-  useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
+  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
   Input, Badge, Separator, Alert, AlertDescription,
 } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function NodeExplorer() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('cl-n8n-mcp');
   const connectionId = activeConnection?.id;
 
   const [query, setQuery] = useState('');

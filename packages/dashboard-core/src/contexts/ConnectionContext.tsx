@@ -81,3 +81,18 @@ export function useConnection() {
   if (!context) throw new Error('useConnection must be used within ConnectionProvider');
   return context;
 }
+
+/**
+ * Plugin-scoped connection hook.
+ * Returns the active connection if it matches the product type,
+ * otherwise finds the first matching connection.
+ */
+export function usePluginConnection(productType: string) {
+  const { connections, activeConnection } = useConnection();
+
+  if (activeConnection?.product_type === productType) {
+    return activeConnection;
+  }
+
+  return connections.find(c => c.product_type === productType) || null;
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { createCredential, updateCredential, deleteCredential, getCredentialSchema } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Separator } from '@node2flow/dashboard-core';
 
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -13,7 +13,7 @@ import { Loader2, Plus, Trash2, Search, X, Pencil, Save, KeyRound, FileSearch, S
 
 
 export default function CredentialList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 

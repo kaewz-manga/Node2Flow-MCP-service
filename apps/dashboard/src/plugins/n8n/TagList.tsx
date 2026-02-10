@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listTags, createTag, updateTag, deleteTag } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag, Tags, Clock } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Tag, T
 
 
 export default function TagList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [tags, setTags] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

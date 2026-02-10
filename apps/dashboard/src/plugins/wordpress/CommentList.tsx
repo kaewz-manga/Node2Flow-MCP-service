@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listComments, createComment, updateComment, deleteComment } from '../../lib/gateway-api';
 import {
-  useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
   Input, Textarea, Badge, Separator, Alert, AlertDescription,
   Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
@@ -23,7 +23,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function CommentList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('wordpress');
   const connectionId = activeConnection?.id;
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

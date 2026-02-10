@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listN8nUsers, deleteN8nUser } from '../../lib/gateway-api';
-import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -13,7 +13,7 @@ import { Loader2, RefreshCw, Trash2, AlertCircle, UserCog, Users, Crown, Shield,
 
 
 export default function N8nUserList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

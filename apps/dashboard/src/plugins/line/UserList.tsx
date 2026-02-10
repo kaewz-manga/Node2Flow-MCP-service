@@ -1,8 +1,8 @@
 import { Users, UserCheck, Search, Info, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 export default function UserList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('line');
 
   if (!activeConnection) {
     return (

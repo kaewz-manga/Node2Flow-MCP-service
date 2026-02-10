@@ -1,8 +1,8 @@
 import { Database, FolderOpen, Trash2, Plus, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 export default function StoreList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('gemini-rag');
 
   if (!activeConnection) {
     return (

@@ -1,8 +1,8 @@
 import { Globe, Link, Shield, RefreshCw, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 export default function WebhookSettings() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('telegram');
 
   if (!activeConnection) {
     return (

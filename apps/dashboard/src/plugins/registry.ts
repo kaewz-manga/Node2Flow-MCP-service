@@ -373,7 +373,7 @@ const playwrightPlugin: AppPlugin = {
   id: 'playwright',
   name: 'Browser Automation',
   icon: PlaywrightIcon,
-  logo: 'https://cdn.simpleicons.org/playwright/2EAD33',
+  logo: 'https://playwright.dev/img/playwright-logo.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/playwright/connections', icon: PlaywrightLinkIcon },

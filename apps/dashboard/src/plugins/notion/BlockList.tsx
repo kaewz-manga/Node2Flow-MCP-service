@@ -1,8 +1,8 @@
 import { Layers, Plus, Trash2, Move, Lightbulb } from 'lucide-react';
-import { useConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 export default function BlockList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('notion');
 
   if (!activeConnection) {
     return (

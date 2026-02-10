@@ -29,7 +29,7 @@ import {
 
 // Tool count per plugin (from gateway)
 const TOOL_COUNTS: Record<string, number> = {
-  n8n: 27,
+  n8n: 31,
   wordpress: 20,
   'cl-n8n-mcp': 20,
   'gemini-rag': 12,
@@ -51,7 +51,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   line: 'https://cdn.simpleicons.org/line/00C300',
   telegram: 'https://cdn.simpleicons.org/telegram/26A5E4',
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
-  playwright: 'https://cdn.simpleicons.org/playwright/2EAD33',
+  playwright: 'https://playwright.dev/img/playwright-logo.svg',
   'google-workspace': 'https://cdn.simpleicons.org/google/4285F4',
 };
 

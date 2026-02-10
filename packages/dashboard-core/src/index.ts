@@ -36,7 +36,7 @@ export type {
 // Contexts
 export { AuthProvider, useAuth } from './contexts/AuthContext';
 export { SudoProvider, useSudoContext } from './contexts/SudoContext';
-export { ConnectionProvider, useConnection } from './contexts/ConnectionContext';
+export { ConnectionProvider, useConnection, usePluginConnection } from './contexts/ConnectionContext';
 
 // Components
 export { default as Layout } from './components/Layout';

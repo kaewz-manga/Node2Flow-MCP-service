@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listMedia, deleteMedia } from '../../lib/gateway-api';
 import {
-  useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
   Badge, Separator, Alert, AlertDescription,
 } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
@@ -22,7 +22,7 @@ function MediaIcon({ type }: { type?: string }) {
 }
 
 export default function MediaList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('wordpress');
   const connectionId = activeConnection?.id;
   const [media, setMedia] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

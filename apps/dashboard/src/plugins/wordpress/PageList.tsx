@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listPages, getPage, createPage, updatePage, deletePage } from '../../lib/gateway-api';
 import {
-  useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
   Input, Textarea, Badge, Separator, Alert, AlertDescription,
   Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function PageList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('wordpress');
   const connectionId = activeConnection?.id;
   const [pages, setPages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

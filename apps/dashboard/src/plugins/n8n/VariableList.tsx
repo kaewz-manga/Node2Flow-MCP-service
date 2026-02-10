@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listVariables, createVariable, updateVariable, deleteVariable } from '../../lib/gateway-api';
-import { useConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from './components/ConfirmDialog';
 import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variable, Hash, Type } from 'lucide-react';
@@ -12,7 +12,7 @@ import { Loader2, Plus, Pencil, Trash2, Check, X, RefreshCw, AlertCircle, Variab
 
 
 export default function VariableList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [variables, setVariables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

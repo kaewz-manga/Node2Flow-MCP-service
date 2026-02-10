@@ -5,7 +5,7 @@ import {
   activateWorkflow, deactivateWorkflow, executeWorkflow,
   getWorkflowTags, updateWorkflowTags, listTags,
 } from '../../lib/gateway-api';
-import { useConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Textarea, Alert, AlertDescription, Badge, Separator } from '@node2flow/dashboard-core';
 
 import StatusBadge from './components/StatusBadge';
 import JsonViewer from './components/JsonViewer';
@@ -22,7 +22,7 @@ import {
 
 
 export default function WorkflowList() {
-  const { activeConnection } = useConnection();
+  const activeConnection = usePluginConnection('n8n');
   const connectionId = activeConnection?.id;
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
