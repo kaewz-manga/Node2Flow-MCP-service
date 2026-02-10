@@ -22,7 +22,7 @@ export const playwrightPlugin: MCPPlugin = {
 
   createClient(_config: Record<string, unknown>, env?: Env) {
     return new PlaywrightClient({
-      mcpUrl: 'https://playwright-mcp.node2flow.net',
+      mcpUrl: env?.PLAYWRIGHT_MCP_URL || 'https://playwright-mcp.node2flow.net',
       authToken: env?.PLAYWRIGHT_MCP_AUTH_TOKEN,
     });
   },

@@ -22,7 +22,7 @@ export const googleWorkspacePlugin: MCPPlugin = {
 
   createClient(_config: Record<string, unknown>, env?: Env) {
     return new GoogleWorkspaceClient({
-      mcpUrl: 'https://google-workspace-mcp.node2flow.net',
+      mcpUrl: env?.GOOGLE_WORKSPACE_MCP_URL || 'https://google-workspace-mcp.node2flow.net',
       authToken: env?.GOOGLE_WORKSPACE_MCP_AUTH_TOKEN,
     });
   },

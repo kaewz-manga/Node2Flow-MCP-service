@@ -59,4 +59,8 @@ export interface Env {
   LINE_OFFICIAL_MCP_AUTH_TOKEN?: string;
   PLAYWRIGHT_MCP_AUTH_TOKEN?: string;
   GOOGLE_WORKSPACE_MCP_AUTH_TOKEN?: string;
+  NOTION_OFFICIAL_MCP_URL?: string;
+  LINE_OFFICIAL_MCP_URL?: string;
+  PLAYWRIGHT_MCP_URL?: string;
+  GOOGLE_WORKSPACE_MCP_URL?: string;
 }

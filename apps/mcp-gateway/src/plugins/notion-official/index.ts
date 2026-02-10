@@ -24,7 +24,7 @@ export const notionOfficialPlugin: MCPPlugin = {
 
   createClient(config: Record<string, unknown>, env?: Env) {
     return new NotionOfficialClient({
-      mcpUrl: 'https://notion-mcp-official.node2flow.net',
+      mcpUrl: env?.NOTION_OFFICIAL_MCP_URL || 'https://notion-mcp-official.node2flow.net',
       authToken: env?.NOTION_OFFICIAL_MCP_AUTH_TOKEN,
       notionToken: config.notion_token as string | undefined,
     });

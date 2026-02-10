@@ -22,7 +22,7 @@ export const lineOfficialPlugin: MCPPlugin = {
 
   createClient(config: Record<string, unknown>, env?: Env) {
     return new LineOfficialClient({
-      mcpUrl: 'https://line-mcp-official.node2flow.net',
+      mcpUrl: env?.LINE_OFFICIAL_MCP_URL || 'https://line-mcp-official.node2flow.net',
       authToken: env?.LINE_OFFICIAL_MCP_AUTH_TOKEN,
       channelAccessToken: config.channel_access_token as string | undefined,
       destinationUserId: config.destination_user_id as string | undefined,
