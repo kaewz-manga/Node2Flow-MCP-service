@@ -532,15 +532,42 @@ export function usePluginConnection(productType: string) {
 
 Commit: `2ff48fb`
 
+### Session 36: Gemini RAG + Telegram + Notion Dashboard Pages (2026-02-10)
+
+**Removed n8n variable tools** — All 4 variable operations (list/create/update/delete) return 403 on Community Edition (paid license required). Removed from gateway (tools.ts, client.ts, index.ts), dashboard (VariableList.tsx deleted, sidebar removed), and gateway-api.ts. n8n tools: 31 → 27.
+
+Commit: `d51be8b`
+
+**Implemented 8 functional dashboard pages** for 3 plugins (replacing static placeholders):
+
+| Plugin | Page | Features |
+|--------|------|----------|
+| **Gemini RAG** | StoreList | CRUD stores, stat cards, expand for JSON details |
+| **Gemini RAG** | DocumentList | Store selector dropdown, upload text, RAG query with response, delete docs |
+| **Telegram** | MessageTools | Bot info on mount, send message/photo forms, result viewer |
+| **Telegram** | ChatManagement | Chat lookup, member info, ban/unban with ConfirmDialog, invite links |
+| **Telegram** | WebhookSettings | Webhook status cards (URL, pending, errors), set/delete webhook |
+| **Notion** | DatabaseList | Search databases, expand to see properties + query results |
+| **Notion** | PageList | Search pages, expand for full properties, external link to Notion |
+| **Notion** | BlockList | Load blocks by page ID, append new blocks (6 types), delete blocks |
+
+Added `geminiCall()`, `tgCall()`, `notionCall()` + 40+ API helper functions to `gateway-api.ts`.
+
+**Playwright test**: 34 pages — 19 OK, 15 NO_CONN (correct, no connection for those plugins), 0 errors, 0 failures.
+
+Commit: `328748c`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
-3. ~~**WordPress pages**~~ - Done (Session 32): PostList, PageList, MediaList, CommentList with full CRUD
-4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32): NodeExplorer, Templates, WorkflowTools with data fetching
-5. ~~**Playwright testing**~~ - Done (Session 33): All 7 pages tested + 4 bugs fixed
-6. ~~**n8n unknown tool**~~ - Done (Session 34): Legacy proxy replaced + 4 variable tools added
-7. ~~**Cross-plugin errors**~~ - Done (Session 35): Plugin-scoped connection hook + 24 pages fixed
+3. ~~**WordPress pages**~~ - Done (Session 32)
+4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32)
+5. ~~**Playwright testing**~~ - Done (Sessions 33, 36)
+6. ~~**n8n unknown tool**~~ - Done (Session 34)
+7. ~~**Cross-plugin errors**~~ - Done (Session 35)
+8. ~~**Gemini RAG / Telegram / Notion pages**~~ - Done (Session 36): 8 functional pages
+9. ~~**Remove n8n variables**~~ - Done (Session 36): CE returns 403
 
 ---
 
@@ -760,9 +787,10 @@ wrangler deploy                         # In each app/
 **Sessions 29-31**: 4 Docker/VPS plugins (Notion Official + LINE Official + Playwright + Google Workspace)
 **Session 32**: WordPress + cl-n8n-mcp dashboard pages (7 pages rewritten with full CRUD + proxy fix)
 **Session 33**: Playwright testing of all 7 new pages + 4 bug fixes (null-safety + URL fallback + API parsing)
-**Session 34**: Fix n8n "Unknown tool" errors + add 4 variable tools (n8n 27→31 tools)
+**Session 34**: Fix n8n "Unknown tool" errors (legacy proxy replaced)
 **Session 35**: Fix cross-plugin connection scoping (`usePluginConnection` hook) + Playwright logo 404 fix
-**Gateway**: 270 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
+**Session 36**: Remove n8n variable tools (CE 403) + implement Gemini RAG, Telegram, Notion dashboard pages (8 pages)
+**Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Deployed**: 2026-02-10 — Platform + Gateway + Dashboard all live
