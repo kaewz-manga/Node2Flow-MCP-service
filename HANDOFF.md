@@ -557,17 +557,40 @@ Added `geminiCall()`, `tgCall()`, `notionCall()` + 40+ API helper functions to `
 
 Commit: `328748c`
 
+### Session 37: LINE Plugin Dashboard Pages (2026-02-10)
+
+Replaced 3 static placeholder LINE pages with functional data-fetching pages.
+
+Added `lineCall()` + 18 LINE API helper functions to `gateway-api.ts`:
+- Messages: `linePushMessage`, `lineBroadcastMessage`, `lineValidateMessage`
+- User/Bot: `lineGetProfile`, `lineGetFollowerIds`, `lineGetBotInfo`
+- Group: `lineGetGroupSummary`, `lineGetGroupMembersCount`, `lineGetGroupMemberIds`
+- Rich Menus: `lineGetRichMenus`, `lineGetRichMenu`, `lineDeleteRichMenu`, `lineSetDefaultRichMenu`, `lineLinkRichMenuToUser`
+- Quota: `lineGetQuota`, `lineGetQuotaConsumption`
+- Webhook: `lineGetWebhookInfo`, `lineSetWebhookUrl`, `lineTestWebhook`
+
+| Page | Features |
+|------|----------|
+| **MessageTools** | Bot info stat cards (name, quota, consumed), push message form (to + text) |
+| **RichMenuList** | List menus with expand/collapse, delete with ConfirmDialog, set default, link menu to user |
+| **UserList** | Bot info cards, user profile lookup (avatar + display name + status), group lookup (summary + members), follower ID list with quick lookup buttons |
+
+**Playwright test**: All 3 pages render correctly with "No connection selected" (no LINE connection configured for test user).
+
+Commit: `055de6c`
+
 ### What's Left
 
 1. **Stripe integration** - Set STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET, update webhook URL
 2. **Lightning payment** - Plan ready, needs Neutron API key (see lightning-plan.md in memory)
 3. ~~**WordPress pages**~~ - Done (Session 32)
 4. ~~**cl-n8n-mcp pages**~~ - Done (Session 32)
-5. ~~**Playwright testing**~~ - Done (Sessions 33, 36)
+5. ~~**Playwright testing**~~ - Done (Sessions 33, 36, 37)
 6. ~~**n8n unknown tool**~~ - Done (Session 34)
 7. ~~**Cross-plugin errors**~~ - Done (Session 35)
 8. ~~**Gemini RAG / Telegram / Notion pages**~~ - Done (Session 36): 8 functional pages
 9. ~~**Remove n8n variables**~~ - Done (Session 36): CE returns 403
+10. ~~**LINE pages**~~ - Done (Session 37): 3 functional pages
 
 ---
 
