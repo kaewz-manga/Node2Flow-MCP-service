@@ -7,6 +7,8 @@ import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, Plus, RefreshCw, AlertCircle, Database, FolderOpen, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 
+const PAGE_SIZE = 20;
+
 export default function StoreList() {
   const activeConnection = usePluginConnection('gemini-rag');
   const connectionId = activeConnection?.id;
@@ -19,19 +21,37 @@ export default function StoreList() {
   const [expandedStore, setExpandedStore] = useState<string | null>(null);
   const [storeDetails, setStoreDetails] = useState<Record<string, any>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   async function fetch() {
     if (!connectionId) return;
     setLoading(true);
     setError('');
-    const res = await listStores(connectionId);
+    const res = await listStores(connectionId, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       setStores(Array.isArray(d) ? d : d.fileSearchStores || d.stores || []);
+      setNextPageToken(d.nextPageToken || null);
     } else {
       setError(res.error?.message || 'Failed to load stores');
     }
     setLoading(false);
+  }
+
+  async function handleLoadMore() {
+    if (!connectionId || !nextPageToken) return;
+    setLoadingMore(true);
+    const res = await listStores(connectionId, PAGE_SIZE, nextPageToken);
+    if (res.success && res.data) {
+      const d = res.data as any;
+      const moreStores = Array.isArray(d) ? d : d.fileSearchStores || d.stores || [];
+      setStores(prev => [...prev, ...moreStores]);
+      setNextPageToken(d.nextPageToken || null);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more stores');
+    }
+    setLoadingMore(false);
   }
 
   useEffect(() => { if (connectionId) fetch(); }, [connectionId]);
@@ -95,7 +115,9 @@ export default function StoreList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">File Search Stores</h1>
-          <p className="text-muted-foreground mt-1">{activeConnection.name} - {stores.length} stores</p>
+          <p className="text-muted-foreground mt-1">
+            {activeConnection.name} - {stores.length} loaded{nextPageToken ? ' (more available)' : ' stores'}
+          </p>
         </div>
         <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
           <RefreshCw className="h-4 w-4" />
@@ -226,6 +248,14 @@ export default function StoreList() {
           ))}
           {stores.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No stores found. Create one to get started!</div>
+          )}
+          {nextPageToken && (
+            <div className="flex justify-center pt-2">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
           )}
         </div>
       )}

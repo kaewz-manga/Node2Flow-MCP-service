@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { notionGetBlockChildren, notionAppendBlocks, notionDeleteBlock } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, RefreshCw, AlertCircle, Box, Plus, Trash2, ChevronRight, ChevronDown, Search } from 'lucide-react';
+
+const PAGE_SIZE = 20;
 
 export default function BlockList() {
   const activeConnection = usePluginConnection('notion');
@@ -17,6 +19,11 @@ export default function BlockList() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
+  // Pagination state
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Append block state
   const [appendBlockId, setAppendBlockId] = useState('');
   const [appendType, setAppendType] = useState('paragraph');
@@ -27,16 +34,36 @@ export default function BlockList() {
     if (!blockId.trim() || !connectionId) return;
     setLoading(true);
     setError('');
-    const res = await notionGetBlockChildren(connectionId, blockId.trim());
+    const res = await notionGetBlockChildren(connectionId, blockId.trim(), undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       const results = d.results || [];
       setBlocks(results);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
     } else {
       setError(res.error?.message || 'Failed');
       setBlocks([]);
+      setNextCursor(null);
+      setHasMore(false);
     }
     setLoading(false);
+  }
+
+  async function handleLoadMore() {
+    if (!blockId.trim() || !connectionId || !nextCursor) return;
+    setLoadingMore(true);
+    const res = await notionGetBlockChildren(connectionId, blockId.trim(), nextCursor, PAGE_SIZE);
+    if (res.success && res.data) {
+      const d = res.data as any;
+      const results = d.results || [];
+      setBlocks((prev) => [...prev, ...results]);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more blocks');
+    }
+    setLoadingMore(false);
   }
 
   async function handleDelete() {
@@ -127,7 +154,9 @@ export default function BlockList() {
             <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
               <CardHeader className="pb-2">
                 <CardDescription>Total Blocks</CardDescription>
-                <CardTitle className="text-2xl font-semibold tabular-nums">{blocks.length}</CardTitle>
+                <CardTitle className="text-2xl font-semibold tabular-nums">
+                  {blocks.length}{hasMore ? '+' : ''}
+                </CardTitle>
               </CardHeader>
               <CardFooter className="text-sm text-muted-foreground">
                 <Box className="h-3.5 w-3.5 mr-1.5 text-primary" />
@@ -177,18 +206,19 @@ export default function BlockList() {
               placeholder="Target Page/Block ID..."
               className="flex-1"
             />
-            <select
-              value={appendType}
-              onChange={(e) => setAppendType(e.target.value)}
-              className="px-3 py-2 bg-background border border-input rounded-md text-sm"
-            >
-              <option value="paragraph">Paragraph</option>
-              <option value="heading_1">Heading 1</option>
-              <option value="heading_2">Heading 2</option>
-              <option value="to_do">To Do</option>
-              <option value="bulleted_list_item">Bulleted List</option>
-              <option value="numbered_list_item">Numbered List</option>
-            </select>
+            <Select value={appendType} onValueChange={setAppendType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="paragraph">Paragraph</SelectItem>
+                <SelectItem value="heading_1">Heading 1</SelectItem>
+                <SelectItem value="heading_2">Heading 2</SelectItem>
+                <SelectItem value="to_do">To Do</SelectItem>
+                <SelectItem value="bulleted_list_item">Bulleted List</SelectItem>
+                <SelectItem value="numbered_list_item">Numbered List</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex gap-2">
             <Input
@@ -267,6 +297,14 @@ export default function BlockList() {
           {blocks.length === 0 && !loading && (
             <div className="text-center py-8 text-muted-foreground">
               {blockId.trim() ? 'No blocks found for this ID' : 'Enter a page or block ID to load blocks'}
+            </div>
+          )}
+          {hasMore && (
+            <div className="flex justify-center pt-2">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </Button>
             </div>
           )}
         </div>

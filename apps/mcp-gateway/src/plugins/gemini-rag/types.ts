@@ -34,10 +34,15 @@ export interface FileSearchDocumentList {
   nextPageToken?: string;
 }
 
+export interface StringList {
+  values: string[];
+}
+
 export interface CustomMetadata {
   key: string;
   stringValue?: string;
   numericValue?: number;
+  stringListValue?: StringList;
 }
 
 export interface ChunkingConfig {

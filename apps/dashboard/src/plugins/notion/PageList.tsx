@@ -6,6 +6,8 @@ import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, Card
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, RefreshCw, AlertCircle, FileText, Search, ChevronRight, ChevronDown, Calendar, ExternalLink } from 'lucide-react';
 
+const PAGE_SIZE = 20;
+
 export default function PageList() {
   const activeConnection = usePluginConnection('notion');
   const connectionId = activeConnection?.id;
@@ -17,16 +19,23 @@ export default function PageList() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedData, setExpandedData] = useState<any>(null);
   const [expandLoading, setExpandLoading] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   async function fetch() {
     if (!connectionId) return;
     setLoading(true);
     setError('');
-    const res = await notionSearch(connectionId, '', 'page');
+    setNextCursor(null);
+    setHasMore(false);
+    const res = await notionSearch(connectionId, '', 'page', undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       const results = d.results || [];
       setPages(results);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
     } else {
       setError(res.error?.message || 'Failed');
     }
@@ -39,15 +48,35 @@ export default function PageList() {
     if (!connectionId) return;
     setSearching(true);
     setError('');
-    const res = await notionSearch(connectionId, searchQuery, 'page');
+    setNextCursor(null);
+    setHasMore(false);
+    const res = await notionSearch(connectionId, searchQuery, 'page', undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       const results = d.results || [];
       setPages(results);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
     } else {
       setError(res.error?.message || 'Failed');
     }
     setSearching(false);
+  }
+
+  async function handleLoadMore() {
+    if (!connectionId || !nextCursor) return;
+    setLoadingMore(true);
+    const res = await notionSearch(connectionId, searchQuery, 'page', nextCursor, PAGE_SIZE);
+    if (res.success && res.data) {
+      const d = res.data as any;
+      const results = d.results || [];
+      setPages(prev => [...prev, ...results]);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more pages');
+    }
+    setLoadingMore(false);
   }
 
   async function handleExpand(page: any) {
@@ -86,7 +115,9 @@ export default function PageList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Pages</h1>
-          <p className="text-muted-foreground mt-1">{activeConnection.name} - {pages.length} pages</p>
+          <p className="text-muted-foreground mt-1">
+            {activeConnection.name} - {pages.length} {hasMore ? 'loaded (more available)' : 'pages'}
+          </p>
         </div>
         <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
           <RefreshCw className="h-4 w-4" />
@@ -99,7 +130,7 @@ export default function PageList() {
           <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Total Pages</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums">{pages.length}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{pages.length}{hasMore ? '+' : ''}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
               <FileText className="h-3.5 w-3.5 mr-1.5 text-primary" />
@@ -218,6 +249,18 @@ export default function PageList() {
           ))}
           {pages.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No pages found</div>
+          )}
+          {hasMore && (
+            <div className="flex justify-center pt-4">
+              <Button
+                variant="outline"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
           )}
         </div>
       )}

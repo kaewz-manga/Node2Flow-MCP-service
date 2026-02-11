@@ -88,8 +88,11 @@ function n8nCall<T>(connectionId: string, tool: string, args: Record<string, unk
 }
 
 // Workflows
-export function listWorkflows(connectionId: string) {
-  return n8nCall(connectionId, 'n8n_list_workflows');
+export function listWorkflows(connectionId: string, limit?: number, cursor?: string) {
+  const args: Record<string, unknown> = {};
+  if (limit) args.limit = limit;
+  if (cursor) args.cursor = cursor;
+  return n8nCall(connectionId, 'n8n_list_workflows', args);
 }
 export function getWorkflow(connectionId: string, id: string) {
   return n8nCall(connectionId, 'n8n_get_workflow', { id });
@@ -120,8 +123,12 @@ export function updateWorkflowTags(connectionId: string, id: string, tags: strin
 }
 
 // Executions
-export function listExecutions(connectionId: string, workflowId?: string) {
-  return n8nCall(connectionId, 'n8n_list_executions', workflowId ? { workflowId } : {});
+export function listExecutions(connectionId: string, workflowId?: string, limit?: number, cursor?: string) {
+  const args: Record<string, unknown> = {};
+  if (workflowId) args.workflowId = workflowId;
+  if (limit) args.limit = limit;
+  if (cursor) args.cursor = cursor;
+  return n8nCall(connectionId, 'n8n_list_executions', args);
 }
 export function getExecution(connectionId: string, id: string) {
   return n8nCall(connectionId, 'n8n_get_execution', { id });
@@ -320,8 +327,10 @@ export function lineValidateMessage(connectionId: string, messages: unknown[]) {
 export function lineGetProfile(connectionId: string, userId: string) {
   return lineCall(connectionId, 'line_get_profile', { userId });
 }
-export function lineGetFollowerIds(connectionId: string) {
-  return lineCall(connectionId, 'line_get_follower_ids');
+export function lineGetFollowerIds(connectionId: string, start?: string) {
+  const args: Record<string, unknown> = {};
+  if (start) args.start = start;
+  return lineCall(connectionId, 'line_get_follower_ids', args);
 }
 export function lineGetBotInfo(connectionId: string) {
   return lineCall(connectionId, 'line_get_bot_info');
@@ -383,8 +392,11 @@ function geminiCall<T>(connectionId: string, tool: string, args: Record<string, 
 }
 
 // Stores
-export function listStores(connectionId: string) {
-  return geminiCall(connectionId, 'gemini_list_stores');
+export function listStores(connectionId: string, pageSize?: number, pageToken?: string) {
+  const args: Record<string, unknown> = {};
+  if (pageSize) args.page_size = pageSize;
+  if (pageToken) args.page_token = pageToken;
+  return geminiCall(connectionId, 'gemini_list_stores', args);
 }
 export function createStore(connectionId: string, displayName: string) {
   return geminiCall(connectionId, 'gemini_create_store', { display_name: displayName });
@@ -397,14 +409,19 @@ export function deleteStore(connectionId: string, storeName: string, force?: boo
 }
 
 // Documents
-export function listDocuments(connectionId: string, storeName: string) {
-  return geminiCall(connectionId, 'gemini_list_documents', { store_name: storeName });
+export function listDocuments(connectionId: string, storeName: string, pageSize?: number, pageToken?: string) {
+  const args: Record<string, unknown> = { store_name: storeName };
+  if (pageSize) args.page_size = pageSize;
+  if (pageToken) args.page_token = pageToken;
+  return geminiCall(connectionId, 'gemini_list_documents', args);
 }
 export function deleteDocument(connectionId: string, documentName: string, force?: boolean) {
   return geminiCall(connectionId, 'gemini_delete_document', { document_name: documentName, force: force || false });
 }
-export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string }) {
-  return geminiCall(connectionId, 'gemini_upload_to_store', { store_name: storeName, mime_type: data.mimeType, content: data.content, display_name: data.displayName });
+export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string }, metadata?: unknown[]) {
+  const args: Record<string, unknown> = { store_name: storeName, mime_type: data.mimeType, content: data.content, display_name: data.displayName };
+  if (metadata && metadata.length > 0) args.custom_metadata = metadata;
+  return geminiCall(connectionId, 'gemini_upload_to_store', args);
 }
 
 // RAG Query
@@ -482,8 +499,11 @@ function notionCall<T>(connectionId: string, tool: string, args: Record<string, 
 }
 
 // Search
-export function notionSearch(connectionId: string, query?: string, filterObject?: string) {
-  return notionCall(connectionId, 'notion_search', { query, filter_object: filterObject });
+export function notionSearch(connectionId: string, query?: string, filterObject?: string, startCursor?: string, pageSize?: number) {
+  const args: Record<string, unknown> = { query, filter_object: filterObject };
+  if (startCursor) args.start_cursor = startCursor;
+  if (pageSize) args.page_size = pageSize;
+  return notionCall(connectionId, 'notion_search', args);
 }
 
 // Pages
@@ -504,10 +524,20 @@ export function notionGetDatabase(connectionId: string, databaseId: string) {
 export function notionQueryDatabase(connectionId: string, databaseId: string, filter?: Record<string, unknown>) {
   return notionCall(connectionId, 'notion_query_database', { database_id: databaseId, filter });
 }
+export function notionCreateDatabase(connectionId: string, parentPageId: string, title: string, properties: Record<string, unknown>) {
+  return notionCall(connectionId, 'notion_create_database', {
+    parent: { type: 'page_id', page_id: parentPageId },
+    title: [{ type: 'text', text: { content: title } }],
+    properties,
+  });
+}
 
 // Blocks
-export function notionGetBlockChildren(connectionId: string, blockId: string) {
-  return notionCall(connectionId, 'notion_get_block_children', { block_id: blockId });
+export function notionGetBlockChildren(connectionId: string, blockId: string, startCursor?: string, pageSize?: number) {
+  const args: Record<string, unknown> = { block_id: blockId };
+  if (startCursor) args.start_cursor = startCursor;
+  if (pageSize) args.page_size = pageSize;
+  return notionCall(connectionId, 'notion_get_block_children', args);
 }
 export function notionAppendBlocks(connectionId: string, blockId: string, children: unknown[]) {
   return notionCall(connectionId, 'notion_append_blocks', { block_id: blockId, children });

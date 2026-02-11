@@ -1,10 +1,25 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listStores, listDocuments, deleteDocument, uploadToStore, ragQuery } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import {
+  usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  Alert, AlertDescription, Separator, Badge, Label, Textarea,
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+  Collapsible, CollapsibleTrigger, CollapsibleContent,
+} from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
-import { Loader2, Plus, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database } from 'lucide-react';
+import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings } from 'lucide-react';
+
+// Metadata row type
+interface MetadataRow {
+  key: string;
+  type: 'string' | 'number' | 'stringList';
+  value: string;
+}
+
+const MAX_METADATA_ROWS = 20;
+const PAGE_SIZE = 20;
 
 export default function DocumentList() {
   const activeConnection = usePluginConnection('gemini-rag');
@@ -21,10 +36,18 @@ export default function DocumentList() {
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
+  // Pagination
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Upload
   const [uploadDisplayName, setUploadDisplayName] = useState('');
   const [uploadContent, setUploadContent] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Custom metadata
+  const [metadataRows, setMetadataRows] = useState<MetadataRow[]>([]);
+  const [metadataOpen, setMetadataOpen] = useState(false);
 
   // RAG Query
   const [query, setQuery] = useState('');
@@ -61,14 +84,32 @@ export default function DocumentList() {
     if (!connectionId || !selectedStore) return;
     setLoading(true);
     setError('');
-    const res = await listDocuments(connectionId, selectedStore);
+    setDocuments([]);
+    setNextPageToken(null);
+    const res = await listDocuments(connectionId, selectedStore, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       setDocuments(Array.isArray(d) ? d : d.documents || []);
+      setNextPageToken(d.nextPageToken || null);
     } else {
       setError(res.error?.message || 'Failed to load documents');
     }
     setLoading(false);
+  }
+
+  async function handleLoadMore() {
+    if (!connectionId || !selectedStore || !nextPageToken) return;
+    setLoadingMore(true);
+    const res = await listDocuments(connectionId, selectedStore, PAGE_SIZE, nextPageToken);
+    if (res.success && res.data) {
+      const d = res.data as any;
+      const newDocs = Array.isArray(d) ? d : d.documents || [];
+      setDocuments(prev => [...prev, ...newDocs]);
+      setNextPageToken(d.nextPageToken || null);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more documents');
+    }
+    setLoadingMore(false);
   }
 
   async function handleDelete() {
@@ -86,15 +127,29 @@ export default function DocumentList() {
   async function handleUpload() {
     if (!uploadContent.trim() || !connectionId || !selectedStore) return;
     setUploading(true);
+
+    // Build metadata for the API call
+    const metadata = metadataRows
+      .filter(r => r.key.trim())
+      .map(r => {
+        const m: any = { key: r.key };
+        if (r.type === 'string') m.stringValue = r.value;
+        else if (r.type === 'number') m.numericValue = parseFloat(r.value) || 0;
+        else if (r.type === 'stringList') m.stringListValue = { values: r.value.split(',').map(v => v.trim()).filter(Boolean) };
+        return m;
+      });
+
     const res = await uploadToStore(connectionId, selectedStore, {
       mimeType: 'text/plain',
       content: uploadContent,
       displayName: uploadDisplayName.trim() || 'Untitled Document'
-    });
+    }, metadata.length > 0 ? metadata : undefined);
     if (res.success) {
       toast.success('Document uploaded successfully');
       setUploadDisplayName('');
       setUploadContent('');
+      setMetadataRows([]);
+      setMetadataOpen(false);
       fetchDocuments();
     } else {
       toast.error(res.error?.message || 'Failed to upload document');
@@ -114,6 +169,26 @@ export default function DocumentList() {
       toast.error(res.error?.message || 'Query failed');
     }
     setQuerying(false);
+  }
+
+  // Metadata row helpers
+  function addMetadataRow() {
+    if (metadataRows.length >= MAX_METADATA_ROWS) return;
+    setMetadataRows(prev => [...prev, { key: '', type: 'string', value: '' }]);
+  }
+
+  function removeMetadataRow(index: number) {
+    setMetadataRows(prev => prev.filter((_, i) => i !== index));
+  }
+
+  function updateMetadataRow(index: number, field: keyof MetadataRow, val: string) {
+    setMetadataRows(prev => prev.map((r, i) => i === index ? { ...r, [field]: val } : r));
+  }
+
+  // Get the display text for store option, showing actual loaded count for selected store
+  function getStoreOptionText(store: any) {
+    const docCount = store.name === selectedStore ? documents.length : (store.documentCount || 0);
+    return `${store.displayName} (${docCount} docs)`;
   }
 
   if (!activeConnection) {
@@ -150,18 +225,19 @@ export default function DocumentList() {
       {/* Store Selector */}
       <Card className="bg-gradient-to-t from-primary/5 to-card">
         <CardContent className="p-4">
-          <label className="text-sm font-medium text-foreground mb-2 block">Select Store</label>
-          <select
-            className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground"
-            value={selectedStore}
-            onChange={(e) => setSelectedStore(e.target.value)}
-          >
-            {stores.map((store) => (
-              <option key={store.name} value={store.name}>
-                {store.displayName} ({store.documentCount || 0} docs)
-              </option>
-            ))}
-          </select>
+          <Label className="text-sm font-medium text-foreground mb-2 block">Select Store</Label>
+          <Select value={selectedStore} onValueChange={setSelectedStore}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a store..." />
+            </SelectTrigger>
+            <SelectContent>
+              {stores.map((store) => (
+                <SelectItem key={store.name} value={store.name}>
+                  {getStoreOptionText(store)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardContent>
       </Card>
 
@@ -225,13 +301,68 @@ export default function DocumentList() {
             placeholder="Document name (optional)"
             disabled={!selectedStore}
           />
-          <textarea
-            className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground min-h-[120px] font-mono text-sm"
+          <Textarea
+            className="min-h-[120px] font-mono text-sm"
             value={uploadContent}
             onChange={(e) => setUploadContent(e.target.value)}
             placeholder="Paste your text content here..."
             disabled={!selectedStore}
           />
+
+          {/* Custom Metadata Section */}
+          <Collapsible open={metadataOpen} onOpenChange={setMetadataOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-full justify-between text-muted-foreground hover:text-foreground">
+                <span className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Custom Metadata {metadataRows.length > 0 && `(${metadataRows.filter(r => r.key.trim()).length})`}
+                </span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${metadataOpen ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2 space-y-2">
+              {metadataRows.map((row, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Input
+                    className="flex-1"
+                    placeholder="Key"
+                    value={row.key}
+                    onChange={(e) => updateMetadataRow(i, 'key', e.target.value)}
+                  />
+                  <Select value={row.type} onValueChange={(v) => updateMetadataRow(i, 'type', v)}>
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="string">String</SelectItem>
+                      <SelectItem value="number">Number</SelectItem>
+                      <SelectItem value="stringList">String List</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    className="flex-1"
+                    placeholder={row.type === 'number' ? '0' : row.type === 'stringList' ? 'a, b, c' : 'Value'}
+                    type={row.type === 'number' ? 'number' : 'text'}
+                    value={row.value}
+                    onChange={(e) => updateMetadataRow(i, 'value', e.target.value)}
+                  />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 hover:text-red-400" onClick={() => removeMetadataRow(i)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {metadataRows.length < MAX_METADATA_ROWS && (
+                <Button variant="outline" size="sm" className="w-full" onClick={addMetadataRow}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Metadata Field
+                </Button>
+              )}
+              {metadataRows.length >= MAX_METADATA_ROWS && (
+                <p className="text-xs text-muted-foreground text-center">Maximum {MAX_METADATA_ROWS} metadata fields</p>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+
           <Button
             className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
             onClick={handleUpload}
@@ -329,6 +460,16 @@ export default function DocumentList() {
           ))}
           {documents.length === 0 && selectedStore && (
             <div className="text-center py-8 text-muted-foreground">No documents found. Upload some content to get started!</div>
+          )}
+
+          {/* Load More */}
+          {nextPageToken && (
+            <div className="flex justify-center pt-2">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
+                Load More
+              </Button>
+            </div>
           )}
         </div>
       )}

@@ -13,6 +13,10 @@ export default function UserList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Follower pagination
+  const [followerNextToken, setFollowerNextToken] = useState<string | null>(null);
+  const [loadingMoreFollowers, setLoadingMoreFollowers] = useState(false);
+
   // Profile lookup
   const [userId, setUserId] = useState('');
   const [profile, setProfile] = useState<any>(null);
@@ -34,7 +38,11 @@ export default function UserList() {
         lineGetFollowerIds(connectionId),
       ]);
       if (botRes.success && botRes.data) setBotInfo(botRes.data);
-      if (followerRes.success && followerRes.data) setFollowers(followerRes.data);
+      if (followerRes.success && followerRes.data) {
+        setFollowers(followerRes.data);
+        const data = followerRes.data as any;
+        setFollowerNextToken(data.next || null);
+      }
       if (!botRes.success) setError(botRes.error?.message || 'Failed to fetch bot info');
     } catch {
       setError('Failed to load data');
@@ -43,6 +51,28 @@ export default function UserList() {
   }
 
   useEffect(() => { if (connectionId) fetchData(); }, [connectionId]);
+
+  async function handleLoadMoreFollowers() {
+    if (!connectionId || !followerNextToken) return;
+    setLoadingMoreFollowers(true);
+    try {
+      const res = await lineGetFollowerIds(connectionId, followerNextToken);
+      if (res.success && res.data) {
+        const data = res.data as any;
+        const newIds = data.userIds || [];
+        setFollowers((prev: any) => ({
+          ...prev,
+          userIds: [...((prev as any)?.userIds || []), ...newIds],
+        }));
+        setFollowerNextToken(data.next || null);
+      } else {
+        toast.error(res.error?.message || 'Failed to load more followers');
+      }
+    } catch {
+      toast.error('Failed to load more followers');
+    }
+    setLoadingMoreFollowers(false);
+  }
 
   async function handleLookupUser() {
     if (!userId.trim() || !connectionId) return;
@@ -235,6 +265,19 @@ export default function UserList() {
                     </div>
                   ))}
                 </div>
+                {followerNextToken && (
+                  <div className="mt-3 flex justify-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleLoadMoreFollowers}
+                      disabled={loadingMoreFollowers}
+                    >
+                      {loadingMoreFollowers ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Users className="h-4 w-4 mr-2" />}
+                      Load More
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

@@ -1,10 +1,23 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { notionSearch, notionQueryDatabase } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import { notionSearch, notionQueryDatabase, notionCreateDatabase } from '../../lib/gateway-api';
+import {
+  usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  Alert, AlertDescription, Separator, Badge, Label,
+  Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from '@node2flow/dashboard-core';
 
 import JsonViewer from '../n8n/components/JsonViewer';
-import { Loader2, RefreshCw, AlertCircle, Database, Search, ChevronRight, ChevronDown, Calendar } from 'lucide-react';
+import { Loader2, RefreshCw, AlertCircle, Database, Search, ChevronRight, ChevronDown, Calendar, Plus, X } from 'lucide-react';
+
+const PROPERTY_TYPES = ['title', 'rich_text', 'number', 'select', 'checkbox', 'date', 'url', 'email'] as const;
+const PAGE_SIZE = 20;
+
+interface PropertyRow {
+  name: string;
+  type: string;
+}
 
 export default function DatabaseList() {
   const activeConnection = usePluginConnection('notion');
@@ -18,36 +31,81 @@ export default function DatabaseList() {
   const [expandedData, setExpandedData] = useState<any>(null);
   const [expandLoading, setExpandLoading] = useState(false);
 
-  async function fetch() {
+  // Pagination
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Create Database dialog
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [createTitle, setCreateTitle] = useState('');
+  const [createParentPageId, setCreateParentPageId] = useState('');
+  const [createProperties, setCreateProperties] = useState<PropertyRow[]>([{ name: 'Name', type: 'title' }]);
+  const [creating, setCreating] = useState(false);
+
+  async function fetchDatabases(cursor?: string) {
     if (!connectionId) return;
-    setLoading(true);
-    setError('');
-    const res = await notionSearch(connectionId, '', 'database');
+    if (!cursor) {
+      setLoading(true);
+      setError('');
+    }
+    const res = await notionSearch(connectionId, '', 'database', cursor || undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       const results = d.results || [];
-      setDatabases(results);
+      if (cursor) {
+        setDatabases(prev => [...prev, ...results]);
+      } else {
+        setDatabases(results);
+      }
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
     } else {
       setError(res.error?.message || 'Failed');
     }
     setLoading(false);
+    setLoadingMore(false);
   }
 
-  useEffect(() => { if (connectionId) fetch(); }, [connectionId]);
+  useEffect(() => { if (connectionId) fetchDatabases(); }, [connectionId]);
 
   async function handleSearch() {
     if (!connectionId) return;
     setSearching(true);
     setError('');
-    const res = await notionSearch(connectionId, searchQuery, 'database');
+    setNextCursor(null);
+    setHasMore(false);
+    const res = await notionSearch(connectionId, searchQuery, 'database', undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const d = res.data as any;
       const results = d.results || [];
       setDatabases(results);
+      setNextCursor(d.next_cursor || null);
+      setHasMore(!!d.has_more);
     } else {
       setError(res.error?.message || 'Failed');
     }
     setSearching(false);
+  }
+
+  async function handleLoadMore() {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    if (searchQuery.trim()) {
+      const res = await notionSearch(connectionId!, searchQuery, 'database', nextCursor, PAGE_SIZE);
+      if (res.success && res.data) {
+        const d = res.data as any;
+        const results = d.results || [];
+        setDatabases(prev => [...prev, ...results]);
+        setNextCursor(d.next_cursor || null);
+        setHasMore(!!d.has_more);
+      } else {
+        toast.error(res.error?.message || 'Failed to load more');
+      }
+      setLoadingMore(false);
+    } else {
+      await fetchDatabases(nextCursor);
+    }
   }
 
   async function handleExpand(db: any) {
@@ -69,25 +127,92 @@ export default function DatabaseList() {
     setExpandLoading(false);
   }
 
+  // Create Database handlers
+  function addPropertyRow() {
+    setCreateProperties(prev => [...prev, { name: '', type: 'rich_text' }]);
+  }
+
+  function removePropertyRow(index: number) {
+    setCreateProperties(prev => prev.filter((_, i) => i !== index));
+  }
+
+  function updatePropertyRow(index: number, field: 'name' | 'type', value: string) {
+    setCreateProperties(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
+  }
+
+  function resetCreateForm() {
+    setCreateTitle('');
+    setCreateParentPageId('');
+    setCreateProperties([{ name: 'Name', type: 'title' }]);
+  }
+
+  async function handleCreateDatabase() {
+    if (!connectionId || !createTitle.trim() || !createParentPageId.trim()) return;
+
+    // Validate: must have at least one property
+    const validProperties = createProperties.filter(p => p.name.trim());
+    if (validProperties.length === 0) {
+      toast.error('At least one property is required');
+      return;
+    }
+
+    // Validate: must have exactly one title property
+    const titleProps = validProperties.filter(p => p.type === 'title');
+    if (titleProps.length === 0) {
+      toast.error('At least one property must be of type "title"');
+      return;
+    }
+    if (titleProps.length > 1) {
+      toast.error('Only one property can be of type "title"');
+      return;
+    }
+
+    setCreating(true);
+    const props: Record<string, unknown> = {};
+    for (const p of validProperties) {
+      props[p.name.trim()] = { [p.type]: {} };
+    }
+
+    const res = await notionCreateDatabase(connectionId, createParentPageId.trim(), createTitle.trim(), props);
+    if (res.success) {
+      toast.success('Database created successfully');
+      setShowCreateDialog(false);
+      resetCreateForm();
+      fetchDatabases();
+    } else {
+      toast.error(res.error?.message || 'Failed to create database');
+    }
+    setCreating(false);
+  }
+
   if (!activeConnection) return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
 
   const getTitle = (db: any) => {
-    if (db.title && db.title.length > 0 && db.title[0].plain_text) {
+    if (db?.title && db.title.length > 0 && db.title[0]?.plain_text) {
       return db.title[0].plain_text;
     }
     return 'Untitled Database';
   };
+
+  const subtitle = hasMore
+    ? `${activeConnection.name} - ${databases.length} loaded (more available)`
+    : `${activeConnection.name} - ${databases.length} databases`;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Databases</h1>
-          <p className="text-muted-foreground mt-1">{activeConnection.name} - {databases.length} databases</p>
+          <p className="text-muted-foreground mt-1">{subtitle}</p>
         </div>
-        <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreateDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Create Database
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => fetchDatabases()} title="Refresh">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -96,7 +221,7 @@ export default function DatabaseList() {
           <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Total Databases</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums">{databases.length}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{databases.length}{hasMore ? '+' : ''}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
               <Database className="h-3.5 w-3.5 mr-1.5 text-primary" />
@@ -212,8 +337,100 @@ export default function DatabaseList() {
           {databases.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No databases found</div>
           )}
+
+          {/* Load More */}
+          {hasMore && (
+            <div className="flex justify-center pt-2">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Load More
+              </Button>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Create Database Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={(open) => { if (!open) { setShowCreateDialog(false); resetCreateForm(); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create Database</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Database Title</Label>
+              <Input
+                value={createTitle}
+                onChange={(e) => setCreateTitle(e.target.value)}
+                placeholder="My Database"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Parent Page ID</Label>
+              <Input
+                value={createParentPageId}
+                onChange={(e) => setCreateParentPageId(e.target.value)}
+                placeholder="e.g. 12345678-abcd-1234-abcd-123456789abc"
+              />
+              <p className="text-xs text-muted-foreground">The ID of the Notion page where this database will be created.</p>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Properties</Label>
+                <Button variant="outline" size="sm" onClick={addPropertyRow}>
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Property
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {createProperties.map((prop, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input
+                      value={prop.name}
+                      onChange={(e) => updatePropertyRow(index, 'name', e.target.value)}
+                      placeholder="Property name"
+                      className="flex-1"
+                    />
+                    <Select value={prop.type} onValueChange={(val) => updatePropertyRow(index, 'type', val)}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PROPERTY_TYPES.map((t) => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removePropertyRow(index)}
+                      disabled={createProperties.length <= 1}
+                      className="shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">Exactly one property must be of type "title".</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowCreateDialog(false); resetCreateForm(); }}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={handleCreateDatabase}
+              disabled={creating || !createTitle.trim() || !createParentPageId.trim()}
+            >
+              {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

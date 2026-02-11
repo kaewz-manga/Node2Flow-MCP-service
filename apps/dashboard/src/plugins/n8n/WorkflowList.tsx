@@ -16,10 +16,7 @@ import {
   Layers, Zap, ZapOff, Clock,
 } from 'lucide-react';
 
-
-
-
-
+const PAGE_SIZE = 20;
 
 export default function WorkflowList() {
   const activeConnection = usePluginConnection('n8n');
@@ -29,6 +26,8 @@ export default function WorkflowList() {
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [executing, setExecuting] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Expanded detail
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -56,10 +55,11 @@ export default function WorkflowList() {
     if (!connectionId) return;
     setLoading(true);
     setError('');
-    const res = await listWorkflows(connectionId);
+    const res = await listWorkflows(connectionId, PAGE_SIZE);
     if (res.success && res.data) {
       const data = res.data as any;
       setWorkflows(Array.isArray(data) ? data : data.data || []);
+      setNextCursor(data.nextCursor || null);
     } else {
       setError(res.error?.message || 'Failed to load');
     }
@@ -67,6 +67,21 @@ export default function WorkflowList() {
   }
 
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId]);
+
+  async function handleLoadMore() {
+    if (!connectionId || !nextCursor) return;
+    setLoadingMore(true);
+    const res = await listWorkflows(connectionId, PAGE_SIZE, nextCursor);
+    if (res.success && res.data) {
+      const data = res.data as any;
+      const newItems = Array.isArray(data) ? data : data.data || [];
+      setWorkflows(prev => [...prev, ...newItems]);
+      setNextCursor(data.nextCursor || null);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more');
+    }
+    setLoadingMore(false);
+  }
 
   async function loadDetail(id: string) {
     if (!connectionId) return;
@@ -183,7 +198,9 @@ export default function WorkflowList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Workflows</h1>
-          <p className="text-muted-foreground mt-1">{activeConnection.name} - {workflows.length} workflows</p>
+          <p className="text-muted-foreground mt-1">
+            {activeConnection.name} - {workflows.length} loaded{nextCursor ? ' (more available)' : ' workflows'}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreate(!showCreate)}>
@@ -410,6 +427,16 @@ export default function WorkflowList() {
           ))}
           {workflows.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No workflows found</div>
+          )}
+
+          {/* Load More button */}
+          {nextCursor && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
           )}
         </div>
       )}

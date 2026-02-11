@@ -13,9 +13,7 @@ import {
   ChevronDown, ChevronRight, Activity, CheckCircle2, XCircle, Clock,
 } from 'lucide-react';
 
-
-
-
+const PAGE_SIZE = 20;
 
 export default function ExecutionList() {
   const activeConnection = usePluginConnection('n8n');
@@ -27,6 +25,8 @@ export default function ExecutionList() {
   const [retrying, setRetrying] = useState<string | null>(null);
   const [filterWorkflow, setFilterWorkflow] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Expanded detail
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -37,10 +37,11 @@ export default function ExecutionList() {
     if (!connectionId) return;
     setLoading(true);
     setError('');
-    const res = await listExecutions(connectionId, filterWorkflow || undefined);
+    const res = await listExecutions(connectionId, filterWorkflow || undefined, PAGE_SIZE);
     if (res.success && res.data) {
       const data = res.data as any;
       let list = Array.isArray(data) ? data : data.data || data.results || [];
+      setNextCursor(data.nextCursor || null);
       if (filterStatus) list = list.filter((e: any) => e.status === filterStatus);
       setExecutions(list);
     } else {
@@ -50,6 +51,22 @@ export default function ExecutionList() {
   }
 
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId, filterWorkflow, filterStatus]);
+
+  async function handleLoadMore() {
+    if (!connectionId || !nextCursor) return;
+    setLoadingMore(true);
+    const res = await listExecutions(connectionId, filterWorkflow || undefined, PAGE_SIZE, nextCursor);
+    if (res.success && res.data) {
+      const data = res.data as any;
+      let newItems = Array.isArray(data) ? data : data.data || data.results || [];
+      setNextCursor(data.nextCursor || null);
+      if (filterStatus) newItems = newItems.filter((e: any) => e.status === filterStatus);
+      setExecutions(prev => [...prev, ...newItems]);
+    } else {
+      toast.error(res.error?.message || 'Failed to load more');
+    }
+    setLoadingMore(false);
+  }
 
   async function loadDetail(id: string) {
     if (!connectionId) return;
@@ -258,6 +275,16 @@ export default function ExecutionList() {
           })}
           {executions.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">No executions found</div>
+          )}
+
+          {/* Load More button */}
+          {nextCursor && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </Button>
+            </div>
           )}
         </div>
       )}

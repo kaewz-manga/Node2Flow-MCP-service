@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { tgGetMe, tgSendMessage, tgSendPhoto } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Textarea, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, Send, Image, RefreshCw, AlertCircle, Bot, MessageSquare } from 'lucide-react';
 
@@ -155,12 +155,11 @@ export default function MessageTools() {
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Message Text</label>
-            <textarea
+            <Textarea
               value={msgText}
               onChange={(e) => setMsgText(e.target.value)}
               placeholder="Enter your message..."
               rows={4}
-              className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
           <Button
