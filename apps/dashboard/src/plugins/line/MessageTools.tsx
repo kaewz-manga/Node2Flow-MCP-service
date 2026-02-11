@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { lineGetBotInfo, linePushMessage, lineGetQuota, lineGetQuotaConsumption } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Textarea, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, RefreshCw, AlertCircle, Send, Bot, Gauge, MessageSquare } from 'lucide-react';
 
@@ -134,11 +134,11 @@ export default function MessageTools() {
                 onChange={(e) => setTo(e.target.value)}
                 placeholder="User/Group ID (e.g. U1234...)"
               />
-              <textarea
+              <Textarea
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 placeholder="Message text..."
-                className="w-full min-h-[80px] rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="min-h-[80px]"
               />
               <Button
                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
