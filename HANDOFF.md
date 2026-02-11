@@ -658,6 +658,23 @@ All 5 tasks implemented, built, deployed, committed (`1fa1b3a`).
 
 **Files changed** (11 total): gateway-api.ts, gemini-rag/types.ts, DocumentList.tsx, StoreList.tsx, DatabaseList.tsx, PageList.tsx, BlockList.tsx, WorkflowList.tsx, ExecutionList.tsx, UserList.tsx, MessageTools.tsx
 
+**Bug fix - LINE MessageTools shadcn** (`6805cd9`):
+- Subagent missed LINE `MessageTools.tsx` — still had native `<textarea>`
+- Fixed: replaced with shadcn `Textarea` component
+- Verified: 0 native `<select>` / `<textarea>` remaining in entire `plugins/` folder
+
+**Bug fix - usage_monthly UPSERT** (`3f715eb`):
+- `internal.ts` `/internal/report-usage` used `UPDATE` only for `usage_monthly`
+- If row didn't exist yet (new month / new user) → UPDATE affects 0 rows → usage not counted
+- Fixed: changed to `INSERT ... ON CONFLICT(user_id, year_month) DO UPDATE SET ...` (upsert)
+- Note: Usage only tracks MCP tool calls (`POST /mcp` → `tools/call`), NOT dashboard REST API calls
+
+**Playwright test results** (10 pages, 0 crashes):
+- n8n WorkflowList/ExecutionList: renders OK (401 = expired API key, not code bug)
+- Gemini RAG, Notion, LINE, Telegram pages: "No connection selected" — correct behavior
+- Test accounts (`claude-admin`, `test-card-check`) don't have Gemini/Notion connections
+- Owner account (`node2flow@gmail.com`) is OAuth-only — can't login via Playwright headless
+
 ### Session 40 Tasks (For Next Claude Code Session)
 
 TBD - All known UX issues from Session 39 have been resolved.
@@ -891,7 +908,7 @@ wrangler deploy                         # In each app/
 **Session 36**: Remove n8n variable tools (CE 403) + implement Gemini RAG, Telegram, Notion dashboard pages (8 pages)
 **Session 37**: LINE plugin dashboard pages (3 pages)
 **Session 38**: Gemini RAG + Notion bug fixes (camelCase/snake_case, response key, API version)
-**Session 39**: Pagination (8 pages), Create Database dialog, Custom Metadata UI, shadcn migration (11 files, +685/-85 lines)
+**Session 39**: Pagination (8 pages), Create Database dialog, Custom Metadata UI, shadcn migration, usage UPSERT fix, LINE shadcn fix
 **Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
