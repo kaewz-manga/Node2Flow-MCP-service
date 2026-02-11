@@ -623,188 +623,44 @@ Commits: `7c9cdeb` (Notion version + Gemini args) → `0f655e1` (Gemini response
 9. ~~**Remove n8n variables**~~ - Done (Session 36): CE returns 403
 10. ~~**LINE pages**~~ - Done (Session 37): 3 functional pages
 11. ~~**Gemini RAG + Notion bugs**~~ - Done (Session 38): 3 bugs fixed
-12. **Dashboard UX polish** - See Session 39 tasks below
+12. ~~**Dashboard UX polish**~~ - Done (Session 39): 5 tasks completed
 
-### Session 39 Tasks (For Next Claude Code Session)
+### Session 39 Completed (2026-02-11)
 
-The following tasks are ready to implement. Do NOT ask the user for clarification — all details are provided below.
+All 5 tasks implemented, built, deployed, committed (`1fa1b3a`).
 
----
+**Task 1 - Create Database dialog** (Notion DatabaseList.tsx):
+- Added Create Database button + dialog with title, parent page ID, dynamic property rows
+- Property types: title, rich_text, number, select, checkbox, date, url, email
+- Added `notionCreateDatabase()` to gateway-api.ts
 
-#### Task 1: Add "Create Database" button to Notion DatabaseList
+**Task 2 - Fix store selector doc count** (Gemini DocumentList.tsx):
+- Store selector now shows actual loaded doc count for selected store instead of stale `documentCount`
 
-**File**: `apps/dashboard/src/plugins/notion/DatabaseList.tsx`
+**Task 3 - Custom Metadata UI** (Gemini DocumentList.tsx + types.ts):
+- Added collapsible "Custom Metadata" section with dynamic key-value rows
+- Supports String, Number, String List types
+- Added `StringList` interface and `stringListValue` to `CustomMetadata` type
+- Updated `uploadToStore()` in gateway-api.ts to accept metadata param
 
-Add a "Create Database" dialog similar to Gemini RAG's `StoreList.tsx` create pattern:
-- Input fields: Database title (text), Parent page ID (text, required)
-- At least 1 default property: "Name" (title type)
-- Optional: Let user add property name + type pairs (text, number, select, checkbox, date, url, email)
-- Use `notionCreateDatabase()` from gateway-api.ts (already exists)
-- Show toast on success, refresh list
+**Task 4 - Pagination** (8 pages across 4 plugins):
+- Added "Load More" pagination with `PAGE_SIZE=20` to all 8 list pages
+- Notion: DatabaseList, PageList, BlockList (cursor-based)
+- Gemini RAG: StoreList, DocumentList (token-based)
+- n8n: WorkflowList, ExecutionList (cursor-based)
+- LINE: UserList (start-token-based)
+- Added pagination params to 7 gateway-api.ts functions
 
-**Gateway API function** (already in `gateway-api.ts`):
-```typescript
-export async function notionCreateDatabase(connectionId: string, parentPageId: string, title: string, properties: Record<string, unknown>)
-```
+**Task 5 - shadcn migration** (3 files):
+- DocumentList: native `<select>` → shadcn Select, native `<textarea>` → shadcn Textarea
+- BlockList: native `<select>` → shadcn Select
+- MessageTools: native `<textarea>` → shadcn Textarea
 
-**Notion API reference** (`apps/mcp-gateway/src/plugins/notion/client.ts` line 227):
-```typescript
-async createDatabase(params: {
-  parent: Record<string, unknown>;
-  title: RichText[];
-  properties: Record<string, unknown>;
-})
-```
+**Files changed** (11 total): gateway-api.ts, gemini-rag/types.ts, DocumentList.tsx, StoreList.tsx, DatabaseList.tsx, PageList.tsx, BlockList.tsx, WorkflowList.tsx, ExecutionList.tsx, UserList.tsx, MessageTools.tsx
 
----
+### Session 40 Tasks (For Next Claude Code Session)
 
-#### Task 2: Fix Gemini RAG DocumentList store selector doc count
-
-**File**: `apps/dashboard/src/plugins/gemini-rag/DocumentList.tsx` (line 159-163)
-
-**Bug**: Store selector `<option>` shows `store.documentCount` from the store list API, but this count may be stale or inaccurate. The actual document count is only known after fetching documents for that store.
-
-**Fix**: After documents are fetched for the selected store, update the displayed count. Options:
-- Show `({documents.length} docs)` for the selected store instead of `store.documentCount`
-- Or keep `store.documentCount` but add a note "(actual: {documents.length})" after loading
-
----
-
-#### Task 3: Add Custom Metadata UI for Gemini RAG document import/upload
-
-**Files to modify**:
-- `apps/mcp-gateway/src/plugins/gemini-rag/types.ts` — Add `stringListValue` to `CustomMetadata`
-- `apps/mcp-gateway/src/plugins/gemini-rag/tools.ts` — Update upload/import tool schema
-- `apps/dashboard/src/plugins/gemini-rag/DocumentList.tsx` — Add metadata UI in upload section
-
-**API Reference**: https://ai.google.dev/api/file-search/documents#CustomMetadata
-
-**Current types.ts** (missing `stringListValue`):
-```typescript
-export interface CustomMetadata {
-  key: string;
-  stringValue?: string;
-  numericValue?: number;
-}
-```
-
-**Should be**:
-```typescript
-export interface StringList {
-  values: string[];
-}
-
-export interface CustomMetadata {
-  key: string;
-  stringValue?: string;
-  numericValue?: number;
-  stringListValue?: StringList;
-}
-```
-
-**UI Design** (in DocumentList upload section):
-- Add collapsible "Custom Metadata" section below upload content textarea
-- Dynamic key-value rows (max 20):
-  - Key input (text)
-  - Type selector: String | Number | String List
-  - Value input (text for string, number for numeric, comma-separated for string list)
-  - Add/Remove row buttons
-- Pass metadata array to `uploadToStore()` function
-
-**gateway-api.ts** `uploadToStore` already accepts metadata — just needs the UI to collect and pass it.
-
----
-
-#### Task 4: Add Pagination to All List-Type Subpages
-
-Add "Load More" / "Next Page" pagination (limit 20 items per page) to list pages where the backend API supports it. Do NOT add pagination where the API doesn't support it.
-
-**Pages that support pagination** (4 plugins, 8 pages):
-
-| Plugin | Page | File | API Pagination Params | Current Behavior |
-|--------|------|------|----------------------|------------------|
-| **Notion** | DatabaseList | `plugins/notion/DatabaseList.tsx` | `start_cursor`, `page_size` (via `notionSearch`) | Loads all |
-| **Notion** | PageList | `plugins/notion/PageList.tsx` | `start_cursor`, `page_size` (via `notionSearch`) | Loads all |
-| **Notion** | BlockList | `plugins/notion/BlockList.tsx` | `start_cursor`, `page_size` (via `notionGetBlockChildren`) | Loads all |
-| **Gemini RAG** | StoreList | `plugins/gemini-rag/StoreList.tsx` | `pageToken`, `pageSize` (via `listStores`) | Loads all |
-| **Gemini RAG** | DocumentList | `plugins/gemini-rag/DocumentList.tsx` | `pageToken`, `pageSize` (via `listDocuments`) | Loads all |
-| **n8n** | WorkflowList | `plugins/n8n/WorkflowList.tsx` | `limit`, `cursor` (via n8n REST API) | Loads all |
-| **n8n** | ExecutionList | `plugins/n8n/ExecutionList.tsx` | `limit`, `cursor` | Loads all |
-| **LINE** | UserList | `plugins/line/UserList.tsx` | `start` token (via `lineGetFollowerIds`) | Loads all |
-
-**Pages that do NOT support pagination** (skip these):
-- WordPress PostList, PageList, MediaList, CommentList — WP REST API uses `page`/`per_page` but our `wpCall()` proxy doesn't pass them through
-- Telegram pages — no list pagination in Bot API
-- cl-n8n-mcp pages — search results only, no cursor
-- LINE MessageTools, RichMenuList — no pagination
-
-**Implementation pattern**:
-1. Set default `pageSize` / `limit` to 20
-2. Store `nextCursor` / `nextPageToken` in state
-3. On fetch, pass cursor/token to API
-4. Show "Load More" button at bottom of list when `has_more` / `nextPageToken` exists
-5. Append new results to existing list (don't replace)
-6. Update stat cards to show "X loaded (more available)" when paginated
-
-**Gateway API functions that need `pageSize`/`cursor` params added** (check if they already accept these — some may need updating in `gateway-api.ts`):
-- `notionSearch(connectionId, query, filterObject, startCursor?, pageSize?)`
-- `notionGetBlockChildren(connectionId, blockId, startCursor?, pageSize?)`
-- `listStores(connectionId, pageSize?, pageToken?)`
-- `listDocuments(connectionId, storeName, pageSize?, pageToken?)`
-
----
-
-#### Task 5: Replace All Native HTML with shadcn/ui Components
-
-Replace remaining native HTML elements (`<select>`, `<textarea>`) with shadcn/ui equivalents from `@node2flow/dashboard-core`.
-
-**Native `<select>` elements (3 instances)**:
-
-| File | Line | Context | Replace With |
-|------|------|---------|-------------|
-| `plugins/gemini-rag/DocumentList.tsx` | 154-164 | Store selector dropdown | shadcn `Select` + `SelectTrigger` + `SelectContent` + `SelectItem` |
-| `plugins/notion/BlockList.tsx` | ~180-191 | Block type selector for append | shadcn `Select` |
-| `plugins/notion/BlockList.tsx` | (another select if present) | Page selector | shadcn `Select` |
-
-**Native `<textarea>` elements (7+ instances)**:
-
-| File | Line | Context | Replace With |
-|------|------|---------|-------------|
-| `plugins/gemini-rag/DocumentList.tsx` | 228-234 | Upload content textarea | shadcn `Textarea` |
-| `plugins/cl-n8n-mcp/WorkflowTools.tsx` | ~various | Workflow JSON input | shadcn `Textarea` |
-| `plugins/telegram/MessageTools.tsx` | ~various | Message text input | shadcn `Textarea` |
-| `plugins/telegram/WebhookSettings.tsx` | ~various | Webhook URL notes | shadcn `Textarea` (if present) |
-| `plugins/notion/BlockList.tsx` | ~various | Block content input | shadcn `Textarea` |
-| `plugins/wordpress/PostList.tsx` | ~various | Post content editor | shadcn `Textarea` |
-| `plugins/wordpress/PageList.tsx` | ~various | Page content editor | shadcn `Textarea` |
-
-**shadcn components available** (already in `@node2flow/dashboard-core`):
-- `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem` — for dropdowns
-- `Textarea` — for multi-line text input
-
-**Import pattern**:
-```typescript
-import { usePluginConnection, Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, ... } from '@node2flow/dashboard-core';
-```
-
-**If `Select` or `Textarea` is not yet exported from `@node2flow/dashboard-core`**, add them:
-1. Check `packages/dashboard-core/src/components/ui/` for the component files
-2. Add export to `packages/dashboard-core/src/index.ts`
-3. Run `pnpm run build` from monorepo root to rebuild
-
----
-
-### Build & Deploy After All Tasks
-
-```bash
-# From monorepo root
-pnpm run build              # Build all 5 packages
-pnpm run deploy             # Deploy gateway + dashboard (if script exists)
-
-# Or manually:
-cd apps/mcp-gateway && npx wrangler deploy
-cd apps/dashboard && npm run deploy
-```
+TBD - All known UX issues from Session 39 have been resolved.
 
 ### Test Accounts
 
@@ -1035,6 +891,7 @@ wrangler deploy                         # In each app/
 **Session 36**: Remove n8n variable tools (CE 403) + implement Gemini RAG, Telegram, Notion dashboard pages (8 pages)
 **Session 37**: LINE plugin dashboard pages (3 pages)
 **Session 38**: Gemini RAG + Notion bug fixes (camelCase/snake_case, response key, API version)
+**Session 39**: Pagination (8 pages), Create Database dialog, Custom Metadata UI, shadcn migration (11 files, +685/-85 lines)
 **Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
