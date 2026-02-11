@@ -158,8 +158,8 @@ export async function handleInternalRoutes(
     // D1 batch = atomic transaction (all succeed or all fail)
     const d1Stmts: D1PreparedStatement[] = [
       env.DB.prepare(
-        `UPDATE usage_monthly SET request_count = request_count + 1, success_count = success_count + ?, error_count = error_count + ?, updated_at = ? WHERE user_id = ? AND year_month = ?`
-      ).bind(successInc, errorInc, now, body.user_id, yearMonth),
+        `INSERT INTO usage_monthly (id, user_id, year_month, request_count, success_count, error_count, created_at, updated_at) VALUES (?, ?, ?, 1, ?, ?, ?, ?) ON CONFLICT(user_id, year_month) DO UPDATE SET request_count = request_count + 1, success_count = success_count + ?, error_count = error_count + ?, updated_at = ?`
+      ).bind(generateUUID(), body.user_id, yearMonth, successInc, errorInc, now, now, successInc, errorInc, now),
       env.DB.prepare(
         `INSERT INTO usage_logs (id, user_id, api_key_id, connection_id, tool_name, status, response_time_ms, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(logId, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null, now),
