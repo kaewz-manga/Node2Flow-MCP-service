@@ -1,13 +1,22 @@
 /**
  * LINE Messaging API - MCP Tool Definitions (25 tools)
+ * Ported from @node2flow/line-bot-mcp (community, Smithery quality 85/100)
  */
 
-export const TOOLS: import('../../types').MCPToolDefinition[] = [
+import type { MCPToolDefinition } from '../../types';
+
+export const TOOLS: MCPToolDefinition[] = [
   // ========== Message Tools (5) ==========
   {
     name: 'line_push_message',
     description:
       'Send a push message to a LINE user, group, or room. Supports all message types: text, image, video, audio, file, location, sticker, template, flex, and imagemap. Example text message: {"type":"text","text":"Hello"}. Example flex: {"type":"flex","altText":"...","contents":{...}}.',
+    annotations: {
+      title: 'Push Message',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -32,6 +41,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_reply_message',
     description:
       'Reply to a webhook event using a reply token. The token expires quickly, so use immediately after receiving an event. Free (does not consume message quota).',
+    annotations: {
+      title: 'Reply Message',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -56,6 +71,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_multicast_message',
     description:
       'Send a message to multiple users simultaneously (max 500 user IDs). More efficient than individual push messages.',
+    annotations: {
+      title: 'Multicast Message',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -81,6 +102,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_broadcast_message',
     description:
       'Send a message to all followers of the bot. No user IDs needed. Consumes message quota based on number of followers.',
+    annotations: {
+      title: 'Broadcast Message',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -101,6 +128,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_validate_message',
     description:
       'Validate message objects before sending. Returns 200 OK if valid, or error details if invalid. Use to check message format before push/reply/multicast/broadcast.',
+    annotations: {
+      title: 'Validate Message',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -119,6 +152,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_profile',
     description:
       'Get a LINE user profile. Returns display name, profile picture URL, status message, and language. The user must have added the bot as a friend.',
+    annotations: {
+      title: 'Get User Profile',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -134,6 +173,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_follower_ids',
     description:
       'Get a list of user IDs of users who added the bot as friend. Returns up to 300 IDs per page. Use the next token for pagination.',
+    annotations: {
+      title: 'Get Follower IDs',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -152,15 +197,29 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_bot_info',
     description:
       'Get bot basic information: user ID, basic ID, display name, picture URL, chat mode, and mark-as-read mode.',
+    annotations: {
+      title: 'Get Bot Info',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        _fields: { type: 'string', description: 'Comma-separated list of fields to include in the response (e.g. "userId,displayName,chatMode")' },
+      },
     },
   },
   {
     name: 'line_display_loading',
     description:
       'Display a loading animation in the chat. Useful before performing slow operations. Animation shows for the specified duration.',
+    annotations: {
+      title: 'Display Loading',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -182,6 +241,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_group_summary',
     description:
       'Get group chat summary: group name, picture URL, and creation time.',
+    annotations: {
+      title: 'Get Group Summary',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -197,6 +262,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_group_members_count',
     description:
       'Get the number of members in a group chat.',
+    annotations: {
+      title: 'Get Group Members Count',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -212,6 +283,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_group_member_ids',
     description:
       'Get a list of user IDs of group members. Returns up to 100 IDs per page. Use the next token for pagination.',
+    annotations: {
+      title: 'Get Group Member IDs',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -231,6 +308,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_group_member_profile',
     description:
       'Get profile of a specific member within a group chat.',
+    annotations: {
+      title: 'Get Group Member Profile',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -252,6 +335,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_create_rich_menu',
     description:
       'Create a rich menu for the bot. Returns the created rich menu ID. After creating, upload an image and set it as default or link to specific users.',
+    annotations: {
+      title: 'Create Rich Menu',
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -284,15 +373,29 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_rich_menus',
     description:
       'List all rich menus created for the bot. Returns array of rich menu objects with IDs, names, sizes, and areas.',
+    annotations: {
+      title: 'List Rich Menus',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        _fields: { type: 'string', description: 'Comma-separated list of fields to include in the response (e.g. "richMenuId,name,selected")' },
+      },
     },
   },
   {
     name: 'line_get_rich_menu',
     description:
       'Get details of a specific rich menu by ID.',
+    annotations: {
+      title: 'Get Rich Menu',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -308,6 +411,12 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_delete_rich_menu',
     description:
       'Delete a rich menu. If this was the default menu or linked to users, it will be unlinked automatically.',
+    annotations: {
+      title: 'Delete Rich Menu',
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -323,6 +432,13 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_set_default_rich_menu',
     description:
       'Set a rich menu as the default for all users who have not been individually linked to a different rich menu.',
+    annotations: {
+      title: 'Set Default Rich Menu',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -338,6 +454,13 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_link_rich_menu_to_user',
     description:
       'Link a specific rich menu to a user. This overrides the default rich menu for that user.',
+    annotations: {
+      title: 'Link Rich Menu to User',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -359,24 +482,46 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_quota',
     description:
       'Get the monthly message quota for the bot. Returns the quota type and limit value.',
+    annotations: {
+      title: 'Get Message Quota',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        _fields: { type: 'string', description: 'Comma-separated list of fields to include in the response (e.g. "type,value")' },
+      },
     },
   },
   {
     name: 'line_get_quota_consumption',
     description:
       'Get the number of messages sent this month. Use with line_get_quota to check remaining messages.',
+    annotations: {
+      title: 'Get Quota Consumption',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        _fields: { type: 'string', description: 'Comma-separated list of fields to include in the response (e.g. "totalUsage")' },
+      },
     },
   },
   {
     name: 'line_get_followers_count',
     description:
       'Get follower statistics for a specific date: number of followers, targeted reaches, and blocks.',
+    annotations: {
+      title: 'Get Followers Count',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -394,6 +539,13 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_set_webhook_url',
     description:
       'Set the webhook endpoint URL for receiving LINE events (messages, follows, etc.).',
+    annotations: {
+      title: 'Set Webhook URL',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
     inputSchema: {
       type: 'object',
       properties: {
@@ -409,15 +561,29 @@ export const TOOLS: import('../../types').MCPToolDefinition[] = [
     name: 'line_get_webhook_info',
     description:
       'Get the current webhook endpoint URL and whether it is active.',
+    annotations: {
+      title: 'Get Webhook Info',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
-      properties: {},
+      properties: {
+        _fields: { type: 'string', description: 'Comma-separated list of fields to include in the response (e.g. "endpoint,active")' },
+      },
     },
   },
   {
     name: 'line_test_webhook',
     description:
       'Test webhook endpoint connectivity. Sends a test request to the configured webhook URL and returns the result.',
+    annotations: {
+      title: 'Test Webhook',
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+    },
     inputSchema: {
       type: 'object',
       properties: {

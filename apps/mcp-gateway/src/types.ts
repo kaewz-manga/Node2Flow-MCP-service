@@ -3,6 +3,13 @@
 export interface MCPToolDefinition {
   name: string;
   description: string;
+  annotations?: {
+    title?: string;
+    readOnlyHint?: boolean;
+    destructiveHint?: boolean;
+    idempotentHint?: boolean;
+    openWorldHint?: boolean;
+  };
   inputSchema: {
     type: 'object';
     properties: Record<string, unknown>;

@@ -4,7 +4,9 @@
  * Ported from @node2flow/n8n-management-mcp (community, Smithery quality 85/100)
  */
 
-export const TOOLS = [
+import type { MCPToolDefinition } from '../../types';
+
+export const TOOLS: MCPToolDefinition[] = [
   // ========== Workflow Tools (10) ==========
   {
     name: 'n8n_list_workflows',
