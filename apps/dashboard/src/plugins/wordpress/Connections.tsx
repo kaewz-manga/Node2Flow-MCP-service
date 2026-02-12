@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -54,6 +54,7 @@ export default function Connections() {
   // Edit connection states
   const [editTarget, setEditTarget] = useState<{ id: string; name: string } | null>(null);
   const [editName, setEditName] = useState('');
+  const isMobile = useIsMobile();
 
   const fetchConnections = async () => {
     setLoading(true);
@@ -437,30 +438,40 @@ export default function Connections() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Connection Name Dialog */}
-      <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Connection Name</DialogTitle>
-          </DialogHeader>
-          <Field>
-            <FieldLabel>Connection Name</FieldLabel>
-            <InputGroup>
-              <InputGroupAddon><Tag /></InputGroupAddon>
-              <InputGroupInput
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Connection name"
-              />
-            </InputGroup>
-          </Field>
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
-            <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Edit Connection Name - Dialog (desktop) / Sheet (mobile) */}
+      {isMobile ? (
+        <Sheet open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+          <SheetContent side="bottom">
+            <SheetHeader><SheetTitle>Edit Connection Name</SheetTitle></SheetHeader>
+            <div className="px-4 py-3">
+              <Field><FieldLabel>Connection Name</FieldLabel>
+                <InputGroup><InputGroupAddon><Tag /></InputGroupAddon>
+                  <InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" />
+                </InputGroup>
+              </Field>
+            </div>
+            <SheetFooter className="px-4 pb-4">
+              <SheetClose asChild><Button variant="outline" className="flex-1">Cancel</Button></SheetClose>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Edit Connection Name</DialogTitle></DialogHeader>
+            <Field><FieldLabel>Connection Name</FieldLabel>
+              <InputGroup><InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" />
+              </InputGroup>
+            </Field>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Delete Connection Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

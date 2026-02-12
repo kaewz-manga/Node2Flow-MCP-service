@@ -8,6 +8,7 @@ import {
   Collapsible, CollapsibleTrigger, CollapsibleContent,
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+  Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext,
 } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
@@ -39,8 +40,10 @@ export default function DocumentList() {
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
   // Pagination
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   // Upload
   const [uploadDisplayName, setUploadDisplayName] = useState('');
@@ -79,40 +82,54 @@ export default function DocumentList() {
   // Load documents when store selected
   useEffect(() => {
     if (selectedStore && connectionId) {
-      fetchDocuments();
+      setCurrentPage(0);
+      setPageTokens([null]);
+      fetchDocuments(null, true);
     }
   }, [selectedStore, connectionId]);
 
-  async function fetchDocuments() {
+  async function fetchDocuments(pageToken?: string | null, isInitial = true) {
     if (!connectionId || !selectedStore) return;
-    setLoading(true);
+    if (isInitial) { setLoading(true); setDocuments([]); }
+    else setPageLoading(true);
     setError('');
-    setDocuments([]);
-    setNextPageToken(null);
-    const res = await listDocuments(connectionId, selectedStore, PAGE_SIZE);
+    const res = await listDocuments(connectionId, selectedStore, PAGE_SIZE, pageToken || undefined);
     if (res.success && res.data) {
       const d = res.data as any;
       setDocuments(Array.isArray(d) ? d : d.documents || []);
-      setNextPageToken(d.nextPageToken || null);
+      const nextToken = d.nextPageToken || null;
+      setHasNextPage(!!nextToken);
+      if (nextToken && isInitial) {
+        setPageTokens([null, nextToken]);
+      } else if (nextToken && !isInitial) {
+        setPageTokens(prev => {
+          const newTokens = [...prev];
+          if (newTokens.length <= currentPage + 1) newTokens.push(nextToken);
+          else newTokens[currentPage + 1] = nextToken;
+          return newTokens;
+        });
+      } else if (isInitial) {
+        setPageTokens([null]);
+      }
     } else {
       setError(res.error?.message || 'Failed to load documents');
     }
-    setLoading(false);
+    if (isInitial) setLoading(false);
+    else setPageLoading(false);
   }
 
-  async function handleLoadMore() {
-    if (!connectionId || !selectedStore || !nextPageToken) return;
-    setLoadingMore(true);
-    const res = await listDocuments(connectionId, selectedStore, PAGE_SIZE, nextPageToken);
-    if (res.success && res.data) {
-      const d = res.data as any;
-      const newDocs = Array.isArray(d) ? d : d.documents || [];
-      setDocuments(prev => [...prev, ...newDocs]);
-      setNextPageToken(d.nextPageToken || null);
-    } else {
-      toast.error(res.error?.message || 'Failed to load more documents');
-    }
-    setLoadingMore(false);
+  function handlePrevPage() {
+    if (currentPage <= 0) return;
+    const prevPage = currentPage - 1;
+    setCurrentPage(prevPage);
+    fetchDocuments(pageTokens[prevPage], false);
+  }
+
+  function handleNextPage() {
+    if (!hasNextPage) return;
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchDocuments(pageTokens[nextPage] || null, false);
   }
 
   async function handleDelete() {
@@ -121,7 +138,7 @@ export default function DocumentList() {
     if (res.success) {
       toast.success('Document deleted successfully');
       setDeleteTarget(null);
-      fetchDocuments();
+      fetchDocuments(pageTokens[currentPage], false);
     } else {
       toast.error(res.error?.message || 'Failed to delete document');
     }
@@ -168,7 +185,8 @@ export default function DocumentList() {
       setUploadFile(null);
       setMetadataRows([]);
       setMetadataOpen(false);
-      fetchDocuments();
+      setCurrentPage(0);
+      fetchDocuments(null, true);
     } else {
       toast.error(res.error?.message || 'Failed to upload document');
     }
@@ -235,7 +253,7 @@ export default function DocumentList() {
           <h1 className="text-2xl font-bold text-foreground">Documents</h1>
           <p className="text-muted-foreground mt-1">{activeConnection.name} - {documents.length} documents in selected store</p>
         </div>
-        <Button variant="outline" size="icon" onClick={fetchDocuments} title="Refresh" disabled={!selectedStore}>
+        <Button variant="outline" size="icon" onClick={() => fetchDocuments()} title="Refresh" disabled={!selectedStore}>
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
@@ -536,14 +554,21 @@ export default function DocumentList() {
                 </Table>
               </div>
 
-              {/* Load More */}
-              {nextPageToken && (
-                <div className="flex justify-center pt-2">
-                  <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
-                    {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
-                    Load More
-                  </Button>
-                </div>
+              {/* Pagination */}
+              {(currentPage > 0 || hasNextPage) && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious onClick={handlePrevPage} disabled={currentPage === 0 || pageLoading} />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <span className="px-3 text-sm text-muted-foreground">Page {currentPage + 1}</span>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext onClick={handleNextPage} disabled={!hasNextPage || pageLoading} />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               )}
             </>
           ) : selectedStore ? (

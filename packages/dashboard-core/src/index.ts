@@ -77,9 +77,11 @@ export { Switch } from './components/ui/switch';
 export { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup, ItemSeparator, ItemHeader, ItemFooter } from './components/ui/item';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 export { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from './components/ui/empty';
+export { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from './components/ui/pagination';
 
 // Hooks
 export { useSudo } from './hooks/useSudo';
+export { useIsMobile } from './hooks/use-mobile';
 
 // Pages
 export { default as LoginPage } from './pages/Login';

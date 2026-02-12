@@ -3,14 +3,16 @@ import { toast } from 'sonner';
 import { listStores, createStore, getStore, deleteStore } from '../../lib/gateway-api';
 import {
   usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
-  Alert, AlertDescription, Separator,
+  Alert, AlertDescription, Separator, Field, FieldLabel,
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+  Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext,
 } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
-import { Loader2, Plus, RefreshCw, AlertCircle, Database, FolderOpen, ChevronDown, ChevronRight, Trash2, MoreHorizontal } from 'lucide-react';
+import { Loader2, Plus, RefreshCw, AlertCircle, Database, FolderOpen, MoreHorizontal } from 'lucide-react';
 
 const PAGE_SIZE = 20;
 
@@ -23,43 +25,71 @@ export default function StoreList() {
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [newDisplayName, setNewDisplayName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [expandedStore, setExpandedStore] = useState<string | null>(null);
   const [storeDetails, setStoreDetails] = useState<Record<string, any>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  async function fetch() {
+  // Pagination: track page tokens for back navigation
+  const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+
+  async function fetchPage(pageToken: string | null, isInitial = false) {
     if (!connectionId) return;
-    setLoading(true);
+    if (isInitial) setLoading(true);
+    else setPageLoading(true);
     setError('');
-    const res = await listStores(connectionId, PAGE_SIZE);
+    const res = await listStores(connectionId, PAGE_SIZE, pageToken || undefined);
     if (res.success && res.data) {
       const d = res.data as any;
       setStores(Array.isArray(d) ? d : d.fileSearchStores || d.stores || []);
-      setNextPageToken(d.nextPageToken || null);
+      const nextToken = d.nextPageToken || null;
+      setHasNextPage(!!nextToken);
+      // Store the next page token if we don't have it yet
+      if (nextToken && !isInitial) {
+        setPageTokens(prev => {
+          const newTokens = [...prev];
+          if (newTokens.length <= currentPage + 1) {
+            newTokens.push(nextToken);
+          } else {
+            newTokens[currentPage + 1] = nextToken;
+          }
+          return newTokens;
+        });
+      } else if (nextToken && isInitial) {
+        setPageTokens([null, nextToken]);
+      } else if (isInitial) {
+        setPageTokens([null]);
+      }
     } else {
       setError(res.error?.message || 'Failed to load stores');
     }
-    setLoading(false);
+    if (isInitial) setLoading(false);
+    else setPageLoading(false);
   }
 
-  async function handleLoadMore() {
-    if (!connectionId || !nextPageToken) return;
-    setLoadingMore(true);
-    const res = await listStores(connectionId, PAGE_SIZE, nextPageToken);
-    if (res.success && res.data) {
-      const d = res.data as any;
-      const moreStores = Array.isArray(d) ? d : d.fileSearchStores || d.stores || [];
-      setStores(prev => [...prev, ...moreStores]);
-      setNextPageToken(d.nextPageToken || null);
-    } else {
-      toast.error(res.error?.message || 'Failed to load more stores');
+  useEffect(() => {
+    if (connectionId) {
+      setCurrentPage(0);
+      fetchPage(null, true);
     }
-    setLoadingMore(false);
+  }, [connectionId]);
+
+  function handlePrevPage() {
+    if (currentPage <= 0) return;
+    const prevPage = currentPage - 1;
+    setCurrentPage(prevPage);
+    fetchPage(pageTokens[prevPage]);
   }
 
-  useEffect(() => { if (connectionId) fetch(); }, [connectionId]);
+  function handleNextPage() {
+    if (!hasNextPage) return;
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchPage(pageTokens[nextPage] || null);
+  }
 
   async function handleCreate() {
     if (!newDisplayName.trim() || !connectionId) return;
@@ -68,7 +98,9 @@ export default function StoreList() {
     if (res.success) {
       toast.success('Store created successfully');
       setNewDisplayName('');
-      fetch();
+      setShowCreateDialog(false);
+      setCurrentPage(0);
+      fetchPage(null, true);
     } else {
       toast.error(res.error?.message || 'Failed to create store');
     }
@@ -77,11 +109,11 @@ export default function StoreList() {
 
   async function handleDelete() {
     if (!deleteTarget || !connectionId) return;
-    const res = await deleteStore(connectionId, deleteTarget.name, true); // force=true to delete docs too
+    const res = await deleteStore(connectionId, deleteTarget.name, true);
     if (res.success) {
       toast.success('Store deleted successfully');
       setDeleteTarget(null);
-      fetch();
+      fetchPage(pageTokens[currentPage]);
     } else {
       toast.error(res.error?.message || 'Failed to delete store');
     }
@@ -105,11 +137,7 @@ export default function StoreList() {
     }
   }
 
-  // Calculate total documents
-  const totalDocs = stores.reduce((sum, store) => {
-    const docCount = store.documentCount || 0;
-    return sum + docCount;
-  }, 0);
+  const totalDocs = stores.reduce((sum, store) => sum + (store.documentCount || 0), 0);
 
   if (!activeConnection) {
     return <div className="text-center py-12 text-muted-foreground">No connection selected. Please select a connection from the sidebar.</div>;
@@ -121,12 +149,17 @@ export default function StoreList() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">File Search Stores</h1>
           <p className="text-muted-foreground mt-1">
-            {activeConnection.name} - {stores.length} loaded{nextPageToken ? ' (more available)' : ' stores'}
+            {activeConnection.name} - Page {currentPage + 1}{hasNextPage ? '+' : ''}
           </p>
         </div>
-        <Button variant="outline" size="icon" onClick={fetch} title="Refresh">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="icon" onClick={() => fetchPage(pageTokens[currentPage])} title="Refresh">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setShowCreateDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Create Store
+          </Button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -168,20 +201,6 @@ export default function StoreList() {
       )}
 
       <Separator />
-
-      {/* Create Store */}
-      <div className="flex gap-2">
-        <Input
-          value={newDisplayName}
-          onChange={(e) => setNewDisplayName(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
-          placeholder="New store display name..."
-          className="flex-1"
-        />
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !newDisplayName.trim()}>
-          {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Create Store
-        </Button>
-      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -265,18 +284,54 @@ export default function StoreList() {
               </TableBody>
             </Table>
           </div>
-          {nextPageToken && (
-            <div className="flex justify-center pt-2">
-              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
-                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {loadingMore ? 'Loading...' : 'Load More'}
-              </Button>
-            </div>
+
+          {/* Pagination */}
+          {(currentPage > 0 || hasNextPage) && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious onClick={handlePrevPage} disabled={currentPage === 0 || pageLoading} />
+                </PaginationItem>
+                <PaginationItem>
+                  <span className="px-3 text-sm text-muted-foreground">Page {currentPage + 1}</span>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext onClick={handleNextPage} disabled={!hasNextPage || pageLoading} />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
         </div>
       ) : (
         <div className="text-center py-8 text-muted-foreground">No stores found. Create one to get started!</div>
       )}
+
+      {/* Create Store Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Store</DialogTitle>
+          </DialogHeader>
+          <Field>
+            <FieldLabel>Display Name</FieldLabel>
+            <Input
+              value={newDisplayName}
+              onChange={(e) => setNewDisplayName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
+              placeholder="My knowledge base..."
+            />
+          </Field>
+          <div className="flex gap-3 pt-2">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => { setShowCreateDialog(false); setNewDisplayName(''); }}>
+              Cancel
+            </Button>
+            <Button className="flex-1" onClick={handleCreate} disabled={creating || !newDisplayName.trim()}>
+              {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+              Create
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmDialog
         open={!!deleteTarget}
