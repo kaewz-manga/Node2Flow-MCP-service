@@ -21,8 +21,8 @@
               │  platform.n2f.net     │  │  mcp.node2flow.net         │
               │                       │  │                            │
               │  /api/auth/*          │  │  POST /mcp (JSON-RPC 2.0)  │
-              │  /api/user/*          │  │  /api/connections (CRUD)   │
-              │  /api/billing/*       │  │  /api/proxy/:product/*     │
+              │  /api/user/*          │  │  /oauth/* (OAuth 2.1)      │
+              │  /api/billing/*       │  │  /api/connections (CRUD)   │
               │  /api/admin/*         │  │                            │
               │  /api/agent/*  (HMAC) │  │  plugins/                  │
               │  /internal/*          │◄─┤    n8n/     (31 tools)     │
@@ -88,9 +88,10 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| `index.ts` | 201 | Main router: MCP endpoint + Dashboard API + proxy |
-| `routes/auth.ts` | 163 | API key auth via Platform service binding + JWT verify |
-| `routes/mcp.ts` | 168 | JSON-RPC 2.0 handler: initialize, tools/list, tools/call, ping |
+| `index.ts` | 230 | Main router: OAuth + MCP endpoint + Dashboard API + proxy |
+| `routes/oauth.ts` | 460 | OAuth 2.1 Authorization Server (PKCE, Dynamic Client Registration, Google/GitHub) |
+| `routes/auth.ts` | 186 | API key + JWT auth, OAUTH_REQUIRED signaling |
+| `routes/mcp.ts` | 230 | JSON-RPC 2.0 handler with dual auth (API key + OAuth JWT) |
 | `routes/connections.ts` | 226 | Unified connection CRUD with AES-256-GCM encryption |
 | `plugin-registry.ts` | 41 | Plugin registration + tool discovery |
 | `plugins/n8n/` | 4 files | n8n plugin: 27 tools, HTTP client |
@@ -108,7 +109,7 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
 
-**MCP Request Flow**:
+**MCP Request Flow (API Key)**:
 ```
 1. POST /mcp + Bearer n2f_xxx
 2. Gateway → Platform /internal/validate-api-key (service binding)
@@ -116,6 +117,18 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 4. Gateway queries connections WHERE id = connection_id
 5. Decrypt config → plugin.createClient(config)
 6. plugin.handleToolCall(toolName, args, client)
+7. Return MCP response
+8. ctx.waitUntil → Platform /internal/report-usage
+```
+
+**MCP Request Flow (OAuth JWT)**:
+```
+1. POST /mcp + Bearer eyJhbG... (JWT from OAuth flow)
+2. Gateway verifies JWT signature + expiry (shared JWT_SECRET)
+3. Gateway → Platform /internal/get-user-usage
+4. tools/list: queries ALL user's active connections → returns tools from all plugins
+5. tools/call: finds plugin for tool → queries connection by user_id + product_type
+6. Decrypt config → plugin.createClient(config) → handleToolCall
 7. Return MCP response
 8. ctx.waitUntil → Platform /internal/report-usage
 ```
@@ -450,8 +463,12 @@ All containers: 512MB mem_limit, mcp-http-bridge.mjs, AUTH_TOKEN env.
 
 | Secret | Purpose |
 |--------|---------|
-| JWT_SECRET | JWT verification |
+| JWT_SECRET | JWT verification (shared with Platform Worker) |
 | ENCRYPTION_KEY | AES-256-GCM config encryption |
+| GOOGLE_CLIENT_ID | Google OAuth (MCP Gateway) |
+| GOOGLE_CLIENT_SECRET | Google OAuth (MCP Gateway) |
+| GITHUB_CLIENT_ID | GitHub OAuth (MCP Gateway) |
+| GITHUB_CLIENT_SECRET | GitHub OAuth (MCP Gateway) |
 | CL_N8N_MCP_AUTH_TOKEN | cl-n8n-mcp VPS auth |
 | NOTION_OFFICIAL_MCP_AUTH_TOKEN | Notion Official VPS auth |
 | LINE_OFFICIAL_MCP_AUTH_TOKEN | LINE Official VPS auth |
@@ -675,9 +692,103 @@ All 5 tasks implemented, built, deployed, committed (`1fa1b3a`).
 - Test accounts (`claude-admin`, `test-card-check`) don't have Gemini/Notion connections
 - Owner account (`node2flow@gmail.com`) is OAuth-only — can't login via Playwright headless
 
-### Session 40 Tasks (For Next Claude Code Session)
+### Session 40: UI Color Overhaul — Remove Orange/Emerald (2026-02-12)
 
-TBD - All known UX issues from Session 39 have been resolved.
+Removed all custom accent colors from the entire dashboard. User preference: use shadcn defaults only, no custom brand color.
+
+1. **Responsive Dialog/Sheet** on remaining 4 connection pages (`2066f4c`):
+   - notion-official, line-official, playwright, google-workspace
+   - Desktop (>=768px): Dialog, Mobile (<768px): Sheet (bottom drawer)
+   - Pagination component added to dashboard-core
+
+2. **Gemini RAG UX** (`2066f4c`):
+   - StoreList: Dialog for create store + Pagination (token-based)
+   - DocumentList: Pagination + TS fix (`onClick={() => fetchDocuments()}`)
+
+3. **Remove emerald, use green** (`a11bc0c` → `c306e29`):
+   - `emerald-*` → `green-*` across 45 files (semantic success/active color)
+   - Removed `bg-green-600 hover:bg-green-700 text-white` from all buttons (use default shadcn Button)
+   - Cleaned up empty `className=""` attributes
+   - Connection pages: success icons `bg-green-900/30` + `text-green-400`
+   - Core UI: alert success variant, badge success variant, SudoModal
+
+4. **Change primary color** (`b07cd78`):
+   - `--primary: 25 95% 53%` (orange) → `0 0% 98%` (neutral white, shadcn zinc default)
+   - Also updated: `--ring`, `--chart-1`, `--sidebar-primary`, `--sidebar-ring`
+   - `--primary-foreground: 240 5.9% 10%` (dark text on white buttons)
+
+**Lesson learned**: When user says "remove orange" → change CSS variable `--primary`, not replace class names with `primary`. If `--primary` IS orange, replacing `emerald-*` with `primary` makes everything orange (worse than before).
+
+**Current theme**: Dark (black bg), neutral white primary, Tailwind `green-*` for success, `red-*` for destructive, `amber-*` for warnings.
+
+### Session 42: MCP OAuth Authentication — Google + GitHub (2026-02-13)
+
+Added OAuth 2.1 authentication to the MCP Gateway, enabling Claude Desktop and other MCP clients to authenticate via Google or GitHub instead of API keys.
+
+1. **New OAuth Authorization Server** (`oauth.ts`, ~460 lines):
+   - `/.well-known/oauth-protected-resource` — Resource metadata discovery
+   - `/.well-known/oauth-authorization-server` — Authorization server metadata
+   - `POST /oauth/register` — Dynamic Client Registration (RFC 7591)
+   - `GET /oauth/authorize` — Authorization endpoint (redirects to Google/GitHub)
+   - `GET /oauth/callback` — Upstream IdP callback (exchanges code, creates/finds user, generates auth code)
+   - `POST /oauth/token` — Token endpoint (PKCE verification, JWT generation)
+
+2. **Dual auth support** in MCP handler:
+   - **API key** (`n2f_xxx`): Connection resolved at auth time (existing flow)
+   - **JWT** (OAuth): Connection resolved per tool call — queries all user's active connections, returns tools from all matching plugins
+   - `AuthResult` interface: nullable `connectionId`, `productType`, `config` + `authMethod: 'api_key' | 'oauth'`
+
+3. **Platform Worker additions** (`internal.ts`):
+   - `POST /internal/find-or-create-oauth-user` — Find existing user by email or create new free user
+   - `POST /internal/get-user-usage` — Return daily usage count + plan limits for JWT users
+
+4. **Infrastructure**:
+   - KV binding `OAUTH_KV` (`a65a07688d774d56bb915cf9e961881a`) — shared with Platform OAuth KV
+   - New secrets: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+   - MCP spec 401 response: `WWW-Authenticate: Bearer resource_metadata="..."`
+
+5. **Bugs fixed during testing**:
+   - 401 not returned (error string `'Missing Authorization header'` didn't match `'OAUTH_REQUIRED'` check)
+   - `/oauth/token` crashed on `application/x-www-form-urlencoded` body (OAuth spec requires this format, but code used `request.json()`)
+
+6. **Files changed** (7):
+   - `apps/mcp-gateway/src/routes/oauth.ts` — NEW
+   - `apps/mcp-gateway/src/routes/auth.ts` — JWT auth path + OAUTH_REQUIRED
+   - `apps/mcp-gateway/src/routes/mcp.ts` — Nullable connection + dynamic resolve
+   - `apps/mcp-gateway/src/index.ts` — OAuth routes + WWW-Authenticate header
+   - `apps/mcp-gateway/src/types.ts` — Env + AuthResult
+   - `apps/mcp-gateway/wrangler.toml` — KV binding
+   - `apps/platform-worker/src/routes/internal.ts` — 2 new endpoints
+
+**Tested**: Claude Desktop → Google OAuth → user created → MCP tools working (all `POST /mcp` returning Ok).
+
+Commit: `3f23d60`
+
+### Session 41: shadcn Accordion on FAQ Page (2026-02-12)
+
+Replaced custom FAQ accordion (Card + Button + ChevronDown + manual state) with shadcn Accordion component.
+
+1. **New shadcn Accordion component** added to dashboard-core:
+   - `packages/dashboard-core/src/components/ui/accordion.tsx` — Radix UI based
+   - New dep: `@radix-ui/react-accordion`
+   - Exported from `packages/dashboard-core/src/index.ts`
+   - Accordion keyframes added to `apps/dashboard/tailwind.config.js`
+
+2. **FAQ.tsx refactored**:
+   - Removed custom `FAQAccordion` component + `useState<Set<string>>` + `toggleItem`
+   - Removed `ChevronDown` import (built into AccordionTrigger)
+   - `type="single" collapsible` — one item open at a time, can close all
+   - Smooth animated expand/collapse (was instant show/hide)
+   - Clean border-separated items (no Card wrapper per item)
+
+3. **Files changed** (4):
+   - `packages/dashboard-core/package.json` — added `@radix-ui/react-accordion`
+   - `packages/dashboard-core/src/components/ui/accordion.tsx` — new component
+   - `packages/dashboard-core/src/index.ts` — export Accordion
+   - `apps/dashboard/tailwind.config.js` — accordion keyframes
+   - `apps/dashboard/src/pages/FAQ.tsx` — use shadcn Accordion
+
+Deployed to CF Pages.
 
 ### Test Accounts
 
@@ -776,10 +887,10 @@ Node2Flow-MCP-service/
 │       └── src/
 │           ├── contexts/              # AuthContext, SudoContext, ConnectionContext
 │           ├── components/            # Layout, AdminLayout, AdminRoute, SudoModal, FeedbackBubble
-│           │   └── ui/               # shadcn/ui: 26 components — Button, Card, Input, Select,
-│           │                          #   Badge, Table, Dialog, Alert, AlertDialog, Tabs, Tooltip,
-│           │                          #   Separator, Label, Textarea, Progress, Sheet, Skeleton,
-│           │                          #   Sidebar, Collapsible, DropdownMenu, Sonner (Toast),
+│           │   └── ui/               # shadcn/ui: 27 components — Accordion, Button, Card, Input,
+│           │                          #   Select, Badge, Table, Dialog, Alert, AlertDialog, Tabs,
+│           │                          #   Tooltip, Separator, Label, Textarea, Progress, Sheet,
+│           │                          #   Skeleton, Sidebar, Collapsible, DropdownMenu, Sonner,
 │           │                          #   Switch, Field, InputGroup, Popover, InputOTP, Avatar
 │           ├── pages/                 # Login, Register
 │           ├── hooks/                 # useSudo, use-mobile
@@ -864,7 +975,9 @@ Node2Flow-MCP-service/
 - **APP_URL**: ต้องตั้ง secret `APP_URL=https://app.node2flow.net` บน Platform Worker (OAuth redirect)
 - **API key prefix**: `n2f_` (old `saas_` keys ไม่ทำงาน)
 - **Original repo**: `n8n-management-mcp` ยังทำงานปกติ ไม่ได้แก้อะไร deploy แยกกัน
-- **OAuth callback path**: `/api/auth/oauth/{provider}/callback` (ไม่ใช่ `/callback/{provider}`)
+- **OAuth callback path (Dashboard)**: `/api/auth/oauth/{provider}/callback` (ไม่ใช่ `/callback/{provider}`)
+- **OAuth callback path (MCP Gateway)**: `/oauth/callback` — separate GitHub OAuth App needed (1 callback URL per app)
+- **MCP OAuth KV**: shares `a65a07688d774d56bb915cf9e961881a` with Platform OAuth KV
 
 ---
 
@@ -909,8 +1022,12 @@ wrangler deploy                         # In each app/
 **Session 37**: LINE plugin dashboard pages (3 pages)
 **Session 38**: Gemini RAG + Notion bug fixes (camelCase/snake_case, response key, API version)
 **Session 39**: Pagination (8 pages), Create Database dialog, Custom Metadata UI, shadcn migration, usage UPSERT fix, LINE shadcn fix
+**Session 40**: Remove orange/emerald → neutral white `--primary` + Tailwind `green-*` for success + responsive Dialog/Sheet
 **Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
-**Deployed**: 2026-02-11 — Platform + Gateway + Dashboard all live
-**Date**: 2026-02-11
+**Session 40**: Remove orange/emerald colors → neutral white primary + green semantic + default shadcn buttons
+**Session 41**: shadcn Accordion on FAQ page (replaces custom Card+Button accordion)
+**Session 42**: MCP OAuth (Google + GitHub) — Claude Desktop can authenticate via Google/GitHub OAuth (PKCE + Dynamic Client Registration)
+**Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
+**Date**: 2026-02-13
