@@ -1,21 +1,10 @@
 /**
  * Auth Middleware for MCP Gateway
- * Validates API keys via Platform service binding or JWT for dashboard
+ * Validates API keys via Platform service binding or JWT for MCP/dashboard
  */
 
-import type { Env, Connection } from '../types';
+import type { Env, Connection, AuthResult } from '../types';
 import { decryptConfig } from './connections';
-
-interface AuthResult {
-  userId: string;
-  email: string;
-  plan: string;
-  connectionId: string;
-  productType: string;
-  config: Record<string, unknown>;
-  apiKeyId: string;
-  usage: { current: number; limit: number; remaining: number };
-}
 
 interface JWTPayload {
   sub: string;
@@ -75,7 +64,7 @@ export async function authenticateMcpRequest(
 ): Promise<{ context: AuthResult | null; error: string | null }> {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
-    return { context: null, error: 'Missing Authorization header' };
+    return { context: null, error: 'OAUTH_REQUIRED' };
   }
 
   const token = authHeader.slice(7);
@@ -126,6 +115,7 @@ export async function authenticateMcpRequest(
           config,
           apiKeyId: result.api_key_id,
           usage: result.usage,
+          authMethod: 'api_key',
         },
         error: null,
       };
@@ -134,7 +124,40 @@ export async function authenticateMcpRequest(
     }
   }
 
-  return { context: null, error: 'Invalid token format' };
+  // JWT auth (OAuth flow — token from /oauth/token)
+  const payload = await verifyJWT(token, env.JWT_SECRET);
+  if (payload) {
+    // Get usage info from Platform
+    const usageRes = await env.PLATFORM.fetch(
+      new Request('https://platform.internal/internal/get-user-usage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: payload.sub, plan: payload.plan }),
+      })
+    );
+
+    const usage = usageRes.ok
+      ? await usageRes.json() as { current: number; limit: number; remaining: number }
+      : { current: 0, limit: 100, remaining: 100 };
+
+    return {
+      context: {
+        userId: payload.sub,
+        email: payload.email,
+        plan: payload.plan,
+        connectionId: null,
+        productType: null,
+        config: null,
+        apiKeyId: 'oauth',
+        usage,
+        authMethod: 'oauth',
+      },
+      error: null,
+    };
+  }
+
+  // No valid auth → signal OAuth required
+  return { context: null, error: 'OAUTH_REQUIRED' };
 }
 
 /**

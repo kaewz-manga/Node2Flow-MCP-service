@@ -3,14 +3,16 @@
  * Shared across all plugins - routes tool calls through plugin registry
  */
 
-import type { Env, MCPToolResult } from '../types';
+import type { Env, MCPToolResult, Connection } from '../types';
 import { getAllTools, getPlugin, findPluginForTool } from '../plugin-registry';
+import { decryptConfig } from './connections';
 
 interface AuthContext {
   user: { id: string; email: string; plan: string };
-  connection: { id: string; product_type: string; config: Record<string, unknown> };
+  connection: { id: string | null; product_type: string | null; config: Record<string, unknown> | null };
   apiKey: { id: string };
   usage: { current: number; limit: number; remaining: number };
+  authMethod: 'api_key' | 'oauth';
 }
 
 interface RateLimitInfo {
@@ -107,9 +109,22 @@ export async function handleMcpRequest(
       }
 
       case 'tools/list': {
-        // Return tools for the specific product this API key is bound to
-        const plugin = getPlugin(authContext.connection.product_type);
-        const tools = plugin ? plugin.tools : getAllTools();
+        if (authContext.authMethod === 'api_key' && authContext.connection.product_type) {
+          // API key auth → return specific plugin's tools
+          const plugin = getPlugin(authContext.connection.product_type);
+          const tools = plugin ? plugin.tools : getAllTools();
+          return jsonRpcResponse(id, { tools }, rateLimitInfo);
+        }
+
+        // OAuth JWT → return tools from all products with active connections
+        const connections = await env.DB.prepare(
+          'SELECT DISTINCT product_type FROM connections WHERE user_id = ? AND status = ?'
+        ).bind(authContext.user.id, 'active').all<{ product_type: string }>();
+
+        const tools = (connections.results || []).flatMap(c => {
+          const plugin = getPlugin(c.product_type);
+          return plugin ? plugin.tools : [];
+        });
         return jsonRpcResponse(id, { tools }, rateLimitInfo);
       }
 
@@ -126,8 +141,26 @@ export async function handleMcpRequest(
           return jsonRpcError(id, -32601, `Unknown tool: ${toolName}`);
         }
 
+        // Resolve connection config
+        let connectionConfig = authContext.connection.config;
+        let connectionId = authContext.connection.id;
+
+        if (!connectionConfig) {
+          // OAuth JWT → find connection by user_id + product_type
+          const conn = await env.DB.prepare(
+            'SELECT * FROM connections WHERE user_id = ? AND product_type = ? AND status = ? LIMIT 1'
+          ).bind(authContext.user.id, plugin.id, 'active').first<Connection>();
+
+          if (!conn) {
+            return jsonRpcError(id, -32000, `No active ${plugin.id} connection. Set up in dashboard first.`);
+          }
+
+          connectionConfig = await decryptConfig(conn.config_encrypted, env.ENCRYPTION_KEY);
+          connectionId = conn.id;
+        }
+
         // Create client from decrypted connection config
-        const client = plugin.createClient(authContext.connection.config, env);
+        const client = plugin.createClient(connectionConfig, env);
 
         // Execute tool call through plugin
         const result: MCPToolResult = await plugin.handleToolCall(toolName, args || {}, client);
@@ -136,12 +169,14 @@ export async function handleMcpRequest(
         const isError = result.isError || false;
 
         // Update connection last_used_at in products-db (non-blocking)
-        ctx.waitUntil(
-          env.DB.prepare('UPDATE connections SET last_used_at = ? WHERE id = ?')
-            .bind(new Date().toISOString(), authContext.connection.id)
-            .run()
-            .catch(() => {})
-        );
+        if (connectionId) {
+          ctx.waitUntil(
+            env.DB.prepare('UPDATE connections SET last_used_at = ? WHERE id = ?')
+              .bind(new Date().toISOString(), connectionId)
+              .run()
+              .catch(() => {})
+          );
+        }
 
         // Report usage to Platform (non-blocking via service binding)
         ctx.waitUntil(
@@ -152,7 +187,7 @@ export async function handleMcpRequest(
               body: JSON.stringify({
                 user_id: authContext.user.id,
                 api_key_id: authContext.apiKey.id,
-                connection_id: authContext.connection.id,
+                connection_id: connectionId || 'oauth',
                 tool_name: toolName,
                 status: isError ? 'error' : 'success',
                 response_time_ms: responseTime,

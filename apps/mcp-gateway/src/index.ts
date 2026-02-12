@@ -15,6 +15,7 @@ import type { Env } from './types';
 import { getAllTools, getAllPlugins, getPlugin } from './plugin-registry';
 import { handleMcpRequest } from './routes/mcp';
 import { authenticateMcpRequest, authenticateDashboardRequest } from './routes/auth';
+import { handleOAuthRoutes } from './routes/oauth';
 import {
   handleListConnections,
   handleCreateConnection,
@@ -69,11 +70,38 @@ export default {
     }
 
     // ========================================
-    // MCP Protocol (POST /mcp) - API Key Auth
+    // OAuth Endpoints (/.well-known/*, /oauth/*)
+    // ========================================
+    if (path.startsWith('/oauth/') || path.startsWith('/.well-known/')) {
+      const oauthResponse = await handleOAuthRoutes(request, env, path, ctx);
+      if (oauthResponse) return oauthResponse;
+    }
+
+    // ========================================
+    // MCP Protocol (POST /mcp) - API Key or OAuth JWT Auth
     // ========================================
     if (path === '/mcp' && method === 'POST') {
       try {
         const { context, error } = await authenticateMcpRequest(request, env);
+
+        if (error === 'OAUTH_REQUIRED' || (!context && !error)) {
+          // Return 401 with OAuth metadata for MCP spec compliance
+          return new Response(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: null,
+              error: { code: -32000, message: 'Authentication required' },
+            }),
+            {
+              status: 401,
+              headers: {
+                'Content-Type': 'application/json',
+                'WWW-Authenticate': 'Bearer resource_metadata="https://mcp.node2flow.net/.well-known/oauth-protected-resource"',
+                ...CORS_HEADERS,
+              },
+            }
+          );
+        }
 
         if (error || !context) {
           return new Response(
@@ -91,6 +119,7 @@ export default {
           connection: { id: context.connectionId, product_type: context.productType, config: context.config },
           apiKey: { id: context.apiKeyId },
           usage: context.usage,
+          authMethod: context.authMethod,
         }, ctx);
       } catch (err) {
         return new Response(

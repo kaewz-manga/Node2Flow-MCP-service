@@ -13,6 +13,7 @@ import {
   hashApiKey,
   getApiKeyByHash,
   getUserById,
+  getUserByEmail,
   updateApiKeyLastUsed,
   getPlan,
   getCurrentDate,
@@ -207,6 +208,71 @@ export async function handleInternalRoutes(
       allowed: dailyOk && minuteOk,
       daily: { used: dailyUsage, limit: dailyLimit, ok: dailyOk },
       minute: { used: minuteUsage, limit: minuteLimit, ok: minuteOk },
+    });
+  }
+
+  // POST /internal/find-or-create-oauth-user
+  if (path === '/internal/find-or-create-oauth-user' && method === 'POST') {
+    const body = await request.json() as {
+      email: string;
+      oauth_provider: 'google' | 'github';
+      oauth_id: string;
+      avatar_url?: string;
+    };
+
+    if (!body.email || !body.oauth_provider || !body.oauth_id) {
+      return json({ error: 'Missing required fields' }, 400);
+    }
+
+    // Try to find existing user by email
+    const existingUser = await getUserByEmail(env.DB, body.email);
+
+    if (existingUser) {
+      return json({
+        user_id: existingUser.id,
+        email: existingUser.email,
+        plan: existingUser.plan,
+        is_new_user: false,
+      });
+    }
+
+    // Create new user
+    const userId = generateUUID();
+    const now = new Date().toISOString();
+    await env.DB.prepare(
+      `INSERT INTO users (id, email, oauth_provider, oauth_id, plan, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 'free', 'active', ?, ?)`
+    ).bind(userId, body.email, body.oauth_provider, body.oauth_id, now, now).run();
+
+    return json({
+      user_id: userId,
+      email: body.email,
+      plan: 'free',
+      is_new_user: true,
+    });
+  }
+
+  // POST /internal/get-user-usage
+  if (path === '/internal/get-user-usage' && method === 'POST') {
+    const body = await request.json() as { user_id: string; plan: string };
+
+    if (!body.user_id) {
+      return json({ error: 'user_id required' }, 400);
+    }
+
+    const plan = await getPlan(env.DB, body.plan || 'free');
+    const dailyLimit = plan?.daily_request_limit ?? 100;
+    const today = getCurrentDate();
+
+    const dailyUsage = dailyLimit > 0
+      ? await getDailyUsage(env.RATE_LIMIT_KV, body.user_id, today)
+      : 0;
+
+    const isUnlimited = dailyLimit < 0;
+    return json({
+      current: dailyUsage,
+      limit: isUnlimited ? -1 : dailyLimit,
+      remaining: isUnlimited ? -1 : Math.max(0, dailyLimit - dailyUsage),
     });
   }
 

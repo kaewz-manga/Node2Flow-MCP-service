@@ -52,8 +52,13 @@ export interface Connection {
 export interface Env {
   DB: D1Database;
   PLATFORM: Fetcher;
+  OAUTH_KV: KVNamespace;
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
   CL_N8N_MCP_URL?: string;
   CL_N8N_MCP_AUTH_TOKEN?: string;
   NOTION_OFFICIAL_MCP_AUTH_TOKEN?: string;
@@ -64,4 +69,16 @@ export interface Env {
   LINE_OFFICIAL_MCP_URL?: string;
   PLAYWRIGHT_MCP_URL?: string;
   GOOGLE_WORKSPACE_MCP_URL?: string;
+}
+
+export interface AuthResult {
+  userId: string;
+  email: string;
+  plan: string;
+  connectionId: string | null;      // null for OAuth JWT auth
+  productType: string | null;       // null for OAuth JWT auth
+  config: Record<string, unknown> | null;  // null for OAuth JWT auth
+  apiKeyId: string;                 // 'oauth' for JWT auth
+  usage: { current: number; limit: number; remaining: number };
+  authMethod: 'api_key' | 'oauth';
 }

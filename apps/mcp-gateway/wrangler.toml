@@ -18,6 +18,10 @@ migrations_dir = "migrations"
 binding = "PLATFORM"
 service = "node2flow-platform"
 
+# KV Namespace - OAuth state storage
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "a65a07688d774d56bb915cf9e961881a"
 
 # VPS MCP server URLs
 [vars]
@@ -28,4 +32,4 @@ PLAYWRIGHT_MCP_URL = "https://playwright-mcp.node2flow.net"
 GOOGLE_WORKSPACE_MCP_URL = "https://google-workspace-mcp.node2flow.net"
 
 # Secrets (set via wrangler secret put)
-# JWT_SECRET, ENCRYPTION_KEY
+# JWT_SECRET, ENCRYPTION_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
