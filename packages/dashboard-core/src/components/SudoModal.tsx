@@ -118,8 +118,8 @@ export default function SudoModal({
         {/* Step: Success */}
         {step === 'success' && (
           <div className="text-center py-4">
-            <div className="bg-primary/10 p-3 rounded-full w-fit mx-auto mb-4">
-              <CheckCircle className="h-8 w-8 text-primary" />
+            <div className="bg-emerald-900/30 p-3 rounded-full w-fit mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-emerald-400" />
             </div>
             <p className="text-foreground font-medium">Verification Successful</p>
             <p className="text-sm text-muted-foreground mt-1">

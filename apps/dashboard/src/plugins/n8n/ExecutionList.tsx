@@ -129,13 +129,13 @@ export default function ExecutionList() {
                 All runs
               </CardFooter>
             </Card>
-            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
               <CardHeader className="pb-2">
                 <CardDescription>Success</CardDescription>
-                <CardTitle className="text-2xl font-semibold tabular-nums text-primary">{successCount}</CardTitle>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{successCount}</CardTitle>
               </CardHeader>
               <CardFooter className="text-sm text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
                 {executions.length > 0 ? `${Math.round((successCount / executions.length) * 100)}%` : '0%'} success rate
               </CardFooter>
             </Card>
@@ -254,7 +254,7 @@ export default function ExecutionList() {
                         {/* Actions */}
                         <div className="flex gap-2">
                           {(detail.status === 'error' || detail.status === 'crashed') && (
-                            <Button size="sm" className="" onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id}>
+                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleRetry(detail.id)} disabled={retrying === detail.id}>
                               {retrying === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <RotateCcw className="h-3.5 w-3.5 mr-2" />}
                               Retry
                             </Button>

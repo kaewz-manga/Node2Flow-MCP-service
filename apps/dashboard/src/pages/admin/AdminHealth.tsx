@@ -61,14 +61,14 @@ export default function AdminHealth() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className={`bg-gradient-to-t shadow-sm ${stats.isHealthy ? 'from-primary/5 to-card' : 'from-red-500/5 to-card'}`}>
+        <Card className={`bg-gradient-to-t shadow-sm ${stats.isHealthy ? 'from-emerald-500/5 to-card' : 'from-red-500/5 to-card'}`}>
           <CardHeader className="pb-2">
             <CardDescription>30-Day Errors</CardDescription>
-            <CardTitle className={`text-2xl font-semibold tabular-nums ${stats.isHealthy ? 'text-primary' : 'text-red-400'}`}>{totalErrors}</CardTitle>
+            <CardTitle className={`text-2xl font-semibold tabular-nums ${stats.isHealthy ? 'text-emerald-400' : 'text-red-400'}`}>{totalErrors}</CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
             {stats.isHealthy ? (
-              <><Activity className="h-3.5 w-3.5 mr-1.5 text-primary" />System healthy</>
+              <><Activity className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />System healthy</>
             ) : (
               <><AlertTriangle className="h-3.5 w-3.5 mr-1.5 text-red-400" />Needs attention</>
             )}
@@ -124,8 +124,8 @@ export default function AdminHealth() {
         <CardContent className="pt-0">
           {trend.length === 0 ? (
             <div className="text-center py-8">
-              <Activity className="h-10 w-10 text-primary mx-auto mb-3" />
-              <p className="text-primary font-medium">All clear</p>
+              <Activity className="h-10 w-10 text-emerald-400 mx-auto mb-3" />
+              <p className="text-emerald-400 font-medium">All clear</p>
               <p className="text-muted-foreground text-sm mt-1">No errors in the last 30 days</p>
             </div>
           ) : (

@@ -154,13 +154,13 @@ export default function AdminFeedback() {
           </CardFooter>
         </Card>
 
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Resolved</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums text-primary">{stats.resolvedCount}</CardTitle>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">{stats.resolvedCount}</CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
-            <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
             Completed
           </CardFooter>
         </Card>

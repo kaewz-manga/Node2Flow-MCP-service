@@ -141,7 +141,7 @@ export default function ChatManagement() {
             />
           </div>
           <Button
-            className=""
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
             onClick={handleGetChat}
             disabled={loadingChat || !chatId.trim()}
           >
@@ -155,7 +155,7 @@ export default function ChatManagement() {
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-foreground">Chat Information</h3>
           {chatResult.title && (
-            <Alert className="bg-gradient-to-t from-primary/5 to-card">
+            <Alert className="bg-gradient-to-t from-emerald-500/5 to-card">
               <Users className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-1">
@@ -201,7 +201,7 @@ export default function ChatManagement() {
             />
           </div>
           <Button
-            className=""
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
             onClick={handleGetMember}
             disabled={loadingMember || !memberChatId.trim() || !userId.trim()}
           >
@@ -258,7 +258,7 @@ export default function ChatManagement() {
               Ban
             </Button>
             <Button
-              className=""
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleUnban}
               disabled={unbanning || !modChatId.trim() || !modUserId.trim()}
             >
@@ -308,7 +308,7 @@ export default function ChatManagement() {
             />
           </div>
           <Button
-            className=""
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
             onClick={handleCreateInvite}
             disabled={creatingInvite || !inviteChatId.trim()}
           >
@@ -322,7 +322,7 @@ export default function ChatManagement() {
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-foreground">Invite Link Created</h3>
           {inviteResult.invite_link && (
-            <Alert className="bg-gradient-to-t from-primary/5 to-card">
+            <Alert className="bg-gradient-to-t from-emerald-500/5 to-card">
               <LinkIcon className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-1">

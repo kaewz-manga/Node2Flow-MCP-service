@@ -405,7 +405,7 @@ export default function Settings() {
                       checked={totpEnabled}
                       onCheckedChange={(checked) => { if (checked) handleSetupTOTP(); else setShowDisableConfirm(true); }}
                       disabled={totpLoading}
-                      className="data-[state=checked]:bg-primary"
+                      className="data-[state=checked]:bg-emerald-600"
                     />
                   </ItemActions>
                 </Item>
@@ -426,7 +426,7 @@ export default function Settings() {
                           <div className="flex items-center gap-2 mt-1">
                             <code className="flex-1 bg-black px-3 py-2 rounded font-mono text-sm text-foreground break-all">{totpSetupData.secret}</code>
                             <Button variant="secondary" size="icon" onClick={handleCopySecret}>
-                              {secretCopied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                              {secretCopied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
                             </Button>
                           </div>
                         </div>
@@ -447,7 +447,7 @@ export default function Settings() {
                               </InputOTPGroup>
                             </InputOTP>
                           </div>
-                          <Button type="submit" className="w-full" disabled={totpLoading || totpCode.length !== 6}>
+                          <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" disabled={totpLoading || totpCode.length !== 6}>
                             {totpLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Verifying...</> : <><Check className="h-4 w-4" /> Verify & Enable</>}
                           </Button>
                         </form>
@@ -521,7 +521,7 @@ export default function Settings() {
                   <ItemContent>
                     <ItemTitle>
                       Session Duration
-                      {sessionSuccess && <Check className="h-3.5 w-3.5 text-primary" />}
+                      {sessionSuccess && <Check className="h-3.5 w-3.5 text-emerald-400" />}
                     </ItemTitle>
                     <ItemDescription>
                       {sessionError || 'How long you stay logged in before needing to sign in again'}
@@ -657,8 +657,8 @@ export default function Settings() {
           <DialogHeader><DialogTitle>Change Password</DialogTitle></DialogHeader>
           {passwordSuccess ? (
             <div className="text-center py-4">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="h-8 w-8 text-primary" />
+              <div className="bg-emerald-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="h-8 w-8 text-emerald-400" />
               </div>
               <h3 className="text-lg font-medium text-foreground">Password Updated!</h3>
               <p className="text-muted-foreground mt-1">Your password has been changed successfully.</p>
@@ -671,7 +671,7 @@ export default function Settings() {
               <div className="space-y-2"><Label>Confirm New Password</Label><Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required /></div>
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="secondary" className="flex-1" onClick={() => { setShowPasswordModal(false); setPasswordError(''); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }}>Cancel</Button>
-                <Button type="submit" className="flex-1" disabled={passwordLoading}>
+                <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" disabled={passwordLoading}>
                   {passwordLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Updating...</> : 'Update Password'}
                 </Button>
               </div>

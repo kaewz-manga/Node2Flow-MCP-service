@@ -89,13 +89,13 @@ export default function MessageTools() {
               {botInfo?.basicId || 'Loading...'}
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Message Quota</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums">{quota?.value?.toLocaleString() || '-'}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Gauge className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              <Gauge className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
               Monthly limit ({quota?.type || '-'})
             </CardFooter>
           </Card>
@@ -141,7 +141,7 @@ export default function MessageTools() {
                 className="min-h-[80px]"
               />
               <Button
-                className=""
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={handleSend}
                 disabled={sending || !to.trim() || !messageText.trim()}
               >

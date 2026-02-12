@@ -82,7 +82,7 @@ export default function NodeExplorer() {
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           className="flex-1"
         />
-        <Button className="" onClick={handleSearch} disabled={searching || !query.trim()}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSearch} disabled={searching || !query.trim()}>
           {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Search
         </Button>
       </div>

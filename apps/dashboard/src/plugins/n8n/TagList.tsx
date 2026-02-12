@@ -88,7 +88,7 @@ export default function TagList() {
               Workflow labels
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Latest Tag</CardDescription>
               <CardTitle className="text-lg font-semibold truncate">
@@ -96,7 +96,7 @@ export default function TagList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Tag className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              <Tag className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
               Most recently added
             </CardFooter>
           </Card>
@@ -130,7 +130,7 @@ export default function TagList() {
           placeholder="New tag name..."
           className="flex-1"
         />
-        <Button className="" onClick={handleCreate} disabled={creating || !newName.trim()}>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !newName.trim()}>
           {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add Tag
         </Button>
       </div>
@@ -159,7 +159,7 @@ export default function TagList() {
                       className="h-8 text-sm"
                       autoFocus
                     />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={() => handleUpdate(tag.id)}><Check className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400 hover:bg-emerald-900/30" onClick={() => handleUpdate(tag.id)}><Check className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
                   </div>
                 ) : (

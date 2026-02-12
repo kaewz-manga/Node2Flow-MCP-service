@@ -101,7 +101,7 @@ export default function CredentialList() {
           <Button variant="outline" onClick={() => { setShowUpdate(!showUpdate); setShowCreate(false); }}>
             <Pencil className="h-4 w-4 mr-2" /> Update
           </Button>
-          <Button className="" onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => { setShowCreate(!showCreate); setShowUpdate(false); }}>
             <Plus className="h-4 w-4 mr-2" /> Create
           </Button>
         </div>
@@ -109,13 +109,13 @@ export default function CredentialList() {
 
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm cursor-pointer hover:shadow-md transition-all" onClick={() => { setShowCreate(true); setShowUpdate(false); }}>
+        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm cursor-pointer hover:shadow-md transition-all" onClick={() => { setShowCreate(true); setShowUpdate(false); }}>
           <CardHeader className="pb-2">
             <CardDescription>Create</CardDescription>
             <CardTitle className="text-lg font-semibold">New Credential</CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
-            <Plus className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <Plus className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
             Add API keys, tokens, passwords
           </CardFooter>
         </Card>
@@ -165,7 +165,7 @@ export default function CredentialList() {
               <Label className="text-xs">Data (JSON)</Label>
               <Textarea value={createData} onChange={(e) => setCreateData(e.target.value)} rows={4} className="mt-1 font-mono text-sm" placeholder='{"user": "...", "password": "..."}' />
             </div>
-            <Button variant="secondary" className="" onClick={handleCreate} disabled={creating}>
+            <Button variant="secondary" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating}>
               {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Create
             </Button>
           </CardContent>
@@ -198,7 +198,7 @@ export default function CredentialList() {
               <Label className="text-xs">New Data (JSON, optional)</Label>
               <Textarea value={updateData} onChange={(e) => setUpdateData(e.target.value)} rows={4} className="mt-1 font-mono text-sm" placeholder='{"user": "new_user", "password": "new_pass"}' />
             </div>
-            <Button className="" onClick={handleUpdate} disabled={updating}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleUpdate} disabled={updating}>
               {updating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Update
             </Button>
           </CardContent>

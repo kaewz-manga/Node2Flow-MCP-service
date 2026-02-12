@@ -117,7 +117,7 @@ export default function WorkflowTools() {
             rows={8}
             className="font-mono text-sm"
           />
-          <Button className="" onClick={handleValidate} disabled={validating || !validateJson.trim()}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleValidate} disabled={validating || !validateJson.trim()}>
             {validating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />} Validate
           </Button>
 
@@ -168,8 +168,8 @@ export default function WorkflowTools() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Play className="h-4 w-4 text-primary" />
+            <div className="p-2 rounded-lg bg-emerald-500/10">
+              <Play className="h-4 w-4 text-emerald-500" />
             </div>
             <div>
               <CardTitle className="text-base">Test Workflow</CardTitle>
@@ -190,7 +190,7 @@ export default function WorkflowTools() {
             rows={4}
             className="font-mono text-sm"
           />
-          <Button className="" onClick={handleTest} disabled={testing || !testWorkflowId.trim()}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleTest} disabled={testing || !testWorkflowId.trim()}>
             {testing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Play className="h-4 w-4 mr-2" />} Test
           </Button>
 

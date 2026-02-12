@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
-  approved: 'bg-primary/10 text-primary',
+  approved: 'bg-emerald-900/30 text-emerald-400',
   hold: 'bg-amber-900/30 text-amber-400',
   spam: 'bg-red-900/30 text-red-400',
   trash: 'bg-muted text-muted-foreground',
@@ -120,7 +120,7 @@ export default function CommentList() {
           <p className="text-muted-foreground mt-1">{activeConnection.name} - {comments.length} comments</p>
         </div>
         <div className="flex gap-2">
-          <Button className="" onClick={() => setShowCreate(!showCreate)}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreate(!showCreate)}>
             <Plus className="h-4 w-4 mr-2" /> Add
           </Button>
           <Button variant="outline" size="icon" onClick={fetchList} title="Refresh">
@@ -140,13 +140,13 @@ export default function CommentList() {
               <Layers className="h-3.5 w-3.5 mr-1.5 text-primary" /> All comments
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Approved</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums text-primary">{approved}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{approved}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-primary" /> Published
+              <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> Published
             </CardFooter>
           </Card>
           <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
@@ -187,7 +187,7 @@ export default function CommentList() {
               <Input placeholder="Author name (optional)" value={createAuthor} onChange={(e) => setCreateAuthor(e.target.value)} />
               <Input placeholder="Author email (optional)" value={createEmail} onChange={(e) => setCreateEmail(e.target.value)} type="email" />
             </div>
-            <Button className="" onClick={handleCreate} disabled={creating || !createContent.trim() || !createPostId.trim()}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !createContent.trim() || !createPostId.trim()}>
               {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Add Comment
             </Button>
           </CardContent>
@@ -244,7 +244,7 @@ export default function CommentList() {
 
                   <div className="flex gap-2 flex-wrap">
                     {comment.status !== 'approved' && (
-                      <Button variant="outline" size="sm" className="text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleStatusChange(comment, 'approved')} disabled={statusUpdating === comment.id}>
+                      <Button variant="outline" size="sm" className="text-emerald-400 border-emerald-700 hover:bg-emerald-900/30" onClick={() => handleStatusChange(comment, 'approved')} disabled={statusUpdating === comment.id}>
                         {statusUpdating === comment.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <CheckCircle className="h-3.5 w-3.5 mr-2" />} Approve
                       </Button>
                     )}

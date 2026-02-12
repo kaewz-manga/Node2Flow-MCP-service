@@ -131,7 +131,7 @@ export default function PostList() {
           <p className="text-muted-foreground mt-1">{activeConnection.name} - {posts.length} posts</p>
         </div>
         <div className="flex gap-2">
-          <Button className="" onClick={() => setShowCreate(!showCreate)}>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreate(!showCreate)}>
             <Plus className="h-4 w-4 mr-2" /> Create
           </Button>
           <Button variant="outline" size="icon" onClick={fetchList} title="Refresh">
@@ -152,13 +152,13 @@ export default function PostList() {
               <Layers className="h-3.5 w-3.5 mr-1.5 text-primary" /> All posts
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Published</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums text-primary">{published}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{published}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-primary" /> Live
+              <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> Live
             </CardFooter>
           </Card>
           <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
@@ -209,7 +209,7 @@ export default function PostList() {
                 <SelectItem value="private">Private</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="" onClick={handleCreate} disabled={creating || !createTitle.trim()}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating || !createTitle.trim()}>
               {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Create Post
             </Button>
           </CardContent>
@@ -238,7 +238,7 @@ export default function PostList() {
                 </Button>
                 <span className="text-xs text-muted-foreground font-mono hidden sm:block">#{post.id}</span>
                 <span className="text-xs text-muted-foreground hidden md:block">{post.date ? new Date(post.date).toLocaleDateString() : ''}</span>
-                <Badge variant="secondary" className={post.status === 'publish' ? 'bg-primary/10 text-primary' : post.status === 'draft' ? 'bg-amber-900/30 text-amber-400' : 'bg-muted text-foreground'}>
+                <Badge variant="secondary" className={post.status === 'publish' ? 'bg-emerald-900/30 text-emerald-400' : post.status === 'draft' ? 'bg-amber-900/30 text-amber-400' : 'bg-muted text-foreground'}>
                   {post.status}
                 </Badge>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:bg-primary/10" onClick={() => openEdit(post)} title="Edit">
@@ -256,7 +256,7 @@ export default function PostList() {
                   ) : detail ? (
                     <>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Status</p><Badge variant="secondary" className={detail.status === 'publish' ? 'bg-primary/10 text-primary' : 'bg-amber-900/30 text-amber-400'}>{detail.status}</Badge></CardContent></Card>
+                        <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Status</p><Badge variant="secondary" className={detail.status === 'publish' ? 'bg-emerald-900/30 text-emerald-400' : 'bg-amber-900/30 text-amber-400'}>{detail.status}</Badge></CardContent></Card>
                         <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Author</p><p className="text-sm font-medium text-foreground">{detail.author || '-'}</p></CardContent></Card>
                         <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Created</p><p className="text-sm font-medium text-foreground">{detail.date ? new Date(detail.date).toLocaleString() : '-'}</p></CardContent></Card>
                         <Card><CardContent className="p-3"><p className="text-xs text-muted-foreground">Modified</p><p className="text-sm font-medium text-foreground">{detail.modified ? new Date(detail.modified).toLocaleString() : '-'}</p></CardContent></Card>
@@ -312,7 +312,7 @@ export default function PostList() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditTarget(null)}>Cancel</Button>
-            <Button className="" onClick={handleUpdate} disabled={saving}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleUpdate} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Save
             </Button>
           </DialogFooter>

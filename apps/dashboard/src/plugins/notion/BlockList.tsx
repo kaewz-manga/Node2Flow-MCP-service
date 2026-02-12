@@ -140,7 +140,7 @@ export default function BlockList() {
               placeholder="Page/Block ID..."
               className="flex-1"
             />
-            <Button className="" onClick={fetch} disabled={loading || !blockId.trim()}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={fetch} disabled={loading || !blockId.trim()}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Load Blocks
             </Button>
           </div>
@@ -163,7 +163,7 @@ export default function BlockList() {
                 Blocks loaded
               </CardFooter>
             </Card>
-            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
+            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
               <CardHeader className="pb-2">
                 <CardDescription>Block Types</CardDescription>
                 <CardTitle className="text-lg font-semibold">
@@ -171,7 +171,7 @@ export default function BlockList() {
                 </CardTitle>
               </CardHeader>
               <CardFooter className="text-sm text-muted-foreground">
-                <Box className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                <Box className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
                 Unique types
               </CardFooter>
             </Card>
@@ -229,7 +229,7 @@ export default function BlockList() {
               className="flex-1"
             />
             <Button
-              className=""
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleAppend}
               disabled={appending || !appendBlockId.trim() || !appendText.trim()}
             >

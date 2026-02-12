@@ -152,15 +152,15 @@ export default function AdminSystem() {
 
       {/* Status Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className={`bg-gradient-to-t shadow-sm ${maintenance.enabled ? 'from-red-500/10 to-card border-red-500/20' : 'from-primary/5 to-card'}`}>
+        <Card className={`bg-gradient-to-t shadow-sm ${maintenance.enabled ? 'from-red-500/10 to-card border-red-500/20' : 'from-emerald-500/5 to-card'}`}>
           <CardHeader className="pb-2">
             <CardDescription>System Status</CardDescription>
-            <CardTitle className={`text-2xl font-semibold ${maintenance.enabled ? 'text-red-400' : 'text-primary'}`}>
+            <CardTitle className={`text-2xl font-semibold ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`}>
               {maintenance.enabled ? 'Offline' : 'Online'}
             </CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
-            <Server className={`h-3.5 w-3.5 mr-1.5 ${maintenance.enabled ? 'text-red-400' : 'text-primary'}`} />
+            <Server className={`h-3.5 w-3.5 mr-1.5 ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`} />
             {maintenance.enabled ? 'Maintenance mode' : 'All systems go'}
           </CardFooter>
         </Card>
@@ -211,8 +211,8 @@ export default function AdminSystem() {
       <Card className={`shadow-sm ${maintenance.enabled ? 'border-red-500/30 bg-gradient-to-br from-red-500/5 to-card' : ''}`}>
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className={`p-2 rounded-lg ${maintenance.enabled ? 'bg-red-500/10' : 'bg-primary/10'}`}>
-              <Power className={`h-5 w-5 ${maintenance.enabled ? 'text-red-400' : 'text-primary'}`} />
+            <div className={`p-2 rounded-lg ${maintenance.enabled ? 'bg-red-500/10' : 'bg-emerald-500/10'}`}>
+              <Power className={`h-5 w-5 ${maintenance.enabled ? 'text-red-400' : 'text-emerald-400'}`} />
             </div>
             <h2 className="text-lg font-semibold text-foreground">Maintenance Mode</h2>
             <Badge

@@ -45,13 +45,13 @@ export default function AdminRevenue() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-t from-primary/10 to-card shadow-sm border-primary/20">
+        <Card className="bg-gradient-to-t from-emerald-500/10 to-card shadow-sm border-emerald-500/20">
           <CardHeader className="pb-2">
             <CardDescription>Monthly Revenue</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums text-primary">${mrr.toFixed(2)}</CardTitle>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">${mrr.toFixed(2)}</CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
-            <DollarSign className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <DollarSign className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
             MRR
           </CardFooter>
         </Card>
@@ -113,7 +113,7 @@ export default function AdminRevenue() {
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-muted-foreground">{pct}%</span>
-                      <span className="font-medium text-primary">${revenue.toFixed(2)}/mo</span>
+                      <span className="font-medium text-emerald-400">${revenue.toFixed(2)}/mo</span>
                     </div>
                   </div>
                   <div className="h-2.5 bg-muted rounded-full overflow-hidden">
@@ -154,14 +154,14 @@ export default function AdminRevenue() {
                   <TableCell className="font-medium capitalize">{d.plan}</TableCell>
                   <TableCell className="text-right">${d.price_monthly}/mo</TableCell>
                   <TableCell className="text-right">{d.count}</TableCell>
-                  <TableCell className="text-right font-medium text-primary">${(d.count * d.price_monthly).toFixed(2)}</TableCell>
+                  <TableCell className="text-right font-medium text-emerald-400">${(d.count * d.price_monthly).toFixed(2)}</TableCell>
                 </TableRow>
               ))}
               <TableRow className="font-medium">
                 <TableCell>Total</TableCell>
                 <TableCell></TableCell>
                 <TableCell className="text-right">{totalUsers}</TableCell>
-                <TableCell className="text-right text-primary">${mrr.toFixed(2)}</TableCell>
+                <TableCell className="text-right text-emerald-400">${mrr.toFixed(2)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
