@@ -418,8 +418,9 @@ export function listDocuments(connectionId: string, storeName: string, pageSize?
 export function deleteDocument(connectionId: string, documentName: string, force?: boolean) {
   return geminiCall(connectionId, 'gemini_delete_document', { document_name: documentName, force: force || false });
 }
-export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string }, metadata?: unknown[]) {
+export function uploadToStore(connectionId: string, storeName: string, data: { mimeType: string; content: string; displayName?: string; contentEncoding?: 'base64' | 'text' }, metadata?: unknown[]) {
   const args: Record<string, unknown> = { store_name: storeName, mime_type: data.mimeType, content: data.content, display_name: data.displayName };
+  if (data.contentEncoding) args.content_encoding = data.contentEncoding;
   if (metadata && metadata.length > 0) args.custom_metadata = metadata;
   return geminiCall(connectionId, 'gemini_upload_to_store', args);
 }

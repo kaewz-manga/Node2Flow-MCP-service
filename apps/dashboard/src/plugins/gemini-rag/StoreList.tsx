@@ -138,21 +138,21 @@ export default function StoreList() {
               <CardTitle className="text-2xl font-semibold tabular-nums">{stores.length}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Database className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              <Database className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               Knowledge bases
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Total Documents</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums">{totalDocs}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <FolderOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <FolderOpen className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               Across all stores
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Latest Store</CardDescription>
               <CardTitle className="text-lg font-semibold truncate">
@@ -160,7 +160,7 @@ export default function StoreList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Database className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+              <Database className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               Most recently created
             </CardFooter>
           </Card>
@@ -210,7 +210,7 @@ export default function StoreList() {
                     <TableRow key={store.name}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Database className="h-4 w-4 text-primary shrink-0" />
+                          <Database className="h-4 w-4 text-foreground shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium">{store.displayName}</p>
                             <p className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">{store.name}</p>

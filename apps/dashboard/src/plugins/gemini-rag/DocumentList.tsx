@@ -11,7 +11,7 @@ import {
 } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
-import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings, MoreHorizontal } from 'lucide-react';
+import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings, MoreHorizontal, File } from 'lucide-react';
 
 // Metadata row type
 interface MetadataRow {
@@ -46,6 +46,7 @@ export default function DocumentList() {
   const [uploadDisplayName, setUploadDisplayName] = useState('');
   const [uploadContent, setUploadContent] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadFile, setUploadFile] = useState<{ name: string; mimeType: string; base64: string } | null>(null);
 
   // Custom metadata
   const [metadataRows, setMetadataRows] = useState<MetadataRow[]>([]);
@@ -126,8 +127,22 @@ export default function DocumentList() {
     }
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1]; // strip data:...;base64,
+      setUploadFile({ name: file.name, mimeType: file.type || 'application/octet-stream', base64 });
+      if (!uploadDisplayName.trim()) setUploadDisplayName(file.name);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = ''; // reset so same file can be re-selected
+  }
+
   async function handleUpload() {
-    if (!uploadContent.trim() || !connectionId || !selectedStore) return;
+    const hasContent = uploadFile || uploadContent.trim();
+    if (!hasContent || !connectionId || !selectedStore) return;
     setUploading(true);
 
     // Build metadata for the API call
@@ -141,15 +156,16 @@ export default function DocumentList() {
         return m;
       });
 
-    const res = await uploadToStore(connectionId, selectedStore, {
-      mimeType: 'text/plain',
-      content: uploadContent,
-      displayName: uploadDisplayName.trim() || 'Untitled Document'
-    }, metadata.length > 0 ? metadata : undefined);
+    const data = uploadFile
+      ? { mimeType: uploadFile.mimeType, content: uploadFile.base64, contentEncoding: 'base64' as const, displayName: uploadDisplayName.trim() || uploadFile.name }
+      : { mimeType: 'text/plain', content: uploadContent, displayName: uploadDisplayName.trim() || 'Untitled Document' };
+
+    const res = await uploadToStore(connectionId, selectedStore, data, metadata.length > 0 ? metadata : undefined);
     if (res.success) {
       toast.success('Document uploaded successfully');
       setUploadDisplayName('');
       setUploadContent('');
+      setUploadFile(null);
       setMetadataRows([]);
       setMetadataOpen(false);
       fetchDocuments();
@@ -252,11 +268,11 @@ export default function DocumentList() {
               <CardTitle className="text-2xl font-semibold tabular-nums">{documents.length}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <FileText className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              <FileText className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               In current store
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Active Docs</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums">
@@ -264,11 +280,11 @@ export default function DocumentList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <FileText className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <FileText className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               Ready to use
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Total Size</CardDescription>
               <CardTitle className="text-lg font-semibold tabular-nums">
@@ -278,7 +294,7 @@ export default function DocumentList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <FileText className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
+              <FileText className="h-3.5 w-3.5 mr-1.5 text-foreground" />
               Storage used
             </CardFooter>
           </Card>
@@ -288,13 +304,13 @@ export default function DocumentList() {
       <Separator />
 
       {/* Upload Section */}
-      <Card className="bg-gradient-to-t from-emerald-500/5 to-card border-emerald-500/20">
+      <Card className="bg-gradient-to-t from-primary/5 to-card border-border/60">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Upload className="h-5 w-5 text-emerald-500" />
+            <Upload className="h-5 w-5 text-foreground" />
             Upload Document
           </CardTitle>
-          <CardDescription>Upload text content to the selected store</CardDescription>
+          <CardDescription>Upload a file or paste text content to the selected store</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
@@ -303,13 +319,45 @@ export default function DocumentList() {
             placeholder="Document name (optional)"
             disabled={!selectedStore}
           />
-          <Textarea
-            className="min-h-[120px] font-mono text-sm"
-            value={uploadContent}
-            onChange={(e) => setUploadContent(e.target.value)}
-            placeholder="Paste your text content here..."
-            disabled={!selectedStore}
-          />
+
+          {/* File Upload */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              disabled={!selectedStore}
+              onClick={() => document.getElementById('gemini-file-input')?.click()}
+            >
+              <File className="h-4 w-4 mr-2" />
+              {uploadFile ? uploadFile.name : 'Choose File...'}
+            </Button>
+            {uploadFile && (
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setUploadFile(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+            <input
+              id="gemini-file-input"
+              type="file"
+              className="hidden"
+              accept=".txt,.md,.pdf,.html,.csv,.json,.xml,.doc,.docx"
+              onChange={handleFileSelect}
+            />
+          </div>
+          {uploadFile && (
+            <p className="text-xs text-muted-foreground">File: {uploadFile.name} ({uploadFile.mimeType})</p>
+          )}
+
+          {/* Text Content (alternative to file) */}
+          {!uploadFile && (
+            <Textarea
+              className="min-h-[120px] font-mono text-sm"
+              value={uploadContent}
+              onChange={(e) => setUploadContent(e.target.value)}
+              placeholder="Or paste your text content here..."
+              disabled={!selectedStore}
+            />
+          )}
 
           {/* Custom Metadata Section */}
           <Collapsible open={metadataOpen} onOpenChange={setMetadataOpen}>
@@ -366,9 +414,9 @@ export default function DocumentList() {
           </Collapsible>
 
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white w-full"
+            className="w-full"
             onClick={handleUpload}
-            disabled={uploading || !uploadContent.trim() || !selectedStore}
+            disabled={uploading || (!uploadFile && !uploadContent.trim()) || !selectedStore}
           >
             {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
             Upload to Store
@@ -447,7 +495,7 @@ export default function DocumentList() {
                       <TableRow key={doc.name}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-primary shrink-0" />
+                            <FileText className="h-4 w-4 text-foreground shrink-0" />
                             <div className="min-w-0">
                               <p className="font-medium truncate">{doc.displayName}</p>
                               <p className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">{doc.name}</p>
