@@ -4,7 +4,6 @@
 
 export interface GeminiRagConfig {
   apiKey: string;
-  fetcher?: Fetcher;
 }
 
 export interface FileSearchStore {
