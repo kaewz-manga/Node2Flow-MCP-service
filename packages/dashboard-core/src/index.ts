@@ -47,6 +47,7 @@ export { default as SudoModal } from './components/SudoModal';
 export { default as FeedbackBubble } from './components/FeedbackBubble';
 
 // UI Components
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './components/ui/accordion';
 export { Button, buttonVariants } from './components/ui/button';
 export type { ButtonProps } from './components/ui/button';
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent } from './components/ui/card';

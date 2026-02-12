@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, ArrowLeft, ChevronDown, Search, HelpCircle, Zap as Lightning, Shield, CreditCard, AlertTriangle } from 'lucide-react';
-import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@node2flow/dashboard-core';
+import { Zap, ArrowLeft, Search, HelpCircle, Zap as Lightning, Shield, CreditCard, AlertTriangle } from 'lucide-react';
+import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Input, Separator, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@node2flow/dashboard-core';
 
 import { plugins } from '../plugins/registry';
 
@@ -286,46 +286,9 @@ const genericCategories: FAQCategory[] = [
 const pluginCategories: FAQCategory[] = plugins.flatMap(p => p.content.faqCategories);
 const faqData: FAQCategory[] = [...genericCategories, ...pluginCategories];
 
-function FAQAccordion({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) {
-  return (
-    <Card className="hover:shadow-md transition-all">
-      <Button
-        variant="ghost"
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 text-left h-auto hover:bg-muted"
-      >
-        <span className="font-medium text-foreground pr-4">{item.question}</span>
-        <ChevronDown
-          className={`h-5 w-5 text-muted-foreground flex-shrink-0 transition-transform ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-        />
-      </Button>
-      {isOpen && (
-        <CardContent className="pt-0 text-muted-foreground">
-          {typeof item.answer === 'string' ? <p>{item.answer}</p> : item.answer}
-        </CardContent>
-      )}
-    </Card>
-  );
-}
-
 export default function FAQ() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
-
-  const toggleItem = (key: string) => {
-    setOpenItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(key)) {
-        newSet.delete(key);
-      } else {
-        newSet.add(key);
-      }
-      return newSet;
-    });
-  };
 
   // Filter FAQ items based on search query
   const filteredCategories = faqData
@@ -379,19 +342,18 @@ export default function FAQ() {
                   <div className="text-primary">{category.icon}</div>
                   <h2 className="text-xl font-semibold text-foreground">{category.name}</h2>
                 </div>
-                <div className="space-y-3">
-                  {category.items.map((item, index) => {
-                    const key = `${category.name}-${index}`;
-                    return (
-                      <FAQAccordion
-                        key={key}
-                        item={item}
-                        isOpen={openItems.has(key)}
-                        onToggle={() => toggleItem(key)}
-                      />
-                    );
-                  })}
-                </div>
+                <Accordion type="single" collapsible>
+                  {category.items.map((item, index) => (
+                    <AccordionItem key={index} value={`${category.name}-${index}`}>
+                      <AccordionTrigger>
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground">
+                        {typeof item.answer === 'string' ? <p>{item.answer}</p> : item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </section>
             ))}
           </div>
