@@ -228,7 +228,7 @@ export default function Connections() {
           <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
           <AlertDescription className="flex items-center justify-between">
             <span>Set up 2FA to manage connections securely</span>
-            <Button size="sm" asChild className="shrink-0 ml-4 bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Button size="sm" asChild className="shrink-0 ml-4">
               <Link to="/settings?tab=security">Enable</Link>
             </Button>
           </AlertDescription>
@@ -421,7 +421,7 @@ export default function Connections() {
               <Button
                 type="submit"
                 disabled={formLoading}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="flex-1"
               >
                 {formLoading ? (
                   <>
@@ -442,8 +442,8 @@ export default function Connections() {
         <DialogContent>
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className="bg-emerald-900/30 p-2 rounded-full">
-                <Check className="h-6 w-6 text-emerald-400" />
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Check className="h-6 w-6 text-primary" />
               </div>
               <DialogTitle>Your API Key</DialogTitle>
             </div>
@@ -466,7 +466,7 @@ export default function Connections() {
               onClick={() => copyToClipboard(newApiKey)}
             >
               {copied ? (
-                <Check className="h-4 w-4 text-emerald-400" />
+                <Check className="h-4 w-4 text-primary" />
               ) : (
                 <Copy className="h-4 w-4" />
               )}
@@ -488,7 +488,7 @@ export default function Connections() {
               setShowApiKeyModal(false);
               setNewApiKey('');
             }}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full"
           >
             I've saved my API key
           </Button>
