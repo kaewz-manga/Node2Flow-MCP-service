@@ -23,6 +23,11 @@ migrations_dir = "migrations"
 binding = "PLATFORM"
 service = "node2flow-platform"
 
+# Service Binding to Gemini API Proxy (Smart Placement → runs near Google servers)
+[[services]]
+binding = "GEMINI_PROXY"
+service = "node2flow-gemini-proxy"
+
 # VPS MCP server URLs
 [vars]
 CL_N8N_MCP_URL = "https://n8n-mcp-dynamic.node2flow.net"

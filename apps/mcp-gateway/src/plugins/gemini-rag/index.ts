@@ -3,7 +3,7 @@
  * Manages Gemini File Search stores, documents, and RAG queries
  */
 
-import type { MCPPlugin } from '../../types';
+import type { MCPPlugin, Env } from '../../types';
 import { TOOLS } from './tools';
 import { GeminiRagClient } from './client';
 import type { CustomMetadata } from './types';
@@ -14,9 +14,10 @@ export const geminiRagPlugin: MCPPlugin = {
   version: '1.0.0',
   tools: TOOLS,
 
-  createClient(config: Record<string, unknown>) {
+  createClient(config: Record<string, unknown>, env?: Env) {
     return new GeminiRagClient({
       apiKey: config.api_key as string,
+      fetcher: env?.GEMINI_PROXY,
     });
   },
 

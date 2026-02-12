@@ -52,6 +52,7 @@ export interface Connection {
 export interface Env {
   DB: D1Database;
   PLATFORM: Fetcher;
+  GEMINI_PROXY: Fetcher;
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
   CL_N8N_MCP_URL?: string;

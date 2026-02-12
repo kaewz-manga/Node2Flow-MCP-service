@@ -17,18 +17,28 @@ import type {
 
 export class GeminiRagClient {
   private config: GeminiRagConfig;
-  private baseUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/v1beta';
-  private uploadUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/upload/v1beta';
+  private fetcher: Fetcher | undefined;
+  // Service binding uses origin URL (ignored by CF, but required for valid Request)
+  private baseUrl = 'https://gemini-proxy/v1beta';
+  private uploadUrl = 'https://gemini-proxy/upload/v1beta';
+  // Fallback for when service binding is not available
+  private httpBaseUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/v1beta';
+  private httpUploadUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/upload/v1beta';
 
   constructor(config: GeminiRagConfig) {
     this.config = config;
+    this.fetcher = config.fetcher;
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const separator = path.includes('?') ? '&' : '?';
-    const url = `${this.baseUrl}${path}${separator}key=${this.config.apiKey}`;
+    const base = this.fetcher ? this.baseUrl : this.httpBaseUrl;
+    const url = `${base}${path}${separator}key=${this.config.apiKey}`;
 
-    const response = await fetch(url, {
+    const doFetch = this.fetcher
+      ? (u: string, o: RequestInit) => this.fetcher!.fetch(u, o as Parameters<Fetcher['fetch']>[1])
+      : fetch;
+    const response = await doFetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -122,8 +132,12 @@ export class GeminiRagClient {
     body.set(contentBytes, prefix.length);
     body.set(suffix, prefix.length + contentBytes.length);
 
-    const url = `${this.uploadUrl}/${storeName}:uploadToFileSearchStore?key=${this.config.apiKey}`;
-    const response = await fetch(url, {
+    const uploadBase = this.fetcher ? this.uploadUrl : this.httpUploadUrl;
+    const url = `${uploadBase}/${storeName}:uploadToFileSearchStore?key=${this.config.apiKey}`;
+    const doFetch = this.fetcher
+      ? (u: string, o: RequestInit) => this.fetcher!.fetch(u, o as Parameters<Fetcher['fetch']>[1])
+      : fetch;
+    const response = await doFetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': `multipart/related; boundary=${boundary}`,
