@@ -2,6 +2,11 @@ name = "node2flow-mcp-gateway"
 main = "src/index.ts"
 compatibility_date = "2025-01-13"
 
+# Smart Placement: run worker near backend (Google/VPS) instead of user edge
+# Fixes Gemini API "User location is not supported" error from Thai edge
+[placement]
+mode = "smart"
+
 routes = [
   { pattern = "mcp.node2flow.net", custom_domain = true }
 ]
