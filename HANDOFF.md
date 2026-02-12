@@ -760,9 +760,15 @@ Added OAuth 2.1 authentication to the MCP Gateway, enabling Claude Desktop and o
    - `apps/mcp-gateway/wrangler.toml` — KV binding
    - `apps/platform-worker/src/routes/internal.ts` — 2 new endpoints
 
-**Tested**: Claude Desktop → Google OAuth → user created → MCP tools working (all `POST /mcp` returning Ok).
+7. **Provider selection login page** (`36bbb60`):
+   - `/oauth/authorize` now shows dark-themed HTML page with Google and GitHub buttons
+   - Previously auto-redirected to Google — no way for user to choose GitHub
+   - Buttons link to `/oauth/authorize/start?provider=google|github&...` which does the actual IdP redirect
+   - Styled to match Node2Flow dark theme (zinc bg, white/gray buttons, brand SVG icons)
 
-Commit: `3f23d60`
+**Tested**: Claude Desktop → Google OAuth + GitHub OAuth → both working, MCP tools accessible.
+
+Commits: `3f23d60` (OAuth implementation) → `36bbb60` (login page)
 
 ### Session 41: shadcn Accordion on FAQ Page (2026-02-12)
 
