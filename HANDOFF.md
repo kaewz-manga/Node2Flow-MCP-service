@@ -796,6 +796,33 @@ Replaced custom FAQ accordion (Card + Button + ChevronDown + manual state) with 
 
 Deployed to CF Pages.
 
+### Session 43: Port Community n8n Plugin Quality to SaaS Gateway (2026-02-13)
+
+Ported the community npm package (`@node2flow/n8n-management-mcp`, Smithery quality 85/100) tool definitions and HTTP client into the SaaS Gateway n8n plugin. Same 27 tools, now with full annotations and rich descriptions.
+
+1. **tools.ts replaced** — All 27 tool definitions now have:
+   - `annotations`: `title`, `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint` on every tool
+   - Rich property descriptions (e.g. `'Filter by active status (true = active only, false = inactive only, omit for all)'`)
+   - New filter parameters on `listWorkflows` (`active`, `tags`), `listTags`/`listUsers` (`limit`)
+
+2. **client.ts replaced** — Community HTTP client with improvements:
+   - 30s timeout via `AbortSignal.timeout(30000)` (was no timeout)
+   - URL normalization: `config.apiUrl.replace(/\/+$/, '')`
+   - `listWorkflows` now accepts `params?: { active?: boolean; tags?: string }` for filtering
+
+3. **index.ts minor update** — Updated `listWorkflows` call to pass filter args
+
+4. **No breaking changes**:
+   - All 27 tool names identical
+   - Plugin interface unchanged (createClient, handleToolCall)
+   - Dashboard gateway-api.ts unaffected (uses same tool names)
+   - Auth, billing, connections untouched
+
+**Source**: `D:\Dev\playground\Claude_Code_Commander\n8n-management-mcp-community\src\tools.ts` + `n8n-client.ts`
+**Target**: `apps/mcp-gateway/src/plugins/n8n/tools.ts` + `client.ts` + `index.ts`
+
+Commit: `1fd744f`
+
 ### Test Accounts
 
 - **Admin**: `claude-admin@node2flow.net` / `ClaudeAdmin123!`
@@ -1035,5 +1062,6 @@ wrangler deploy                         # In each app/
 **Session 40**: Remove orange/emerald colors → neutral white primary + green semantic + default shadcn buttons
 **Session 41**: shadcn Accordion on FAQ page (replaces custom Card+Button accordion)
 **Session 42**: MCP OAuth (Google + GitHub) — Claude Desktop can authenticate via Google/GitHub OAuth (PKCE + Dynamic Client Registration)
+**Session 43**: Port community n8n plugin quality to SaaS Gateway (annotations, rich descriptions, improved client)
 **Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-13
