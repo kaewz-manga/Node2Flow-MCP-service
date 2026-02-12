@@ -823,6 +823,27 @@ Ported the community npm package (`@node2flow/n8n-management-mcp`, Smithery qual
 
 Commit: `1fd744f`
 
+### Session 44: Port Community Quality to All 6 Gateway Plugins (2026-02-13)
+
+Extended Session 43's quality port from just n8n to ALL 6 in-worker plugins. Every tool now has Smithery-quality annotations.
+
+1. **6 `tools.ts` files updated** — All ported from community npm packages:
+   - n8n (27 tools) — type fix from Session 43
+   - WordPress (20 tools) — from `@node2flow/wordpress-mcp`
+   - Telegram (27 tools) — from `@node2flow/telegram-bot-mcp`
+   - LINE (25 tools) — from `@node2flow/line-bot-mcp`
+   - Notion (25 tools) — from `@node2flow/notion-mcp`
+   - Gemini RAG (12 tools) — from `@node2flow/gemini-file-search-rag-mcp`
+
+2. **`types.ts` updated** — Added `annotations` field to `MCPToolDefinition` interface:
+   - `title`, `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`
+
+3. **`_fields` param added** — Read-only tools with empty `properties: {}` now have `_fields` parameter for Smithery param description coverage
+
+4. **Total**: 136 tools across 6 plugins, all with full annotations
+
+Commit: `d857548`
+
 ### Test Accounts
 
 - **Admin**: `claude-admin@node2flow.net` / `ClaudeAdmin123!`
@@ -1063,5 +1084,6 @@ wrangler deploy                         # In each app/
 **Session 41**: shadcn Accordion on FAQ page (replaces custom Card+Button accordion)
 **Session 42**: MCP OAuth (Google + GitHub) — Claude Desktop can authenticate via Google/GitHub OAuth (PKCE + Dynamic Client Registration)
 **Session 43**: Port community n8n plugin quality to SaaS Gateway (annotations, rich descriptions, improved client)
+**Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
 **Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-13
