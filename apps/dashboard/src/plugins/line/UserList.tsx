@@ -143,13 +143,13 @@ export default function UserList() {
               {botInfo?.chatMode || '-'} mode
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Followers</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums">{followerIds.length}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Users className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <Users className="h-3.5 w-3.5 mr-1.5 text-green-500" />
               Known user IDs
             </CardFooter>
           </Card>
@@ -191,7 +191,7 @@ export default function UserList() {
                   placeholder="User ID (e.g. U1234...)"
                   className="flex-1"
                 />
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleLookupUser} disabled={lookingUp || !userId.trim()}>
+                <Button onClick={handleLookupUser} disabled={lookingUp || !userId.trim()}>
                   {lookingUp ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
                   Lookup
                 </Button>
@@ -226,7 +226,7 @@ export default function UserList() {
                   placeholder="Group ID (e.g. C1234...)"
                   className="flex-1"
                 />
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleLookupGroup} disabled={lookingUpGroup || !groupId.trim()}>
+                <Button onClick={handleLookupGroup} disabled={lookingUpGroup || !groupId.trim()}>
                   {lookingUpGroup ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
                   Lookup
                 </Button>

@@ -35,7 +35,7 @@ export default function AdminOverview() {
 
   const colorMap: Record<string, { bg: string; icon: string }> = {
     blue: { bg: 'bg-primary/10', icon: 'text-primary' },
-    green: { bg: 'bg-emerald-900/30', icon: 'text-emerald-400' },
+    green: { bg: 'bg-green-900/30', icon: 'text-green-400' },
     purple: { bg: 'bg-purple-900/30', icon: 'text-purple-400' },
     yellow: { bg: 'bg-amber-900/30', icon: 'text-amber-400' },
     red: { bg: 'bg-red-900/30', icon: 'text-red-400' },

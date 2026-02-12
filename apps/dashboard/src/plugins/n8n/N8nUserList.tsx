@@ -85,13 +85,13 @@ export default function N8nUserList() {
                 {ownerCount} owner, {adminCount} admin
               </CardFooter>
             </Card>
-            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+            <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm">
               <CardHeader className="pb-2">
                 <CardDescription>Active</CardDescription>
-                <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{activeCount}</CardTitle>
+                <CardTitle className="text-2xl font-semibold tabular-nums text-green-500">{activeCount}</CardTitle>
               </CardHeader>
               <CardFooter className="text-sm text-muted-foreground">
-                <Shield className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+                <Shield className="h-3.5 w-3.5 mr-1.5 text-green-500" />
                 Verified accounts
               </CardFooter>
             </Card>

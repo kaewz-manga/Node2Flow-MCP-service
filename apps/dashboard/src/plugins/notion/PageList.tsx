@@ -137,7 +137,7 @@ export default function PageList() {
               Notion pages found
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Latest Page</CardDescription>
               <CardTitle className="text-lg font-semibold truncate">
@@ -145,7 +145,7 @@ export default function PageList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <FileText className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <FileText className="h-3.5 w-3.5 mr-1.5 text-green-500" />
               Most recently edited
             </CardFooter>
           </Card>
@@ -177,7 +177,7 @@ export default function PageList() {
           placeholder="Search pages..."
           className="flex-1"
         />
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSearch} disabled={searching}>
+        <Button onClick={handleSearch} disabled={searching}>
           {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Search
         </Button>
       </div>

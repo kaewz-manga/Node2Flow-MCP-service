@@ -419,8 +419,8 @@ export default function Connections() {
         <DialogContent>
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Check className="h-6 w-6 text-primary" />
+              <div className="bg-green-900/30 p-2 rounded-full">
+                <Check className="h-6 w-6 text-green-400" />
               </div>
               <DialogTitle>Your API Key</DialogTitle>
             </div>
@@ -439,7 +439,7 @@ export default function Connections() {
               size="icon"
               onClick={() => copyToClipboard(newApiKey)}
             >
-              {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
 

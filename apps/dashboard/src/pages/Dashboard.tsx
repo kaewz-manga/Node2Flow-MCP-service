@@ -153,7 +153,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-5 text-base text-white">
                 <span className="flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-emerald-400" />
+                  <Layers className="h-5 w-5 text-green-400" />
                   {connectedServices}/{plugins.length} services
                 </span>
                 <span className="flex items-center gap-2">
@@ -282,7 +282,7 @@ export default function Dashboard() {
                     return (
                       <TableRow key={conn.id}>
                         <TableCell className="text-center">
-                          <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-emerald-400' : 'bg-muted-foreground'}`} />
+                          <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
                         </TableCell>
                         <TableCell className="font-medium text-center">
                           {conn.name}
@@ -348,7 +348,7 @@ export default function Dashboard() {
             </ol>
           </CardContent>
           <CardFooter>
-            <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" asChild>
+            <Button size="sm" className="w-full" asChild>
               <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
                 Get Started
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />

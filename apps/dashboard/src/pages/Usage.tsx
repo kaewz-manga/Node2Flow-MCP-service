@@ -79,7 +79,7 @@ export default function Usage() {
               <p className="text-muted-foreground mt-2">
                 {minuteLimit === -1 ? 'Unlimited' : minuteLimit} req/min
                 {' \u2022 '}
-                {dailyLimit === -1 ? <span className="font-semibold text-emerald-400">Unlimited/day</span> : `${dailyLimit.toLocaleString()} req/day`}
+                {dailyLimit === -1 ? <span className="font-semibold text-green-400">Unlimited/day</span> : `${dailyLimit.toLocaleString()} req/day`}
                 {' \u2022 '} Unlimited instances
               </p>
             </div>
@@ -111,9 +111,9 @@ export default function Usage() {
               <>
                 <p className="text-3xl font-bold text-foreground">
                   {usage?.requests.used.toLocaleString()}
-                  <span className="text-lg font-normal text-emerald-400 ml-2">Unlimited</span>
+                  <span className="text-lg font-normal text-green-400 ml-2">Unlimited</span>
                 </p>
-                <Progress value={100} indicatorClassName="bg-emerald-400" className="mt-3" />
+                <Progress value={100} indicatorClassName="bg-green-400" className="mt-3" />
               </>
             ) : (
               <>
@@ -131,10 +131,10 @@ export default function Usage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm hover:shadow-md transition-all">
+        <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-muted-foreground font-normal flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-emerald-400" />
+              <TrendingUp className="h-4 w-4 text-green-400" />
               Success Rate
             </CardTitle>
           </CardHeader>
@@ -209,8 +209,8 @@ export default function Usage() {
                     <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-primary rounded-full" />Unlimited n8n instances</li>
                     <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-primary rounded-full" />{isEnterprise ? 'Custom' : isMinuteUnlimited ? 'Unlimited' : planMinuteLimit} req/min</li>
                     <li className="flex items-center gap-2">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isDailyUnlimited ? 'bg-emerald-400' : 'bg-primary'}`} />
-                      {isEnterprise ? 'Custom daily quota' : isDailyUnlimited ? <span className="text-emerald-400 font-semibold">Unlimited req/day</span> : `${planDailyLimit.toLocaleString()} req/day`}
+                      <span className={`w-1.5 h-1.5 rounded-full ${isDailyUnlimited ? 'bg-green-400' : 'bg-primary'}`} />
+                      {isEnterprise ? 'Custom daily quota' : isDailyUnlimited ? <span className="text-green-400 font-semibold">Unlimited req/day</span> : `${planDailyLimit.toLocaleString()} req/day`}
                     </li>
                     <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-primary rounded-full" />{plan.features?.support || 'Community'} support</li>
                   </ul>
@@ -220,7 +220,7 @@ export default function Usage() {
                   ) : isEnterprise ? (
                     <Button variant="secondary" className="w-full" asChild><a href="mailto:contact@node2flow.net?subject=Enterprise%20Inquiry">Contact Sales</a></Button>
                   ) : isUpgrade ? (
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleChangePlan(plan.id)} disabled={checkoutLoading === plan.id}>
+                    <Button className="w-full" onClick={() => handleChangePlan(plan.id)} disabled={checkoutLoading === plan.id}>
                       {checkoutLoading === plan.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Upgrade <ArrowUpRight className="h-4 w-4" /></>}
                     </Button>
                   ) : (

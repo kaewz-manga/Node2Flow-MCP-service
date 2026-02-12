@@ -90,13 +90,13 @@ export default function RichMenuList() {
               <Menu className="h-3.5 w-3.5 mr-1.5 text-primary" /> Rich menus
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Selected Menus</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums">{menus.filter(m => m.selected).length}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Star className="h-3.5 w-3.5 mr-1.5 text-emerald-500" /> Active by default
+              <Star className="h-3.5 w-3.5 mr-1.5 text-green-500" /> Active by default
             </CardFooter>
           </Card>
           <Card className="bg-gradient-to-t from-amber-500/5 to-card shadow-sm">
@@ -137,7 +137,7 @@ export default function RichMenuList() {
                     </div>
                     {menu.selected && <Badge variant="secondary" className="text-xs">Default</Badge>}
                     <span className="text-xs text-muted-foreground font-mono">{menu.richMenuId?.substring(0, 12)}...</span>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-emerald-400" onClick={() => handleSetDefault(menu.richMenuId)} title="Set as default">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-green-400" onClick={() => handleSetDefault(menu.richMenuId)} title="Set as default">
                       <Star className="h-3.5 w-3.5" />
                     </Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-red-400 hover:bg-red-900/30" onClick={() => setDeleteTarget(menu)} title="Delete">
@@ -169,7 +169,7 @@ export default function RichMenuList() {
                 <Input value={linkUserId} onChange={(e) => setLinkUserId(e.target.value)} placeholder="User ID" />
               </div>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+               
                 onClick={handleLinkToUser}
                 disabled={linking || !linkMenuId.trim() || !linkUserId.trim()}
               >

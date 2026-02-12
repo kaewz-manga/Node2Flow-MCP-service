@@ -203,7 +203,7 @@ export default function WorkflowList() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreate(!showCreate)}>
+          <Button onClick={() => setShowCreate(!showCreate)}>
             <Plus className="h-4 w-4 mr-2" /> Create
           </Button>
           <Button variant="outline" size="icon" onClick={fetchList} title="Refresh">
@@ -225,13 +225,13 @@ export default function WorkflowList() {
               All workflows
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-green-500/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Active</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-500">{workflows.filter(w => w.active).length}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tabular-nums text-green-500">{workflows.filter(w => w.active).length}</CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Zap className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <Zap className="h-3.5 w-3.5 mr-1.5 text-green-500" />
               Currently running
             </CardFooter>
           </Card>
@@ -282,7 +282,7 @@ export default function WorkflowList() {
               rows={12}
               className="font-mono text-sm"
             />
-            <Button variant="secondary" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCreate} disabled={creating}>
+            <Button variant="secondary" onClick={handleCreate} disabled={creating}>
               {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />} Create Workflow
             </Button>
           </CardContent>
@@ -315,7 +315,7 @@ export default function WorkflowList() {
                 <Button variant="ghost" className="p-0 h-auto" onClick={() => handleToggle(wf)} title={wf.active ? 'Deactivate' : 'Activate'}>
                   <StatusBadge status={wf.active ? 'active' : 'inactive'} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-400 hover:bg-emerald-900/30" onClick={() => handleExecute(wf.id)} disabled={executing === wf.id} title="Execute">
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-green-400 hover:bg-green-900/30" onClick={() => handleExecute(wf.id)} disabled={executing === wf.id} title="Execute">
                   {executing === wf.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                 </Button>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 hover:bg-red-900/30" onClick={() => setDeleteTarget(wf)} title="Delete">
@@ -371,7 +371,7 @@ export default function WorkflowList() {
                                 {allTags.length === 0 && <span className="text-xs text-muted-foreground">No tags available</span>}
                               </div>
                               <div className="flex gap-2">
-                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSaveTags} disabled={savingTags}>
+                                <Button size="sm" onClick={handleSaveTags} disabled={savingTags}>
                                   {savingTags ? 'Saving...' : 'Save Tags'}
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={() => setEditingTags(false)}>Cancel</Button>
@@ -389,11 +389,11 @@ export default function WorkflowList() {
 
                       {/* Actions */}
                       <div className="flex gap-2 flex-wrap">
-                        <Button variant="outline" size="sm" className={detail.active ? 'text-amber-400 border-amber-700 hover:bg-amber-900/30' : 'text-emerald-400 border-emerald-700 hover:bg-emerald-900/30'} onClick={() => handleToggle(detail)}>
+                        <Button variant="outline" size="sm" className={detail.active ? 'text-amber-400 border-amber-700 hover:bg-amber-900/30' : 'text-green-400 border-green-700 hover:bg-green-900/30'} onClick={() => handleToggle(detail)}>
                           {detail.active ? <PowerOff className="h-3.5 w-3.5 mr-2" /> : <Power className="h-3.5 w-3.5 mr-2" />}
                           {detail.active ? 'Deactivate' : 'Activate'}
                         </Button>
-                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleExecute(detail.id)} disabled={executing === detail.id}>
+                        <Button size="sm" onClick={() => handleExecute(detail.id)} disabled={executing === detail.id}>
                           {executing === detail.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : <Play className="h-3.5 w-3.5 mr-2" />}
                           Execute
                         </Button>
@@ -411,7 +411,7 @@ export default function WorkflowList() {
                             rows={20}
                             className="font-mono text-xs"
                           />
-                          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleUpdate} disabled={saving}>
+                          <Button onClick={handleUpdate} disabled={saving}>
                             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Changes
                           </Button>
                         </div>
