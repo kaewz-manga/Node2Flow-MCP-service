@@ -29,7 +29,7 @@ export const n8nPlugin: MCPPlugin = {
       switch (toolName) {
         // ========== Workflow Operations ==========
         case 'n8n_list_workflows':
-          result = await n8n.listWorkflows();
+          result = await n8n.listWorkflows(args as { active?: boolean; tags?: string } | undefined);
           break;
         case 'n8n_get_workflow':
           result = await n8n.getWorkflow(args.id as string);
