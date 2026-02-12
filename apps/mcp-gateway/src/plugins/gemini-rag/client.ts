@@ -17,8 +17,8 @@ import type {
 
 export class GeminiRagClient {
   private config: GeminiRagConfig;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
-  private uploadUrl = 'https://generativelanguage.googleapis.com/upload/v1beta';
+  private baseUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/v1beta';
+  private uploadUrl = 'https://node2flow-gemini-proxy.suphakitm99.workers.dev/upload/v1beta';
 
   constructor(config: GeminiRagConfig) {
     this.config = config;

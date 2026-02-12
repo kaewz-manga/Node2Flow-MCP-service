@@ -1,0 +1,12 @@
+name = "node2flow-gemini-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-01-13"
+
+# Smart Placement: run near Google servers (US) — single backend optimization
+# This worker ONLY talks to generativelanguage.googleapis.com
+[placement]
+mode = "smart"
+
+routes = [
+  { pattern = "gemini-proxy.node2flow.net", custom_domain = true }
+]
