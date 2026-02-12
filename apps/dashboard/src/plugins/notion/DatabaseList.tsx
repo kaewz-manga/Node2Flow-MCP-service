@@ -206,7 +206,7 @@ export default function DatabaseList() {
           <p className="text-muted-foreground mt-1">{subtitle}</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setShowCreateDialog(true)}>
+          <Button className="" onClick={() => setShowCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" /> Create Database
           </Button>
           <Button variant="outline" size="icon" onClick={() => fetchDatabases()} title="Refresh">
@@ -228,7 +228,7 @@ export default function DatabaseList() {
               Notion databases found
             </CardFooter>
           </Card>
-          <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+          <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription>Latest Database</CardDescription>
               <CardTitle className="text-lg font-semibold truncate">
@@ -236,7 +236,7 @@ export default function DatabaseList() {
               </CardTitle>
             </CardHeader>
             <CardFooter className="text-sm text-muted-foreground">
-              <Database className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+              <Database className="h-3.5 w-3.5 mr-1.5 text-primary" />
               Most recently edited
             </CardFooter>
           </Card>
@@ -268,7 +268,7 @@ export default function DatabaseList() {
           placeholder="Search databases..."
           className="flex-1"
         />
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSearch} disabled={searching}>
+        <Button className="" onClick={handleSearch} disabled={searching}>
           {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Search
         </Button>
       </div>
@@ -421,7 +421,7 @@ export default function DatabaseList() {
               Cancel
             </Button>
             <Button
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className=""
               onClick={handleCreateDatabase}
               disabled={creating || !createTitle.trim() || !createParentPageId.trim()}
             >

@@ -108,7 +108,7 @@ export default function WebhookSettings() {
                 <CardTitle className="text-xl font-semibold flex items-center gap-2">
                   {hasWebhook ? (
                     <>
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Active</span>
                     </>
                   ) : (
@@ -125,13 +125,13 @@ export default function WebhookSettings() {
               </CardFooter>
             </Card>
 
-            <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+            <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
               <CardHeader className="pb-2">
                 <CardDescription>Pending Updates</CardDescription>
                 <CardTitle className="text-2xl font-semibold tabular-nums">{pendingUpdates}</CardTitle>
               </CardHeader>
               <CardFooter className="text-sm text-muted-foreground">
-                <AlertCircle className="h-3.5 w-3.5 mr-1.5 text-emerald-500" />
+                <AlertCircle className="h-3.5 w-3.5 mr-1.5 text-primary" />
                 Unprocessed messages
               </CardFooter>
             </Card>
@@ -193,7 +193,7 @@ export default function WebhookSettings() {
               </div>
               <div className="flex gap-3">
                 <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className=""
                   onClick={handleSetWebhook}
                   disabled={setting || !webhookUrl.trim()}
                 >

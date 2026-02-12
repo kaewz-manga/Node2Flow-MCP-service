@@ -104,7 +104,7 @@ export default function Templates() {
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           className="flex-1"
         />
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSearch} disabled={searching || !query.trim()}>
+        <Button className="" onClick={handleSearch} disabled={searching || !query.trim()}>
           {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />} Search
         </Button>
       </div>
@@ -137,7 +137,7 @@ export default function Templates() {
                   </Button>
                   <span className="text-xs text-muted-foreground font-mono hidden sm:block">#{id}</span>
                   {template.totalViews && <Badge variant="secondary" className="bg-muted text-foreground">{template.totalViews} views</Badge>}
-                  <Button variant="outline" size="sm" className="text-emerald-400 border-emerald-700 hover:bg-emerald-900/30" onClick={() => openDeploy(template)}>
+                  <Button variant="outline" size="sm" className="text-primary border-primary/50 hover:bg-primary/10" onClick={() => openDeploy(template)}>
                     <Rocket className="h-3.5 w-3.5 mr-1" /> Deploy
                   </Button>
                 </div>
@@ -187,7 +187,7 @@ export default function Templates() {
                         )}
 
                         <div className="flex gap-2">
-                          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" size="sm" onClick={() => openDeploy(detail)}>
+                          <Button className="" size="sm" onClick={() => openDeploy(detail)}>
                             <Rocket className="h-3.5 w-3.5 mr-2" /> Deploy to n8n
                           </Button>
                         </div>
@@ -220,7 +220,7 @@ export default function Templates() {
           <Input placeholder="Workflow name (optional)" value={deployName} onChange={(e) => setDeployName(e.target.value)} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeployTarget(null)}>Cancel</Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleDeploy} disabled={deploying}>
+            <Button className="" onClick={handleDeploy} disabled={deploying}>
               {deploying ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Rocket className="h-4 w-4 mr-2" />} Deploy
             </Button>
           </DialogFooter>

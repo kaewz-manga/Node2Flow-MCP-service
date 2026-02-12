@@ -121,13 +121,13 @@ export default function AdminUsers() {
           </CardFooter>
         </Card>
 
-        <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm">
+        <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm">
           <CardHeader className="pb-2">
             <CardDescription>Active</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums text-emerald-400">{stats.active}</CardTitle>
+            <CardTitle className="text-2xl font-semibold tabular-nums text-primary">{stats.active}</CardTitle>
           </CardHeader>
           <CardFooter className="text-sm text-muted-foreground">
-            <UserCheck className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+            <UserCheck className="h-3.5 w-3.5 mr-1.5 text-primary" />
             On this page
           </CardFooter>
         </Card>
@@ -285,7 +285,7 @@ export default function AdminUsers() {
                             u.status === 'active' ? 'default' :
                             u.status === 'suspended' ? 'secondary' : 'destructive'
                           } className={
-                            u.status === 'active' ? 'bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/40' :
+                            u.status === 'active' ? 'bg-primary/10 text-primary hover:bg-primary/15' :
                             u.status === 'suspended' ? 'bg-amber-900/30 text-amber-400 hover:bg-amber-900/40' :
                             'bg-red-900/30 text-red-400 hover:bg-red-900/40'
                           }>
@@ -298,7 +298,7 @@ export default function AdminUsers() {
                           {u.status === 'active' ? (
                             <Button variant="link" size="sm" className="text-amber-400 p-0 h-auto" onClick={() => handleChangeStatus(u.id, 'suspended')}>Suspend</Button>
                           ) : u.status === 'suspended' ? (
-                            <Button variant="link" size="sm" className="text-emerald-400 p-0 h-auto" onClick={() => handleChangeStatus(u.id, 'active')}>Activate</Button>
+                            <Button variant="link" size="sm" className="text-primary p-0 h-auto" onClick={() => handleChangeStatus(u.id, 'active')}>Activate</Button>
                           ) : null}
                           <Button variant="link" size="sm" className="text-red-400 p-0 h-auto" onClick={() => handleDelete(u.id, u.email)}>Delete</Button>
                         </TableCell>

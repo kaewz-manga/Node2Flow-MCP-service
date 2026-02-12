@@ -125,9 +125,9 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
                   <p className="text-sm text-muted-foreground mt-1">Tool Executions</p>
                 </CardContent>
               </Card>
-              <Card className="bg-gradient-to-t from-emerald-500/5 to-card shadow-sm text-center">
+              <Card className="bg-gradient-to-t from-primary/5 to-card shadow-sm text-center">
                 <CardContent className="p-6">
-                  <CheckCircle className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
+                  <CheckCircle className="h-5 w-5 text-primary mx-auto mb-2" />
                   <p className="text-3xl font-bold text-foreground tabular-nums">{stats.total_successes.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground mt-1">Successful</p>
                 </CardContent>
@@ -158,7 +158,7 @@ Found 3 matching nodes: HTTP Request, HTTP Request Tool, Webhook`}</code>
               const gradients = [
                 'from-primary/5 to-card',
                 'from-purple-500/5 to-card',
-                'from-emerald-500/5 to-card',
+                'from-primary/5 to-card',
                 'from-amber-500/5 to-card',
                 'from-blue-500/5 to-card',
                 'from-rose-500/5 to-card',
@@ -352,12 +352,12 @@ function PricingCard({ plan }: { plan: Plan }) {
           )}
         </div>
         <ul className="space-y-3 mb-6">
-          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />{isEnterprise ? 'Custom' : 'Unlimited'} service connections</li>
-          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />{isEnterprise ? 'Custom rate limits' : <span>{isMinuteUnlimited ? 'Unlimited' : minuteLimit} req/min{features.fair_use && <span className="text-muted-foreground"> (fair use)</span>}</span>}</li>
-          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />{isEnterprise ? 'Custom daily quota' : isDailyUnlimited ? <span className="text-primary font-semibold">Unlimited req/day</span> : <span>{dailyLimit.toLocaleString()} req/day</span>}</li>
-          {features.analytics && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />Usage analytics</li>}
-          {features.support && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />{features.support.charAt(0).toUpperCase() + features.support.slice(1)} support</li>}
-          {features.private_server && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-emerald-400" />Private MCP server</li>}
+          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />{isEnterprise ? 'Custom' : 'Unlimited'} service connections</li>
+          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />{isEnterprise ? 'Custom rate limits' : <span>{isMinuteUnlimited ? 'Unlimited' : minuteLimit} req/min{features.fair_use && <span className="text-muted-foreground"> (fair use)</span>}</span>}</li>
+          <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />{isEnterprise ? 'Custom daily quota' : isDailyUnlimited ? <span className="text-primary font-semibold">Unlimited req/day</span> : <span>{dailyLimit.toLocaleString()} req/day</span>}</li>
+          {features.analytics && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />Usage analytics</li>}
+          {features.support && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />{features.support.charAt(0).toUpperCase() + features.support.slice(1)} support</li>}
+          {features.private_server && <li className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-primary" />Private MCP server</li>}
         </ul>
         {isFree ? (
           <Button variant="secondary" className="w-full" asChild><Link to="/register">Start Free</Link></Button>

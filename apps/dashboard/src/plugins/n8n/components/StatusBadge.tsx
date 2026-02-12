@@ -2,9 +2,9 @@ import { Badge } from '@node2flow/dashboard-core';
 
 
 const colors: Record<string, string> = {
-  active: 'bg-emerald-900/30 text-emerald-400',
+  active: 'bg-primary/10 text-primary',
   inactive: 'bg-muted text-foreground',
-  success: 'bg-emerald-900/30 text-emerald-400',
+  success: 'bg-primary/10 text-primary',
   error: 'bg-red-900/30 text-red-400',
   pending: 'bg-amber-900/30 text-amber-400',
   waiting: 'bg-amber-900/30 text-amber-400',

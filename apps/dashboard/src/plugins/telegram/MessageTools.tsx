@@ -163,7 +163,7 @@ export default function MessageTools() {
             />
           </div>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className=""
             onClick={handleSendMessage}
             disabled={sending || !msgChatId.trim() || !msgText.trim()}
           >
@@ -210,7 +210,7 @@ export default function MessageTools() {
             />
           </div>
           <Button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className=""
             onClick={handleSendPhoto}
             disabled={sendingPhoto || !photoChatId.trim() || !photoUrl.trim()}
           >
