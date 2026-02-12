@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listStores, createStore, getStore, deleteStore } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
+import {
+  usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  Alert, AlertDescription, Separator,
+  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+} from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
-import { Loader2, Plus, RefreshCw, AlertCircle, Database, FolderOpen, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { Loader2, Plus, RefreshCw, AlertCircle, Database, FolderOpen, ChevronDown, ChevronRight, Trash2, MoreHorizontal } from 'lucide-react';
 
 const PAGE_SIZE = 20;
 
@@ -187,68 +192,79 @@ export default function StoreList() {
 
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-      ) : (
+      ) : stores.length > 0 ? (
         <div className="space-y-3">
-          {stores.map((store) => (
-            <Card key={store.name} className="hover:shadow-md transition-all">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <Database className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground">{store.displayName}</h3>
-                      <span className="text-xs text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded">
-                        {store.documentCount || 0} docs
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground font-mono truncate mb-2">{store.name}</p>
-                    {store.createTime && (
-                      <p className="text-xs text-muted-foreground">Created: {new Date(store.createTime).toLocaleString()}</p>
-                    )}
-
-                    {/* Expanded Detail */}
-                    {expandedStore === store.name && (
-                      <div className="mt-3 pt-3 border-t border-border">
-                        {loadingDetail === store.name ? (
-                          <div className="flex items-center justify-center py-4">
-                            <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />
-                            <span className="text-sm text-muted-foreground">Loading details...</span>
+          <div className="rounded-md border border-border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Store Name</TableHead>
+                  <TableHead>Documents</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {stores.map((store) => (
+                  <>
+                    <TableRow key={store.name}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Database className="h-4 w-4 text-primary shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium">{store.displayName}</p>
+                            <p className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">{store.name}</p>
                           </div>
-                        ) : storeDetails[store.name] ? (
-                          <JsonViewer data={storeDetails[store.name]} />
-                        ) : (
-                          <p className="text-sm text-muted-foreground">No details available</p>
-                        )}
-                      </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">{store.documentCount || 0}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {store.createTime ? new Date(store.createTime).toLocaleDateString() : '-'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <MoreHorizontal />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleExpand(store.name)}>
+                              {expandedStore === store.name ? 'Hide Details' : 'View Details'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(store.name)}>
+                              Copy ID
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => setDeleteTarget(store)}>
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                    {expandedStore === store.name && (
+                      <TableRow key={`${store.name}-detail`}>
+                        <TableCell colSpan={4} className="bg-muted/30">
+                          {loadingDetail === store.name ? (
+                            <div className="flex items-center justify-center py-4">
+                              <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />
+                              <span className="text-sm text-muted-foreground">Loading details...</span>
+                            </div>
+                          ) : storeDetails[store.name] ? (
+                            <JsonViewer data={storeDetails[store.name]} />
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No details available</p>
+                          )}
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 hover:text-primary hover:bg-primary/10"
-                      onClick={() => handleExpand(store.name)}
-                      title={expandedStore === store.name ? 'Collapse' : 'Expand details'}
-                    >
-                      {expandedStore === store.name ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 hover:text-red-400 hover:bg-red-900/30"
-                      onClick={() => setDeleteTarget(store)}
-                      title="Delete store"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          {stores.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">No stores found. Create one to get started!</div>
-          )}
+                  </>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           {nextPageToken && (
             <div className="flex justify-center pt-2">
               <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
@@ -258,6 +274,8 @@ export default function StoreList() {
             </div>
           )}
         </div>
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">No stores found. Create one to get started!</div>
       )}
 
       <ConfirmDialog

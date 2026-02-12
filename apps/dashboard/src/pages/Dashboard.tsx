@@ -221,7 +221,7 @@ export default function Dashboard() {
       {/* Services Grid — Compact cards */}
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-3">Services</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           {plugins.map((plugin) => {
             const pluginConns = connections.filter(c => c.product_type === plugin.id);
             const isConnected = pluginConns.length > 0;
@@ -235,23 +235,16 @@ export default function Dashboard() {
               <Link
                 key={plugin.id}
                 to={connectionsHref}
-                className={`block rounded-lg border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-primary/40 ${
-                  isConnected ? 'border-l-[3px] border-l-emerald-500' : ''
-                }`}
+                className="block rounded-md border border-border/60 bg-card p-2.5 transition-all hover:shadow-md hover:border-primary/40"
               >
-                <div className="flex flex-col items-center text-center gap-2">
+                <div className="flex flex-col items-center text-center gap-1.5">
                   {logoUrl ? (
-                    <img src={logoUrl} alt={plugin.name} className="h-10 w-10 shrink-0" />
+                    <img src={logoUrl} alt={plugin.name} className="h-8 w-8 shrink-0" />
                   ) : (
-                    <PluginIcon className={`h-10 w-10 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+                    <PluginIcon className="h-8 w-8 shrink-0 text-muted-foreground" />
                   )}
-                  <span className="text-sm font-medium truncate w-full">{plugin.name}</span>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{toolCount} tools</Badge>
-                    {isConnected && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                    )}
-                  </div>
+                  <span className="text-xs font-medium truncate w-full">{plugin.name}</span>
+                  <Badge variant="outline" className="text-[10px]">{toolCount} tools</Badge>
                 </div>
               </Link>
             );

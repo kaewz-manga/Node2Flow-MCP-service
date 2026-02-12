@@ -6,10 +6,12 @@ import {
   Alert, AlertDescription, Separator, Badge, Label, Textarea,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
   Collapsible, CollapsibleTrigger, CollapsibleContent,
+  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
-import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings } from 'lucide-react';
+import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings, MoreHorizontal } from 'lucide-react';
 
 // Metadata row type
 interface MetadataRow {
@@ -421,56 +423,84 @@ export default function DocumentList() {
         </Alert>
       )}
 
-      {/* Documents List */}
+      {/* Documents Table */}
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">Documents in Store</h2>
-          {documents.map((doc) => (
-            <Card key={doc.name} className="hover:shadow-md transition-all">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <FileText className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground">{doc.displayName}</h3>
-                      <Badge variant={doc.state === 'STATE_ACTIVE' ? 'default' : 'secondary'} className="text-xs">
-                        {doc.state?.replace('STATE_', '')}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground font-mono truncate mb-1">{doc.name}</p>
-                    <div className="flex gap-3 text-xs text-muted-foreground">
-                      {doc.mimeType && <span>Type: {doc.mimeType}</span>}
-                      {doc.sizeBytes && <span>Size: {(parseInt(doc.sizeBytes) / 1024).toFixed(1)} KB</span>}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 hover:text-red-400 hover:bg-red-900/30"
-                    onClick={() => setDeleteTarget(doc)}
-                    title="Delete document"
-                  >
-                    <Trash2 className="h-4 w-4" />
+          {documents.length > 0 ? (
+            <>
+              <div className="rounded-md border border-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Size</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {documents.map((doc) => (
+                      <TableRow key={doc.name}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-primary shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-medium truncate">{doc.displayName}</p>
+                              <p className="text-xs text-muted-foreground font-mono truncate max-w-[300px]">{doc.name}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={doc.state === 'STATE_ACTIVE' ? 'default' : 'secondary'} className="text-xs">
+                            {doc.state?.replace('STATE_', '')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{doc.mimeType || '-'}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {doc.sizeBytes ? `${(parseInt(doc.sizeBytes) / 1024).toFixed(1)} KB` : '-'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8">
+                                <MoreHorizontal />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(doc.name)}>
+                                Copy ID
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => setDeleteTarget(doc)}>
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Load More */}
+              {nextPageToken && (
+                <div className="flex justify-center pt-2">
+                  <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                    {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
+                    Load More
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-          {documents.length === 0 && selectedStore && (
+              )}
+            </>
+          ) : selectedStore ? (
             <div className="text-center py-8 text-muted-foreground">No documents found. Upload some content to get started!</div>
-          )}
-
-          {/* Load More */}
-          {nextPageToken && (
-            <div className="flex justify-center pt-2">
-              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
-                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
-                Load More
-              </Button>
-            </div>
-          )}
+          ) : null}
         </div>
       )}
 
