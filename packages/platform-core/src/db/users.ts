@@ -144,6 +144,17 @@ export async function updateSessionDuration(
     .run();
 }
 
+export async function updateUserOAuthScope(
+  db: D1Database,
+  userId: string,
+  scopeJson: string | null
+): Promise<void> {
+  await db
+    .prepare('UPDATE users SET oauth_scope = ?, updated_at = ? WHERE id = ?')
+    .bind(scopeJson, new Date().toISOString(), userId)
+    .run();
+}
+
 export async function deleteUser(db: D1Database, userId: string): Promise<void> {
   await db
     .prepare('UPDATE users SET status = ?, updated_at = ? WHERE id = ?')

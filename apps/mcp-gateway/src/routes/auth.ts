@@ -159,9 +159,14 @@ export async function authenticateMcpRequest(
       })
     );
 
-    const usage = usageRes.ok
-      ? await usageRes.json() as { current: number; limit: number; remaining: number }
-      : { current: 0, limit: 100, remaining: 100 };
+    const usageData = usageRes.ok
+      ? await usageRes.json() as { current: number; limit: number; remaining: number; oauth_scope?: string | null }
+      : { current: 0, limit: 100, remaining: 100, oauth_scope: null };
+
+    // Parse OAuth scope from user settings
+    const oauthScope = usageData.oauth_scope
+      ? JSON.parse(usageData.oauth_scope) as { plugins?: string[]; permissions?: string[] }
+      : null;
 
     return {
       context: {
@@ -172,9 +177,9 @@ export async function authenticateMcpRequest(
         productType: null,
         config: null,
         apiKeyId: 'oauth',
-        usage,
+        usage: { current: usageData.current, limit: usageData.limit, remaining: usageData.remaining },
         authMethod: 'oauth',
-        scope: null,
+        scope: oauthScope,
       },
       error: null,
     };

@@ -15,6 +15,7 @@ export {
   getUserByStripeCustomerId,
   updateUserPassword,
   updateSessionDuration,
+  updateUserOAuthScope,
   deleteUser,
   setUserTOTPSecret,
   enableUserTOTP,

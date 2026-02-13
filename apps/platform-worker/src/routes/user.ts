@@ -51,6 +51,7 @@ import {
   deleteBotConnection,
   createBotConnection,
   updateBotConnectionWebhook,
+  updateUserOAuthScope,
 } from '@node2flow/platform-core';
 
 export async function handleUserRoutes(
@@ -77,6 +78,22 @@ export async function handleUserRoutes(
         avatar_url: (user as any).avatar_url || null,
       },
     });
+  }
+
+  // GET /api/user/oauth-scope
+  if (path === '/api/user/oauth-scope' && method === 'GET') {
+    const user = await getUserById(env.DB, authUser.userId);
+    if (!user) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+    const scope = user.oauth_scope ? JSON.parse(user.oauth_scope) : null;
+    return apiResponse({ success: true, data: { scope } });
+  }
+
+  // PUT /api/user/oauth-scope
+  if (path === '/api/user/oauth-scope' && method === 'PUT') {
+    const body = await request.json() as { scope: { plugins?: string[]; permissions?: string[] } | null };
+    const scopeJson = body.scope ? JSON.stringify(body.scope) : null;
+    await updateUserOAuthScope(env.DB, authUser.userId, scopeJson);
+    return apiResponse({ success: true, data: { message: 'OAuth scope updated', scope: body.scope } });
   }
 
   // PUT /api/user/session-duration
