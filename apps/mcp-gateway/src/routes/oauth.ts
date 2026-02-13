@@ -61,6 +61,37 @@ async function generateJWT(
   return `${header}.${body}.${sig}`;
 }
 
+/** Create HMAC-signed token (replaces KV session — avoids eventual consistency) */
+async function createSignedToken(data: Record<string, unknown>, secret: string, ttlSeconds: number): Promise<string> {
+  const encoder = new TextEncoder();
+  const payload = { ...data, exp: Math.floor(Date.now() / 1000) + ttlSeconds };
+  const payloadStr = base64UrlEncode(JSON.stringify(payload));
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(payloadStr));
+  const sigStr = base64UrlEncode(String.fromCharCode(...new Uint8Array(sig)));
+  return `${payloadStr}.${sigStr}`;
+}
+
+/** Verify HMAC-signed token and return payload */
+async function verifySignedToken<T = Record<string, unknown>>(token: string, secret: string): Promise<T | null> {
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadStr, sigStr] = parts;
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+  // Restore base64url → base64 → binary
+  const sigB64 = sigStr.replace(/-/g, '+').replace(/_/g, '/');
+  const sigBytes = Uint8Array.from(atob(sigB64), c => c.charCodeAt(0));
+  const valid = await crypto.subtle.verify('HMAC', key, sigBytes, encoder.encode(payloadStr));
+  if (!valid) return null;
+  // Decode payload
+  const payloadB64 = payloadStr.replace(/-/g, '+').replace(/_/g, '/');
+  const payload = JSON.parse(atob(payloadB64)) as T & { exp: number };
+  // Check expiry
+  if (payload.exp < Math.floor(Date.now() / 1000)) return null;
+  return payload as T;
+}
+
 /** Login page HTML — simple provider selection */
 function loginPage(googleUrl: string, githubUrl: string): string {
   return `<!DOCTYPE html>
@@ -109,7 +140,7 @@ function loginPage(googleUrl: string, githubUrl: string): string {
 /** Key selector page HTML — shown after OAuth login when user has global API keys */
 function keySelectPage(
   email: string,
-  sessionId: string,
+  sessionToken: string,
   keys: Array<{ id: string; name: string; prefix: string; scope: string | null }>
 ): string {
   const keyRows = keys.map(k => {
@@ -163,7 +194,7 @@ function keySelectPage(
 </head>
 <body>
 <form method="POST" action="${GATEWAY_ORIGIN}/oauth/select-key" class="card">
-  <input type="hidden" name="session_id" value="${sessionId}">
+  <input type="hidden" name="session_token" value="${sessionToken}">
   <h1>Select API Key</h1>
   <div class="subtitle">Signed in as <span class="email">${email}</span></div>
   <div class="keys">${keyRows}</div>
@@ -491,23 +522,19 @@ export async function handleOAuthRoutes(
 
     // If user has global keys → show key selector page
     if (keysData.api_keys.length > 0) {
-      const sessionId = randomString(32);
-      await env.OAUTH_KV.put(
-        `mcp_oauth_session:${sessionId}`,
-        JSON.stringify({
-          user_id: user.user_id,
-          email: user.email,
-          plan: user.plan,
-          client_id: stateData.client_id,
-          client_state: stateData.client_state,
-          redirect_uri: stateData.redirect_uri,
-          code_challenge: stateData.code_challenge,
-          api_keys: keysData.api_keys,
-        }),
-        { expirationTtl: 600 } // 10min
-      );
+      // Use signed token instead of KV (avoids eventual consistency issues)
+      const sessionToken = await createSignedToken({
+        user_id: user.user_id,
+        email: user.email,
+        plan: user.plan,
+        client_id: stateData.client_id,
+        client_state: stateData.client_state,
+        redirect_uri: stateData.redirect_uri,
+        code_challenge: stateData.code_challenge,
+        api_keys: keysData.api_keys,
+      }, env.JWT_SECRET, 600); // 10min
 
-      return new Response(keySelectPage(user.email, sessionId, keysData.api_keys), {
+      return new Response(keySelectPage(user.email, sessionToken, keysData.api_keys), {
         status: 200,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       });
@@ -545,15 +572,15 @@ export async function handleOAuthRoutes(
     // Parse form data
     const formData = await request.text();
     const params = new URLSearchParams(formData);
-    const sessionId = params.get('session_id');
+    const sessionToken = params.get('session_token');
     const keyId = params.get('key_id');
 
-    if (!sessionId || !keyId) {
-      return json({ error: 'invalid_request', error_description: 'Missing session_id or key_id' }, 400);
+    if (!sessionToken || !keyId) {
+      return json({ error: 'invalid_request', error_description: 'Missing session_token or key_id' }, 400);
     }
 
-    // Retrieve and delete session
-    const sessionData = await env.OAUTH_KV.get(`mcp_oauth_session:${sessionId}`, 'json') as {
+    // Verify signed token (no KV dependency — avoids eventual consistency issues)
+    const sessionData = await verifySignedToken<{
       user_id: string;
       email: string;
       plan: string;
@@ -562,14 +589,11 @@ export async function handleOAuthRoutes(
       redirect_uri: string;
       code_challenge: string;
       api_keys: Array<{ id: string; name: string; prefix: string; scope: string | null }>;
-    } | null;
+    }>(sessionToken, env.JWT_SECRET);
 
     if (!sessionData) {
       return json({ error: 'invalid_request', error_description: 'Invalid or expired session' }, 400);
     }
-
-    // Delete session (one-time use)
-    ctx.waitUntil(env.OAUTH_KV.delete(`mcp_oauth_session:${sessionId}`));
 
     // Determine scope from selected key
     let mcpScope: string | undefined;
