@@ -292,10 +292,15 @@ export async function handleInternalRoutes(
 
     const isUnlimited = dailyLimit < 0;
 
+    // Fetch user's OAuth scope for MCP access filtering
+    const user = await getUserById(env.DB, body.user_id);
+    const oauthScope = user?.oauth_scope ?? null;
+
     return json({
       current: dailyUsage,
       limit: isUnlimited ? -1 : dailyLimit,
       remaining: isUnlimited ? -1 : Math.max(0, dailyLimit - dailyUsage),
+      oauth_scope: oauthScope,
     });
   }
 

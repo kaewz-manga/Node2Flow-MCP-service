@@ -1199,5 +1199,39 @@ wrangler deploy                         # In each app/
 **Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
 **Session 45**: Scoped API keys — `n2f_xxx` keys can now access all services (`connection_id='_all'`) with optional plugin + permission scope filtering
 **Session 45b**: Dashboard UI — Settings → API Keys tab with scope presets (Full Access / Read Only / Custom)
+### Session 47: Fix 3 Audit Bugs in API Key System (2026-02-13)
+
+Fixed 3 critical bugs discovered during API key system audit.
+
+**Bug 1 (CRITICAL): KV cache not invalidated on key revoke**
+- When API key revoked, KV cache (`apikey:{hash}` with 1hr TTL) still served old valid key data
+- User could continue using revoked key for up to 1 hour
+- Fix: Added `env.RATE_LIMIT_KV.delete(cacheKey)` in `/api/api-keys/:id/revoke` handler
+- File: `apps/platform-worker/src/routes/user.ts`
+
+**Bug 2 (MEDIUM): JSON.parse without try-catch for scope**
+- Corrupt or invalid scope JSON in 2 places caused 500 crashes:
+  1. `auth.ts:169` — JWT `mcp_scope` claim parsed without error handling
+  2. `user.ts:192` — API key `scope` field displayed in listing
+- Fix: Added try-catch blocks with fallback to null (means full access / empty scope)
+- Files: `apps/mcp-gateway/src/routes/auth.ts`, `apps/platform-worker/src/routes/user.ts`
+
+**Bug 3 (MEDIUM): LIMIT 1 picks arbitrary connection**
+- OAuth/global key user with multiple connections for same plugin (e.g., multiple n8n instances)
+- Query: `SELECT * FROM connections WHERE user_id=? AND product_type=? LIMIT 1`
+- Would pick arbitrarily, not clearly signal error
+- Fix: Changed to `SELECT * FROM connections WHERE user_id=? AND product_type=?` (no limit), check `count > 1` in handler, return clear error message
+- File: `apps/mcp-gateway/src/routes/mcp.ts:211`
+
+**Files changed** (2):
+- `apps/platform-worker/src/routes/user.ts` — KV cache deletion + try-catch for scope
+- `apps/mcp-gateway/src/routes/auth.ts` — try-catch for JWT mcp_scope
+- `apps/mcp-gateway/src/routes/mcp.ts` — Multiple connection check
+
+**Deployed**: 2026-02-13 — Both platform-worker and mcp-gateway (automatic via wrangler)
+**Commit**: `8e68d61`
+
+---
+
 **Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-13

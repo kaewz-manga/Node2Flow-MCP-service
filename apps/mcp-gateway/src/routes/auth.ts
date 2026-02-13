@@ -161,13 +161,15 @@ export async function authenticateMcpRequest(
     );
 
     const usageData = usageRes.ok
-      ? await usageRes.json() as { current: number; limit: number; remaining: number }
-      : { current: 0, limit: 100, remaining: 100 };
+      ? await usageRes.json() as { current: number; limit: number; remaining: number; oauth_scope?: string | null }
+      : { current: 0, limit: 100, remaining: 100, oauth_scope: null };
 
-    // Scope from JWT (set during OAuth key selection, or null for full access)
+    // Scope priority: JWT mcp_scope (from key selector) > user's default oauth_scope
     let scope: { plugins?: string[]; permissions?: string[] } | null = null;
     if (payload.mcp_scope) {
       try { scope = JSON.parse(payload.mcp_scope); } catch { /* corrupt scope → full access */ }
+    } else if (usageData.oauth_scope) {
+      try { scope = JSON.parse(usageData.oauth_scope); } catch { /* corrupt scope → full access */ }
     }
 
     return {

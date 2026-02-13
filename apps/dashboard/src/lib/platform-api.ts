@@ -307,6 +307,21 @@ export async function revokeApiKey(id: string): Promise<ApiResponse<{ message: s
 }
 
 // ============================================
+// OAuth Scope (default MCP access for OAuth login)
+// ============================================
+
+export async function getOAuthScope(): Promise<ApiResponse<{ scope: ApiKeyScope | null }>> {
+  return platformRequest('/api/user/oauth-scope');
+}
+
+export async function updateOAuthScope(scope: ApiKeyScope | null): Promise<ApiResponse<{ message: string }>> {
+  return platformRequest('/api/user/oauth-scope', {
+    method: 'PUT',
+    body: JSON.stringify({ scope }),
+  });
+}
+
+// ============================================
 // Feedback
 // ============================================
 

@@ -12,6 +12,7 @@ import {
   getUserById,
   updateUserPassword,
   updateSessionDuration,
+  updateUserOAuthScope,
   hashPassword,
   verifyPassword,
   generateJWT,
@@ -89,6 +90,23 @@ export async function handleUserRoutes(
     await updateSessionDuration(env.DB, authUser.userId, body.duration);
     const token = await generateJWT({ sub: authUser.userId, email: authUser.email, plan: authUser.plan, is_admin: authUser.is_admin }, env.JWT_SECRET, body.duration);
     return apiResponse({ success: true, data: { message: 'Session duration updated', token, duration: body.duration } });
+  }
+
+  // GET /api/user/oauth-scope
+  if (path === '/api/user/oauth-scope' && method === 'GET') {
+    const user = await getUserById(env.DB, authUser.userId);
+    if (!user) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+    let scope = null;
+    if (user.oauth_scope) { try { scope = JSON.parse(user.oauth_scope); } catch { /* corrupt → null */ } }
+    return apiResponse({ success: true, data: { scope } });
+  }
+
+  // PUT /api/user/oauth-scope
+  if (path === '/api/user/oauth-scope' && method === 'PUT') {
+    const body = await request.json() as { scope: { plugins?: string[]; permissions?: string[] } | null };
+    const scopeJson = body.scope ? JSON.stringify(body.scope) : null;
+    await updateUserOAuthScope(env.DB, authUser.userId, scopeJson);
+    return apiResponse({ success: true, data: { message: 'OAuth scope updated' } });
   }
 
   // PUT /api/user/password
