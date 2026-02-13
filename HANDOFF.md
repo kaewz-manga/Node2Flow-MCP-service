@@ -1199,6 +1199,54 @@ wrangler deploy                         # In each app/
 **Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
 **Session 45**: Scoped API keys — `n2f_xxx` keys can now access all services (`connection_id='_all'`) with optional plugin + permission scope filtering
 **Session 45b**: Dashboard UI — Settings → API Keys tab with scope presets (Full Access / Read Only / Custom)
+### Session 48: API Key System Improvements — Expiry Dates, OAuth Scope, Hard Delete (2026-02-14)
+
+Complete overhaul of API key system with 4 major features. Fixed 3 audit bugs, added expiry dates, OAuth default scope, and hard delete instead of revoke.
+
+**1. Fix 3 Audit Bugs** (commit `8e68d61`):
+- **Bug 1 (CRITICAL)**: KV cache not invalidated on key revoke → delete `apikey:{hash}` from KV on revoke
+- **Bug 2 (MEDIUM)**: JSON.parse without try-catch for scope → added try-catch in auth.ts + user.ts
+- **Bug 3 (MEDIUM)**: LIMIT 1 picks arbitrary connection → error if multiple connections for same plugin
+
+**2. OAuth Default Scope** (commit `6404539`):
+- Migration 004: `oauth_scope TEXT` on users table
+- GET/PUT `/api/user/oauth-scope` endpoints
+- Gateway auth: JWT mcp_scope > user's default oauth_scope > full access
+- Dashboard: Settings > MCP Access tab with Full/ReadOnly/Custom presets
+- New file: `apps/dashboard/src/pages/OAuthScope.tsx`
+
+**3. API Key Expiry Date** (commit `0b507bc`):
+- Migration 005: `expires_at TEXT` on api_keys table
+- createApiKey accepts expiresAt parameter
+- Validation checks expiry on both cache hit and cache miss
+- KV cache TTL capped to time-until-expiry
+- Dashboard: expiry preset selector (Never/7d/30d/90d/Custom) in create dialog
+- Dashboard: Expires column + Expired badge in table
+
+**4. Revoke → Hard Delete** (commit `ab165a2`):
+- revokeApiKey (UPDATE status='revoked') → deleteApiKey (DELETE FROM api_keys)
+- Revoked keys had no purpose in DB — can't reactivate, just waste space
+- Updated all 16 files: DB function, API, ApiKeys.tsx, 11 Connections.tsx
+- "Revoke Key" → "Delete Key" everywhere
+
+**Files changed** (16 total):
+- `packages/platform-core/src/db/api-keys.ts` — createApiKey + expiresAt param, revokeApiKey → deleteApiKey
+- `packages/platform-core/src/types/platform.ts` — expires_at on ApiKey
+- `apps/platform-worker/src/routes/internal.ts` — expiry validation, oauth_scope in usage response, KV cache expires_at
+- `apps/platform-worker/src/routes/user.ts` — GET/PUT oauth-scope, expires_at in create, hard delete
+- `apps/platform-worker/migrations/005_api_key_expires.sql` — NEW
+- `apps/mcp-gateway/src/routes/auth.ts` — scope priority (JWT > oauth_scope > full), try-catch
+- `apps/mcp-gateway/src/routes/mcp.ts` — multiple connections error instead of LIMIT 1
+- `apps/dashboard/src/pages/OAuthScope.tsx` — NEW
+- `apps/dashboard/src/pages/Settings.tsx` — MCP Access tab
+- `apps/dashboard/src/pages/ApiKeys.tsx` — expiry picker, Expires column, revoke→delete
+- `apps/dashboard/src/lib/platform-api.ts` — expires_at, expiresAt param, deleteApiKey, getOAuthScope, updateOAuthScope
+- All 11 `apps/dashboard/src/plugins/*/Connections.tsx` — revoke→delete
+
+**Deployed**: 2026-02-14
+
+---
+
 ### Session 47: Fix 3 Audit Bugs in API Key System (2026-02-13)
 
 Fixed 3 critical bugs discovered during API key system audit.
