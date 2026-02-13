@@ -36,6 +36,7 @@ export interface ApiKey {
   name: string;
   scope: string | null;
   status: 'active' | 'revoked';
+  expires_at: string | null;
   last_used_at: string | null;
   created_at: string;
 }

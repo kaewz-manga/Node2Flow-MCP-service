@@ -91,6 +91,8 @@ export default function ApiKeysTab() {
   const [selectedPlugins, setSelectedPlugins] = useState<string[]>(plugins.map(p => p.id));
   const [selectedPerms, setSelectedPerms] = useState<string[]>(['read', 'write', 'delete']);
   const [createLoading, setCreateLoading] = useState(false);
+  const [expiryPreset, setExpiryPreset] = useState('never');
+  const [customExpiry, setCustomExpiry] = useState('');
 
   // Key display dialog
   const [newApiKey, setNewApiKey] = useState('');
@@ -121,7 +123,7 @@ export default function ApiKeysTab() {
       if (!scope.plugins && !scope.permissions) scope = null; // effectively full access
     }
 
-    const res = await createApiKey(undefined, createName || 'API Key', scope);
+    const res = await createApiKey(undefined, createName || 'API Key', scope, getExpiryDate());
     setCreateLoading(false);
 
     if (res.success && res.data) {
@@ -130,6 +132,8 @@ export default function ApiKeysTab() {
       setShowKeyModal(true);
       setCreateName('');
       setPreset('full');
+      setExpiryPreset('never');
+      setCustomExpiry('');
       await loadKeys();
     } else {
       toast.error(res.error?.message || 'Failed to create API key');
@@ -167,6 +171,17 @@ export default function ApiKeysTab() {
       prev.includes(perm) ? prev.filter(p => p !== perm) : [...prev, perm]
     );
   };
+
+  const getExpiryDate = (): string | null => {
+    if (expiryPreset === 'never') return null;
+    if (expiryPreset === 'custom') return customExpiry ? new Date(customExpiry).toISOString() : null;
+    const days = parseInt(expiryPreset);
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString();
+  };
+
+  const isExpired = (k: ApiKeyInfo) => k.expires_at && new Date(k.expires_at) < new Date();
 
   const globalKeys = keys.filter(k => k.connection_id === '_all');
   const activeKeys = globalKeys.filter(k => k.status === 'active');
@@ -236,6 +251,7 @@ export default function ApiKeysTab() {
                 <TableHead>Name</TableHead>
                 <TableHead>Scope</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Expires</TableHead>
                 <TableHead>Last Used</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
@@ -249,10 +265,15 @@ export default function ApiKeysTab() {
                   <TableCell className="font-medium">{k.name}</TableCell>
                   <TableCell><ScopeBadge scope={k.scope} connectionId={k.connection_id} /></TableCell>
                   <TableCell>
-                    {k.status === 'active'
-                      ? <Badge variant="success">Active</Badge>
-                      : <Badge variant="destructive">Revoked</Badge>
+                    {isExpired(k)
+                      ? <Badge variant="destructive">Expired</Badge>
+                      : k.status === 'active'
+                        ? <Badge variant="success">Active</Badge>
+                        : <Badge variant="destructive">Revoked</Badge>
                     }
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Never'}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}
@@ -376,8 +397,32 @@ export default function ApiKeysTab() {
               </>
             )}
 
+            <div className="space-y-2">
+              <Label>Expires</Label>
+              <Select value={expiryPreset} onValueChange={setExpiryPreset}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="never">Never</SelectItem>
+                  <SelectItem value="7">7 days</SelectItem>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="90">90 days</SelectItem>
+                  <SelectItem value="custom">Custom date</SelectItem>
+                </SelectContent>
+              </Select>
+              {expiryPreset === 'custom' && (
+                <Input
+                  type="date"
+                  value={customExpiry}
+                  onChange={(e) => setCustomExpiry(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              )}
+            </div>
+
             <div className="flex gap-3 pt-2">
-              <Button variant="secondary" className="flex-1" onClick={() => { setShowCreate(false); setCreateName(''); setPreset('full'); }}>
+              <Button variant="secondary" className="flex-1" onClick={() => { setShowCreate(false); setCreateName(''); setPreset('full'); setExpiryPreset('never'); setCustomExpiry(''); }}>
                 Cancel
               </Button>
               <Button

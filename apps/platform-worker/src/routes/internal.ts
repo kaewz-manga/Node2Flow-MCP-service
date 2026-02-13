@@ -55,12 +55,23 @@ export async function handleInternalRoutes(
     let cachedData = await env.RATE_LIMIT_KV?.get(cacheKey, 'json') as {
       user_id: string; email: string; plan: string;
       connection_id: string; api_key_id: string;
-      scope: string | null;
+      scope: string | null; expires_at: string | null;
     } | null;
+
+    // Check expiry on cache hit
+    if (cachedData?.expires_at && new Date(cachedData.expires_at) < new Date()) {
+      await env.RATE_LIMIT_KV?.delete(cacheKey).catch(() => {});
+      return json({ error: 'API key has expired' }, 401);
+    }
 
     if (!cachedData) {
       const apiKeyRecord = await getApiKeyByHash(env.DB, keyHash);
       if (!apiKeyRecord) return json({ error: 'Invalid or revoked API key' }, 401);
+
+      // Check expiry on cache miss
+      if (apiKeyRecord.expires_at && new Date(apiKeyRecord.expires_at) < new Date()) {
+        return json({ error: 'API key has expired' }, 401);
+      }
 
       const user = await getUserById(env.DB, apiKeyRecord.user_id);
       if (!user || user.status !== 'active') return json({ error: 'Account suspended or deleted' }, 401);
@@ -73,10 +84,16 @@ export async function handleInternalRoutes(
         connection_id: apiKeyRecord.connection_id,
         api_key_id: apiKeyRecord.id,
         scope: apiKeyRecord.scope ?? null,
+        expires_at: apiKeyRecord.expires_at ?? null,
       };
 
-      // Cache for 1 hour
-      await env.RATE_LIMIT_KV?.put(cacheKey, JSON.stringify(cachedData), { expirationTtl: 3600 });
+      // Cache for 1 hour (or until expiry if sooner)
+      let ttl = 3600;
+      if (cachedData.expires_at) {
+        const secsUntilExpiry = Math.floor((new Date(cachedData.expires_at).getTime() - Date.now()) / 1000);
+        ttl = Math.min(ttl, Math.max(secsUntilExpiry, 60));
+      }
+      await env.RATE_LIMIT_KV?.put(cacheKey, JSON.stringify(cachedData), { expirationTtl: ttl });
     }
 
     // Check rate limits

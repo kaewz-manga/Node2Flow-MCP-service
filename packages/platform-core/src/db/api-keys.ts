@@ -12,17 +12,18 @@ export async function createApiKey(
   keyHash: string,
   keyPrefix: string,
   name: string = 'Default',
-  scope: string | null = null
+  scope: string | null = null,
+  expiresAt: string | null = null
 ): Promise<ApiKey> {
   const id = generateUUID();
   const now = new Date().toISOString();
 
   await db
     .prepare(
-      `INSERT INTO api_keys (id, user_id, connection_id, key_hash, key_prefix, name, scope, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?)`
+      `INSERT INTO api_keys (id, user_id, connection_id, key_hash, key_prefix, name, scope, expires_at, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
     )
-    .bind(id, userId, connectionId, keyHash, keyPrefix, name, scope, now)
+    .bind(id, userId, connectionId, keyHash, keyPrefix, name, scope, expiresAt, now)
     .run();
 
   return {
@@ -34,6 +35,7 @@ export async function createApiKey(
     name,
     scope,
     status: 'active',
+    expires_at: expiresAt,
     last_used_at: null,
     created_at: now,
   };

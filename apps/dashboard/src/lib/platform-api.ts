@@ -68,6 +68,7 @@ export interface ApiKeyInfo {
   status: string;
   connection_id: string;
   scope: ApiKeyScope | null;
+  expires_at: string | null;
   last_used_at: string | null;
   created_at: string;
 }
@@ -290,7 +291,8 @@ export async function getApiKeys(): Promise<ApiResponse<{ api_keys: ApiKeyInfo[]
 export async function createApiKey(
   connectionId?: string,
   name?: string,
-  scope?: ApiKeyScope | null
+  scope?: ApiKeyScope | null,
+  expiresAt?: string | null
 ): Promise<ApiResponse<{ api_key: string; prefix: string; message: string }>> {
   return platformRequest('/api/api-keys', {
     method: 'POST',
@@ -298,6 +300,7 @@ export async function createApiKey(
       connection_id: connectionId,
       name,
       scope: scope || undefined,
+      expires_at: expiresAt || undefined,
     }),
   });
 }

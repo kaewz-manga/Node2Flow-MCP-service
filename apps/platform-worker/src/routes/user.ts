@@ -210,7 +210,7 @@ export async function handleUserRoutes(
           if (k.scope) { try { scope = JSON.parse(k.scope); } catch { /* corrupt scope */ } }
           return {
             id: k.id, connection_id: k.connection_id, prefix: k.key_prefix,
-            name: k.name, scope, status: k.status, last_used_at: k.last_used_at, created_at: k.created_at,
+            name: k.name, scope, status: k.status, expires_at: k.expires_at ?? null, last_used_at: k.last_used_at, created_at: k.created_at,
           };
         }),
       },
@@ -223,12 +223,14 @@ export async function handleUserRoutes(
       connection_id?: string;
       name?: string;
       scope?: { plugins?: string[]; permissions?: string[] } | null;
+      expires_at?: string | null;
     };
     // connection_id is optional: omit or '_all' = access all services
     const connectionId = body.connection_id || '_all';
     const scopeJson = body.scope ? JSON.stringify(body.scope) : null;
+    const expiresAt = body.expires_at || null;
     const { key, hash, prefix } = await generateApiKey();
-    await createApiKeyDb(env.DB, authUser.userId, connectionId, hash, prefix, body.name || 'API Key', scopeJson);
+    await createApiKeyDb(env.DB, authUser.userId, connectionId, hash, prefix, body.name || 'API Key', scopeJson, expiresAt);
     return apiResponse({ success: true, data: { api_key: key, prefix, message: 'Save your API key now. It will not be shown again.' } }, 201);
   }
 
