@@ -11,6 +11,7 @@ interface JWTPayload {
   email: string;
   plan: string;
   is_admin?: boolean;
+  mcp_scope?: string;
   exp: number;
 }
 
@@ -160,12 +161,12 @@ export async function authenticateMcpRequest(
     );
 
     const usageData = usageRes.ok
-      ? await usageRes.json() as { current: number; limit: number; remaining: number; oauth_scope?: string | null }
-      : { current: 0, limit: 100, remaining: 100, oauth_scope: null };
+      ? await usageRes.json() as { current: number; limit: number; remaining: number }
+      : { current: 0, limit: 100, remaining: 100 };
 
-    // Parse OAuth scope from user settings
-    const oauthScope = usageData.oauth_scope
-      ? JSON.parse(usageData.oauth_scope) as { plugins?: string[]; permissions?: string[] }
+    // Scope from JWT (set during OAuth key selection, or null for full access)
+    const scope = payload.mcp_scope
+      ? JSON.parse(payload.mcp_scope) as { plugins?: string[]; permissions?: string[] }
       : null;
 
     return {
@@ -177,9 +178,9 @@ export async function authenticateMcpRequest(
         productType: null,
         config: null,
         apiKeyId: 'oauth',
-        usage: { current: usageData.current, limit: usageData.limit, remaining: usageData.remaining },
+        usage: usageData,
         authMethod: 'oauth',
-        scope: oauthScope,
+        scope,
       },
       error: null,
     };

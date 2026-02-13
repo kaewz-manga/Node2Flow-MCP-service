@@ -47,7 +47,7 @@ async function sha256(plain: string): Promise<string> {
 
 /** Generate JWT (same format as Platform Worker) */
 async function generateJWT(
-  payload: { sub: string; email: string; plan: string },
+  payload: { sub: string; email: string; plan: string; mcp_scope?: string },
   secret: string,
   expiresIn = 86400
 ): Promise<string> {
@@ -61,7 +61,7 @@ async function generateJWT(
   return `${header}.${body}.${sig}`;
 }
 
-/** Login page HTML — provider selection */
+/** Login page HTML — simple provider selection */
 function loginPage(googleUrl: string, githubUrl: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -74,7 +74,7 @@ function loginPage(googleUrl: string, githubUrl: string): string {
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090b; color: #fafafa; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
   .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
   h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-  p { color: #a1a1aa; font-size: 14px; margin-bottom: 32px; }
+  p { color: #a1a1aa; font-size: 14px; margin-bottom: 24px; }
   .btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: 500; text-decoration: none; transition: background 0.15s; cursor: pointer; border: 1px solid #3f3f46; }
   .btn-google { background: #fafafa; color: #09090b; margin-bottom: 12px; border-color: #fafafa; }
   .btn-google:hover { background: #e4e4e7; }
@@ -102,6 +102,74 @@ function loginPage(googleUrl: string, githubUrl: string): string {
   </a>
   <div class="footer">By signing in, you agree to our <a href="https://app.node2flow.net/terms">Terms</a></div>
 </div>
+</body>
+</html>`;
+}
+
+/** Key selector page HTML — shown after OAuth login when user has global API keys */
+function keySelectPage(
+  email: string,
+  sessionId: string,
+  keys: Array<{ id: string; name: string; prefix: string; scope: string | null }>
+): string {
+  const keyRows = keys.map(k => {
+    const scope = k.scope ? JSON.parse(k.scope) as { plugins?: string[]; permissions?: string[] } : null;
+    const scopeLabel = !scope
+      ? 'Full Access'
+      : scope.permissions?.length === 1 && scope.permissions[0] === 'read'
+        ? 'Read Only'
+        : 'Custom';
+    const scopeDetail = !scope
+      ? 'All plugins, all permissions'
+      : [
+          scope.plugins?.length ? `${scope.plugins.length} plugin${scope.plugins.length > 1 ? 's' : ''}` : 'All plugins',
+          scope.permissions?.join(', ') || 'all permissions',
+        ].join(' · ');
+    const badgeColor = scopeLabel === 'Full Access' ? '#22c55e' : scopeLabel === 'Read Only' ? '#3b82f6' : '#f59e0b';
+    return `<button type="submit" name="key_id" value="${k.id}" class="key-btn">
+      <div class="key-info">
+        <div class="key-name">${k.name || 'Unnamed Key'}</div>
+        <div class="key-detail">${k.prefix}••• · ${scopeDetail}</div>
+      </div>
+      <span class="badge" style="background:${badgeColor}20;color:${badgeColor}">${scopeLabel}</span>
+    </button>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select API Key — Node2Flow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090b; color: #fafafa; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 32px; width: 100%; max-width: 440px; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; text-align: center; }
+  .subtitle { color: #a1a1aa; font-size: 13px; margin-bottom: 20px; text-align: center; }
+  .email { color: #fafafa; font-weight: 500; }
+  .keys { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .key-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: left; font-family: inherit; }
+  .key-btn:hover { border-color: #fafafa; background: #3f3f46; }
+  .key-info { flex: 1; min-width: 0; }
+  .key-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .key-detail { font-size: 12px; color: #71717a; }
+  .badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; margin-left: 12px; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #52525b; font-size: 12px; }
+  .divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid #27272a; }
+  .full-btn { display: block; width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #3f3f46; background: transparent; color: #a1a1aa; cursor: pointer; font-size: 14px; font-family: inherit; transition: border-color 0.15s, color 0.15s; }
+  .full-btn:hover { border-color: #fafafa; color: #fafafa; }
+</style>
+</head>
+<body>
+<form method="POST" action="${GATEWAY_ORIGIN}/oauth/select-key" class="card">
+  <input type="hidden" name="session_id" value="${sessionId}">
+  <h1>Select API Key</h1>
+  <div class="subtitle">Signed in as <span class="email">${email}</span></div>
+  <div class="keys">${keyRows}</div>
+  <div class="divider">or</div>
+  <button type="submit" name="key_id" value="_none" class="full-btn">Continue with Full Access</button>
+</form>
 </body>
 </html>`;
 }
@@ -210,12 +278,12 @@ export async function handleOAuthRoutes(
       return json({ error: 'invalid_request', error_description: 'redirect_uri not registered' }, 400);
     }
 
-    // Build start URLs for each provider (pass all params through)
+    // Build start URLs for each provider
     const params = url.searchParams.toString();
-    const googleStartUrl = `${GATEWAY_ORIGIN}/oauth/authorize/start?provider=google&${params}`;
-    const githubStartUrl = `${GATEWAY_ORIGIN}/oauth/authorize/start?provider=github&${params}`;
+    const googleUrl = `${GATEWAY_ORIGIN}/oauth/authorize/start?provider=google&${params}`;
+    const githubUrl = `${GATEWAY_ORIGIN}/oauth/authorize/start?provider=github&${params}`;
 
-    return new Response(loginPage(googleStartUrl, githubStartUrl), {
+    return new Response(loginPage(googleUrl, githubUrl), {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -408,7 +476,44 @@ export async function handleOAuthRoutes(
       user_id: string; email: string; plan: string; is_new_user: boolean;
     };
 
-    // Generate authorization code for the MCP client
+    // Check if user has global API keys
+    const keysRes = await env.PLATFORM.fetch(
+      new Request('https://platform.internal/internal/get-user-api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.user_id }),
+      })
+    );
+
+    const keysData = keysRes.ok
+      ? await keysRes.json() as { api_keys: Array<{ id: string; name: string; prefix: string; scope: string | null }> }
+      : { api_keys: [] };
+
+    // If user has global keys → show key selector page
+    if (keysData.api_keys.length > 0) {
+      const sessionId = randomString(32);
+      await env.OAUTH_KV.put(
+        `mcp_oauth_session:${sessionId}`,
+        JSON.stringify({
+          user_id: user.user_id,
+          email: user.email,
+          plan: user.plan,
+          client_id: stateData.client_id,
+          client_state: stateData.client_state,
+          redirect_uri: stateData.redirect_uri,
+          code_challenge: stateData.code_challenge,
+          api_keys: keysData.api_keys,
+        }),
+        { expirationTtl: 600 } // 10min
+      );
+
+      return new Response(keySelectPage(user.email, sessionId, keysData.api_keys), {
+        status: 200,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      });
+    }
+
+    // No global keys → generate auth code with full access (no scope)
     const authCode = randomString(64);
     await env.OAUTH_KV.put(
       `mcp_authcode:${authCode}`,
@@ -431,6 +536,76 @@ export async function handleOAuthRoutes(
     } catch (err) {
       return json({ error: 'server_error', error_description: err instanceof Error ? err.message : 'Unknown error' }, 500);
     }
+  }
+
+  // -----------------------------------------
+  // POST /oauth/select-key — Key selector form submission
+  // -----------------------------------------
+  if (path === '/oauth/select-key' && method === 'POST') {
+    // Parse form data
+    const formData = await request.text();
+    const params = new URLSearchParams(formData);
+    const sessionId = params.get('session_id');
+    const keyId = params.get('key_id');
+
+    if (!sessionId || !keyId) {
+      return json({ error: 'invalid_request', error_description: 'Missing session_id or key_id' }, 400);
+    }
+
+    // Retrieve and delete session
+    const sessionData = await env.OAUTH_KV.get(`mcp_oauth_session:${sessionId}`, 'json') as {
+      user_id: string;
+      email: string;
+      plan: string;
+      client_id: string;
+      client_state: string;
+      redirect_uri: string;
+      code_challenge: string;
+      api_keys: Array<{ id: string; name: string; prefix: string; scope: string | null }>;
+    } | null;
+
+    if (!sessionData) {
+      return json({ error: 'invalid_request', error_description: 'Invalid or expired session' }, 400);
+    }
+
+    // Delete session (one-time use)
+    ctx.waitUntil(env.OAUTH_KV.delete(`mcp_oauth_session:${sessionId}`));
+
+    // Determine scope from selected key
+    let mcpScope: string | undefined;
+    if (keyId !== '_none') {
+      const selectedKey = sessionData.api_keys.find(k => k.id === keyId);
+      if (!selectedKey) {
+        return json({ error: 'invalid_request', error_description: 'Selected key not found' }, 400);
+      }
+      // Use the key's scope (null = full access, string = JSON scope)
+      if (selectedKey.scope) {
+        mcpScope = selectedKey.scope;
+      }
+    }
+    // keyId === '_none' or key has no scope → mcpScope stays undefined (full access)
+
+    // Generate authorization code
+    const authCode = randomString(64);
+    await env.OAUTH_KV.put(
+      `mcp_authcode:${authCode}`,
+      JSON.stringify({
+        user_id: sessionData.user_id,
+        email: sessionData.email,
+        plan: sessionData.plan,
+        client_id: sessionData.client_id,
+        redirect_uri: sessionData.redirect_uri,
+        code_challenge: sessionData.code_challenge,
+        ...(mcpScope ? { mcp_scope: mcpScope } : {}),
+      }),
+      { expirationTtl: 300 } // 5min
+    );
+
+    // Redirect back to MCP client
+    const clientRedirect = new URL(sessionData.redirect_uri);
+    clientRedirect.searchParams.set('code', authCode);
+    clientRedirect.searchParams.set('state', sessionData.client_state);
+    return redirect(clientRedirect.toString());
   }
 
   // -----------------------------------------
@@ -485,6 +660,7 @@ export async function handleOAuthRoutes(
     const authData = await env.OAUTH_KV.get(`mcp_authcode:${body.code}`, 'json') as {
       user_id: string; email: string; plan: string;
       client_id: string; redirect_uri: string; code_challenge: string;
+      mcp_scope?: string;
     } | null;
 
     if (!authData) {
@@ -505,9 +681,14 @@ export async function handleOAuthRoutes(
       return json({ error: 'invalid_grant', error_description: 'PKCE verification failed' }, 400);
     }
 
-    // Generate JWT access token
+    // Generate JWT access token (mcp_scope is JSON string from selected API key, or undefined for full access)
     const accessToken = await generateJWT(
-      { sub: authData.user_id, email: authData.email, plan: authData.plan },
+      {
+        sub: authData.user_id,
+        email: authData.email,
+        plan: authData.plan,
+        ...(authData.mcp_scope ? { mcp_scope: authData.mcp_scope } : {}),
+      },
       env.JWT_SECRET,
       86400 // 24h
     );

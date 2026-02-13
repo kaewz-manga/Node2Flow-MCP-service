@@ -255,6 +255,20 @@ export async function handleInternalRoutes(
     });
   }
 
+  // POST /internal/get-user-api-keys — Return user's global API keys for OAuth key selector
+  if (path === '/internal/get-user-api-keys' && method === 'POST') {
+    const body = await request.json() as { user_id: string };
+    if (!body.user_id) return json({ error: 'user_id required' }, 400);
+
+    const keys = await env.DB.prepare(
+      `SELECT id, name, prefix, scope FROM api_keys
+       WHERE user_id = ? AND connection_id = '_all' AND status = 'active'
+       ORDER BY created_at DESC`
+    ).bind(body.user_id).all();
+
+    return json({ api_keys: keys.results || [] });
+  }
+
   // POST /internal/get-user-usage
   if (path === '/internal/get-user-usage' && method === 'POST') {
     const body = await request.json() as { user_id: string; plan: string };
@@ -273,15 +287,10 @@ export async function handleInternalRoutes(
 
     const isUnlimited = dailyLimit < 0;
 
-    // Fetch user's OAuth scope for MCP access control
-    const user = await env.DB.prepare('SELECT oauth_scope FROM users WHERE id = ?')
-      .bind(body.user_id).first<{ oauth_scope: string | null }>();
-
     return json({
       current: dailyUsage,
       limit: isUnlimited ? -1 : dailyLimit,
       remaining: isUnlimited ? -1 : Math.max(0, dailyLimit - dailyUsage),
-      oauth_scope: user?.oauth_scope ?? null,
     });
   }
 
