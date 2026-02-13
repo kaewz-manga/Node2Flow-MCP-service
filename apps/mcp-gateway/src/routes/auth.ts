@@ -91,10 +91,32 @@ export async function authenticateMcpRequest(
         plan: string;
         connection_id: string;
         api_key_id: string;
+        scope: string | null;
         usage: { current: number; limit: number; remaining: number };
       };
 
-      // Get connection config from Gateway DB
+      const scope = result.scope ? JSON.parse(result.scope) as { plugins?: string[]; permissions?: string[] } : null;
+
+      // All-services key (_all) → resolve connection per tool call (like OAuth)
+      if (result.connection_id === '_all') {
+        return {
+          context: {
+            userId: result.user_id,
+            email: result.email,
+            plan: result.plan,
+            connectionId: null,
+            productType: null,
+            config: null,
+            apiKeyId: result.api_key_id,
+            usage: result.usage,
+            authMethod: 'api_key',
+            scope,
+          },
+          error: null,
+        };
+      }
+
+      // Single-connection key → get specific connection config
       const conn = await env.DB.prepare(
         'SELECT * FROM connections WHERE id = ? AND status = ?'
       ).bind(result.connection_id, 'active').first<Connection>();
@@ -116,6 +138,7 @@ export async function authenticateMcpRequest(
           apiKeyId: result.api_key_id,
           usage: result.usage,
           authMethod: 'api_key',
+          scope,
         },
         error: null,
       };
@@ -151,6 +174,7 @@ export async function authenticateMcpRequest(
         apiKeyId: 'oauth',
         usage,
         authMethod: 'oauth',
+        scope: null,
       },
       error: null,
     };

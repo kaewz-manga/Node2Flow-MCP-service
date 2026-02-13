@@ -120,6 +120,7 @@ export default {
           apiKey: { id: context.apiKeyId },
           usage: context.usage,
           authMethod: context.authMethod,
+          scope: context.scope,
         }, ctx);
       } catch (err) {
         return new Response(

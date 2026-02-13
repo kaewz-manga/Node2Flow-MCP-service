@@ -33,6 +33,7 @@ export interface ApiKey {
   key_hash: string;
   key_prefix: string;
   name: string;
+  scope: string | null;
   status: 'active' | 'revoked';
   last_used_at: string | null;
   created_at: string;

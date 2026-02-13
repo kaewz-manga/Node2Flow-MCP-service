@@ -55,6 +55,7 @@ export async function handleInternalRoutes(
     let cachedData = await env.RATE_LIMIT_KV?.get(cacheKey, 'json') as {
       user_id: string; email: string; plan: string;
       connection_id: string; api_key_id: string;
+      scope: string | null;
     } | null;
 
     if (!cachedData) {
@@ -71,6 +72,7 @@ export async function handleInternalRoutes(
         plan: user.plan,
         connection_id: apiKeyRecord.connection_id,
         api_key_id: apiKeyRecord.id,
+        scope: apiKeyRecord.scope ?? null,
       };
 
       // Cache for 1 hour
@@ -111,6 +113,7 @@ export async function handleInternalRoutes(
       plan: cachedData.plan,
       connection_id: cachedData.connection_id,
       api_key_id: cachedData.api_key_id,
+      scope: cachedData.scope,
       usage: {
         current: dailyUsage,
         limit: isUnlimited ? -1 : dailyLimit,

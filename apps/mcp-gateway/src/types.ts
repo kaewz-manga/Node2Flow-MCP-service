@@ -82,10 +82,11 @@ export interface AuthResult {
   userId: string;
   email: string;
   plan: string;
-  connectionId: string | null;      // null for OAuth JWT auth
-  productType: string | null;       // null for OAuth JWT auth
-  config: Record<string, unknown> | null;  // null for OAuth JWT auth
+  connectionId: string | null;      // null for OAuth JWT auth or '_all' scoped keys
+  productType: string | null;       // null for OAuth JWT auth or '_all' scoped keys
+  config: Record<string, unknown> | null;  // null for OAuth JWT auth or '_all' scoped keys
   apiKeyId: string;                 // 'oauth' for JWT auth
   usage: { current: number; limit: number; remaining: number };
   authMethod: 'api_key' | 'oauth';
+  scope: { plugins?: string[]; permissions?: string[] } | null;  // null = full access
 }
