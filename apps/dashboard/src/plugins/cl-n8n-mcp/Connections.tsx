@@ -20,6 +20,7 @@ import {
   Tag,
   MoreHorizontal,
   Pencil,
+  Info,
 } from 'lucide-react';
 
 
@@ -254,6 +255,16 @@ export default function Connections() {
           </Button>
         </ItemActions>
       </Item>
+
+      {/* Key Usage Info */}
+      <Alert className="bg-blue-950/20 border-blue-900/50">
+        <Info className="h-4 w-4 text-blue-400" />
+        <AlertDescription className="text-sm text-muted-foreground">
+          <strong className="text-foreground">Connection key</strong> — Each connection has its own API key that only accesses this plugin.
+          For a single key that works across all plugins, create a <strong className="text-foreground">Global API Key</strong> in Settings &rarr; API Keys.
+          You can also use <strong className="text-foreground">OAuth login</strong> (Google/GitHub) from MCP clients like Claude Desktop.
+        </AlertDescription>
+      </Alert>
 
       {connections.length === 0 ? (
         <Empty>

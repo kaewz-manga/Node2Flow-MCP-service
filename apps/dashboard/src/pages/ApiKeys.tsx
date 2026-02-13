@@ -55,6 +55,10 @@ import {
   MoreHorizontal,
   AlertCircle,
   Ban,
+  Info,
+  Globe,
+  Link2,
+  Smartphone,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -168,6 +172,38 @@ export default function ApiKeysTab() {
   const activeKeys = globalKeys.filter(k => k.status === 'active');
 
   return (
+    <div className="space-y-4">
+      {/* Usage Guide */}
+      <div className="rounded-lg border bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <Info className="h-4 w-4 text-blue-400" />
+          How API Keys Work
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="flex gap-3 p-3 rounded-md bg-muted/50">
+            <Globe className="h-5 w-5 text-green-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Global Key</p>
+              <p className="text-xs text-muted-foreground mt-0.5">One key for all plugins. Set scope to limit access. Best for MCP clients like Claude Desktop.</p>
+            </div>
+          </div>
+          <div className="flex gap-3 p-3 rounded-md bg-muted/50">
+            <Link2 className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Connection Key</p>
+              <p className="text-xs text-muted-foreground mt-0.5">One key per plugin connection. Only accesses that specific service. Created on each plugin's page.</p>
+            </div>
+          </div>
+          <div className="flex gap-3 p-3 rounded-md bg-muted/50">
+            <Smartphone className="h-5 w-5 text-purple-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-foreground">OAuth Login</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Sign in with Google/GitHub. Pick a global key's scope on login, or use full access.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <Card>
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4">
@@ -414,5 +450,6 @@ export default function ApiKeysTab() {
         </AlertDialogContent>
       </AlertDialog>
     </Card>
+    </div>
   );
 }

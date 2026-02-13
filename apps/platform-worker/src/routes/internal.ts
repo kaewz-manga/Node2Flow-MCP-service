@@ -261,12 +261,17 @@ export async function handleInternalRoutes(
     if (!body.user_id) return json({ error: 'user_id required' }, 400);
 
     const keys = await env.DB.prepare(
-      `SELECT id, name, prefix, scope FROM api_keys
+      `SELECT id, name, key_prefix, scope FROM api_keys
        WHERE user_id = ? AND connection_id = '_all' AND status = 'active'
        ORDER BY created_at DESC`
     ).bind(body.user_id).all();
 
-    return json({ api_keys: keys.results || [] });
+    // Map key_prefix → prefix for consistent API response
+    const apiKeys = (keys.results || []).map((k: any) => ({
+      id: k.id, name: k.name, prefix: k.key_prefix, scope: k.scope,
+    }));
+
+    return json({ api_keys: apiKeys });
   }
 
   // POST /internal/get-user-usage

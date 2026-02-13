@@ -936,6 +936,26 @@ Commit: `1c12cac`
 - **JWT `mcp_scope`**: Now contains actual JSON scope string from selected API key (not preset like "readonly")
 - Commit: `fed80c7`
 
+## Session 46b: OAuth Key Selector UX + HMAC Token Fix (2026-02-13)
+
+**UX improvements** — Key selector page redesign:
+- Changed click-to-select pattern to radio button + confirm pattern
+- Radio buttons for key selection (clearer than click-to-select cards)
+- "Confirm Selection" button → explicit user action before redirecting
+- Success page after selection: "You can close this page" message + green check icon
+- Commit: `14f039d`
+
+**HMAC-signed tokens replace KV session**:
+- **Problem**: KV eventual consistency caused users to see "Session not found" error after callback (key selector page 500 error)
+- **Root cause**: `/oauth/callback` writes to KV → redirects to `/oauth/keys` → reads from KV too fast → data not yet propagated
+- **Fix**: Replaced KV session with HMAC-signed query param token
+  - `?session=HMAC(sessionId, JWT_SECRET)` — tamper-proof, no KV dependency
+  - Token stores JSON payload (user_id, keys, OAuth params) in `mcp_oauth_session:{id}` KV (still used but no read race)
+  - `/oauth/keys` verifies HMAC signature + reads KV (now has time to propagate)
+  - `/oauth/select-key` verifies HMAC before updating session
+- **Security**: HMAC prevents token tampering, 10min TTL, single-use (deleted after selection)
+- Commit: `a7de180`
+
 ### Test Accounts
 
 - **Admin**: `claude-admin@node2flow.net` / `ClaudeAdmin123!`
