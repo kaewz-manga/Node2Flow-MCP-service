@@ -887,6 +887,33 @@ API keys (`n2f_xxx`) can now optionally access all services instead of being tie
 
 Commit: `885381f`
 
+### Session 45b: Dashboard UI for Scoped API Keys (2026-02-13)
+
+Added "API Keys" tab to Settings page for creating/managing global scoped API keys.
+
+1. **`platform-api.ts`** — Updated types + function:
+   - New `ApiKeyScope` interface: `{ plugins?: string[]; permissions?: string[] }`
+   - `ApiKeyInfo.scope: ApiKeyScope | null` added
+   - `createApiKey(connectionId?, name?, scope?)` — all params now optional
+
+2. **`ApiKeys.tsx`** — NEW page component (~300 lines):
+   - **Table**: Lists global keys (prefix, name, scope badge, status, last used)
+   - **Scope badges**: "Full Access" / "Read Only" / "Custom" / "Connection"
+   - **Create dialog**: Name input + scope preset Select (Full Access / Read Only / Custom)
+   - **Custom mode**: Plugin checkboxes (11 plugins, Select All) + Permission checkboxes (Read/Write/Delete)
+   - **Key display dialog**: One-time display with copy button (same pattern as Connections.tsx)
+   - **Revoke**: DropdownMenu → AlertDialog + withSudo()
+   - **Empty state**: Key icon + create CTA
+
+3. **`Settings.tsx`** — Added tab:
+   - New `<TabsTrigger value="api-keys">API Keys</TabsTrigger>`
+   - Lazy import: `const ApiKeysTab = lazy(() => import('./ApiKeys'))`
+   - `<Suspense>` wrapper with loading spinner
+
+4. **Filters**: Only shows `connection_id === '_all'` keys (global keys, not per-connection)
+
+Commit: `1c12cac`
+
 ### Test Accounts
 
 - **Admin**: `claude-admin@node2flow.net` / `ClaudeAdmin123!`
@@ -1129,5 +1156,6 @@ wrangler deploy                         # In each app/
 **Session 43**: Port community n8n plugin quality to SaaS Gateway (annotations, rich descriptions, improved client)
 **Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
 **Session 45**: Scoped API keys — `n2f_xxx` keys can now access all services (`connection_id='_all'`) with optional plugin + permission scope filtering
+**Session 45b**: Dashboard UI — Settings → API Keys tab with scope presets (Full Access / Read Only / Custom)
 **Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-13
