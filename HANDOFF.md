@@ -138,11 +138,12 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 1. POST /mcp + Bearer eyJhbG... (JWT from OAuth flow)
 2. Gateway verifies JWT signature + expiry (shared JWT_SECRET)
 3. Gateway → Platform /internal/get-user-usage
-4. tools/list: queries ALL user's active connections → returns tools from all plugins
-5. tools/call: finds plugin for tool → queries connection by user_id + product_type
-6. Decrypt config → plugin.createClient(config) → handleToolCall
-7. Return MCP response
-8. ctx.waitUntil → Platform /internal/report-usage
+4. JWT may contain mcp_scope (from API key selected during OAuth login)
+5. tools/list: queries ALL user's active connections → filter by scope
+6. tools/call: finds plugin → checks scope → resolves connection by user_id + product_type
+7. Decrypt config → plugin.createClient(config) → handleToolCall
+8. Return MCP response
+9. ctx.waitUntil → Platform /internal/report-usage
 ```
 
 ### packages/dashboard-core (shared React components)
@@ -914,26 +915,26 @@ Added "API Keys" tab to Settings page for creating/managing global scoped API ke
 
 Commit: `1c12cac`
 
-### Session 46: OAuth Default Scope Setting (2026-02-13)
+### Session 46: OAuth Default Scope → Key Selector (2026-02-13)
 
-Added MCP access scope control for OAuth users (Claude Desktop via Google/GitHub login).
+**Phase 1** — OAuth default scope (later replaced):
+- Migration `004_oauth_scope.sql` — `ALTER TABLE users ADD COLUMN oauth_scope TEXT`
+- Settings "MCP Access" tab with scope presets
+- Commit: `d510e6e`
 
-**Backend** (6 files):
-1. **Migration `004_oauth_scope.sql`** — `ALTER TABLE users ADD COLUMN oauth_scope TEXT`
-2. **`platform-core/types/platform.ts`** — Added `oauth_scope?: string | null` to User interface
-3. **`platform-core/db/users.ts`** — Added `updateUserOAuthScope()` function
-4. **`platform-worker/routes/internal.ts`** — `/internal/get-user-usage` now returns `oauth_scope`
-5. **`platform-worker/routes/user.ts`** — New `GET/PUT /api/user/oauth-scope` endpoints
-6. **`mcp-gateway/routes/auth.ts`** — OAuth path parses `oauth_scope` from usage response → `scope` field (was hardcoded `null`)
-
-**Dashboard** (3 files):
-7. **`platform-api.ts`** — Added `getOAuthScope()` + `updateOAuthScope()` (reuses `ApiKeyScope` type)
-8. **`OAuthScope.tsx`** (NEW) — Scope preset UI: Full Access / Read Only / Custom (same pattern as ApiKeys.tsx)
-9. **`Settings.tsx`** — New "MCP Access" tab with lazy-loaded `OAuthScopeTab`
-
-**Flow**: Settings → MCP Access → Set scope → Save → OAuth login reads scope from DB → Gateway filters tools
-
-Commit: `d510e6e`
+**Phase 2** — Replaced with API key selector on OAuth login:
+- Scope defined ONLY on API Keys (single source of truth)
+- Removed: `OAuthScope.tsx`, MCP Access tab, `GET/PUT /api/user/oauth-scope`, `oauth_scope` from usage response
+- **New OAuth flow**:
+  1. Login page (simple Google/GitHub buttons, no scope dropdown)
+  2. `/oauth/callback` → find/create user → query user's global API keys
+  3. If user has keys → show key selector page (key name, prefix, scope badge)
+  4. User clicks key → `POST /oauth/select-key` → key's scope embedded in JWT → redirect
+  5. If no keys → full access, redirect immediately (no intermediate page)
+- **New endpoints**: `/internal/get-user-api-keys` (Platform), `/oauth/select-key` (Gateway)
+- **New KV key**: `mcp_oauth_session:{id}` (10min TTL) — stores user + OAuth params + keys between callback and selection
+- **JWT `mcp_scope`**: Now contains actual JSON scope string from selected API key (not preset like "readonly")
+- Commit: `fed80c7`
 
 ### Test Accounts
 
