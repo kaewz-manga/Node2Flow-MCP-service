@@ -53,6 +53,7 @@ import {
   getTOTPStatus,
   exportUserData,
   recoverAccount,
+  revokeAllConnectionKeys,
   type TOTPSetupData,
 } from '../lib/platform-api';
 import {
@@ -73,7 +74,10 @@ import {
   RotateCcw,
   Lock,
   LogOut,
+  Ban,
 } from 'lucide-react';
+
+import { toast } from 'sonner';
 
 const ApiKeysTab = lazy(() => import('./ApiKeys'));
 const OAuthScopeTab = lazy(() => import('./OAuthScope'));
@@ -126,6 +130,11 @@ export default function Settings() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  // Revoke all keys state
+  const [showRevokeAll, setShowRevokeAll] = useState(false);
+  const [revokeAllText, setRevokeAllText] = useState('');
+  const [revokeAllLoading, setRevokeAllLoading] = useState(false);
 
   // Data export state
   const [exportLoading, setExportLoading] = useState<'json' | 'csv' | null>(null);
@@ -219,6 +228,20 @@ export default function Settings() {
         setTimeout(() => { setShowPasswordModal(false); setPasswordSuccess(false); }, 2000);
       } else setPasswordError(res.error?.message || 'Failed to change password');
     });
+  };
+
+  const handleRevokeAllKeys = async () => {
+    if (revokeAllText !== 'REVOKE ALL') return;
+    setRevokeAllLoading(true);
+    const res = await revokeAllConnectionKeys();
+    setRevokeAllLoading(false);
+    if (res.success && res.data) {
+      toast.success(`${res.data.revoked_count} connection key(s) revoked`);
+      setShowRevokeAll(false);
+      setRevokeAllText('');
+    } else {
+      toast.error(res.error?.message || 'Failed to revoke keys');
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -631,6 +654,43 @@ export default function Settings() {
         <TabsContent value="danger">
           <Card className="border-red-900/50">
             <CardContent className="p-0">
+              <ItemGroup>
+                <Item>
+                  <ItemMedia variant="icon">
+                    <Ban className="h-4 w-4 text-red-400" />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle className="text-red-400">Revoke All Connection Keys</ItemTitle>
+                    <ItemDescription>Emergency: instantly revoke all connection API keys across all services</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    {!showRevokeAll ? (
+                      <Button variant="destructive" size="sm" onClick={() => setShowRevokeAll(true)}>Revoke All</Button>
+                    ) : null}
+                  </ItemActions>
+                </Item>
+              </ItemGroup>
+
+              {showRevokeAll && (
+                <div className="px-4 pb-4">
+                  <Card className="border-red-700">
+                    <CardContent className="p-4 space-y-4">
+                      <p className="text-sm text-red-300">This will immediately revoke all connection API keys across every service. Global API keys will not be affected. Applications using connection keys will stop working instantly.</p>
+                      <div className="space-y-2">
+                        <Label className="text-red-300">Type <span className="font-mono font-bold">REVOKE ALL</span> to confirm</Label>
+                        <Input placeholder="REVOKE ALL" value={revokeAllText} onChange={(e) => setRevokeAllText(e.target.value)} />
+                      </div>
+                      <div className="flex gap-3">
+                        <Button variant="secondary" onClick={() => { setShowRevokeAll(false); setRevokeAllText(''); }}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleRevokeAllKeys} disabled={revokeAllLoading || revokeAllText !== 'REVOKE ALL'}>
+                          {revokeAllLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Revoking...</> : 'Revoke All Keys'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
               <ItemGroup>
                 <Item>
                   <ItemMedia variant="icon">

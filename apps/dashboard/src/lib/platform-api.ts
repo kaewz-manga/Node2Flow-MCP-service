@@ -309,6 +309,10 @@ export async function deleteApiKey(id: string): Promise<ApiResponse<{ message: s
   return platformRequest(`/api/api-keys/${id}`, { method: 'DELETE' });
 }
 
+export async function revokeAllConnectionKeys(): Promise<ApiResponse<{ revoked_count: number; message: string }>> {
+  return platformRequest('/api/api-keys/connection-keys', { method: 'DELETE' });
+}
+
 // ============================================
 // OAuth Scope (default MCP access for OAuth login)
 // ============================================

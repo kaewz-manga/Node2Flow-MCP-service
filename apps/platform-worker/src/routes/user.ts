@@ -26,6 +26,7 @@ import {
   createApiKey as createApiKeyDb,
   hashApiKey,
   deleteApiKey,
+  deleteAllConnectionApiKeys,
   getOrCreateMonthlyUsage,
   getDailyUsage,
   getMinuteUsage,
@@ -234,6 +235,15 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { api_key: key, prefix, message: 'Save your API key now. It will not be shown again.' } }, 201);
   }
 
+  // DELETE /api/api-keys/connection-keys (bulk revoke all connection keys)
+  if (path === '/api/api-keys/connection-keys' && method === 'DELETE') {
+    const hashes = await deleteAllConnectionApiKeys(env.DB, authUser.userId);
+    await Promise.all(
+      hashes.map((h: string) => env.RATE_LIMIT_KV?.delete(`apikey:${h}`).catch(() => {}))
+    );
+    return apiResponse({ success: true, data: { revoked_count: hashes.length, message: `${hashes.length} connection key(s) revoked` } });
+  }
+
   // DELETE /api/api-keys/:id
   const deleteKeyMatch = path.match(/^\/api\/api-keys\/([^/]+)$/);
   if (deleteKeyMatch && method === 'DELETE') {
@@ -241,11 +251,10 @@ export async function handleUserRoutes(
     const apiKey = apiKeys.find((k: any) => k.id === deleteKeyMatch[1]);
     if (!apiKey) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'API key not found' } }, 404);
     await deleteApiKey(env.DB, deleteKeyMatch[1]);
-    // Invalidate KV cache so deleted key stops working immediately
     if (apiKey.key_hash) {
       await env.RATE_LIMIT_KV?.delete(`apikey:${apiKey.key_hash}`).catch(() => {});
     }
-    return apiResponse({ success: true, data: { message: 'API key deleted' } });
+    return apiResponse({ success: true, data: { message: 'API key revoked' } });
   }
 
   // ============================================

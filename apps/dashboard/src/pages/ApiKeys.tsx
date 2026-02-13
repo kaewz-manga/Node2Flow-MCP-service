@@ -140,16 +140,16 @@ export default function ApiKeysTab() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleRevoke = async () => {
     if (!deleteTarget) return;
     await withSudo(async () => {
       const res = await deleteApiKey(deleteTarget.id);
       if (res.success) {
-        toast.success('API key deleted');
+        toast.success('API key revoked');
         setDeleteTarget(null);
         await loadKeys();
       } else {
-        toast.error(res.error?.message || 'Failed to delete');
+        toast.error(res.error?.message || 'Failed to revoke');
       }
     });
   };
@@ -289,7 +289,7 @@ export default function ApiKeysTab() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-400" onClick={() => setDeleteTarget(k)}>
-                          <Ban className="h-4 w-4" /> Delete Key
+                          <Ban className="h-4 w-4" /> Revoke Key
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -472,20 +472,20 @@ export default function ApiKeysTab() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Revoke Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete API Key</AlertDialogTitle>
+            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete <strong>{deleteTarget?.prefix}...</strong> ({deleteTarget?.name}).
+              This will permanently revoke <strong>{deleteTarget?.prefix}...</strong> ({deleteTarget?.name}).
               Any applications using this key will stop working immediately.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-              Delete
+            <AlertDialogAction onClick={handleRevoke} className="bg-red-600 hover:bg-red-700">
+              Revoke
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

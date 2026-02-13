@@ -72,3 +72,21 @@ export async function deleteApiKey(db: D1Database, id: string): Promise<void> {
     .bind(id)
     .run();
 }
+
+export async function deleteAllConnectionApiKeys(db: D1Database, userId: string): Promise<string[]> {
+  const keys = await db
+    .prepare("SELECT key_hash FROM api_keys WHERE user_id = ? AND connection_id != '_all'")
+    .bind(userId)
+    .all<{ key_hash: string }>();
+
+  const hashes = (keys.results || []).map(k => k.key_hash);
+
+  if (hashes.length > 0) {
+    await db
+      .prepare("DELETE FROM api_keys WHERE user_id = ? AND connection_id != '_all'")
+      .bind(userId)
+      .run();
+  }
+
+  return hashes;
+}

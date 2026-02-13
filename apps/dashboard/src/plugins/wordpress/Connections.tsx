@@ -131,45 +131,41 @@ export default function Connections() {
     });
   };
 
-  const handleGenerateApiKey = async (connectionId: string) => {
-    if (!totpEnabled) {
-      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
-      return;
-    }
-    await withSudo(async () => {
-      const res = await createApiKey(connectionId);
-      if (res.success && res.data) {
-        setNewApiKey(res.data.api_key);
-        setShowApiKeyModal(true);
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to generate API key');
-      }
-      return true;
-    });
+  // Generate Key states
+  const [generateKeyTarget, setGenerateKeyTarget] = useState<string | null>(null);
+
+  const handleGenerateApiKey = (connectionId: string) => {
+    setGenerateKeyTarget(connectionId);
   };
 
-  const handleDeleteApiKey = async (keyId: string) => {
-    if (!totpEnabled) {
-      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
-      return;
+  const confirmGenerateApiKey = async () => {
+    if (!generateKeyTarget) return;
+    const connectionId = generateKeyTarget;
+    setGenerateKeyTarget(null);
+    const res = await createApiKey(connectionId);
+    if (res.success && res.data) {
+      setNewApiKey(res.data.api_key);
+      setShowApiKeyModal(true);
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to generate API key');
     }
+  };
+
+  const handleRevokeApiKey = (keyId: string) => {
     setDeleteKeyTarget(keyId);
   };
 
-  const confirmDeleteApiKey = async () => {
+  const confirmRevokeApiKey = async () => {
     if (!deleteKeyTarget) return;
     const keyId = deleteKeyTarget;
     setDeleteKeyTarget(null);
-    await withSudo(async () => {
-      const res = await deleteApiKey(keyId);
-      if (res.success) {
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to delete API key');
-      }
-      return true;
-    });
+    const res = await deleteApiKey(keyId);
+    if (res.success) {
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to revoke API key');
+    }
   };
 
   const handleEditConnection = (conn: Connection) => {
@@ -343,8 +339,8 @@ export default function Connections() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {connKeys.filter(k => k.status === 'active').map(key => (
-                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleDeleteApiKey(key.id)}>
-                              <Key className="h-4 w-4" /> Delete Key
+                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
+                              <Key className="h-4 w-4" /> Revoke Key
                             </DropdownMenuItem>
                           ))}
                           <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteConnection(conn.id)}>
@@ -500,18 +496,34 @@ export default function Connections() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete API Key Confirmation */}
+      {/* Revoke API Key Confirmation */}
       <AlertDialog open={!!deleteKeyTarget} onOpenChange={(open) => !open && setDeleteKeyTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete API Key</AlertDialogTitle>
+            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this API key? This action cannot be undone.
+              Are you sure you want to revoke this API key? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteApiKey}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={confirmRevokeApiKey}>Revoke</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Generate API Key Confirmation */}
+      <AlertDialog open={!!generateKeyTarget} onOpenChange={(open) => !open && setGenerateKeyTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Generate New API Key</AlertDialogTitle>
+            <AlertDialogDescription>
+              A new API key will be generated for this connection. Make sure to copy it — you won't be able to see it again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmGenerateApiKey}>Generate</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
