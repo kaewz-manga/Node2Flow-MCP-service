@@ -137,7 +137,7 @@ function loginPage(googleUrl: string, githubUrl: string): string {
 </html>`;
 }
 
-/** Key selector page HTML — shown after OAuth login when user has global API keys */
+/** Key selector page HTML — click to select, then confirm */
 function keySelectPage(
   email: string,
   sessionToken: string,
@@ -157,13 +157,16 @@ function keySelectPage(
           scope.permissions?.join(', ') || 'all permissions',
         ].join(' · ');
     const badgeColor = scopeLabel === 'Full Access' ? '#22c55e' : scopeLabel === 'Read Only' ? '#3b82f6' : '#f59e0b';
-    return `<button type="submit" name="key_id" value="${k.id}" class="key-btn">
-      <div class="key-info">
-        <div class="key-name">${k.name || 'Unnamed Key'}</div>
-        <div class="key-detail">${k.prefix}••• · ${scopeDetail}</div>
+    return `<label class="key-option" data-key-id="${k.id}">
+      <input type="radio" name="key_id" value="${k.id}" class="key-radio">
+      <div class="key-content">
+        <div class="key-info">
+          <div class="key-name">${k.name || 'Unnamed Key'}</div>
+          <div class="key-detail">${k.prefix}... · ${scopeDetail}</div>
+        </div>
+        <span class="badge" style="background:${badgeColor}20;color:${badgeColor}">${scopeLabel}</span>
       </div>
-      <span class="badge" style="background:${badgeColor}20;color:${badgeColor}">${scopeLabel}</span>
-    </button>`;
+    </label>`;
   }).join('');
 
   return `<!DOCTYPE html>
@@ -180,27 +183,78 @@ function keySelectPage(
   .subtitle { color: #a1a1aa; font-size: 13px; margin-bottom: 20px; text-align: center; }
   .email { color: #fafafa; font-weight: 500; }
   .keys { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-  .key-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: left; font-family: inherit; }
-  .key-btn:hover { border-color: #fafafa; background: #3f3f46; }
+  .key-radio { display: none; }
+  .key-option { display: block; cursor: pointer; }
+  .key-content { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 16px; border-radius: 8px; border: 2px solid #3f3f46; background: #27272a; transition: border-color 0.15s, background 0.15s; }
+  .key-option:hover .key-content { border-color: #71717a; background: #3f3f46; }
+  .key-radio:checked + .key-content { border-color: #22c55e; background: #22c55e10; }
   .key-info { flex: 1; min-width: 0; }
   .key-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
   .key-detail { font-size: 12px; color: #71717a; }
   .badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; margin-left: 12px; }
   .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #52525b; font-size: 12px; }
   .divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid #27272a; }
-  .full-btn { display: block; width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #3f3f46; background: transparent; color: #a1a1aa; cursor: pointer; font-size: 14px; font-family: inherit; transition: border-color 0.15s, color 0.15s; }
-  .full-btn:hover { border-color: #fafafa; color: #fafafa; }
+  .full-option { display: block; cursor: pointer; }
+  .full-content { display: block; width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid #3f3f46; background: transparent; color: #a1a1aa; text-align: center; font-size: 14px; transition: border-color 0.15s, color 0.15s; }
+  .full-option:hover .full-content { border-color: #71717a; color: #fafafa; }
+  .full-radio:checked + .full-content { border-color: #22c55e; color: #fafafa; background: #22c55e10; }
+  .full-radio { display: none; }
+  .submit-btn { display: block; width: 100%; padding: 12px 16px; border-radius: 8px; border: none; background: #22c55e; color: #09090b; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 20px; transition: background 0.15s, opacity 0.15s; }
+  .submit-btn:hover { background: #16a34a; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
-<form method="POST" action="${GATEWAY_ORIGIN}/oauth/select-key" class="card">
+<form method="POST" action="${GATEWAY_ORIGIN}/oauth/select-key" class="card" id="keyForm">
   <input type="hidden" name="session_token" value="${sessionToken}">
   <h1>Select API Key</h1>
   <div class="subtitle">Signed in as <span class="email">${email}</span></div>
   <div class="keys">${keyRows}</div>
   <div class="divider">or</div>
-  <button type="submit" name="key_id" value="_none" class="full-btn">Continue with Full Access</button>
+  <label class="full-option">
+    <input type="radio" name="key_id" value="_none" class="full-radio">
+    <div class="full-content">Continue with Full Access</div>
+  </label>
+  <button type="submit" class="submit-btn" id="submitBtn" disabled>Select & Connect</button>
 </form>
+<script>
+  var radios = document.querySelectorAll('input[name="key_id"]');
+  var btn = document.getElementById('submitBtn');
+  radios.forEach(function(r) {
+    r.addEventListener('change', function() { btn.disabled = false; });
+  });
+</script>
+</body>
+</html>`;
+}
+
+/** Success page HTML — shown after OAuth key selection completes */
+function successPage(redirectUrl: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connected — Node2Flow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090b; color: #fafafa; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
+  .icon { width: 48px; height: 48px; margin: 0 auto 16px; background: #22c55e20; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .icon svg { width: 24px; height: 24px; color: #22c55e; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  p { color: #a1a1aa; font-size: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div>
+  <h1>Connected Successfully</h1>
+  <p>Authentication is complete.<br>You can close this page now.</p>
+</div>
+<script>window.location.href = ${JSON.stringify(redirectUrl)};</script>
 </body>
 </html>`;
 }
@@ -625,11 +679,14 @@ export async function handleOAuthRoutes(
       { expirationTtl: 300 } // 5min
     );
 
-    // Redirect back to MCP client
+    // Show success page + JS redirect to MCP client
     const clientRedirect = new URL(sessionData.redirect_uri);
     clientRedirect.searchParams.set('code', authCode);
     clientRedirect.searchParams.set('state', sessionData.client_state);
-    return redirect(clientRedirect.toString());
+    return new Response(successPage(clientRedirect.toString()), {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
   }
 
   // -----------------------------------------
