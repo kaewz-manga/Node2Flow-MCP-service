@@ -41,7 +41,7 @@ import {
 import {
   getApiKeys,
   createApiKey,
-  revokeApiKey,
+  deleteApiKey,
   type ApiKeyInfo,
   type ApiKeyScope,
 } from '../lib/platform-api';
@@ -99,8 +99,8 @@ export default function ApiKeysTab() {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Revoke
-  const [revokeTarget, setRevokeTarget] = useState<ApiKeyInfo | null>(null);
+  // Delete
+  const [deleteTarget, setDeleteTarget] = useState<ApiKeyInfo | null>(null);
 
   useEffect(() => { loadKeys(); }, []);
 
@@ -140,16 +140,16 @@ export default function ApiKeysTab() {
     }
   };
 
-  const handleRevoke = async () => {
-    if (!revokeTarget) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     await withSudo(async () => {
-      const res = await revokeApiKey(revokeTarget.id);
+      const res = await deleteApiKey(deleteTarget.id);
       if (res.success) {
-        toast.success('API key revoked');
-        setRevokeTarget(null);
+        toast.success('API key deleted');
+        setDeleteTarget(null);
         await loadKeys();
       } else {
-        toast.error(res.error?.message || 'Failed to revoke');
+        toast.error(res.error?.message || 'Failed to delete');
       }
     });
   };
@@ -267,9 +267,7 @@ export default function ApiKeysTab() {
                   <TableCell>
                     {isExpired(k)
                       ? <Badge variant="destructive">Expired</Badge>
-                      : k.status === 'active'
-                        ? <Badge variant="success">Active</Badge>
-                        : <Badge variant="destructive">Revoked</Badge>
+                      : <Badge variant="success">Active</Badge>
                     }
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
@@ -279,24 +277,22 @@ export default function ApiKeysTab() {
                     {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}
                   </TableCell>
                   <TableCell>
-                    {k.status === 'active' && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => copyToClipboard(k.prefix)}>
-                            <Copy className="h-4 w-4" /> Copy Prefix
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-400" onClick={() => setRevokeTarget(k)}>
-                            <Ban className="h-4 w-4" /> Revoke Key
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => copyToClipboard(k.prefix)}>
+                          <Copy className="h-4 w-4" /> Copy Prefix
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-400" onClick={() => setDeleteTarget(k)}>
+                          <Ban className="h-4 w-4" /> Delete Key
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -476,20 +472,20 @@ export default function ApiKeysTab() {
         </DialogContent>
       </Dialog>
 
-      {/* Revoke Confirmation */}
-      <AlertDialog open={!!revokeTarget} onOpenChange={(open) => !open && setRevokeTarget(null)}>
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
+            <AlertDialogTitle>Delete API Key</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently revoke <strong>{revokeTarget?.prefix}...</strong> ({revokeTarget?.name}).
-              Any applications using this key will stop working.
+              This will permanently delete <strong>{deleteTarget?.prefix}...</strong> ({deleteTarget?.name}).
+              Any applications using this key will stop working immediately.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRevoke} className="bg-red-600 hover:bg-red-700">
-              Revoke
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

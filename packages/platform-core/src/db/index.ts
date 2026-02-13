@@ -36,7 +36,7 @@ export {
   getApiKeyByHash,
   getApiKeysByUserId,
   updateApiKeyLastUsed,
-  revokeApiKey,
+  deleteApiKey,
 } from './api-keys';
 
 // Usage operations

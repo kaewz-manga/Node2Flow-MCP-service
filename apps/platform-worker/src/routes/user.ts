@@ -25,7 +25,7 @@ import {
   generateApiKey,
   createApiKey as createApiKeyDb,
   hashApiKey,
-  revokeApiKey,
+  deleteApiKey,
   getOrCreateMonthlyUsage,
   getDailyUsage,
   getMinuteUsage,
@@ -235,17 +235,17 @@ export async function handleUserRoutes(
   }
 
   // DELETE /api/api-keys/:id
-  const revokeKeyMatch = path.match(/^\/api\/api-keys\/([^/]+)$/);
-  if (revokeKeyMatch && method === 'DELETE') {
+  const deleteKeyMatch = path.match(/^\/api\/api-keys\/([^/]+)$/);
+  if (deleteKeyMatch && method === 'DELETE') {
     const apiKeys = await getApiKeysByUserId(env.DB, authUser.userId);
-    const apiKey = apiKeys.find((k: any) => k.id === revokeKeyMatch[1]);
+    const apiKey = apiKeys.find((k: any) => k.id === deleteKeyMatch[1]);
     if (!apiKey) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'API key not found' } }, 404);
-    await revokeApiKey(env.DB, revokeKeyMatch[1]);
-    // Invalidate KV cache so revoked key stops working immediately
+    await deleteApiKey(env.DB, deleteKeyMatch[1]);
+    // Invalidate KV cache so deleted key stops working immediately
     if (apiKey.key_hash) {
       await env.RATE_LIMIT_KV?.delete(`apikey:${apiKey.key_hash}`).catch(() => {});
     }
-    return apiResponse({ success: true, data: { message: 'API key revoked' } });
+    return apiResponse({ success: true, data: { message: 'API key deleted' } });
   }
 
   // ============================================

@@ -305,7 +305,7 @@ export async function createApiKey(
   });
 }
 
-export async function revokeApiKey(id: string): Promise<ApiResponse<{ message: string }>> {
+export async function deleteApiKey(id: string): Promise<ApiResponse<{ message: string }>> {
   return platformRequest(`/api/api-keys/${id}`, { method: 'DELETE' });
 }
 

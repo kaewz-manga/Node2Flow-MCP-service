@@ -66,9 +66,9 @@ export async function updateApiKeyLastUsed(db: D1Database, id: string): Promise<
     .run();
 }
 
-export async function revokeApiKey(db: D1Database, id: string): Promise<void> {
+export async function deleteApiKey(db: D1Database, id: string): Promise<void> {
   await db
-    .prepare('UPDATE api_keys SET status = ? WHERE id = ?')
-    .bind('revoked', id)
+    .prepare('DELETE FROM api_keys WHERE id = ?')
+    .bind(id)
     .run();
 }

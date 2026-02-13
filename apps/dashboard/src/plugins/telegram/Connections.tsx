@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
-import { getApiKeys, createApiKey, revokeApiKey } from '../../lib/platform-api';
+import { getApiKeys, createApiKey, deleteApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
 import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
 
@@ -47,7 +47,7 @@ export default function Connections() {
 
   // AlertDialog states
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+  const [deleteKeyTarget, setDeleteKeyTarget] = useState<string | null>(null);
 
   // Edit connection states
   const [editTarget, setEditTarget] = useState<{ id: string; name: string } | null>(null);
@@ -142,24 +142,24 @@ export default function Connections() {
     });
   };
 
-  const handleRevokeApiKey = async (keyId: string) => {
+  const handleDeleteApiKey = async (keyId: string) => {
     if (!totpEnabled) {
       toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
       return;
     }
-    setRevokeTarget(keyId);
+    setDeleteKeyTarget(keyId);
   };
 
-  const confirmRevokeApiKey = async () => {
-    if (!revokeTarget) return;
-    const keyId = revokeTarget;
-    setRevokeTarget(null);
+  const confirmDeleteApiKey = async () => {
+    if (!deleteKeyTarget) return;
+    const keyId = deleteKeyTarget;
+    setDeleteKeyTarget(null);
     await withSudo(async () => {
-      const res = await revokeApiKey(keyId);
+      const res = await deleteApiKey(keyId);
       if (res.success) {
         fetchConnections();
       } else {
-        toast.error(res.error?.message || 'Failed to revoke API key');
+        toast.error(res.error?.message || 'Failed to delete API key');
       }
       return true;
     });
@@ -335,8 +335,8 @@ export default function Connections() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {connKeys.filter(k => k.status === 'active').map(key => (
-                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
-                              <Key className="h-4 w-4" /> Revoke Key
+                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleDeleteApiKey(key.id)}>
+                              <Key className="h-4 w-4" /> Delete Key
                             </DropdownMenuItem>
                           ))}
                           <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteConnection(conn.id)}>
@@ -473,7 +473,7 @@ export default function Connections() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Connection</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this connection? All API keys will be revoked. This action cannot be undone.
+              Are you sure you want to delete this connection? All API keys will be deleted. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -483,18 +483,18 @@ export default function Connections() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Revoke API Key Confirmation */}
-      <AlertDialog open={!!revokeTarget} onOpenChange={(open) => !open && setRevokeTarget(null)}>
+      {/* Delete API Key Confirmation */}
+      <AlertDialog open={!!deleteKeyTarget} onOpenChange={(open) => !open && setDeleteKeyTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
+            <AlertDialogTitle>Delete API Key</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to revoke this API key? This action cannot be undone.
+              Are you sure you want to delete this API key? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRevokeApiKey}>Revoke</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDeleteApiKey}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
