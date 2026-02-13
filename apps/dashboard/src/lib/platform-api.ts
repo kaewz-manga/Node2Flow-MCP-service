@@ -56,12 +56,18 @@ export interface PlatformStats {
   pass_rate: number;
 }
 
+export interface ApiKeyScope {
+  plugins?: string[];
+  permissions?: string[];
+}
+
 export interface ApiKeyInfo {
   id: string;
   prefix: string;
   name: string;
   status: string;
   connection_id: string;
+  scope: ApiKeyScope | null;
   last_used_at: string | null;
   created_at: string;
 }
@@ -282,12 +288,17 @@ export async function getApiKeys(): Promise<ApiResponse<{ api_keys: ApiKeyInfo[]
 }
 
 export async function createApiKey(
-  connectionId: string,
-  name?: string
+  connectionId?: string,
+  name?: string,
+  scope?: ApiKeyScope | null
 ): Promise<ApiResponse<{ api_key: string; prefix: string; message: string }>> {
   return platformRequest('/api/api-keys', {
     method: 'POST',
-    body: JSON.stringify({ connection_id: connectionId, name }),
+    body: JSON.stringify({
+      connection_id: connectionId,
+      name,
+      scope: scope || undefined,
+    }),
   });
 }
 

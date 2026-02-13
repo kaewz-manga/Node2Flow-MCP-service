@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   useAuth,
@@ -74,6 +74,8 @@ import {
   Lock,
   LogOut,
 } from 'lucide-react';
+
+const ApiKeysTab = lazy(() => import('./ApiKeys'));
 
 const SESSION_OPTIONS = [
   { value: '3600', label: '1 hour' },
@@ -320,6 +322,7 @@ export default function Settings() {
         <TabsList variant="line">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
           <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
@@ -561,6 +564,13 @@ export default function Settings() {
               </ItemGroup>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ── API Keys Tab ── */}
+        <TabsContent value="api-keys">
+          <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+            <ApiKeysTab />
+          </Suspense>
         </TabsContent>
 
         {/* ── Data Tab ── */}
