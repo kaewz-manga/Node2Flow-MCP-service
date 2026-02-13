@@ -109,14 +109,26 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
 
-**MCP Request Flow (API Key)**:
+**MCP Request Flow (API Key — single connection)**:
 ```
 1. POST /mcp + Bearer n2f_xxx
 2. Gateway → Platform /internal/validate-api-key (service binding)
-3. Platform returns: user_id, plan, connection_id, usage
+3. Platform returns: user_id, plan, connection_id, scope, usage
 4. Gateway queries connections WHERE id = connection_id
 5. Decrypt config → plugin.createClient(config)
 6. plugin.handleToolCall(toolName, args, client)
+7. Return MCP response
+8. ctx.waitUntil → Platform /internal/report-usage
+```
+
+**MCP Request Flow (API Key — `_all` scoped)**:
+```
+1. POST /mcp + Bearer n2f_xxx (connection_id='_all')
+2. Gateway → Platform /internal/validate-api-key (service binding)
+3. Platform returns: user_id, plan, connection_id='_all', scope, usage
+4. Gateway sets connectionId=null (like OAuth path)
+5. tools/list: queries all active connections → filter by scope
+6. tools/call: finds plugin → checks scope → resolves connection by user_id + product_type
 7. Return MCP response
 8. ctx.waitUntil → Platform /internal/report-usage
 ```
@@ -844,6 +856,37 @@ Extended Session 43's quality port from just n8n to ALL 6 in-worker plugins. Eve
 
 Commit: `d857548`
 
+### Session 45: Scoped API Keys (2026-02-13)
+
+API keys (`n2f_xxx`) can now optionally access all services instead of being tied to a single connection. Added scope system with plugin and permission filtering.
+
+1. **Migration** (`003_api_key_scope.sql`):
+   - `ALTER TABLE api_keys ADD COLUMN scope TEXT` — nullable JSON column
+
+2. **Platform changes**:
+   - `platform-core/types/platform.ts` — Added `scope: string | null` to `ApiKey` interface
+   - `platform-core/db/api-keys.ts` — `createApiKey()` accepts optional `scope` parameter
+   - `user.ts` POST /api/api-keys — `connection_id` optional (defaults to `_all`), accepts `scope` JSON
+   - `user.ts` GET /api/api-keys — returns parsed scope object
+   - `internal.ts` — `/internal/validate-api-key` returns `scope` in response + KV cache
+
+3. **Gateway changes**:
+   - `types.ts` — Added `scope` to `AuthResult` interface
+   - `auth.ts` — Handles `connection_id='_all'` (sets connectionId/productType/config to null, like OAuth). Passes scope through
+   - `mcp.ts` — Scope enforcement:
+     - `filterToolsByScope()` — filters tools by plugin ID + permission annotations
+     - `matchesPermission()` — maps annotations to permission types (read=readOnlyHint, write=default, delete=destructiveHint)
+     - `tools/list` applies scope filter, `tools/call` enforces scope before execution
+   - `index.ts` — Passes `scope` from AuthResult to MCP handler
+
+4. **Scope format**: `{ plugins?: string[], permissions?: string[] }` — null = full access
+   - `plugins`: filter by plugin ID (e.g. `["n8n", "wordpress"]`)
+   - `permissions`: filter by type (`read`, `write`, `delete`) — maps to tool annotations
+
+5. **Backward compatible**: Existing keys (scope=null, specific connection_id) work unchanged
+
+Commit: `885381f`
+
 ### Test Accounts
 
 - **Admin**: `claude-admin@node2flow.net` / `ClaudeAdmin123!`
@@ -888,7 +931,7 @@ Commit: `d857548`
 | **Unified connections** | 1 table, `product_type` column | No new tables per product |
 | **Encrypted JSON config** | AES-256-GCM | Each product defines own config schema |
 | **Service Binding** | Gateway → Platform | 0ms latency, not internet-facing |
-| **API key scope** | 1 key = 1 connection | Key leak affects only 1 connection |
+| **API key scope** | 1 key = 1 connection OR `_all` | Scoped by plugins + permissions (read/write/delete) |
 | **Pooled billing** | Plan covers all products | 100 req/day = shared across n8n + WP + etc. |
 | **JWT SSO** | Shared secret between Workers | Login once, access all products |
 
@@ -1085,5 +1128,6 @@ wrangler deploy                         # In each app/
 **Session 42**: MCP OAuth (Google + GitHub) — Claude Desktop can authenticate via Google/GitHub OAuth (PKCE + Dynamic Client Registration)
 **Session 43**: Port community n8n plugin quality to SaaS Gateway (annotations, rich descriptions, improved client)
 **Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
+**Session 45**: Scoped API keys — `n2f_xxx` keys can now access all services (`connection_id='_all'`) with optional plugin + permission scope filtering
 **Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
 **Date**: 2026-02-13
