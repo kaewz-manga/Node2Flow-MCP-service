@@ -187,11 +187,14 @@ export async function handleUserRoutes(
     return apiResponse({
       success: true,
       data: {
-        api_keys: apiKeys.map((k: any) => ({
-          id: k.id, connection_id: k.connection_id, prefix: k.key_prefix,
-          name: k.name, scope: k.scope ? JSON.parse(k.scope) : null,
-          status: k.status, last_used_at: k.last_used_at, created_at: k.created_at,
-        })),
+        api_keys: apiKeys.map((k: any) => {
+          let scope = null;
+          if (k.scope) { try { scope = JSON.parse(k.scope); } catch { /* corrupt scope */ } }
+          return {
+            id: k.id, connection_id: k.connection_id, prefix: k.key_prefix,
+            name: k.name, scope, status: k.status, last_used_at: k.last_used_at, created_at: k.created_at,
+          };
+        }),
       },
     });
   }
@@ -218,6 +221,10 @@ export async function handleUserRoutes(
     const apiKey = apiKeys.find((k: any) => k.id === revokeKeyMatch[1]);
     if (!apiKey) return apiResponse({ success: false, error: { code: 'NOT_FOUND', message: 'API key not found' } }, 404);
     await revokeApiKey(env.DB, revokeKeyMatch[1]);
+    // Invalidate KV cache so revoked key stops working immediately
+    if (apiKey.key_hash) {
+      await env.RATE_LIMIT_KV?.delete(`apikey:${apiKey.key_hash}`).catch(() => {});
+    }
     return apiResponse({ success: true, data: { message: 'API key revoked' } });
   }
 

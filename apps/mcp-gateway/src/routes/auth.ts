@@ -165,9 +165,10 @@ export async function authenticateMcpRequest(
       : { current: 0, limit: 100, remaining: 100 };
 
     // Scope from JWT (set during OAuth key selection, or null for full access)
-    const scope = payload.mcp_scope
-      ? JSON.parse(payload.mcp_scope) as { plugins?: string[]; permissions?: string[] }
-      : null;
+    let scope: { plugins?: string[]; permissions?: string[] } | null = null;
+    if (payload.mcp_scope) {
+      try { scope = JSON.parse(payload.mcp_scope); } catch { /* corrupt scope → full access */ }
+    }
 
     return {
       context: {

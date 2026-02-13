@@ -206,15 +206,20 @@ export async function handleMcpRequest(
         let connectionId = authContext.connection.id;
 
         if (!connectionConfig) {
-          // OAuth JWT → find connection by user_id + product_type
-          const conn = await env.DB.prepare(
-            'SELECT * FROM connections WHERE user_id = ? AND product_type = ? AND status = ? LIMIT 1'
-          ).bind(authContext.user.id, plugin.id, 'active').first<Connection>();
+          // OAuth JWT or global API key → find connection by user_id + product_type
+          const conns = await env.DB.prepare(
+            'SELECT * FROM connections WHERE user_id = ? AND product_type = ? AND status = ?'
+          ).bind(authContext.user.id, plugin.id, 'active').all<Connection>();
 
-          if (!conn) {
+          if (!conns.results?.length) {
             return jsonRpcError(id, -32000, `No active ${plugin.id} connection. Set up in dashboard first.`);
           }
 
+          if (conns.results.length > 1) {
+            return jsonRpcError(id, -32000, `Multiple ${plugin.id} connections found. Use a connection-specific API key to select which one.`);
+          }
+
+          const conn = conns.results[0];
           connectionConfig = await decryptConfig(conn.config_encrypted, env.ENCRYPTION_KEY);
           connectionId = conn.id;
         }
