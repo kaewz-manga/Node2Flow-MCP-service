@@ -1199,6 +1199,9 @@ wrangler deploy                         # In each app/
 **Session 44**: Port community quality to ALL 6 gateway plugins (136 tools with annotations + _fields params)
 **Session 45**: Scoped API keys — `n2f_xxx` keys can now access all services (`connection_id='_all'`) with optional plugin + permission scope filtering
 **Session 45b**: Dashboard UI — Settings → API Keys tab with scope presets (Full Access / Read Only / Custom)
+**Session 48**: API key system overhaul — expiry dates, OAuth default scope, hard delete, 3 audit bug fixes
+**Session 49**: Revoke Key UX — rename Delete→Revoke, AlertDialog for connection keys (no 2FA), emergency bulk revoke in Settings
+
 ### Session 48: API Key System Improvements — Expiry Dates, OAuth Scope, Hard Delete (2026-02-14)
 
 Complete overhaul of API key system with 4 major features. Fixed 3 audit bugs, added expiry dates, OAuth default scope, and hard delete instead of revoke.
@@ -1243,6 +1246,52 @@ Complete overhaul of API key system with 4 major features. Fixed 3 audit bugs, a
 - `apps/dashboard/src/lib/platform-api.ts` — expires_at, expiresAt param, deleteApiKey, getOAuthScope, updateOAuthScope
 - All 11 `apps/dashboard/src/plugins/*/Connections.tsx` — revoke→delete
 
+**Deployed**: 2026-02-14
+
+---
+
+### Session 49: Revoke Key UX + Emergency Bulk Revoke (2026-02-14)
+
+API key management UX improvements with security-appropriate confirmation levels.
+
+**1. Rename "Delete Key" → "Revoke Key"** (all 11 Connection pages + ApiKeys.tsx):
+- Better terminology for credential revocation
+- DropdownMenuItem text, AlertDialog titles, toast messages all updated
+
+**2. Connection key generation: AlertDialog instead of 2FA**:
+- Removed `withSudo()` from handleGenerateApiKey on all 11 Connection pages
+- Now uses AlertDialog confirmation (faster UX for connection-scoped keys)
+- Added `generateKeyTarget` state + `confirmGenerateApiKey` handler
+
+**3. Connection key revoke: AlertDialog instead of 2FA**:
+- Removed `withSudo()` from handleRevokeApiKey on all 11 Connection pages
+- Direct AlertDialog confirmation (connection keys are limited scope)
+
+**4. Global API keys: Keep 2FA** (ApiKeys.tsx):
+- Create + Revoke still use `withSudo()` (global keys = Full Access = higher risk)
+- Only text renamed (Delete → Revoke)
+
+**5. Emergency "Revoke All Connection Keys"** (Settings.tsx Danger Zone):
+- New bulk revoke button above Delete Account
+- Type "REVOKE ALL" to confirm (no 2FA — emergency needs speed)
+- Backend: `DELETE /api/api-keys/connection-keys` with KV cache invalidation
+- `deleteAllConnectionApiKeys()` in platform-core: deletes all keys where `connection_id != '_all'`
+
+**Security hierarchy**:
+- Connection keys → AlertDialog (fast)
+- Global keys → 2FA/TOTP (secure)
+- Emergency revoke all → type confirmation (fast for emergencies)
+
+**Files changed** (17):
+- `packages/platform-core/src/db/api-keys.ts` — `deleteAllConnectionApiKeys()`
+- `packages/platform-core/src/db/index.ts` — barrel export
+- `apps/platform-worker/src/routes/user.ts` — bulk revoke endpoint (before `:id` regex)
+- `apps/dashboard/src/lib/platform-api.ts` — `revokeAllConnectionKeys()`
+- `apps/dashboard/src/pages/ApiKeys.tsx` — Delete → Revoke text
+- `apps/dashboard/src/pages/Settings.tsx` — Emergency Revoke All in Danger Zone
+- 11x `apps/dashboard/src/plugins/*/Connections.tsx` — Revoke naming + AlertDialog (no sudo)
+
+Commit: `b2e9383`
 **Deployed**: 2026-02-14
 
 ---
