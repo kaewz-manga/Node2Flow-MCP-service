@@ -32,6 +32,8 @@ import {
   slackDeleteFile,
   slackSearchFiles,
   slackListPins,
+  slackPinMessage,
+  slackUnpinMessage,
 } from '../../lib/gateway-api';
 import {
   Upload,
@@ -39,6 +41,7 @@ import {
   Trash2,
   Search,
   Pin,
+  PinOff,
   Loader2,
   AlertCircle,
   RefreshCw,
@@ -84,6 +87,12 @@ export default function SlackFileManager() {
   const [pinsChannel, setPinsChannel] = useState('');
   const [pinsResult, setPinsResult] = useState<any>(null);
   const [loadingPins, setLoadingPins] = useState(false);
+
+  // Pin/Unpin Message
+  const [pinChannel, setPinChannel] = useState('');
+  const [pinTimestamp, setPinTimestamp] = useState('');
+  const [pinning, setPinning] = useState(false);
+  const [unpinning, setUnpinning] = useState(false);
 
   const fetchFiles = useCallback(async () => {
     if (!connectionId) return;
@@ -183,6 +192,32 @@ export default function SlackFileManager() {
     } finally {
       setLoadingPins(false);
     }
+  };
+
+  const handlePinMessage = async () => {
+    if (!pinChannel.trim() || !pinTimestamp.trim()) return;
+    setPinning(true);
+    try {
+      const res = await slackPinMessage(connectionId, pinChannel.trim(), pinTimestamp.trim());
+      if (res.error) {
+        toast.error(String(res.error));
+      } else {
+        toast.success('Message pinned');
+      }
+    } catch (e) { toast.error(String(e)); } finally { setPinning(false); }
+  };
+
+  const handleUnpinMessage = async () => {
+    if (!pinChannel.trim() || !pinTimestamp.trim()) return;
+    setUnpinning(true);
+    try {
+      const res = await slackUnpinMessage(connectionId, pinChannel.trim(), pinTimestamp.trim());
+      if (res.error) {
+        toast.error(String(res.error));
+      } else {
+        toast.success('Message unpinned');
+      }
+    } catch (e) { toast.error(String(e)); } finally { setUnpinning(false); }
   };
 
   const formatSize = (bytes?: number) => {
@@ -350,6 +385,50 @@ export default function SlackFileManager() {
             </Button>
           </div>
           {pinsResult && <JsonViewer data={pinsResult} />}
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Pin / Unpin Message */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Pin className="h-4 w-4" /> Pin / Unpin Message
+          </CardTitle>
+          <CardDescription>Pin or unpin a specific message in a channel</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium">Channel ID</label>
+              <Input
+                placeholder="C01234567"
+                value={pinChannel}
+                onChange={(e) => setPinChannel(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Message Timestamp</label>
+              <Input
+                placeholder="1234567890.123456"
+                value={pinTimestamp}
+                onChange={(e) => setPinTimestamp(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handlePinMessage} disabled={pinning || !pinChannel.trim() || !pinTimestamp.trim()}>
+              {pinning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Pin className="mr-2 h-4 w-4" />}
+              Pin
+            </Button>
+            <Button variant="outline" onClick={handleUnpinMessage} disabled={unpinning || !pinChannel.trim() || !pinTimestamp.trim()}>
+              {unpinning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PinOff className="mr-2 h-4 w-4" />}
+              Unpin
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

@@ -37,10 +37,15 @@ import {
   slackListChannels,
   slackGetChannelInfo,
   slackGetChannelHistory,
+  slackGetThreadReplies,
   slackCreateChannel,
   slackArchiveChannel,
   slackSetChannelTopic,
   slackGetChannelMembers,
+  slackInviteToChannel,
+  slackKickFromChannel,
+  slackJoinChannel,
+  slackOpenConversation,
 } from '../../lib/gateway-api';
 import {
   Hash,
@@ -54,6 +59,10 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  UserPlus,
+  UserMinus,
+  LogIn,
+  MessageCircle,
 } from 'lucide-react';
 
 interface SlackChannel {
@@ -98,6 +107,27 @@ export default function SlackChannelList() {
   const [membersTarget, setMembersTarget] = useState<SlackChannel | null>(null);
   const [membersResult, setMembersResult] = useState<any>(null);
   const [loadingMembers, setLoadingMembers] = useState(false);
+
+  // Thread Replies
+  const [threadTarget, setThreadTarget] = useState<SlackChannel | null>(null);
+  const [threadTs, setThreadTs] = useState('');
+  const [threadResult, setThreadResult] = useState<any>(null);
+  const [loadingThread, setLoadingThread] = useState(false);
+
+  // Invite User
+  const [inviteTarget, setInviteTarget] = useState<SlackChannel | null>(null);
+  const [inviteUsers, setInviteUsers] = useState('');
+  const [inviting, setInviting] = useState(false);
+
+  // Kick User
+  const [kickTarget, setKickTarget] = useState<SlackChannel | null>(null);
+  const [kickUser, setKickUser] = useState('');
+  const [kicking, setKicking] = useState(false);
+
+  // Open Conversation
+  const [openConvoUsers, setOpenConvoUsers] = useState('');
+  const [openConvoResult, setOpenConvoResult] = useState<any>(null);
+  const [openingConvo, setOpeningConvo] = useState(false);
 
   const fetchChannels = useCallback(async () => {
     if (!connectionId) return;
@@ -227,6 +257,67 @@ export default function SlackChannelList() {
     }
   };
 
+  const handleGetThreadReplies = async () => {
+    if (!threadTarget || !threadTs.trim()) return;
+    setLoadingThread(true);
+    setThreadResult(null);
+    try {
+      const res = await slackGetThreadReplies(connectionId, threadTarget.id, threadTs.trim());
+      setThreadResult(res.data ?? res.error);
+    } catch (e) { toast.error(String(e)); } finally { setLoadingThread(false); }
+  };
+
+  const handleInvite = async () => {
+    if (!inviteTarget || !inviteUsers.trim()) return;
+    setInviting(true);
+    try {
+      const res = await slackInviteToChannel(connectionId, inviteTarget.id, inviteUsers.trim());
+      if (res.error) {
+        toast.error(String(res.error));
+      } else {
+        toast.success(`User(s) invited to #${inviteTarget.name}`);
+        setInviteTarget(null);
+        setInviteUsers('');
+      }
+    } finally { setInviting(false); }
+  };
+
+  const handleKick = async () => {
+    if (!kickTarget || !kickUser.trim()) return;
+    setKicking(true);
+    try {
+      const res = await slackKickFromChannel(connectionId, kickTarget.id, kickUser.trim());
+      if (res.error) {
+        toast.error(String(res.error));
+      } else {
+        toast.success(`User removed from #${kickTarget.name}`);
+        setKickTarget(null);
+        setKickUser('');
+      }
+    } finally { setKicking(false); }
+  };
+
+  const handleJoinChannel = async (ch: SlackChannel) => {
+    try {
+      const res = await slackJoinChannel(connectionId, ch.id);
+      if (res.error) {
+        toast.error(String(res.error));
+      } else {
+        toast.success(`Joined #${ch.name}`);
+      }
+    } catch (e) { toast.error(String(e)); }
+  };
+
+  const handleOpenConversation = async () => {
+    if (!openConvoUsers.trim()) return;
+    setOpeningConvo(true);
+    try {
+      const res = await slackOpenConversation(connectionId, openConvoUsers.trim());
+      setOpenConvoResult(res.data ?? res.error);
+      if (!res.error) toast.success('Conversation opened');
+    } catch (e) { toast.error(String(e)); } finally { setOpeningConvo(false); }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -295,6 +386,18 @@ export default function SlackChannelList() {
                       setTopicValue(ch.topic?.value || '');
                     }}>
                       Set Topic
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setThreadTarget(ch); setThreadTs(''); setThreadResult(null); }}>
+                      <MessageCircle className="mr-1 h-3 w-3" /> Thread
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setInviteTarget(ch); setInviteUsers(''); }}>
+                      <UserPlus className="mr-1 h-3 w-3" /> Invite
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setKickTarget(ch); setKickUser(''); }}>
+                      <UserMinus className="mr-1 h-3 w-3" /> Kick
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleJoinChannel(ch); }}>
+                      <LogIn className="mr-1 h-3 w-3" /> Join
                     </Button>
                     {!ch.is_archived && (
                       <Button variant="outline" size="sm" className="text-amber-500" onClick={(e) => { e.stopPropagation(); setArchiveTarget(ch); }}>
@@ -417,6 +520,94 @@ export default function SlackChannelList() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Thread Replies Dialog */}
+      <Dialog open={!!threadTarget} onOpenChange={(open) => !open && setThreadTarget(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Thread Replies — #{threadTarget?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Field>
+              <FieldLabel>Parent Message Timestamp</FieldLabel>
+              <FieldDescription>The ts of the parent message to get replies for</FieldDescription>
+              <Input placeholder="1234567890.123456" value={threadTs} onChange={(e) => setThreadTs(e.target.value)} />
+            </Field>
+            <Button onClick={handleGetThreadReplies} disabled={loadingThread || !threadTs.trim()}>
+              {loadingThread ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MessageCircle className="mr-2 h-4 w-4" />}
+              Get Replies
+            </Button>
+            {threadResult && <div className="max-h-72 overflow-auto"><JsonViewer data={threadResult} /></div>}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite User Dialog */}
+      <Dialog open={!!inviteTarget} onOpenChange={(open) => !open && setInviteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite to #{inviteTarget?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <Field>
+              <FieldLabel>User ID(s)</FieldLabel>
+              <FieldDescription>Comma-separated user IDs (e.g. U01234,U05678)</FieldDescription>
+              <Input placeholder="U01234567" value={inviteUsers} onChange={(e) => setInviteUsers(e.target.value)} />
+            </Field>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setInviteTarget(null)}>Cancel</Button>
+              <Button onClick={handleInvite} disabled={inviting || !inviteUsers.trim()}>
+                {inviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Invite
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Kick User Dialog */}
+      <Dialog open={!!kickTarget} onOpenChange={(open) => !open && setKickTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove from #{kickTarget?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <Field>
+              <FieldLabel>User ID</FieldLabel>
+              <Input placeholder="U01234567" value={kickUser} onChange={(e) => setKickUser(e.target.value)} />
+            </Field>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setKickTarget(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={handleKick} disabled={kicking || !kickUser.trim()}>
+                {kicking && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Remove
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Separator />
+
+      {/* Open Conversation */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Open Conversation</CardTitle>
+          <CardDescription>Open or create a direct message / group conversation</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <label className="text-sm font-medium">User ID(s)</label>
+            <Input placeholder="U01234567,U89012345" value={openConvoUsers} onChange={(e) => setOpenConvoUsers(e.target.value)} className="mt-1" />
+            <p className="text-xs text-muted-foreground mt-1">Comma-separated for group DMs</p>
+          </div>
+          <Button onClick={handleOpenConversation} disabled={openingConvo || !openConvoUsers.trim()}>
+            {openingConvo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MessageSquare className="mr-2 h-4 w-4" />}
+            Open
+          </Button>
+          {openConvoResult && <JsonViewer data={openConvoResult} />}
+        </CardContent>
+      </Card>
     </div>
   );
 }

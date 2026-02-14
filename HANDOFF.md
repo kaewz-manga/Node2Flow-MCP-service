@@ -1118,7 +1118,7 @@ Node2Flow-MCP-service/
 │           │   ├── line/              # LINE plugin (4 pages + content)
 │           │   ├── telegram/          # Telegram plugin (4 pages + content)
 │           │   ├── notion/            # Notion plugin (4 pages + content)
-│           │   ├── slack/             # Slack plugin (5 pages + content)
+│           │   ├── slack/             # Slack plugin (6 pages + content)
 │           │   ├── notion-official/   # Notion Official (Connections + content)
 │           │   ├── line-official/     # LINE Official (Connections + content)
 │           │   ├── playwright/        # Playwright (Connections + content)
@@ -1206,6 +1206,7 @@ wrangler deploy                         # In each app/
 **Session 49**: Revoke Key UX — rename Delete→Revoke, AlertDialog for connection keys (no 2FA), emergency bulk revoke in Settings
 **Session 50**: Slack plugin — 38 tools (Messages, Conversations, Users, Reactions, Search, Files, Pins, Bookmarks, Team, Emoji) → 304 total tools
 **Session 51**: Slack dashboard pages — 4 sub-pages (Messages, Channels, Files & Pins) + content + 38 API helpers in gateway-api.ts
+**Session 52**: Slack dashboard full 38/38 tool coverage — enhanced 3 pages + new UserList.tsx (reactions, bookmarks, emoji) + Slack logo fix
 
 ### Session 48: API Key System Improvements — Expiry Dates, OAuth Scope, Hard Delete (2026-02-14)
 
@@ -1298,6 +1299,40 @@ API key management UX improvements with security-appropriate confirmation levels
 
 Commit: `b2e9383`
 **Deployed**: 2026-02-14
+
+### Session 52: Slack Dashboard Full Tool Coverage — 38/38 (2026-02-14)
+
+Enhanced all Slack dashboard pages to cover 100% of 38 tools (was 14/38 from Session 51).
+
+**Enhanced pages (3)**:
+
+| Page | Before | After | Added Tools |
+|------|--------|-------|-------------|
+| MessageTools.tsx | 4 tools | 9 tools | update, delete, list/cancel scheduled, get permalink |
+| ChannelList.tsx | 7 tools | 12 tools | thread replies, invite, kick, join, open conversation |
+| FileManager.tsx | 5 tools | 7 tools | pin message, unpin message |
+
+**New page (1)**:
+
+| Page | Tools | Features |
+|------|-------|----------|
+| UserList.tsx | 10 tools | List users (with avatar, filter), user lookup, add/remove/get reactions, channel bookmarks CRUD (list/add/edit/remove), custom emoji list |
+
+**Registry update**:
+- Added 5th sidebar item: "Users & Tools" → `/slack/users`
+- Added 5th route: `lazy(() => import('./slack/UserList'))`
+
+**Logo fix**:
+- `cdn.simpleicons.org/slack/4A154B` → 404
+- Changed to `cdn.jsdelivr.net/npm/simple-icons@v13/icons/slack.svg` → 200 OK
+
+**Playwright test results** (no login):
+- Landing page: Slack product card renders with logo + "38 tools" description
+- FAQ page: 3 Slack categories (Setup 3 items, Usage 3 items, Troubleshooting 3 items)
+- Docs page: Connection guide (3 steps + 22 scopes), 8 example prompts
+- Auth-protected routes: Redirect to login (expected)
+
+**Deployed**: `app.node2flow.net` (CF Pages)
 
 ---
 

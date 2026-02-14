@@ -417,25 +417,28 @@ import {
   Send as SlackSend,
   Hash as SlackHash,
   Paperclip as SlackFiles,
+  Users as SlackUsers,
 } from 'lucide-react';
 
 const slackPlugin: AppPlugin = {
   id: 'slack',
   name: 'Slack',
   icon: SlackIcon,
-  logo: 'https://cdn.simpleicons.org/slack/4A154B',
+  logo: 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/slack.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/slack/connections', icon: SlackLinkIcon },
     { name: 'Messages', href: '/slack/messages', icon: SlackSend },
     { name: 'Channels', href: '/slack/channels', icon: SlackHash },
     { name: 'Files & Pins', href: '/slack/files', icon: SlackFiles },
+    { name: 'Users & Tools', href: '/slack/users', icon: SlackUsers },
   ],
   routes: [
     { path: '/slack/connections', component: lazy(() => import('./slack/Connections')) },
     { path: '/slack/messages', component: lazy(() => import('./slack/MessageTools')) },
     { path: '/slack/channels', component: lazy(() => import('./slack/ChannelList')) },
     { path: '/slack/files', component: lazy(() => import('./slack/FileManager')) },
+    { path: '/slack/users', component: lazy(() => import('./slack/UserList')) },
   ],
   content: slackContent,
 };
