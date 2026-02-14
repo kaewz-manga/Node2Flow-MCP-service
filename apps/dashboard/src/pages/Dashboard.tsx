@@ -274,7 +274,7 @@ export default function Dashboard() {
                     <TableHead className="w-[1%] text-center">Status</TableHead>
                     <TableHead className="w-[40%] text-center">Name</TableHead>
                     <TableHead className="text-center">Service</TableHead>
-                    <TableHead className="w-[1%] whitespace-nowrap text-center">Actions</TableHead>
+                    <TableHead className="w-[1%] whitespace-nowrap text-center"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

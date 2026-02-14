@@ -256,7 +256,7 @@ export default function AdminUsers() {
                       <TableHead>Status</TableHead>
                       <TableHead>Auth</TableHead>
                       <TableHead>Created</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
