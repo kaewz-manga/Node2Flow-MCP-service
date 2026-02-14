@@ -24,7 +24,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const LOGO = 'https://cdn.simpleicons.org/line/06C755';
+const LOGO = '/logos/line.png';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

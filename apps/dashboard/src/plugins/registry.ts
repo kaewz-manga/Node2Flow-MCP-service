@@ -189,7 +189,7 @@ const geminiRagPlugin: AppPlugin = {
   id: 'gemini-rag',
   name: 'Gemini RAG',
   icon: Database,
-  logo: 'https://cdn.simpleicons.org/googlegemini/8E75B2',
+  logo: '/logos/gemini.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/gemini-rag/connections', icon: GeminiLinkIcon },
@@ -221,7 +221,7 @@ const linePlugin: AppPlugin = {
   id: 'line',
   name: 'LINE Bot',
   icon: LineIcon,
-  logo: 'https://cdn.simpleicons.org/line/00C300',
+  logo: '/logos/line.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/line/connections', icon: LineLinkIcon },
@@ -255,7 +255,7 @@ const telegramPlugin: AppPlugin = {
   id: 'telegram',
   name: 'Telegram Bot',
   icon: TelegramIcon,
-  logo: 'https://cdn.simpleicons.org/telegram/26A5E4',
+  logo: '/logos/telegram.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/telegram/connections', icon: TelegramLinkIcon },
@@ -345,7 +345,7 @@ const lineOfficialPlugin: AppPlugin = {
   id: 'line-official',
   name: 'LINE (Official)',
   icon: LineOffIcon,
-  logo: 'https://cdn.simpleicons.org/line/06C755',
+  logo: '/logos/line.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/line-official/connections', icon: LineOffLinkIcon },
@@ -424,7 +424,7 @@ const slackPlugin: AppPlugin = {
   id: 'slack',
   name: 'Slack',
   icon: SlackIcon,
-  logo: 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/slack.svg',
+  logo: '/logos/slack.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/slack/connections', icon: SlackLinkIcon },

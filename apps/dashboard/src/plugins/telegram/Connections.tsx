@@ -234,7 +234,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram" className="h-10 w-10" />
+          <img src="/logos/telegram.svg" alt="Telegram" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
