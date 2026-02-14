@@ -1,9 +1,5 @@
-/**
- * Slack Plugin - Connections Page
- * Manage Slack Bot Token connections
- */
-
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, deleteApiKey } from '../../lib/platform-api';
@@ -13,11 +9,23 @@ import {
   useConnection,
   useSudoContext,
   type Connection,
+  Field,
+  FieldLabel,
+  FieldDescription,
+  InputGroup,
+  InputGroupInput,
+  InputGroupAddon,
   Button,
-  Card,
-  CardContent,
-  Input,
+  Alert,
+  AlertTitle,
+  AlertDescription,
   Badge,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -47,12 +55,6 @@ import {
   EmptyTitle,
   EmptyDescription,
   EmptyContent,
-  Field,
-  FieldLabel,
-  FieldDescription,
-  InputGroup,
-  InputGroupInput,
-  InputGroupAddon,
   useIsMobile,
   Sheet,
   SheetContent,
@@ -70,28 +72,27 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  Shield,
+  Lock,
+  Tag,
   MoreHorizontal,
   Pencil,
-  ExternalLink,
+  Info,
   MessageSquare,
 } from 'lucide-react';
 
 export default function SlackConnections() {
-  const { withSudo } = useSudoContext();
+  const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
   const { activeConnection, setActiveConnectionId } = useConnection();
-  const isMobile = useIsMobile();
-
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Add modal
   const [showAddModal, setShowAddModal] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [newApiKey, setNewApiKey] = useState('');
 
-  // Form
   const [formName, setFormName] = useState('');
   const [formBotToken, setFormBotToken] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -105,260 +106,300 @@ export default function SlackConnections() {
   const [deleteKeyTarget, setDeleteKeyTarget] = useState<string | null>(null);
   const [generateKeyTarget, setGenerateKeyTarget] = useState<string | null>(null);
 
-  // Edit
+  // Edit connection states
   const [editTarget, setEditTarget] = useState<{ id: string; name: string } | null>(null);
   const [editName, setEditName] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
+  const isMobile = useIsMobile();
 
-  const MCP_ENDPOINT = 'https://mcp.node2flow.net/mcp';
+  const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
 
-  const fetchData = async () => {
+  const fetchConnections = async () => {
     setLoading(true);
-    setError('');
-    try {
-      const [connRes, keysRes] = await Promise.all([
-        getConnections('slack'),
-        getApiKeys(),
-      ]);
-      if (connRes.data) setConnections(connRes.data.connections || []);
-      if (keysRes.data) setApiKeys(keysRes.data.api_keys || []);
-    } catch (e) {
-      setError('Failed to load connections');
-    } finally {
-      setLoading(false);
+    const [connRes, keysRes] = await Promise.all([
+      getConnections('slack'),
+      getApiKeys(),
+    ]);
+    if (connRes.success && connRes.data) {
+      setConnections(connRes.data.connections);
+    } else {
+      setError(connRes.error?.message || 'Failed to load connections');
     }
+    if (keysRes.success && keysRes.data) {
+      setApiKeys(keysRes.data.api_keys);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchConnections();
   }, []);
 
-  const handleCreate = async () => {
-    if (!formName.trim() || !formBotToken.trim()) return;
-    setFormLoading(true);
+  const handleAddConnection = async (e: React.FormEvent) => {
+    e.preventDefault();
     setFormError('');
-    try {
-      const res = await createConnection('slack', formName.trim(), {
-        bot_token: formBotToken.trim(),
-      });
-      if (res.error) {
-        setFormError(res.error?.message || 'Failed to create connection');
-        return;
+    setFormLoading(true);
+
+    const res = await createConnection('slack', formName, {
+      bot_token: formBotToken.trim(),
+    });
+
+    if (res.success && res.data) {
+      const keyRes = await createApiKey((res.data as any).id || (res.data as any).connection?.id);
+      if (keyRes.success && keyRes.data) {
+        setNewApiKey(keyRes.data.api_key);
+        setShowApiKeyModal(true);
       }
-      // Auto-generate API key
-      const connId = (res.data as any)?.id || (res.data as any)?.connection?.id;
-      if (connId) {
-        const keyRes = await createApiKey(connId);
-        if (keyRes.data?.api_key) {
-          setNewApiKey(keyRes.data.api_key);
-          setShowApiKeyModal(true);
-        }
-      }
-      toast.success('Connection created');
       setShowAddModal(false);
       setFormName('');
       setFormBotToken('');
-      fetchData();
-    } finally {
-      setFormLoading(false);
+      fetchConnections();
+    } else {
+      setFormError(res.error?.message || 'Failed to add connection');
     }
+
+    setFormLoading(false);
   };
 
-  const handleDelete = (id: string) => setDeleteTarget(id);
-  const confirmDelete = async () => {
+  const handleDeleteConnection = async (id: string) => {
+    if (!totpEnabled) {
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
+      return;
+    }
+    setDeleteTarget(id);
+  };
+
+  const confirmDeleteConnection = async () => {
     if (!deleteTarget) return;
-    await withSudo(async () => {
-      const res = await deleteConnection(deleteTarget);
-      if (res.error) {
-        toast.error(res.error?.message || 'Operation failed');
-      } else {
-        toast.success('Connection deleted');
-        fetchData();
-      }
-    });
+    const id = deleteTarget;
     setDeleteTarget(null);
+    await withSudo(async () => {
+      const res = await deleteConnection(id);
+      if (res.success) {
+        fetchConnections();
+      } else {
+        toast.error(res.error?.message || 'Failed to delete connection');
+      }
+      return true;
+    });
   };
 
-  const handleGenerateApiKey = (connectionId: string) => setGenerateKeyTarget(connectionId);
+  const handleGenerateApiKey = (connectionId: string) => {
+    setGenerateKeyTarget(connectionId);
+  };
+
   const confirmGenerateApiKey = async () => {
     if (!generateKeyTarget) return;
-    const res = await createApiKey(generateKeyTarget);
-    if (res.data?.api_key) {
+    const connectionId = generateKeyTarget;
+    setGenerateKeyTarget(null);
+    const res = await createApiKey(connectionId);
+    if (res.success && res.data) {
       setNewApiKey(res.data.api_key);
       setShowApiKeyModal(true);
-      fetchData();
+      fetchConnections();
     } else {
-      toast.error('Failed to generate API key');
+      toast.error(res.error?.message || 'Failed to generate API key');
     }
-    setGenerateKeyTarget(null);
   };
 
-  const handleRevokeApiKey = (keyId: string) => setDeleteKeyTarget(keyId);
+  const handleRevokeApiKey = (keyId: string) => {
+    setDeleteKeyTarget(keyId);
+  };
+
   const confirmRevokeApiKey = async () => {
     if (!deleteKeyTarget) return;
-    const res = await deleteApiKey(deleteKeyTarget);
-    if (res.error) {
-      toast.error(res.error?.message || 'Operation failed');
-    } else {
-      toast.success('API key revoked');
-      fetchData();
-    }
+    const keyId = deleteKeyTarget;
     setDeleteKeyTarget(null);
+    const res = await deleteApiKey(keyId);
+    if (res.success) {
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to revoke API key');
+    }
   };
 
-  const handleEdit = (conn: Connection) => {
+  const handleEditConnection = (conn: Connection) => {
     setEditTarget({ id: conn.id, name: conn.name });
     setEditName(conn.name);
   };
 
-  const confirmEdit = async () => {
+  const confirmEditConnection = async () => {
     if (!editTarget || !editName.trim()) return;
-    setEditLoading(true);
-    try {
-      const res = await updateConnection(editTarget.id, { name: editName.trim() });
-      if (res.error) {
-        toast.error(res.error?.message || 'Operation failed');
-      } else {
-        toast.success('Connection updated');
-        setEditTarget(null);
-        fetchData();
-      }
-    } finally {
-      setEditLoading(false);
+    const res = await updateConnection(editTarget.id, { name: editName.trim() });
+    if (res.success) {
+      toast.success('Connection renamed');
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to rename connection');
     }
+    setEditTarget(null);
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const copyMcp = () => {
-    navigator.clipboard.writeText(MCP_ENDPOINT);
-    setCopiedMcp(true);
-    setTimeout(() => setCopiedMcp(false), 2000);
-  };
+  const getKeysForConnection = (connectionId: string) =>
+    apiKeys.filter((k) => k.connection_id === connectionId);
 
-  const getConnectionKeys = (connId: string) =>
-    apiKeys.filter((k) => k.connection_id === connId);
-
-  // Edit dialog — responsive
-  const editForm = (
-    <div className="space-y-4 p-4">
-      <Field>
-        <FieldLabel>Connection Name</FieldLabel>
-        <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
-      </Field>
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={() => setEditTarget(null)}>Cancel</Button>
-        <Button onClick={confirmEdit} disabled={editLoading}>
-          {editLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save
-        </Button>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Slack Connections</h2>
-          <p className="text-sm text-muted-foreground">Manage Slack workspace connections</p>
+          <h1 className="text-2xl font-bold text-foreground">Slack Connections</h1>
+          <p className="text-muted-foreground mt-1">Manage your Slack workspace connections</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={fetchData} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Add Connection
-          </Button>
-        </div>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Connection
+        </Button>
       </div>
 
-      {/* MCP Endpoint */}
-      <Card>
-        <CardContent className="py-3">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground shrink-0">MCP Endpoint:</span>
-            <code className="flex-1 text-sm font-mono truncate">{MCP_ENDPOINT}</code>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={copyMcp}>
-              {copiedMcp ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+      {/* 2FA Warning - hidden when enabled */}
+      {statusLoaded && !totpEnabled && (
+        <Alert>
+          <Shield className="h-5 w-5" />
+          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>Set up 2FA to manage connections securely</span>
+            <Button size="sm" asChild className="shrink-0 ml-4">
+              <Link to="/settings?tab=security">Enable</Link>
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </AlertDescription>
+        </Alert>
+      )}
 
-      {/* Connection List */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : connections.length === 0 ? (
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-5 w-5" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* MCP Endpoint */}
+      <Item variant="outline">
+        <ItemMedia>
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/slack.svg" alt="Slack" className="h-10 w-10 invert" />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>MCP Endpoint</ItemTitle>
+          <ItemDescription>
+            <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
+          </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
+          </Button>
+        </ItemActions>
+      </Item>
+
+      {/* Key Usage Info */}
+      <Alert className="bg-blue-950/20 border-blue-900/50">
+        <Info className="h-4 w-4 text-blue-400" />
+        <AlertDescription className="text-sm text-muted-foreground">
+          <strong className="text-foreground">Connection key</strong> — Each connection has its own API key that only accesses this plugin.
+          For a single key that works across all plugins, create a <strong className="text-foreground">Global API Key</strong> in Settings &rarr; API Keys.
+          You can also use <strong className="text-foreground">OAuth login</strong> (Google/GitHub) from MCP clients like Claude Desktop.
+        </AlertDescription>
+      </Alert>
+
+      {connections.length === 0 ? (
         <Empty>
           <EmptyHeader>
-            <EmptyMedia>
-              <MessageSquare className="h-10 w-10" />
+            <EmptyMedia variant="icon">
+              <MessageSquare />
             </EmptyMedia>
-            <EmptyTitle>No Slack connections</EmptyTitle>
-            <EmptyDescription>Add a Slack Bot Token to start managing your workspace.</EmptyDescription>
+            <EmptyTitle>No connections yet</EmptyTitle>
+            <EmptyDescription>
+              Add your Slack Bot Token to start managing your workspace.
+            </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button onClick={() => setShowAddModal(true)}>
-              <Plus className="mr-2 h-4 w-4" /> Add Connection
+            <Button variant="outline" onClick={() => setShowAddModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Connection
             </Button>
+            <p className="text-xs text-muted-foreground">
+              By connecting, you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms</Link> and <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
+            </p>
           </EmptyContent>
         </Empty>
       ) : (
-        <div className="space-y-2">
-          {connections.map((conn) => {
-            const keys = getConnectionKeys(conn.id);
-            const isActive = activeConnection?.id === conn.id;
-            return (
-              <Item key={conn.id} className={isActive ? 'border-green-500/50' : ''}>
-                <ItemMedia>
-                  <MessageSquare className="h-5 w-5" />
-                </ItemMedia>
-                <ItemContent onClick={() => setActiveConnectionId(conn.id)} className="cursor-pointer">
-                  <ItemTitle>
-                    {conn.name}
-                    {isActive && <Badge variant="outline" className="ml-2 text-green-500 border-green-500/50">Active</Badge>}
-                  </ItemTitle>
-                  <ItemDescription>
-                    Created {new Date(conn.created_at).toLocaleDateString()}
-                    {conn.last_used_at && ` · Last used ${new Date(conn.last_used_at).toLocaleDateString()}`}
-                    {keys.length > 0 && ` · ${keys.length} API key${keys.length > 1 ? 's' : ''}`}
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEdit(conn)}>
-                        <Pencil className="mr-2 h-4 w-4" /> Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleGenerateApiKey(conn.id)}>
-                        <Key className="mr-2 h-4 w-4" /> Generate API Key
-                      </DropdownMenuItem>
-                      {keys.map((key) => (
-                        <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" /> Revoke {key.prefix}
-                        </DropdownMenuItem>
+        <div className="rounded-md border max-w-4xl mx-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>API Key</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {connections.map((conn) => {
+                const connKeys = getKeysForConnection(conn.id);
+                return (
+                  <TableRow key={conn.id}>
+                    <TableCell className="font-medium">
+                      {conn.name}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={conn.status === 'active' ? 'success' : 'secondary'} className="capitalize">
+                        {conn.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {connKeys.map((key) => (
+                        <code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
                       ))}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDelete(conn.id)}>
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </ItemActions>
-              </Item>
-            );
-          })}
+                      {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(conn.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8">
+                            <MoreHorizontal />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditConnection(conn)}>
+                            <Pencil className="h-4 w-4" /> Edit Name
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleGenerateApiKey(conn.id)}>
+                            <RefreshCw className="h-4 w-4" /> New Key
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {connKeys.filter(k => k.status === 'active').map(key => (
+                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
+                              <Key className="h-4 w-4" /> Revoke Key
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteConnection(conn.id)}>
+                            <Trash2 className="h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       )}
 
@@ -368,106 +409,138 @@ export default function SlackConnections() {
           <DialogHeader>
             <DialogTitle>Add Slack Connection</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            {formError && <p className="text-sm text-red-500">{formError}</p>}
+          <form onSubmit={handleAddConnection} className="space-y-4">
+            {formError && (
+              <Alert variant="destructive">
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
+            )}
             <Field>
               <FieldLabel>Connection Name</FieldLabel>
-              <Input
-                placeholder="My Workspace"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-              />
+              <InputGroup>
+                <InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput type="text" placeholder="My Workspace" value={formName} onChange={(e) => setFormName(e.target.value)} required />
+              </InputGroup>
             </Field>
             <Field>
               <FieldLabel>Bot Token</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon><Lock /></InputGroupAddon>
+                <InputGroupInput type="password" placeholder="xoxb-..." value={formBotToken} onChange={(e) => setFormBotToken(e.target.value)} required />
+              </InputGroup>
               <FieldDescription>
                 Get your Bot Token from{' '}
-                <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                  Slack App Settings <ExternalLink className="inline h-3 w-3" />
+                <a
+                  href="https://api.slack.com/apps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Slack App Settings
                 </a>
+                {' '}&mdash; create an app and add Bot Token scopes
               </FieldDescription>
-              <Input
-                type="password"
-                placeholder="xoxb-..."
-                value={formBotToken}
-                onChange={(e) => setFormBotToken(e.target.value)}
-              />
             </Field>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
-              <Button onClick={handleCreate} disabled={formLoading || !formName.trim() || !formBotToken.trim()}>
-                {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
+              <Button type="submit" disabled={formLoading} className="flex-1">
+                {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
               </Button>
             </div>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
 
-      {/* API Key Modal */}
+      {/* API Key Display Dialog */}
       <Dialog open={showApiKeyModal} onOpenChange={(open) => { if (!open) { setShowApiKeyModal(false); setNewApiKey(''); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>API Key Generated</DialogTitle>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-900/30 p-2 rounded-full">
+                <Check className="h-6 w-6 text-green-400" />
+              </div>
+              <DialogTitle>Your API Key</DialogTitle>
+            </div>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">Copy this key now. You won't be able to see it again.</p>
-          <InputGroup>
-            <InputGroupInput readOnly value={newApiKey} className="font-mono text-sm" />
-            <InputGroupAddon>
-              <Button variant="secondary" size="icon" onClick={() => copyToClipboard(newApiKey)}>
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </InputGroupAddon>
-          </InputGroup>
-          <Button variant="outline" className="w-full" onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}>
-            Done
+          <Alert className="bg-yellow-900/30 border-yellow-600">
+            <AlertDescription className="text-yellow-300">
+              <strong>Important:</strong> Copy this API key now. You won't be able to see it again!
+            </AlertDescription>
+          </Alert>
+          <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
+            <code className="flex-1 text-sm font-mono break-all text-foreground">{newApiKey}</code>
+            <Button variant="secondary" size="icon" onClick={() => copyToClipboard(newApiKey)}>
+              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </div>
+          <Button
+            onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }}
+            className="w-full"
+          >
+            I've saved my API key
           </Button>
         </DialogContent>
       </Dialog>
 
-      {/* Edit — responsive Dialog/Sheet */}
+      {/* Edit Connection Name - Dialog (desktop) / Sheet (mobile) */}
       {isMobile ? (
         <Sheet open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Rename Connection</SheetTitle>
-            </SheetHeader>
-            {editForm}
+          <SheetContent side="bottom">
+            <SheetHeader><SheetTitle>Edit Connection Name</SheetTitle></SheetHeader>
+            <div className="px-4 py-3">
+              <Field><FieldLabel>Connection Name</FieldLabel>
+                <InputGroup><InputGroupAddon><Tag /></InputGroupAddon>
+                  <InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" />
+                </InputGroup>
+              </Field>
+            </div>
+            <SheetFooter className="px-4 pb-4">
+              <SheetClose asChild><Button variant="outline" className="flex-1">Cancel</Button></SheetClose>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </SheetFooter>
           </SheetContent>
         </Sheet>
       ) : (
         <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Rename Connection</DialogTitle>
-            </DialogHeader>
-            {editForm}
+            <DialogHeader><DialogTitle>Edit Connection Name</DialogTitle></DialogHeader>
+            <Field><FieldLabel>Connection Name</FieldLabel>
+              <InputGroup><InputGroupAddon><Tag /></InputGroupAddon>
+                <InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" />
+              </InputGroup>
+            </Field>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </div>
           </DialogContent>
         </Dialog>
       )}
 
-      {/* Delete connection */}
+      {/* Delete Connection Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Connection</AlertDialogTitle>
             <AlertDialogDescription>
-              This will delete the connection and all associated API keys. This action cannot be undone.
+              Are you sure you want to delete this connection? All API keys will be deleted. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDeleteConnection}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Revoke API key */}
+      {/* Revoke API Key Confirmation */}
       <AlertDialog open={!!deleteKeyTarget} onOpenChange={(open) => !open && setDeleteKeyTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
-            <AlertDialogDescription>This API key will stop working immediately.</AlertDialogDescription>
+            <AlertDialogDescription>
+              Are you sure you want to revoke this API key? This action cannot be undone.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -476,12 +549,14 @@ export default function SlackConnections() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Generate API key confirm */}
+      {/* Generate API Key Confirmation */}
       <AlertDialog open={!!generateKeyTarget} onOpenChange={(open) => !open && setGenerateKeyTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Generate API Key</AlertDialogTitle>
-            <AlertDialogDescription>A new API key will be generated for this connection.</AlertDialogDescription>
+            <AlertDialogTitle>Generate New API Key</AlertDialogTitle>
+            <AlertDialogDescription>
+              A new API key will be generated for this connection. Make sure to copy it — you won't be able to see it again.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
