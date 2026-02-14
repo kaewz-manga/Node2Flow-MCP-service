@@ -282,11 +282,11 @@ export default function Connections() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>API Key</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right"></TableHead>
+                <TableHead className="text-center">Name</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">API Key</TableHead>
+                <TableHead className="text-center">Created</TableHead>
+                <TableHead className="text-center"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
