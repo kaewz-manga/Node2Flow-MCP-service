@@ -559,3 +559,145 @@ export function notionCreateComment(connectionId: string, pageId: string, richTe
 export function notionListUsers(connectionId: string) {
   return notionCall(connectionId, 'notion_list_users');
 }
+
+// ============================================
+// Slack Proxy
+// ============================================
+
+function slackCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('slack', connectionId, tool, args);
+}
+
+// Messages
+export function slackSendMessage(connectionId: string, channel: string, text: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_send_message', { channel, text, ...opts });
+}
+export function slackUpdateMessage(connectionId: string, channel: string, ts: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_update_message', { channel, ts, ...opts });
+}
+export function slackDeleteMessage(connectionId: string, channel: string, ts: string) {
+  return slackCall(connectionId, 'slack_delete_message', { channel, ts });
+}
+export function slackScheduleMessage(connectionId: string, channel: string, postAt: number, text: string) {
+  return slackCall(connectionId, 'slack_schedule_message', { channel, post_at: postAt, text });
+}
+export function slackDeleteScheduledMessage(connectionId: string, channel: string, scheduledMessageId: string) {
+  return slackCall(connectionId, 'slack_delete_scheduled_message', { channel, scheduled_message_id: scheduledMessageId });
+}
+export function slackListScheduledMessages(connectionId: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_list_scheduled_messages', opts || {});
+}
+export function slackGetPermalink(connectionId: string, channel: string, messageTs: string) {
+  return slackCall(connectionId, 'slack_get_permalink', { channel, message_ts: messageTs });
+}
+
+// Conversations
+export function slackListChannels(connectionId: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_list_channels', opts || {});
+}
+export function slackGetChannelInfo(connectionId: string, channel: string) {
+  return slackCall(connectionId, 'slack_get_channel_info', { channel });
+}
+export function slackGetChannelHistory(connectionId: string, channel: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_get_channel_history', { channel, ...opts });
+}
+export function slackGetThreadReplies(connectionId: string, channel: string, ts: string) {
+  return slackCall(connectionId, 'slack_get_thread_replies', { channel, ts });
+}
+export function slackGetChannelMembers(connectionId: string, channel: string) {
+  return slackCall(connectionId, 'slack_get_channel_members', { channel });
+}
+export function slackCreateChannel(connectionId: string, name: string, isPrivate?: boolean) {
+  const args: Record<string, unknown> = { name };
+  if (isPrivate) args.is_private = true;
+  return slackCall(connectionId, 'slack_create_channel', args);
+}
+export function slackArchiveChannel(connectionId: string, channel: string) {
+  return slackCall(connectionId, 'slack_archive_channel', { channel });
+}
+export function slackInviteToChannel(connectionId: string, channel: string, users: string) {
+  return slackCall(connectionId, 'slack_invite_to_channel', { channel, users });
+}
+export function slackKickFromChannel(connectionId: string, channel: string, user: string) {
+  return slackCall(connectionId, 'slack_kick_from_channel', { channel, user });
+}
+export function slackJoinChannel(connectionId: string, channel: string) {
+  return slackCall(connectionId, 'slack_join_channel', { channel });
+}
+export function slackSetChannelTopic(connectionId: string, channel: string, topic: string) {
+  return slackCall(connectionId, 'slack_set_channel_topic', { channel, topic });
+}
+export function slackOpenConversation(connectionId: string, users: string) {
+  return slackCall(connectionId, 'slack_open_conversation', { users });
+}
+
+// Users
+export function slackListUsers(connectionId: string) {
+  return slackCall(connectionId, 'slack_list_users');
+}
+export function slackGetUserInfo(connectionId: string, user: string) {
+  return slackCall(connectionId, 'slack_get_user_info', { user });
+}
+
+// Reactions
+export function slackAddReaction(connectionId: string, channel: string, timestamp: string, name: string) {
+  return slackCall(connectionId, 'slack_add_reaction', { channel, timestamp, name });
+}
+export function slackRemoveReaction(connectionId: string, channel: string, timestamp: string, name: string) {
+  return slackCall(connectionId, 'slack_remove_reaction', { channel, timestamp, name });
+}
+export function slackGetReactions(connectionId: string, channel: string, timestamp: string) {
+  return slackCall(connectionId, 'slack_get_reactions', { channel, timestamp });
+}
+
+// Search
+export function slackSearchMessages(connectionId: string, query: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_search_messages', { query, ...opts });
+}
+export function slackSearchFiles(connectionId: string, query: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_search_files', { query, ...opts });
+}
+
+// Files
+export function slackUploadFile(connectionId: string, content: string, filename: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_upload_file', { content, filename, ...opts });
+}
+export function slackListFiles(connectionId: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_list_files', opts || {});
+}
+export function slackDeleteFile(connectionId: string, file: string) {
+  return slackCall(connectionId, 'slack_delete_file', { file });
+}
+
+// Pins
+export function slackPinMessage(connectionId: string, channel: string, timestamp: string) {
+  return slackCall(connectionId, 'slack_pin_message', { channel, timestamp });
+}
+export function slackUnpinMessage(connectionId: string, channel: string, timestamp: string) {
+  return slackCall(connectionId, 'slack_unpin_message', { channel, timestamp });
+}
+export function slackListPins(connectionId: string, channel: string) {
+  return slackCall(connectionId, 'slack_list_pins', { channel });
+}
+
+// Bookmarks
+export function slackAddBookmark(connectionId: string, channelId: string, title: string, link: string) {
+  return slackCall(connectionId, 'slack_add_bookmark', { channel_id: channelId, title, link });
+}
+export function slackEditBookmark(connectionId: string, bookmarkId: string, channelId: string, opts?: Record<string, unknown>) {
+  return slackCall(connectionId, 'slack_edit_bookmark', { bookmark_id: bookmarkId, channel_id: channelId, ...opts });
+}
+export function slackRemoveBookmark(connectionId: string, bookmarkId: string, channelId: string) {
+  return slackCall(connectionId, 'slack_remove_bookmark', { bookmark_id: bookmarkId, channel_id: channelId });
+}
+export function slackListBookmarks(connectionId: string, channelId: string) {
+  return slackCall(connectionId, 'slack_list_bookmarks', { channel_id: channelId });
+}
+
+// Team & Emoji
+export function slackGetTeamInfo(connectionId: string) {
+  return slackCall(connectionId, 'slack_get_team_info');
+}
+export function slackListEmoji(connectionId: string) {
+  return slackCall(connectionId, 'slack_list_emoji');
+}

@@ -1110,7 +1110,7 @@ Node2Flow-MCP-service/
 │           │   ├── platform-api.ts    # Platform Worker API (~40 functions)
 │           │   └── gateway-api.ts     # Gateway Worker API (connections + proxy)
 │           ├── plugins/
-│           │   ├── registry.ts        # Plugin registration (11 plugins)
+│           │   ├── registry.ts        # Plugin registration (12 plugins)
 │           │   ├── n8n/               # n8n plugin (7 pages + content)
 │           │   ├── wordpress/         # WordPress plugin (6 pages + content)
 │           │   ├── cl-n8n-mcp/        # cl-n8n-mcp plugin (5 pages + content)
@@ -1118,6 +1118,7 @@ Node2Flow-MCP-service/
 │           │   ├── line/              # LINE plugin (4 pages + content)
 │           │   ├── telegram/          # Telegram plugin (4 pages + content)
 │           │   ├── notion/            # Notion plugin (4 pages + content)
+│           │   ├── slack/             # Slack plugin (5 pages + content)
 │           │   ├── notion-official/   # Notion Official (Connections + content)
 │           │   ├── line-official/     # LINE Official (Connections + content)
 │           │   ├── playwright/        # Playwright (Connections + content)
@@ -1204,6 +1205,7 @@ wrangler deploy                         # In each app/
 **Session 48**: API key system overhaul — expiry dates, OAuth default scope, hard delete, 3 audit bug fixes
 **Session 49**: Revoke Key UX — rename Delete→Revoke, AlertDialog for connection keys (no 2FA), emergency bulk revoke in Settings
 **Session 50**: Slack plugin — 38 tools (Messages, Conversations, Users, Reactions, Search, Files, Pins, Bookmarks, Team, Emoji) → 304 total tools
+**Session 51**: Slack dashboard pages — 4 sub-pages (Messages, Channels, Files & Pins) + content + 38 API helpers in gateway-api.ts
 
 ### Session 48: API Key System Improvements — Expiry Dates, OAuth Scope, Hard Delete (2026-02-14)
 
@@ -1362,4 +1364,36 @@ Added Slack Web API plugin to MCP Gateway — 38 tools ported from `@node2flow/s
 6. **Gateway total**: 304 tools across 12 plugins (8 In-Worker + 4 Docker/VPS)
 
 **Deployed**: `mcp.node2flow.net` — 306.20 KiB / gzip: 50.01 KiB
+**Date**: 2026-02-14
+
+### Session 51: Slack Dashboard Pages (2026-02-14)
+
+Added 4 functional dashboard pages for the Slack plugin + content metadata + 38 API helpers.
+
+1. **5 new files** in `apps/dashboard/src/plugins/slack/`:
+   - `Connections.tsx` — Connection CRUD (bot_token), API key generation, responsive edit Dialog/Sheet, MCP endpoint display
+   - `MessageTools.tsx` — Send message, schedule message, search messages, workspace info card
+   - `ChannelList.tsx` — List/create/archive channels, channel history, members, set topic, expand/collapse
+   - `FileManager.tsx` — Upload files (text content), list files, delete files, search files, view pinned items
+   - `content.tsx` — Landing (4 features, 4 setup steps, demo code), dashboard quickstart, docs (connection guide, scopes list, example prompts), FAQ (3 categories: Setup, Usage, Troubleshooting)
+
+2. **Updated `registry.ts`** — Registered `slackPlugin` as 12th dashboard plugin:
+   - Sidebar: Connections, Messages, Channels, Files & Pins
+   - 4 lazy-loaded routes: `/slack/connections`, `/slack/messages`, `/slack/channels`, `/slack/files`
+   - Logo: `cdn.simpleicons.org/slack/4A154B`
+
+3. **Updated `gateway-api.ts`** — Added `slackCall()` + 38 Slack API helper functions:
+   - Messages (7): slackSendMessage, slackUpdateMessage, slackDeleteMessage, slackScheduleMessage, slackDeleteScheduledMessage, slackListScheduledMessages, slackGetPermalink
+   - Conversations (13): slackListChannels, slackGetChannelInfo, slackGetChannelHistory, slackGetThreadReplies, slackGetChannelMembers, slackCreateChannel, slackArchiveChannel, slackInviteToChannel, slackKickFromChannel, slackJoinChannel, slackSetChannelTopic, slackOpenConversation
+   - Users (2): slackListUsers, slackGetUserInfo
+   - Reactions (3): slackAddReaction, slackRemoveReaction, slackGetReactions
+   - Search (2): slackSearchMessages, slackSearchFiles
+   - Files (3): slackUploadFile, slackListFiles, slackDeleteFile
+   - Pins (3): slackPinMessage, slackUnpinMessage, slackListPins
+   - Bookmarks (4): slackAddBookmark, slackEditBookmark, slackRemoveBookmark, slackListBookmarks
+   - Team/Emoji (2): slackGetTeamInfo, slackListEmoji
+
+4. **TypeScript**: 0 errors (tsc --noEmit clean)
+
+**Deployed**: `app.node2flow.net` (CF Pages)
 **Date**: 2026-02-14

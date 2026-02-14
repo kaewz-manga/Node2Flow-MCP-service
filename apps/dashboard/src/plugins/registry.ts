@@ -407,7 +407,41 @@ const googleWorkspacePlugin: AppPlugin = {
 };
 
 // ============================================
+// Slack Plugin
+// ============================================
+
+import { slackContent } from './slack/content';
+import {
+  MessageSquare as SlackIcon,
+  Link as SlackLinkIcon,
+  Send as SlackSend,
+  Hash as SlackHash,
+  Paperclip as SlackFiles,
+} from 'lucide-react';
+
+const slackPlugin: AppPlugin = {
+  id: 'slack',
+  name: 'Slack',
+  icon: SlackIcon,
+  logo: 'https://cdn.simpleicons.org/slack/4A154B',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/slack/connections', icon: SlackLinkIcon },
+    { name: 'Messages', href: '/slack/messages', icon: SlackSend },
+    { name: 'Channels', href: '/slack/channels', icon: SlackHash },
+    { name: 'Files & Pins', href: '/slack/files', icon: SlackFiles },
+  ],
+  routes: [
+    { path: '/slack/connections', component: lazy(() => import('./slack/Connections')) },
+    { path: '/slack/messages', component: lazy(() => import('./slack/MessageTools')) },
+    { path: '/slack/channels', component: lazy(() => import('./slack/ChannelList')) },
+    { path: '/slack/files', component: lazy(() => import('./slack/FileManager')) },
+  ],
+  content: slackContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin];
