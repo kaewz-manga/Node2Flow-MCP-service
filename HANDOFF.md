@@ -105,6 +105,7 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugins/line-official/` | 4 files | LINE Official: 12 tools, VPS proxy |
 | `plugins/playwright/` | 4 files | Playwright: 22 tools, VPS proxy |
 | `plugins/google-workspace/` | 4 files | Google Workspace: 54 tools, VPS proxy |
+| `plugins/slack/` | 4 files | Slack: 38 tools, Slack Web API |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -205,7 +206,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (266 tools across 11 plugins) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (304 tools across 12 plugins) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -492,7 +493,7 @@ All containers: 512MB mem_limit, mcp-http-bridge.mjs, AUTH_TOKEN env.
 
 | Type | Plugins | How it works |
 |------|---------|-------------|
-| **In-Worker** (7) | n8n, wordpress, cl-n8n-mcp, gemini-rag, line, telegram, notion | Custom code calls REST API directly |
+| **In-Worker** (8) | n8n, wordpress, cl-n8n-mcp, gemini-rag, line, telegram, notion, slack | Custom code calls REST API directly |
 | **Docker/VPS** (4) | notion-official, line-official, playwright, google-workspace | Proxy to MCP packages via mcp-http-bridge |
 | **Hybrid** | cl-n8n-mcp | In-Worker code but proxies to VPS MCP server |
 
@@ -1091,6 +1092,7 @@ Node2Flow-MCP-service/
 │   │   │       ├── line-official/   # 12 tools, VPS proxy (Docker)
 │   │   │       ├── playwright/     # 22 tools, VPS proxy (Docker)
 │   │   │       ├── google-workspace/ # 54 tools, VPS proxy (Docker)
+│   │   │       ├── slack/           # 38 tools, Slack Web API
 │   │   │       └── _template/        # New plugin template
 │   │   └── wrangler.toml
 │   │
@@ -1189,7 +1191,7 @@ wrangler deploy                         # In each app/
 **Session 38**: Gemini RAG + Notion bug fixes (camelCase/snake_case, response key, API version)
 **Session 39**: Pagination (8 pages), Create Database dialog, Custom Metadata UI, shadcn migration, usage UPSERT fix, LINE shadcn fix
 **Session 40**: Remove orange/emerald → neutral white `--primary` + Tailwind `green-*` for success + responsive Dialog/Sheet
-**Gateway**: 266 tools across 11 plugins (7 In-Worker + 4 Docker/VPS)
+**Gateway**: 304 tools across 12 plugins (8 In-Worker + 4 Docker/VPS)
 **VPS**: 5 Docker containers on ports 3011-3016 (n8n-mcp-dynamic, notion, line, playwright, google-workspace)
 **Branding**: Rebranded from "n8n Management MCP" → "Node2Flow" across all pages (`f80107d`)
 **Session 40**: Remove orange/emerald colors → neutral white primary + green semantic + default shadcn buttons
@@ -1201,6 +1203,7 @@ wrangler deploy                         # In each app/
 **Session 45b**: Dashboard UI — Settings → API Keys tab with scope presets (Full Access / Read Only / Custom)
 **Session 48**: API key system overhaul — expiry dates, OAuth default scope, hard delete, 3 audit bug fixes
 **Session 49**: Revoke Key UX — rename Delete→Revoke, AlertDialog for connection keys (no 2FA), emergency bulk revoke in Settings
+**Session 50**: Slack plugin — 38 tools (Messages, Conversations, Users, Reactions, Search, Files, Pins, Bookmarks, Team, Emoji) → 304 total tools
 
 ### Session 48: API Key System Improvements — Expiry Dates, OAuth Scope, Hard Delete (2026-02-14)
 
@@ -1330,5 +1333,33 @@ Fixed 3 critical bugs discovered during API key system audit.
 
 ---
 
-**Deployed**: 2026-02-13 — Platform + Gateway + Dashboard all live
-**Date**: 2026-02-13
+### Session 50: Slack Plugin (2026-02-14)
+
+Added Slack Web API plugin to MCP Gateway — 38 tools ported from `@node2flow/slack-mcp` community npm.
+
+1. **4 new files** in `apps/mcp-gateway/src/plugins/slack/`:
+   - `types.ts` — SlackConfig, SlackUser, SlackChannel, SlackMessage, SlackFile, etc.
+   - `client.ts` — SlackClient with 38 methods (Bearer auth, `ok` field checking, 2-step file upload)
+   - `tools.ts` — 38 MCP tool definitions with annotations
+   - `index.ts` — Plugin entry: `createClient(config)` + `handleToolCall()` switch
+
+2. **Updated `plugin-registry.ts`** — registered `slackPlugin` as 12th plugin
+
+3. **38 tools across 10 categories**:
+   - Messages (7): send, update, delete, schedule, delete scheduled, list scheduled, get permalink
+   - Conversations (12): list channels, get info, history, thread replies, members, create, archive, invite, kick, join, set topic, open DM
+   - Users (2): list, get info
+   - Reactions (3): add, remove, get
+   - Search (2): messages, files
+   - Files (3): upload, list, delete
+   - Pins (3): pin, unpin, list
+   - Bookmarks (4): add, edit, remove, list
+   - Team (1): get info
+   - Emoji (1): list custom emoji
+
+4. **Config key**: `bot_token` in encrypted connection config
+5. **Type**: In-Worker (calls `https://slack.com/api/*` directly)
+6. **Gateway total**: 304 tools across 12 plugins (8 In-Worker + 4 Docker/VPS)
+
+**Deployed**: `mcp.node2flow.net` — 306.20 KiB / gzip: 50.01 KiB
+**Date**: 2026-02-14

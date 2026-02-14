@@ -10,6 +10,7 @@ import { notionOfficialPlugin } from './plugins/notion-official';
 import { lineOfficialPlugin } from './plugins/line-official';
 import { playwrightPlugin } from './plugins/playwright';
 import { googleWorkspacePlugin } from './plugins/google-workspace';
+import { slackPlugin } from './plugins/slack';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -25,6 +26,7 @@ PLUGINS.set('notion-official', notionOfficialPlugin);
 PLUGINS.set('line-official', lineOfficialPlugin);
 PLUGINS.set('playwright', playwrightPlugin);
 PLUGINS.set('google-workspace', googleWorkspacePlugin);
+PLUGINS.set('slack', slackPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);
