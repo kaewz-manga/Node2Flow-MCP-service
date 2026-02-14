@@ -370,7 +370,7 @@ const playwrightPlugin: AppPlugin = {
   id: 'playwright',
   name: 'Browser Automation',
   icon: PlaywrightIcon,
-  logo: 'https://playwright.dev/img/playwright-logo.svg',
+  logo: '/logos/playwright.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/playwright/connections', icon: PlaywrightLinkIcon },

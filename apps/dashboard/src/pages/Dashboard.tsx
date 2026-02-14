@@ -54,7 +54,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   slack: '/logos/slack.png',
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
   'notion-official': 'https://cdn.simpleicons.org/notion/FFFFFF',
-  playwright: 'https://playwright.dev/img/playwright-logo.svg',
+  playwright: '/logos/playwright.svg',
   'google-workspace': 'https://cdn.simpleicons.org/google/4285F4',
 };
 
