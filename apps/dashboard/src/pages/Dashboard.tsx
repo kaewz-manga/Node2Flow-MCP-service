@@ -42,15 +42,18 @@ const TOOL_COUNTS: Record<string, number> = {
   'google-workspace': 54,
 };
 
-// Real brand logos via SimpleIcons CDN
+// Brand logos — local for custom, CDN for standard
 const SERVICE_LOGOS: Record<string, string> = {
   n8n: 'https://cdn.simpleicons.org/n8n/EA4B71',
   wordpress: 'https://cdn.simpleicons.org/wordpress/21759B',
   'cl-n8n-mcp': 'https://cdn.simpleicons.org/n8n/FF8C69',
   'gemini-rag': '/logos/gemini.png',
   line: '/logos/line.png',
+  'line-official': '/logos/line.png',
   telegram: '/logos/telegram.svg',
+  slack: '/logos/slack.png',
   notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  'notion-official': 'https://cdn.simpleicons.org/notion/FFFFFF',
   playwright: 'https://playwright.dev/img/playwright-logo.svg',
   'google-workspace': 'https://cdn.simpleicons.org/google/4285F4',
 };
