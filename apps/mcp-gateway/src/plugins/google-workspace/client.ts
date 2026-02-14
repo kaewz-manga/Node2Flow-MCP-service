@@ -19,6 +19,16 @@ export class GoogleWorkspaceClient {
       headers['Authorization'] = `Bearer ${this.config.authToken}`;
     }
 
+    // Pass user's Google credentials per-request via headers
+    // Priority: OAuth token > service account JSON
+    if (this.config.oauthToken) {
+      headers['x-service-token'] = this.config.oauthToken;
+      headers['x-service-token-env'] = 'GOOGLE_OAUTH_TOKEN';
+    } else if (this.config.serviceAccountJson) {
+      headers['x-service-token'] = this.config.serviceAccountJson;
+      headers['x-service-token-env'] = 'GOOGLE_SERVICE_ACCOUNT';
+    }
+
     const response = await fetch(mcpEndpoint, {
       method: 'POST',
       headers,

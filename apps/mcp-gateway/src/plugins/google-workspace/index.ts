@@ -20,10 +20,12 @@ export const googleWorkspacePlugin: MCPPlugin = {
   version: '1.0.0',
   tools: TOOLS,
 
-  createClient(_config: Record<string, unknown>, env?: Env) {
+  createClient(config: Record<string, unknown>, env?: Env) {
     return new GoogleWorkspaceClient({
       mcpUrl: env?.GOOGLE_WORKSPACE_MCP_URL || 'https://google-workspace-mcp.node2flow.net',
       authToken: env?.GOOGLE_WORKSPACE_MCP_AUTH_TOKEN,
+      serviceAccountJson: config.service_account_json as string | undefined,
+      oauthToken: config.oauth_token as string | undefined,
     });
   },
 
