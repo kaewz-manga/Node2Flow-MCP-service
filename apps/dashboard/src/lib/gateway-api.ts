@@ -703,6 +703,181 @@ export function slackListEmoji(connectionId: string) {
 }
 
 // ============================================
+// Airtable Proxy
+// ============================================
+
+function atCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('airtable', connectionId, tool, args);
+}
+
+// Records
+export function atListRecords(connectionId: string, baseId: string, tableIdOrName: string, opts?: Record<string, unknown>) {
+  return atCall(connectionId, 'airtable_list_records', { base_id: baseId, table_id_or_name: tableIdOrName, ...opts });
+}
+export function atGetRecord(connectionId: string, baseId: string, tableIdOrName: string, recordId: string) {
+  return atCall(connectionId, 'airtable_get_record', { base_id: baseId, table_id_or_name: tableIdOrName, record_id: recordId });
+}
+export function atCreateRecords(connectionId: string, baseId: string, tableIdOrName: string, records: unknown[], typecast?: boolean) {
+  const args: Record<string, unknown> = { base_id: baseId, table_id_or_name: tableIdOrName, records };
+  if (typecast) args.typecast = true;
+  return atCall(connectionId, 'airtable_create_records', args);
+}
+export function atUpdateRecords(connectionId: string, baseId: string, tableIdOrName: string, records: unknown[], typecast?: boolean) {
+  const args: Record<string, unknown> = { base_id: baseId, table_id_or_name: tableIdOrName, records };
+  if (typecast) args.typecast = true;
+  return atCall(connectionId, 'airtable_update_records', args);
+}
+export function atDeleteRecords(connectionId: string, baseId: string, tableIdOrName: string, recordIds: string[]) {
+  return atCall(connectionId, 'airtable_delete_records', { base_id: baseId, table_id_or_name: tableIdOrName, record_ids: recordIds });
+}
+export function atUpsertRecords(connectionId: string, baseId: string, tableIdOrName: string, records: unknown[], fieldsToMergeOn: string[]) {
+  return atCall(connectionId, 'airtable_upsert_records', { base_id: baseId, table_id_or_name: tableIdOrName, records, fields_to_merge_on: fieldsToMergeOn });
+}
+
+// Bases & Schema
+export function atListBases(connectionId: string) {
+  return atCall(connectionId, 'airtable_list_bases');
+}
+export function atGetBaseSchema(connectionId: string, baseId: string) {
+  return atCall(connectionId, 'airtable_get_base_schema', { base_id: baseId });
+}
+export function atCreateTable(connectionId: string, baseId: string, name: string, fields: unknown[], description?: string) {
+  const args: Record<string, unknown> = { base_id: baseId, name, fields };
+  if (description) args.description = description;
+  return atCall(connectionId, 'airtable_create_table', args);
+}
+
+// Webhooks
+export function atListWebhooks(connectionId: string, baseId: string) {
+  return atCall(connectionId, 'airtable_list_webhooks', { base_id: baseId });
+}
+export function atCreateWebhook(connectionId: string, baseId: string, notificationUrl: string, specification?: Record<string, unknown>) {
+  const args: Record<string, unknown> = { base_id: baseId, notification_url: notificationUrl };
+  if (specification) args.specification = specification;
+  return atCall(connectionId, 'airtable_create_webhook', args);
+}
+export function atDeleteWebhook(connectionId: string, baseId: string, webhookId: string) {
+  return atCall(connectionId, 'airtable_delete_webhook', { base_id: baseId, webhook_id: webhookId });
+}
+
+// ============================================
+// YouTube Proxy
+// ============================================
+
+function ytCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('youtube', connectionId, tool, args);
+}
+
+// Search & Discovery
+export function ytSearch(connectionId: string, q?: string, opts?: Record<string, unknown>) {
+  const args: Record<string, unknown> = { ...opts };
+  if (q) args.q = q;
+  return ytCall(connectionId, 'youtube_search', args);
+}
+export function ytGetVideo(connectionId: string, id: string, part?: string) {
+  const args: Record<string, unknown> = { id };
+  if (part) args.part = part;
+  return ytCall(connectionId, 'youtube_get_video', args);
+}
+export function ytGetChannel(connectionId: string, id?: string, forUsername?: string) {
+  const args: Record<string, unknown> = {};
+  if (id) args.id = id;
+  if (forUsername) args.for_username = forUsername;
+  return ytCall(connectionId, 'youtube_get_channel', args);
+}
+export function ytGetPopularVideos(connectionId: string, opts?: Record<string, unknown>) {
+  return ytCall(connectionId, 'youtube_get_popular_videos', opts || {});
+}
+
+// Playlists
+export function ytListPlaylists(connectionId: string, opts?: Record<string, unknown>) {
+  return ytCall(connectionId, 'youtube_list_playlists', opts || {});
+}
+export function ytListPlaylistItems(connectionId: string, playlistId: string, opts?: Record<string, unknown>) {
+  return ytCall(connectionId, 'youtube_list_playlist_items', { playlist_id: playlistId, ...opts });
+}
+export function ytCreatePlaylist(connectionId: string, title: string, description?: string, privacyStatus?: string) {
+  const args: Record<string, unknown> = { title };
+  if (description) args.description = description;
+  if (privacyStatus) args.privacy_status = privacyStatus;
+  return ytCall(connectionId, 'youtube_create_playlist', args);
+}
+export function ytDeletePlaylist(connectionId: string, playlistId: string) {
+  return ytCall(connectionId, 'youtube_delete_playlist', { playlist_id: playlistId });
+}
+export function ytAddPlaylistItem(connectionId: string, playlistId: string, videoId: string, position?: number) {
+  const args: Record<string, unknown> = { playlist_id: playlistId, video_id: videoId };
+  if (position !== undefined) args.position = position;
+  return ytCall(connectionId, 'youtube_add_playlist_item', args);
+}
+export function ytRemovePlaylistItem(connectionId: string, playlistItemId: string) {
+  return ytCall(connectionId, 'youtube_remove_playlist_item', { playlist_item_id: playlistItemId });
+}
+
+// Comments
+export function ytListComments(connectionId: string, opts?: Record<string, unknown>) {
+  return ytCall(connectionId, 'youtube_list_comments', opts || {});
+}
+export function ytPostComment(connectionId: string, videoId: string, text: string) {
+  return ytCall(connectionId, 'youtube_post_comment', { video_id: videoId, text });
+}
+export function ytReplyComment(connectionId: string, parentId: string, text: string) {
+  return ytCall(connectionId, 'youtube_reply_comment', { parent_id: parentId, text });
+}
+export function ytDeleteComment(connectionId: string, commentId: string) {
+  return ytCall(connectionId, 'youtube_delete_comment', { comment_id: commentId });
+}
+
+// Engagement
+export function ytRateVideo(connectionId: string, videoId: string, rating: string) {
+  return ytCall(connectionId, 'youtube_rate_video', { video_id: videoId, rating });
+}
+
+// ============================================
+// PostgREST Proxy
+// ============================================
+
+function pgCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('postgrest', connectionId, tool, args);
+}
+
+// Schema
+export function pgGetSchema(connectionId: string) {
+  return pgCall(connectionId, 'pg_get_schema');
+}
+export function pgDescribeTable(connectionId: string, table: string) {
+  return pgCall(connectionId, 'pg_describe_table', { table });
+}
+
+// Read
+export function pgListRecords(connectionId: string, table: string, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_list_records', { table, ...opts });
+}
+export function pgCountRecords(connectionId: string, table: string, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_count_records', { table, ...opts });
+}
+export function pgCallFunction(connectionId: string, functionName: string, params?: Record<string, unknown>, method?: string) {
+  const args: Record<string, unknown> = { function_name: functionName };
+  if (params) args.params = params;
+  if (method) args.method = method;
+  return pgCall(connectionId, 'pg_call_function', args);
+}
+
+// Write
+export function pgInsertRecords(connectionId: string, table: string, records: unknown, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_insert_records', { table, records, ...opts });
+}
+export function pgUpdateRecords(connectionId: string, table: string, filter: string, data: Record<string, unknown>, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_update_records', { table, filter, data, ...opts });
+}
+export function pgUpsertRecords(connectionId: string, table: string, records: unknown, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_upsert_records', { table, records, ...opts });
+}
+export function pgDeleteRecords(connectionId: string, table: string, filter: string, opts?: Record<string, unknown>) {
+  return pgCall(connectionId, 'pg_delete_records', { table, filter, ...opts });
+}
+
+// ============================================
 // Google Workspace OAuth
 // ============================================
 

@@ -444,7 +444,82 @@ const slackPlugin: AppPlugin = {
 };
 
 // ============================================
+// Airtable Plugin
+// ============================================
+
+import { airtableContent } from './airtable/content';
+import {
+  Table2 as AirtableIcon,
+  Link as AirtableLinkIcon,
+} from 'lucide-react';
+
+const airtablePlugin: AppPlugin = {
+  id: 'airtable',
+  name: 'Airtable',
+  icon: AirtableIcon,
+  logo: '/logos/airtable.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/airtable/connections', icon: AirtableLinkIcon },
+  ],
+  routes: [
+    { path: '/airtable/connections', component: lazy(() => import('./airtable/Connections')) },
+  ],
+  content: airtableContent,
+};
+
+// ============================================
+// YouTube Plugin
+// ============================================
+
+import { youtubeContent } from './youtube/content';
+import {
+  Play as YouTubeIcon,
+  Link as YouTubeLinkIcon,
+} from 'lucide-react';
+
+const youtubePlugin: AppPlugin = {
+  id: 'youtube',
+  name: 'YouTube',
+  icon: YouTubeIcon,
+  logo: '/logos/youtube.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/youtube/connections', icon: YouTubeLinkIcon },
+  ],
+  routes: [
+    { path: '/youtube/connections', component: lazy(() => import('./youtube/Connections')) },
+  ],
+  content: youtubeContent,
+};
+
+// ============================================
+// PostgREST Plugin
+// ============================================
+
+import { postgrestContent } from './postgrest/content';
+import {
+  Database as PostgrestIcon,
+  Link as PostgrestLinkIcon,
+} from 'lucide-react';
+
+const postgrestPlugin: AppPlugin = {
+  id: 'postgrest',
+  name: 'PostgREST',
+  icon: PostgrestIcon,
+  logo: '/logos/postgrest.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/postgrest/connections', icon: PostgrestLinkIcon },
+  ],
+  routes: [
+    { path: '/postgrest/connections', component: lazy(() => import('./postgrest/Connections')) },
+  ],
+  content: postgrestContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin];

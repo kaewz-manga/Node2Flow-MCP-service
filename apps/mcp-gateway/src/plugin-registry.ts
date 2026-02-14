@@ -11,6 +11,9 @@ import { lineOfficialPlugin } from './plugins/line-official';
 import { playwrightPlugin } from './plugins/playwright';
 import { googleWorkspacePlugin } from './plugins/google-workspace';
 import { slackPlugin } from './plugins/slack';
+import { airtablePlugin } from './plugins/airtable';
+import { youtubePlugin } from './plugins/youtube';
+import { postgrestPlugin } from './plugins/postgrest';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -27,6 +30,9 @@ PLUGINS.set('line-official', lineOfficialPlugin);
 PLUGINS.set('playwright', playwrightPlugin);
 PLUGINS.set('google-workspace', googleWorkspacePlugin);
 PLUGINS.set('slack', slackPlugin);
+PLUGINS.set('airtable', airtablePlugin);
+PLUGINS.set('youtube', youtubePlugin);
+PLUGINS.set('postgrest', postgrestPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);
