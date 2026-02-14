@@ -24,7 +24,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const LOGO = 'https://cdn.simpleicons.org/notion/ffffff';
+const LOGO = '/logos/notion.svg';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

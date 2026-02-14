@@ -23,7 +23,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const LOGO = 'https://cdn.simpleicons.org/google/4285F4';
+const LOGO = '/logos/google.svg';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

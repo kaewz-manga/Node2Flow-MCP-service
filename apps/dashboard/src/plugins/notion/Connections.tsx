@@ -234,7 +234,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="https://cdn.simpleicons.org/notion/FFFFFF" alt="Notion" className="h-10 w-10" />
+          <img src="/logos/notion.svg" alt="Notion" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>

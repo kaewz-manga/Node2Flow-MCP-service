@@ -44,18 +44,18 @@ const TOOL_COUNTS: Record<string, number> = {
 
 // Brand logos — local for custom, CDN for standard
 const SERVICE_LOGOS: Record<string, string> = {
-  n8n: 'https://cdn.simpleicons.org/n8n/EA4B71',
-  wordpress: 'https://cdn.simpleicons.org/wordpress/21759B',
-  'cl-n8n-mcp': 'https://cdn.simpleicons.org/n8n/FF8C69',
+  n8n: '/logos/n8n.svg',
+  wordpress: '/logos/wordpress.svg',
+  'cl-n8n-mcp': '/logos/n8n-alt.svg',
   'gemini-rag': '/logos/gemini.png',
   line: '/logos/line.png',
   'line-official': '/logos/line.png',
   telegram: '/logos/telegram.svg',
   slack: '/logos/slack.png',
-  notion: 'https://cdn.simpleicons.org/notion/FFFFFF',
-  'notion-official': 'https://cdn.simpleicons.org/notion/FFFFFF',
+  notion: '/logos/notion.svg',
+  'notion-official': '/logos/notion.svg',
   playwright: '/logos/playwright.svg',
-  'google-workspace': 'https://cdn.simpleicons.org/google/4285F4',
+  'google-workspace': '/logos/google.svg',
 };
 
 export default function Dashboard() {

@@ -81,7 +81,7 @@ const n8nPlugin: AppPlugin = {
   id: 'n8n',
   name: 'n8n Management',
   icon: Server,
-  logo: 'https://cdn.simpleicons.org/n8n/EA4B71',
+  logo: '/logos/n8n.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/n8n/connections', icon: LinkIcon },
@@ -120,7 +120,7 @@ const wordpressPlugin: AppPlugin = {
   id: 'wordpress',
   name: 'WordPress',
   icon: Globe,
-  logo: 'https://cdn.simpleicons.org/wordpress/21759B',
+  logo: '/logos/wordpress.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/wordpress/connections', icon: WPLinkIcon },
@@ -156,7 +156,7 @@ const clN8nMcpPlugin: AppPlugin = {
   id: 'cl-n8n-mcp',
   name: 'Workflow Builder',
   icon: Cpu,
-  logo: 'https://cdn.simpleicons.org/n8n/FF8C69',
+  logo: '/logos/n8n-alt.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/cl-n8n-mcp/connections', icon: McpLinkIcon },
@@ -289,7 +289,7 @@ const notionPlugin: AppPlugin = {
   id: 'notion',
   name: 'Notion',
   icon: NotionIcon,
-  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  logo: '/logos/notion.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/notion/connections', icon: NotionLinkIcon },
@@ -320,7 +320,7 @@ const notionOfficialPlugin: AppPlugin = {
   id: 'notion-official',
   name: 'Notion (Official)',
   icon: NotionOffIcon,
-  logo: 'https://cdn.simpleicons.org/notion/FFFFFF',
+  logo: '/logos/notion.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/notion-official/connections', icon: NotionOffLinkIcon },
@@ -395,7 +395,7 @@ const googleWorkspacePlugin: AppPlugin = {
   id: 'google-workspace',
   name: 'Google Workspace',
   icon: GWSIcon,
-  logo: 'https://cdn.simpleicons.org/google/4285F4',
+  logo: '/logos/google.svg',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-workspace/connections', icon: GWSLinkIcon },

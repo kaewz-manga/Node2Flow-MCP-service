@@ -91,7 +91,7 @@ const SESSION_OPTIONS = [
 
 const OAUTH_LOGOS: Record<string, string> = {
   google: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-  github: 'https://cdn.simpleicons.org/github/white',
+  github: '/logos/github.svg',
 };
 
 export default function Settings() {
