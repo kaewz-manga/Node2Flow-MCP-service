@@ -1432,3 +1432,37 @@ Added 4 functional dashboard pages for the Slack plugin + content metadata + 38 
 
 **Deployed**: `app.node2flow.net` (CF Pages)
 **Date**: 2026-02-14
+
+### Session 52: Slack Pattern Fix + Local Logos + Dashboard UI Polish (2026-02-14)
+
+Rewrote Slack Connections page, migrated all logos from CDN to local, and polished Dashboard + Connection table UI.
+
+1. **Slack Connections.tsx rewrite** — Full rewrite to match established plugin pattern (Table layout, 2FA alert, MCP endpoint Item, InputGroup forms, green-check API key modal, responsive edit Dialog/Sheet)
+
+2. **Local logos** — Migrated all 11 logos from external CDN to `apps/dashboard/public/logos/`:
+   - User-provided: `telegram.svg`, `line.png`, `gemini.png`, `slack.png`
+   - Downloaded: `playwright.svg`, `n8n.svg`, `n8n-alt.svg`, `wordpress.svg`, `notion.svg`, `google.svg`, `github.svg`
+   - Updated: `registry.ts` (12 plugins), `Dashboard.tsx` (SERVICE_LOGOS 12 entries), `Settings.tsx` (OAUTH_LOGOS), 10 Connections.tsx files
+   - Zero external CDN references remaining
+
+3. **Connection table UI** — All 12 plugins:
+   - Removed "Actions" column header text (empty column header)
+   - Replaced Active badge with green dot (`bg-green-400`, 2.5x2.5 rounded-full)
+   - Center-aligned all TableHead and TableCell text
+
+4. **Dashboard cards** — Plugin cards with active connections show green border (`border-green-400`)
+
+5. **Commits** (7):
+   - `7d67165` — fix: align Slack Connections page with established plugin pattern
+   - `6890a95` — feat: replace CDN logos with local color logos
+   - `e5a349a` — fix: add missing Slack, LINE Official, Notion Official logos
+   - `74bf8a0` — fix: move Playwright logo to local
+   - `04a709f` — feat: move all remaining logos from CDN to local
+   - `ff24ce8` — style: remove Actions column header text
+   - `0deca79` — style: replace Active badge with green dot, green border
+   - `2522a78` — style: remove Actions from Dashboard and AdminUsers
+   - `b3a8926` — style: center-align all table text in connection pages
+   - `29df57d` — fix: add missing text-center to playwright, notion-official, line-official
+
+**Deployed**: `app.node2flow.net` (CF Pages)
+**Date**: 2026-02-14
