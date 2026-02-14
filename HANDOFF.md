@@ -1517,6 +1517,41 @@ Migrated Per-User OAuth flow to Gateway Worker + Dashboard. Each user can now co
 **Deployed**: Gateway `b8b129a2` (`mcp.node2flow.net`) + Dashboard `7477b13d` (`app.node2flow.net`)
 **Date**: 2026-02-15
 
+### Session 55: Airtable + YouTube + PostgREST Plugins (2026-02-15)
+
+Added 3 community MCP packages as Gateway plugins + Dashboard pages. Platform now has **15 plugins (352 tools)** — up from 12 plugins (304 tools).
+
+1. **Gateway — Airtable Plugin** (18 tools, PAT auth):
+   - Records (6): list, get, create, update, delete, upsert
+   - Schema (7): list bases, get schema, create base/table/field, update table/field
+   - Webhooks (5): create, list, refresh, payloads, delete
+   - Files: `apps/mcp-gateway/src/plugins/airtable/{types,client,tools,index}.ts`
+
+2. **Gateway — YouTube Plugin** (20 tools, OAuth 2.0):
+   - Read (10): search, get video/channel, list playlists/items/comments/replies/categories/subscriptions, popular
+   - Write (10): post/reply/update/delete comment, create/update/delete playlist, add/remove playlist item, rate video
+   - Files: `apps/mcp-gateway/src/plugins/youtube/{types,client,tools,index}.ts`
+
+3. **Gateway — PostgREST Plugin** (10 tools, optional JWT):
+   - Schema (2): get OpenAPI schema, describe table
+   - Read (3): list records, count records, call function (RPC)
+   - Write (5): insert, update, upsert, delete, replace
+   - Files: `apps/mcp-gateway/src/plugins/postgrest/{types,client,tools,index}.ts`
+
+4. **Dashboard — 3 Plugin UIs**:
+   - `content.tsx` + `Connections.tsx` for each (airtable, youtube, postgrest)
+   - SVG logos: `apps/dashboard/public/logos/{airtable,youtube,postgrest}.svg`
+   - Registry entries + 48 API helpers in `gateway-api.ts`
+
+5. **Files changed** (24 total):
+   - NEW (12): Gateway plugin files (4 per plugin × 3)
+   - NEW (9): Dashboard plugin files (content + Connections × 3) + 3 SVGs
+   - EDIT (3): `plugin-registry.ts`, `registry.ts`, `gateway-api.ts`
+
+**Commit**: `5aa8364` — feat: add Airtable, YouTube, PostgREST plugins to Gateway + Dashboard
+**Deployed**: Gateway `13ad2386` (`mcp.node2flow.net`) + Dashboard `9fdb3533` (`app.node2flow.net`)
+**Date**: 2026-02-15
+
 ### Planned: Per-User OAuth Flow (Other Providers)
 
 **Done**: Google Workspace — Per-user OAuth via Gateway Worker (Session 54)
