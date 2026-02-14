@@ -299,9 +299,7 @@ export default function Connections() {
                   <TableRow key={conn.id}>
                     <TableCell className="font-medium">{conn.name}</TableCell>
                     <TableCell>
-                      <Badge variant={conn.status === 'active' ? 'success' : 'secondary'} className="capitalize">
-                        {conn.status}
-                      </Badge>
+                      <div className={`w-2.5 h-2.5 rounded-full ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
                     </TableCell>
                     <TableCell>
                       {connKeys.map((key) => (

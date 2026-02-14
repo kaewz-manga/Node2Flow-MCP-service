@@ -238,7 +238,7 @@ export default function Dashboard() {
               <Link
                 key={plugin.id}
                 to={connectionsHref}
-                className="block rounded-md border border-border/60 bg-card p-2.5 transition-all hover:shadow-md hover:border-primary/40"
+                className={`block rounded-md border bg-card p-2.5 transition-all hover:shadow-md ${isConnected ? 'border-green-400 hover:border-green-300' : 'border-border/60 hover:border-primary/40'}`}
               >
                 <div className="flex flex-col items-center text-center gap-1.5">
                   {logoUrl ? (
