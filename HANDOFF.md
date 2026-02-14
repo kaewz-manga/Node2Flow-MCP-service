@@ -1466,3 +1466,68 @@ Rewrote Slack Connections page, migrated all logos from CDN to local, and polish
 
 **Deployed**: `app.node2flow.net` (CF Pages)
 **Date**: 2026-02-14
+
+### Session 54: Per-User Google Workspace OAuth (2026-02-15)
+
+Migrated Per-User OAuth flow to Gateway Worker + Dashboard. Each user can now connect their own Google account for Gmail, Drive, Calendar, Docs, Sheets access.
+
+1. **New file: `apps/mcp-gateway/src/routes/google-workspace-oauth.ts`**
+   - `POST /api/oauth/google-workspace/start` — JWT auth, verify connection ownership, create KV state, return Google authorize URL
+   - `GET /api/oauth/google-workspace/callback` — Public, exchange code for tokens, store in `config_encrypted`, redirect to Dashboard
+   - `GET /api/oauth/google-workspace/status/:id` — JWT auth, return `{ connected, email, expired }`
+   - `POST /api/oauth/google-workspace/disconnect/:id` — JWT auth, remove OAuth fields, revoke at Google
+   - `refreshGoogleTokenIfNeeded()` — Auto-refresh utility (300s buffer), called before tool calls
+
+2. **Gateway route registration** (`index.ts`, `mcp.ts`):
+   - OAuth routes registered before Dashboard API section (callback is public, others need JWT)
+   - Token refresh in both MCP path (`/mcp`) and proxy path (`/api/proxy`)
+
+3. **Dashboard UI** (`Connections.tsx`):
+   - Per-connection Google Account status: green dot + `user@gmail.com` or "Connect" button
+   - "Connect Google Account" / "Disconnect Google" menu items
+   - URL param handling: `?google_connected=true` → toast, `?google_error=...` → error toast
+
+4. **Gateway API helpers** (`gateway-api.ts`):
+   - `startGoogleWorkspaceOAuth(connectionId)` — Returns authorize URL
+   - `getGoogleWorkspaceOAuthStatus(connectionId)` — Connected/email/expired
+   - `disconnectGoogleWorkspace(connectionId)` — Remove tokens + revoke
+
+5. **Token storage**: `connections.config_encrypted` (AES-256-GCM) — no new table needed
+   ```json
+   { "oauth_token": "ya29.xxx", "refresh_token": "1//0xxx", "token_expires_at": 1708000000, "google_email": "user@gmail.com" }
+   ```
+
+6. **Security**:
+   - CSRF: KV state `gws_state:{random}` → 10min TTL, deleted synchronously (`await`, not `waitUntil`)
+   - Callback: exact path match (not `includes`)
+   - Refresh token rotation: handles Google returning new refresh_token
+   - Revocation: logs errors instead of silent catch
+
+7. **Files changed**:
+   - NEW: `apps/mcp-gateway/src/routes/google-workspace-oauth.ts`
+   - EDIT: `apps/mcp-gateway/src/routes/connections.ts` (export `encryptConfig`)
+   - EDIT: `apps/mcp-gateway/src/routes/mcp.ts` (refresh before createClient)
+   - EDIT: `apps/mcp-gateway/src/index.ts` (register OAuth routes + refresh in proxy)
+   - EDIT: `apps/mcp-gateway/src/types.ts` (add `DASHBOARD_URL`)
+   - EDIT: `apps/mcp-gateway/wrangler.toml` (add `DASHBOARD_URL` var)
+   - EDIT: `apps/dashboard/src/lib/gateway-api.ts` (3 OAuth helpers)
+   - EDIT: `apps/dashboard/src/plugins/google-workspace/Connections.tsx` (Connect/Disconnect UI)
+
+**Commit**: `d9f1f71` — feat: add per-user Google Workspace OAuth to Gateway + Dashboard
+**Deployed**: Gateway `b8b129a2` (`mcp.node2flow.net`) + Dashboard `7477b13d` (`app.node2flow.net`)
+**Date**: 2026-02-15
+
+### Planned: Per-User OAuth Flow (Other Providers)
+
+**Done**: Google Workspace — Per-user OAuth via Gateway Worker (Session 54)
+
+**Remaining**: Notion Official, LINE Official (same pattern — Gateway OAuth routes + Dashboard UI)
+
+**Architecture** (established by Google Workspace):
+1. Gateway OAuth routes: start → callback → status → disconnect → auto-refresh
+2. Tokens in `connections.config_encrypted` (no separate table)
+3. Gateway passes token via `x-service-token` header to VPS bridge
+4. VPS bridge spawns isolated subprocess per unique token
+
+**Priority**: Notion Official → LINE Official
+**Status**: Google Workspace DONE, others NOT STARTED
