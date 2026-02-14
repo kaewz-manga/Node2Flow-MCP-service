@@ -16,6 +16,7 @@ import { getAllTools, getAllPlugins, getPlugin } from './plugin-registry';
 import { handleMcpRequest } from './routes/mcp';
 import { authenticateMcpRequest, authenticateDashboardRequest } from './routes/auth';
 import { handleOAuthRoutes } from './routes/oauth';
+import { handleGoogleWorkspaceOAuth, refreshGoogleTokenIfNeeded } from './routes/google-workspace-oauth';
 import {
   handleListConnections,
   handleCreateConnection,
@@ -135,6 +136,15 @@ export default {
     }
 
     // ========================================
+    // Google Workspace OAuth (callback is public, others need JWT)
+    // ========================================
+    if (path.startsWith('/api/oauth/google-workspace/')) {
+      const user = path === '/api/oauth/google-workspace/callback' ? null : await authenticateDashboardRequest(request, env);
+      const oauthRes = await handleGoogleWorkspaceOAuth(request, env, path, user?.userId || null, ctx);
+      if (oauthRes) return oauthRes;
+    }
+
+    // ========================================
     // Dashboard API (JWT Auth)
     // ========================================
     if (path.startsWith('/api/')) {
@@ -186,6 +196,11 @@ export default {
         const conn = await getConnectionWithConfig(env, connectionId);
         if (!conn || conn.user_id !== user.userId) {
           return json({ success: false, error: { code: 'NOT_FOUND', message: 'Connection not found' } }, 404);
+        }
+
+        // Auto-refresh Google token if expired
+        if (productType === 'google-workspace' && conn.config.oauth_token) {
+          conn.config = await refreshGoogleTokenIfNeeded(conn.config, env, connectionId);
         }
 
         // Create client and proxy the request

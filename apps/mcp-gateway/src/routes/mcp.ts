@@ -6,6 +6,7 @@
 import type { Env, MCPToolDefinition, MCPToolResult, Connection } from '../types';
 import { getAllTools, getPlugin, findPluginForTool } from '../plugin-registry';
 import { decryptConfig } from './connections';
+import { refreshGoogleTokenIfNeeded } from './google-workspace-oauth';
 
 /**
  * Filter tools by scope (plugin + permission restrictions)
@@ -222,6 +223,11 @@ export async function handleMcpRequest(
           const conn = conns.results[0];
           connectionConfig = await decryptConfig(conn.config_encrypted, env.ENCRYPTION_KEY);
           connectionId = conn.id;
+        }
+
+        // Auto-refresh Google token if expired
+        if (plugin.id === 'google-workspace' && connectionConfig.oauth_token && connectionId) {
+          connectionConfig = await refreshGoogleTokenIfNeeded(connectionConfig, env, connectionId);
         }
 
         // Create client from decrypted connection config

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
+import { useSearchParams } from 'react-router-dom';
+import { createConnection, updateConnection, deleteConnection, startGoogleWorkspaceOAuth, getGoogleWorkspaceOAuthStatus, disconnectGoogleWorkspace } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, deleteApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
 import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
@@ -21,17 +22,28 @@ import {
   Pencil,
   Globe,
   Info,
+  Unlink,
+  LogIn,
 } from 'lucide-react';
 
 const LOGO = '/logos/google.svg';
 
+interface OAuthStatus {
+  connected: boolean;
+  email: string | null;
+  expired: boolean;
+}
+
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
   const { activeConnection, setActiveConnectionId } = useConnection();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
+  const [oauthStatuses, setOauthStatuses] = useState<Record<string, OAuthStatus>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [connectingId, setConnectingId] = useState<string | null>(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
@@ -59,6 +71,17 @@ export default function Connections() {
     ]);
     if (connRes.success && connRes.data) {
       setConnections(connRes.data.connections);
+      // Fetch OAuth status for each connection
+      const statuses: Record<string, OAuthStatus> = {};
+      await Promise.all(
+        connRes.data.connections.map(async (conn: Connection) => {
+          const statusRes = await getGoogleWorkspaceOAuthStatus(conn.id);
+          if (statusRes.success && statusRes.data) {
+            statuses[conn.id] = statusRes.data;
+          }
+        })
+      );
+      setOauthStatuses(statuses);
     } else {
       setError(connRes.error?.message || 'Failed to load connections');
     }
@@ -70,6 +93,22 @@ export default function Connections() {
 
   useEffect(() => {
     fetchConnections();
+  }, []);
+
+  // Handle OAuth redirect params
+  useEffect(() => {
+    if (searchParams.get('google_connected') === 'true') {
+      toast.success('Google account connected successfully');
+      searchParams.delete('google_connected');
+      setSearchParams(searchParams, { replace: true });
+      fetchConnections();
+    }
+    const googleError = searchParams.get('google_error');
+    if (googleError) {
+      toast.error(`Google connection failed: ${googleError}`);
+      searchParams.delete('google_error');
+      setSearchParams(searchParams, { replace: true });
+    }
   }, []);
 
   const handleAddConnection = async (e: React.FormEvent) => {
@@ -93,6 +132,27 @@ export default function Connections() {
     }
 
     setFormLoading(false);
+  };
+
+  const handleConnectGoogle = async (connectionId: string) => {
+    setConnectingId(connectionId);
+    const res = await startGoogleWorkspaceOAuth(connectionId);
+    if (res.success && res.data) {
+      window.location.href = res.data.authorize_url;
+    } else {
+      toast.error(res.error?.message || 'Failed to start Google OAuth');
+      setConnectingId(null);
+    }
+  };
+
+  const handleDisconnectGoogle = async (connectionId: string) => {
+    const res = await disconnectGoogleWorkspace(connectionId);
+    if (res.success) {
+      toast.success('Google account disconnected');
+      fetchConnections();
+    } else {
+      toast.error(res.error?.message || 'Failed to disconnect');
+    }
   };
 
   const handleDeleteConnection = async (id: string) => {
@@ -278,7 +338,7 @@ export default function Connections() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">Name</TableHead>
-                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Google Account</TableHead>
                 <TableHead className="text-center">API Key</TableHead>
                 <TableHead className="text-center">Created</TableHead>
                 <TableHead className="text-center"></TableHead>
@@ -287,11 +347,33 @@ export default function Connections() {
             <TableBody>
               {connections.map((conn) => {
                 const connKeys = getKeysForConnection(conn.id);
+                const oauth = oauthStatuses[conn.id];
                 return (
                   <TableRow key={conn.id}>
                     <TableCell className="font-medium text-center">{conn.name}</TableCell>
                     <TableCell className="text-center">
-                      <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
+                      {oauth?.connected ? (
+                        <div className="flex items-center justify-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-green-400" />
+                          <span className="text-xs text-muted-foreground">{oauth.email}</span>
+                          {oauth.expired && <span className="text-xs text-amber-400">(expired)</span>}
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs"
+                          disabled={connectingId === conn.id}
+                          onClick={() => handleConnectGoogle(conn.id)}
+                        >
+                          {connectingId === conn.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : (
+                            <LogIn className="h-3 w-3 mr-1" />
+                          )}
+                          Connect
+                        </Button>
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       {connKeys.map((key) => (
@@ -311,6 +393,11 @@ export default function Connections() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {!oauth?.connected && (
+                            <DropdownMenuItem onClick={() => handleConnectGoogle(conn.id)}>
+                              <LogIn className="h-4 w-4" /> Connect Google
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => handleEditConnection(conn)}>
                             <Pencil className="h-4 w-4" /> Edit Name
                           </DropdownMenuItem>
@@ -318,6 +405,11 @@ export default function Connections() {
                             <RefreshCw className="h-4 w-4" /> New Key
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
+                          {oauth?.connected && (
+                            <DropdownMenuItem className="text-amber-400 focus:text-amber-400" onClick={() => handleDisconnectGoogle(conn.id)}>
+                              <Unlink className="h-4 w-4" /> Disconnect Google
+                            </DropdownMenuItem>
+                          )}
                           {connKeys.filter(k => k.status === 'active').map(key => (
                             <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => handleRevokeApiKey(key.id)}>
                               <Key className="h-4 w-4" /> Revoke Key

@@ -75,7 +75,7 @@ async function decryptConfig(encrypted: string, encryptionKey: string): Promise<
   return JSON.parse(new TextDecoder().decode(decrypted));
 }
 
-export { decryptConfig };
+export { decryptConfig, encryptConfig };
 
 // ============================================
 // Connection CRUD Handlers

@@ -76,6 +76,7 @@ export interface Env {
   LINE_OFFICIAL_MCP_URL?: string;
   PLAYWRIGHT_MCP_URL?: string;
   GOOGLE_WORKSPACE_MCP_URL?: string;
+  DASHBOARD_URL?: string;
 }
 
 export interface AuthResult {

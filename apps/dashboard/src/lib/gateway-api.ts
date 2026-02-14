@@ -701,3 +701,30 @@ export function slackGetTeamInfo(connectionId: string) {
 export function slackListEmoji(connectionId: string) {
   return slackCall(connectionId, 'slack_list_emoji');
 }
+
+// ============================================
+// Google Workspace OAuth
+// ============================================
+
+export async function startGoogleWorkspaceOAuth(
+  connectionId: string
+): Promise<ApiResponse<{ authorize_url: string }>> {
+  return gatewayRequest('/api/oauth/google-workspace/start', {
+    method: 'POST',
+    body: JSON.stringify({ connection_id: connectionId }),
+  });
+}
+
+export async function getGoogleWorkspaceOAuthStatus(
+  connectionId: string
+): Promise<ApiResponse<{ connected: boolean; email: string | null; expired: boolean }>> {
+  return gatewayRequest(`/api/oauth/google-workspace/status/${connectionId}`);
+}
+
+export async function disconnectGoogleWorkspace(
+  connectionId: string
+): Promise<ApiResponse<{ disconnected: boolean }>> {
+  return gatewayRequest(`/api/oauth/google-workspace/disconnect/${connectionId}`, {
+    method: 'POST',
+  });
+}
