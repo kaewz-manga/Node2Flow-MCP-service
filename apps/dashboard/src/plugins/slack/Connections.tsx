@@ -343,7 +343,7 @@ export default function SlackConnections() {
                 <TableHead>Status</TableHead>
                 <TableHead>API Key</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
