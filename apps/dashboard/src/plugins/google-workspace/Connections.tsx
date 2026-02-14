@@ -277,11 +277,11 @@ export default function Connections() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>API Key</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right"></TableHead>
+                <TableHead className="text-center">Name</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">API Key</TableHead>
+                <TableHead className="text-center">Created</TableHead>
+                <TableHead className="text-center"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -289,20 +289,20 @@ export default function Connections() {
                 const connKeys = getKeysForConnection(conn.id);
                 return (
                   <TableRow key={conn.id}>
-                    <TableCell className="font-medium">{conn.name}</TableCell>
-                    <TableCell>
-                      <div className={`w-2.5 h-2.5 rounded-full ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
+                    <TableCell className="font-medium text-center">{conn.name}</TableCell>
+                    <TableCell className="text-center">
+                      <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       {connKeys.map((key) => (
                         <code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>
                       ))}
                       {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground text-center">
                       {new Date(conn.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="size-8">
