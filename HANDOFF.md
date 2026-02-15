@@ -1664,24 +1664,30 @@ Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platf
 
 ### Session 56c — Supabase Plugin (2026-02-15)
 
-Added Supabase plugin to Gateway. Platform now has **22 plugins, ~532 tools**.
+Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~532 tools**.
 
 1. **Gateway — Supabase Plugin** (31 tools, `sb_` prefix):
    - Database (6): list, insert, update, upsert, delete records, call RPC function
-   - Storage (5): list/create/delete buckets, list/delete objects, create signed URL
+   - Storage (6): list/create/delete buckets, list/delete objects, create signed URL
    - Auth (5): list/get/create/update/delete users
-   - Management (7): list/get/create/pause/restore projects, run SQL query, list migrations
+   - Management (5): list/get/create/pause/restore projects
+   - Database Mgmt (3): run SQL query, list migrations, get TypeScript types
    - Edge Functions (2): list functions, get function
-   - TypeScript (1): get TypeScript types
-   - Secrets (3): list/create/delete secrets
-   - API Keys (1): list API keys
-   - Config: `{ supabase_url, anon_key, service_role_key, access_token }` — dual client (Supabase JS + Management API)
+   - Secrets & Keys (4): list/create/delete secrets, list API keys
+   - Config: `{ supabase_url, service_role_key, access_token }` — dual client (SupabaseClient + ManagementClient)
    - Files: `apps/mcp-gateway/src/plugins/supabase/{types,supabase-client,management-client,tools,index}.ts`
 
-2. **Files changed** (6 total):
-   - NEW (5): Gateway plugin files
-   - EDIT (1): `plugin-registry.ts`
+2. **Dashboard — Supabase Plugin**:
+   - `content.tsx`: PluginContent with tagline, features (Database+Storage, Auth Admin, Project Mgmt), setup steps, demo code, FAQ (3 items)
+   - `Connections.tsx`: 3 config fields — Supabase URL, Service Role Key, Access Token (optional)
+   - `supabase.svg`: Official Supabase logo
+   - `registry.ts`: Added `supabasePlugin` (Database icon, /supabase/connections route)
+   - `gateway-api.ts`: Added `sbCall()` + 31 API helper functions (all 7 categories)
 
-**Deployed**: Gateway `95a5793c` (`mcp.node2flow.net`) + Dashboard `9fe00e7d` (`app.node2flow.net`)
-**Commit**: `9e8bae3`
+3. **Files changed** (11 total):
+   - NEW (8): 5 Gateway plugin files + 3 Dashboard files (content, connections, logo)
+   - EDIT (3): `plugin-registry.ts` (Gateway + Dashboard) + `gateway-api.ts`
+
+**Deployed**: Gateway `306edcbe` (`mcp.node2flow.net`) + Dashboard `a125ed8d` (`app.node2flow.net`)
+**Commits**: `9e8bae3` (Gateway) → `b25c297` (Dashboard)
 **Date**: 2026-02-15
