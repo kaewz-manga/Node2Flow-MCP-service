@@ -241,7 +241,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="/logos/wordpress.svg" alt="WordPress" className="h-10 w-10" />
+          <img src="/logos/wordpress.svg?v=2" alt="WordPress" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -271,7 +271,7 @@ export default function Connections() {
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <img src="/logos/wordpress.svg" alt="WordPress" className="h-10 w-10" />
+              <img src="/logos/wordpress.svg?v=2" alt="WordPress" className="h-10 w-10" />
             </EmptyMedia>
             <EmptyTitle>No connections yet</EmptyTitle>
             <EmptyDescription>
@@ -377,7 +377,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>Site URL</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><img src="/logos/wordpress.svg" alt="WordPress" className="h-6 w-6" /></InputGroupAddon>
+                <InputGroupAddon><img src="/logos/wordpress.svg?v=2" alt="WordPress" className="h-6 w-6" /></InputGroupAddon>
                 <InputGroupInput type="url" placeholder="https://example.com" value={formUrl} onChange={(e) => setFormUrl(e.target.value)} required />
               </InputGroup>
               <FieldDescription>Your WordPress site URL (without /wp-admin)</FieldDescription>

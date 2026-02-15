@@ -199,7 +199,7 @@ export default function Connections() {
 
       {/* MCP Endpoint */}
       <Item>
-        <ItemMedia><Key className="h-5 w-5 text-muted-foreground" /></ItemMedia>
+        <ItemMedia><img src="/logos/google-calendar.svg?v=2" alt="Google Calendar" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
           <ItemDescription className="font-mono text-xs">https://mcp.node2flow.net/mcp</ItemDescription>

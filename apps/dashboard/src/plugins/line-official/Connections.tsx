@@ -24,7 +24,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const LOGO = '/logos/line.png';
+const LOGO = '/logos/line.png?v=2';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

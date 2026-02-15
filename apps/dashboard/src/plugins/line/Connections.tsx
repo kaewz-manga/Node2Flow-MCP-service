@@ -234,7 +234,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="/logos/line.png" alt="LINE" className="h-10 w-10" />
+          <img src="/logos/line.png?v=2" alt="LINE" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>

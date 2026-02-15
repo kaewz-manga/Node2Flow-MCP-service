@@ -23,7 +23,7 @@ import {
   Info,
 } from 'lucide-react';
 
-const LOGO = '/logos/playwright.svg';
+const LOGO = '/logos/playwright.svg?v=2';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();

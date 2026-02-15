@@ -241,7 +241,7 @@ export default function Connections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="/logos/n8n.svg" alt="n8n" className="h-10 w-10" />
+          <img src="/logos/n8n.svg?v=2" alt="n8n" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
@@ -386,7 +386,7 @@ export default function Connections() {
             <Field>
               <FieldLabel>n8n URL</FieldLabel>
               <InputGroup>
-                <InputGroupAddon><img src="/logos/n8n.svg" alt="n8n" className="h-6 w-6" /></InputGroupAddon>
+                <InputGroupAddon><img src="/logos/n8n.svg?v=2" alt="n8n" className="h-6 w-6" /></InputGroupAddon>
                 <InputGroupInput
                   type="url"
                   placeholder="https://your-n8n.example.com"

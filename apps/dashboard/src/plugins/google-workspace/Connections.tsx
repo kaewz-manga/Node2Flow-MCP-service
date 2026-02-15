@@ -26,7 +26,7 @@ import {
   LogIn,
 } from 'lucide-react';
 
-const LOGO = '/logos/google.svg';
+const LOGO = '/logos/google.svg?v=2';
 
 interface OAuthStatus {
   connected: boolean;

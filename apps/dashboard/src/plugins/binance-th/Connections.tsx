@@ -291,7 +291,7 @@ export default function BinanceThConnections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="/logos/binance-th.png" alt="Binance TH" className="h-10 w-10" />
+          <img src="/logos/binance.png?v=2" alt="Binance TH" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
