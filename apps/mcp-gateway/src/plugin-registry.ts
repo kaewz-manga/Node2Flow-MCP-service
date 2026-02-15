@@ -24,6 +24,7 @@ import { supabasePlugin } from './plugins/supabase';
 import { sqlitePlugin } from './plugins/sqlite';
 import { gmailPlugin } from './plugins/gmail';
 import { googleCalendarPlugin } from './plugins/google-calendar';
+import { context7Plugin } from './plugins/context7';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -53,6 +54,7 @@ PLUGINS.set('supabase', supabasePlugin);
 PLUGINS.set('sqlite', sqlitePlugin);
 PLUGINS.set('gmail', gmailPlugin);
 PLUGINS.set('google-calendar', googleCalendarPlugin);
+PLUGINS.set('context7', context7Plugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);
