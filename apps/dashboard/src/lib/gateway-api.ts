@@ -1347,3 +1347,66 @@ export function sbDeleteSecrets(connectionId: string, projectRef: string, names:
 export function sbListApiKeys(connectionId: string, projectRef: string) {
   return sbCall(connectionId, 'sb_list_api_keys', { project_ref: projectRef });
 }
+
+// ============================================================
+// SQLite Proxy (15 tools)
+// ============================================================
+
+function sqCall<T = unknown>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('sqlite', connectionId, tool, args);
+}
+
+// Query & Execute (3)
+export function sqQuery(connectionId: string, sql: string, params?: unknown[]) {
+  return sqCall(connectionId, 'sqlite_query', { sql, ...(params ? { params } : {}) });
+}
+export function sqExecute(connectionId: string, sql: string, params?: unknown[]) {
+  return sqCall(connectionId, 'sqlite_execute', { sql, ...(params ? { params } : {}) });
+}
+export function sqRunScript(connectionId: string, sql: string) {
+  return sqCall(connectionId, 'sqlite_run_script', { sql });
+}
+
+// Schema Inspection (4)
+export function sqListTables(connectionId: string) {
+  return sqCall(connectionId, 'sqlite_list_tables');
+}
+export function sqDescribeTable(connectionId: string, table: string) {
+  return sqCall(connectionId, 'sqlite_describe_table', { table });
+}
+export function sqListIndexes(connectionId: string, table: string) {
+  return sqCall(connectionId, 'sqlite_list_indexes', { table });
+}
+export function sqListForeignKeys(connectionId: string, table: string) {
+  return sqCall(connectionId, 'sqlite_list_foreign_keys', { table });
+}
+
+// Schema Management (3)
+export function sqCreateTable(connectionId: string, table: string, columns: Array<Record<string, unknown>>, ifNotExists?: boolean) {
+  return sqCall(connectionId, 'sqlite_create_table', { table, columns, ...(ifNotExists ? { ifNotExists } : {}) });
+}
+export function sqAlterTable(connectionId: string, table: string, action: string, params: Record<string, unknown> = {}) {
+  return sqCall(connectionId, 'sqlite_alter_table', { table, action, ...params });
+}
+export function sqDropTable(connectionId: string, table: string, ifExists?: boolean) {
+  return sqCall(connectionId, 'sqlite_drop_table', { table, ...(ifExists ? { ifExists } : {}) });
+}
+
+// Index Management (2)
+export function sqCreateIndex(connectionId: string, table: string, columns: string[], opts: { indexName?: string; unique?: boolean; ifNotExists?: boolean } = {}) {
+  return sqCall(connectionId, 'sqlite_create_index', { table, columns, ...opts });
+}
+export function sqDropIndex(connectionId: string, indexName: string, ifExists?: boolean) {
+  return sqCall(connectionId, 'sqlite_drop_index', { indexName, ...(ifExists ? { ifExists } : {}) });
+}
+
+// Database Management (3)
+export function sqGetInfo(connectionId: string) {
+  return sqCall(connectionId, 'sqlite_get_info');
+}
+export function sqVacuum(connectionId: string) {
+  return sqCall(connectionId, 'sqlite_vacuum');
+}
+export function sqIntegrityCheck(connectionId: string) {
+  return sqCall(connectionId, 'sqlite_integrity_check');
+}

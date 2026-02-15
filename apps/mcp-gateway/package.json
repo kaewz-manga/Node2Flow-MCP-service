@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.0",
     "@node2flow/platform-core": "workspace:*"
   },
   "devDependencies": {

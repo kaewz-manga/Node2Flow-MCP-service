@@ -21,6 +21,7 @@ import { googleSheetsPlugin } from './plugins/google-sheets';
 import { googleDrivePlugin } from './plugins/google-drive';
 import { googleDocsPlugin } from './plugins/google-docs';
 import { supabasePlugin } from './plugins/supabase';
+import { sqlitePlugin } from './plugins/sqlite';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -47,6 +48,7 @@ PLUGINS.set('google-sheets', googleSheetsPlugin);
 PLUGINS.set('google-drive', googleDrivePlugin);
 PLUGINS.set('google-docs', googleDocsPlugin);
 PLUGINS.set('supabase', supabasePlugin);
+PLUGINS.set('sqlite', sqlitePlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

@@ -694,7 +694,32 @@ const supabasePlugin: AppPlugin = {
 };
 
 // ============================================
+// SQLite Plugin
+// ============================================
+
+import { sqliteContent } from './sqlite/content';
+import {
+  Database as SqliteIcon,
+  Link as SqliteLinkIcon,
+} from 'lucide-react';
+
+const sqlitePlugin: AppPlugin = {
+  id: 'sqlite',
+  name: 'SQLite',
+  icon: SqliteIcon,
+  logo: '/logos/sqlite.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/sqlite/connections', icon: SqliteLinkIcon },
+  ],
+  routes: [
+    { path: '/sqlite/connections', component: lazy(() => import('./sqlite/Connections')) },
+  ],
+  content: sqliteContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin];
