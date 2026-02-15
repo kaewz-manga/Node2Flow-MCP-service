@@ -1823,3 +1823,33 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `f690606b` (`mcp.node2flow.net`) + Dashboard `2564f712` (`app.node2flow.net`)
 **Commit**: `a501911`
 **Date**: 2026-02-16
+
+### Session 58: Browserbase Cloud Browser Plugin (2026-02-16)
+
+**Goal**: Add Browserbase MCP as VPS Docker proxy plugin for cloud browser automation.
+**Total**: 29 plugins, 665 tools.
+
+1. **Browserbase plugin added** (`62fdc26`):
+   - **Architecture**: VPS Docker proxy pattern (same as playwright-mcp)
+   - **Gateway**: `plugins/browserbase/` — 9 tools with `bb_` prefix
+     - Session (2): bb_session_create, bb_session_close
+     - Browser Actions (5): bb_navigate, bb_act, bb_extract, bb_observe, bb_screenshot
+     - Advanced (2): bb_get_url, bb_agent (autonomous AI agent, requires Gemini)
+   - **Proxy**: JSON-RPC forwarded to VPS via mcp-http-bridge with per-token process pool
+   - **Per-user auth**: x-service-token (API Key) + x-service-extra-env (Project ID, Gemini Key)
+   - **Dashboard**: content.tsx + Connections.tsx (3 fields: API Key, Project ID, optional Gemini Key)
+   - **Config**: `{ api_key, project_id, gemini_api_key? }`
+   - **Env types**: Added BROWSERBASE_MCP_URL + BROWSERBASE_MCP_AUTH_TOKEN to Env interface
+
+2. **Files changed** (11 total):
+   - NEW (7): 4 Gateway files + 2 Dashboard files + browserbase.svg logo
+   - EDIT (4): plugin-registry.ts + types.ts (Gateway) + registry.ts + Dashboard.tsx (Dashboard)
+
+3. **VPS Docker setup** (pending separate task):
+   - Port 3018, URL: browserbase-mcp.node2flow.net
+   - mcp-http-bridge + @browserbasehq/mcp-server-browserbase per-token
+   - mem_limit: 1g
+
+**Deployed**: Gateway `9bc45eaa` (`mcp.node2flow.net`) + Dashboard `8a755dcd` (`app.node2flow.net`)
+**Commit**: `62fdc26`
+**Date**: 2026-02-16
