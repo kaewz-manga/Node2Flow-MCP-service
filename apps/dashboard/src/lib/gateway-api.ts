@@ -1512,3 +1512,105 @@ export function gmGetProfile(connectionId: string) {
 export function gmUpdateVacation(connectionId: string, opts: { enable_auto_reply: boolean; response_subject?: string; response_body_plain_text?: string; response_body_html?: string; restrict_to_contacts?: boolean; restrict_to_domain?: boolean; start_time?: string; end_time?: string }) {
   return gmCall(connectionId, 'gmail_update_vacation', opts);
 }
+
+// ============================================================
+// Google Calendar Proxy (28 tools)
+// ============================================================
+
+function gcalCall<T = unknown>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('google-calendar', connectionId, tool, args);
+}
+
+// Events (10)
+export function gcalListEvents(connectionId: string, opts: { calendar_id: string; time_min?: string; time_max?: string; q?: string; max_results?: number; page_token?: string; single_events?: boolean; order_by?: string; time_zone?: string; show_deleted?: boolean }) {
+  return gcalCall(connectionId, 'gcal_list_events', opts);
+}
+export function gcalGetEvent(connectionId: string, calendarId: string, eventId: string, opts: { time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_get_event', { calendar_id: calendarId, event_id: eventId, ...opts });
+}
+export function gcalCreateEvent(connectionId: string, calendarId: string, opts: { summary?: string; description?: string; location?: string; start_date_time?: string; start_date?: string; start_time_zone?: string; end_date_time?: string; end_date?: string; end_time_zone?: string; attendees?: string[]; recurrence?: string[]; color_id?: string; visibility?: string; transparency?: string; send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_create_event', { calendar_id: calendarId, ...opts });
+}
+export function gcalUpdateEvent(connectionId: string, calendarId: string, eventId: string, opts: { summary?: string; description?: string; location?: string; start_date_time?: string; start_date?: string; start_time_zone?: string; end_date_time?: string; end_date?: string; end_time_zone?: string; attendees?: string[]; recurrence?: string[]; color_id?: string; visibility?: string; transparency?: string; send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_update_event', { calendar_id: calendarId, event_id: eventId, ...opts });
+}
+export function gcalPatchEvent(connectionId: string, calendarId: string, eventId: string, opts: { summary?: string; description?: string; location?: string; start_date_time?: string; start_date?: string; start_time_zone?: string; end_date_time?: string; end_date?: string; end_time_zone?: string; attendees?: string[]; color_id?: string; visibility?: string; transparency?: string; send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_patch_event', { calendar_id: calendarId, event_id: eventId, ...opts });
+}
+export function gcalDeleteEvent(connectionId: string, calendarId: string, eventId: string, opts: { send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_delete_event', { calendar_id: calendarId, event_id: eventId, ...opts });
+}
+export function gcalQuickAdd(connectionId: string, calendarId: string, text: string, opts: { send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_quick_add', { calendar_id: calendarId, text, ...opts });
+}
+export function gcalMoveEvent(connectionId: string, calendarId: string, eventId: string, destination: string, opts: { send_updates?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_move_event', { calendar_id: calendarId, event_id: eventId, destination, ...opts });
+}
+export function gcalListInstances(connectionId: string, calendarId: string, eventId: string, opts: { time_min?: string; time_max?: string; max_results?: number; page_token?: string; time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_list_instances', { calendar_id: calendarId, event_id: eventId, ...opts });
+}
+export function gcalImportEvent(connectionId: string, calendarId: string, icalUid: string, opts: { summary?: string; description?: string; location?: string; start_date_time?: string; start_date?: string; start_time_zone?: string; end_date_time?: string; end_date?: string; end_time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_import_event', { calendar_id: calendarId, ical_uid: icalUid, ...opts });
+}
+
+// CalendarList (5)
+export function gcalListCalendars(connectionId: string, opts: { max_results?: number; page_token?: string; show_deleted?: boolean; show_hidden?: boolean } = {}) {
+  return gcalCall(connectionId, 'gcal_list_calendars', opts);
+}
+export function gcalGetCalendarEntry(connectionId: string, calendarId: string) {
+  return gcalCall(connectionId, 'gcal_get_calendar_entry', { calendar_id: calendarId });
+}
+export function gcalAddCalendar(connectionId: string, id: string, opts: { color_id?: string; summary_override?: string; hidden?: boolean; selected?: boolean } = {}) {
+  return gcalCall(connectionId, 'gcal_add_calendar', { id, ...opts });
+}
+export function gcalUpdateCalendarEntry(connectionId: string, calendarId: string, opts: { color_id?: string; summary_override?: string; hidden?: boolean; selected?: boolean; default_reminders?: { method: string; minutes: number }[] } = {}) {
+  return gcalCall(connectionId, 'gcal_update_calendar_entry', { calendar_id: calendarId, ...opts });
+}
+export function gcalRemoveCalendar(connectionId: string, calendarId: string) {
+  return gcalCall(connectionId, 'gcal_remove_calendar', { calendar_id: calendarId });
+}
+
+// Calendars (5)
+export function gcalGetCalendar(connectionId: string, calendarId: string) {
+  return gcalCall(connectionId, 'gcal_get_calendar', { calendar_id: calendarId });
+}
+export function gcalCreateCalendar(connectionId: string, summary: string, opts: { description?: string; location?: string; time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_create_calendar', { summary, ...opts });
+}
+export function gcalUpdateCalendar(connectionId: string, calendarId: string, opts: { summary?: string; description?: string; location?: string; time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_update_calendar', { calendar_id: calendarId, ...opts });
+}
+export function gcalDeleteCalendar(connectionId: string, calendarId: string) {
+  return gcalCall(connectionId, 'gcal_delete_calendar', { calendar_id: calendarId });
+}
+export function gcalClearCalendar(connectionId: string, calendarId: string) {
+  return gcalCall(connectionId, 'gcal_clear_calendar', { calendar_id: calendarId });
+}
+
+// ACL (5)
+export function gcalListAcl(connectionId: string, calendarId: string, opts: { max_results?: number; page_token?: string; show_deleted?: boolean } = {}) {
+  return gcalCall(connectionId, 'gcal_list_acl', { calendar_id: calendarId, ...opts });
+}
+export function gcalGetAcl(connectionId: string, calendarId: string, ruleId: string) {
+  return gcalCall(connectionId, 'gcal_get_acl', { calendar_id: calendarId, rule_id: ruleId });
+}
+export function gcalCreateAcl(connectionId: string, calendarId: string, role: string, scopeType: string, opts: { scope_value?: string; send_notifications?: boolean } = {}) {
+  return gcalCall(connectionId, 'gcal_create_acl', { calendar_id: calendarId, role, scope_type: scopeType, ...opts });
+}
+export function gcalUpdateAcl(connectionId: string, calendarId: string, ruleId: string, role: string, opts: { send_notifications?: boolean } = {}) {
+  return gcalCall(connectionId, 'gcal_update_acl', { calendar_id: calendarId, rule_id: ruleId, role, ...opts });
+}
+export function gcalDeleteAcl(connectionId: string, calendarId: string, ruleId: string) {
+  return gcalCall(connectionId, 'gcal_delete_acl', { calendar_id: calendarId, rule_id: ruleId });
+}
+
+// Utility (3)
+export function gcalQueryFreeBusy(connectionId: string, timeMin: string, timeMax: string, calendarIds: string[], opts: { time_zone?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_query_freebusy', { time_min: timeMin, time_max: timeMax, calendar_ids: calendarIds, ...opts });
+}
+export function gcalGetColors(connectionId: string) {
+  return gcalCall(connectionId, 'gcal_get_colors');
+}
+export function gcalListSettings(connectionId: string, opts: { max_results?: number; page_token?: string } = {}) {
+  return gcalCall(connectionId, 'gcal_list_settings', opts);
+}

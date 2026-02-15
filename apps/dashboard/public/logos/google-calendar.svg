@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Calendar background -->
+  <rect x="3" y="4" width="18" height="18" rx="2" fill="#FFFFFF"/>
+  <rect x="3" y="4" width="18" height="18" rx="2" stroke="#4285F4" stroke-width="1.5"/>
+
+  <!-- Top blue header -->
+  <rect x="3" y="4" width="18" height="4" rx="2" fill="#4285F4"/>
+  <rect x="3" y="8" width="18" height="0.5" fill="#4285F4"/>
+
+  <!-- Date "31" -->
+  <text x="12" y="17" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#EA4335" text-anchor="middle">31</text>
+
+  <!-- Calendar grid dots (subtle) -->
+  <circle cx="7" cy="11" r="0.5" fill="#BDC1C6"/>
+  <circle cx="12" cy="11" r="0.5" fill="#BDC1C6"/>
+  <circle cx="17" cy="11" r="0.5" fill="#BDC1C6"/>
+  <circle cx="7" cy="14" r="0.5" fill="#BDC1C6"/>
+  <circle cx="12" cy="14" r="0.5" fill="#BDC1C6"/>
+  <circle cx="17" cy="14" r="0.5" fill="#BDC1C6"/>
+
+  <!-- Binding rings (top) -->
+  <circle cx="6" cy="3.5" r="0.8" fill="none" stroke="#BDC1C6" stroke-width="1"/>
+  <circle cx="12" cy="3.5" r="0.8" fill="none" stroke="#BDC1C6" stroke-width="1"/>
+  <circle cx="18" cy="3.5" r="0.8" fill="none" stroke="#BDC1C6" stroke-width="1"/>
+</svg>

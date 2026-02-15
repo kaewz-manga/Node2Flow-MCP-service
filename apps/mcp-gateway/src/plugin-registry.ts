@@ -23,6 +23,7 @@ import { googleDocsPlugin } from './plugins/google-docs';
 import { supabasePlugin } from './plugins/supabase';
 import { sqlitePlugin } from './plugins/sqlite';
 import { gmailPlugin } from './plugins/gmail';
+import { googleCalendarPlugin } from './plugins/google-calendar';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -51,6 +52,7 @@ PLUGINS.set('google-docs', googleDocsPlugin);
 PLUGINS.set('supabase', supabasePlugin);
 PLUGINS.set('sqlite', sqlitePlugin);
 PLUGINS.set('gmail', gmailPlugin);
+PLUGINS.set('google-calendar', googleCalendarPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

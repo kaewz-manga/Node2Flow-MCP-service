@@ -744,7 +744,32 @@ const gmailPlugin: AppPlugin = {
 };
 
 // ============================================
+// Google Calendar
+// ============================================
+
+import { googleCalendarContent } from './google-calendar/content';
+import {
+  CalendarDays as GoogleCalendarIcon,
+  Link as GoogleCalendarLinkIcon,
+} from 'lucide-react';
+
+const googleCalendarPlugin: AppPlugin = {
+  id: 'google-calendar',
+  name: 'Google Calendar',
+  icon: GoogleCalendarIcon,
+  logo: '/logos/google-calendar.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/google-calendar/connections', icon: GoogleCalendarLinkIcon },
+  ],
+  routes: [
+    { path: '/google-calendar/connections', component: lazy(() => import('./google-calendar/Connections')) },
+  ],
+  content: googleCalendarContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin];
