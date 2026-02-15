@@ -40,9 +40,20 @@ const TOOL_COUNTS: Record<string, number> = {
   'line-official': 12,
   playwright: 22,
   'google-workspace': 54,
+  slack: 38,
+  airtable: 18,
+  youtube: 20,
+  postgrest: 10,
   bitkub: 28,
   binance: 23,
   'binance-th': 27,
+  'google-sheets': 23,
+  'google-drive': 23,
+  'google-docs': 26,
+  supabase: 31,
+  sqlite: 15,
+  gmail: 20,
+  'google-calendar': 28,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -59,9 +70,19 @@ const SERVICE_LOGOS: Record<string, string> = {
   'notion-official': '/logos/notion.svg',
   playwright: '/logos/playwright.svg',
   'google-workspace': '/logos/google.svg',
-  bitkub: '/logos/bitkub.svg',
-  binance: '/logos/binance.svg',
-  'binance-th': '/logos/binance-th.svg',
+  airtable: '/logos/airtable.svg',
+  youtube: '/logos/youtube.svg',
+  postgrest: '/logos/postgrest.png',
+  bitkub: '/logos/bitkub.png',
+  binance: '/logos/binance.png',
+  'binance-th': '/logos/binance.png',
+  'google-sheets': '/logos/google-sheets.svg',
+  'google-drive': '/logos/google-drive.svg',
+  'google-docs': '/logos/google-docs.svg',
+  supabase: '/logos/supabase.svg',
+  sqlite: '/logos/sqlite.svg',
+  gmail: '/logos/gmail.svg',
+  'google-calendar': '/logos/google-calendar.svg',
 };
 
 export default function Dashboard() {

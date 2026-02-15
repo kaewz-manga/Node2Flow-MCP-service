@@ -507,7 +507,7 @@ const postgrestPlugin: AppPlugin = {
   id: 'postgrest',
   name: 'PostgREST',
   icon: PostgrestIcon,
-  logo: '/logos/postgrest.svg',
+  logo: '/logos/postgrest.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/postgrest/connections', icon: PostgrestLinkIcon },
@@ -532,7 +532,7 @@ const bitkubPlugin: AppPlugin = {
   id: 'bitkub',
   name: 'Bitkub',
   icon: BitkubIcon,
-  logo: '/logos/bitkub.svg',
+  logo: '/logos/bitkub.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/bitkub/connections', icon: BitkubLinkIcon },
@@ -557,7 +557,7 @@ const binancePlugin: AppPlugin = {
   id: 'binance',
   name: 'Binance',
   icon: BinanceIcon,
-  logo: '/logos/binance.svg',
+  logo: '/logos/binance.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/binance/connections', icon: BinanceLinkIcon },
@@ -582,7 +582,7 @@ const binanceThPlugin: AppPlugin = {
   id: 'binance-th',
   name: 'Binance TH',
   icon: BinanceThIcon,
-  logo: '/logos/binance-th.svg',
+  logo: '/logos/binance.png',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/binance-th/connections', icon: BinanceThLinkIcon },
