@@ -7,8 +7,14 @@ import type { ClN8nMcpConfig } from './types';
 
 export class ClN8nMcpClient {
   private sessionId: string | null = null;
+  private authToken?: string;
 
-  constructor(private config: ClN8nMcpConfig) {}
+  constructor(config: ClN8nMcpConfig, authToken?: string) {
+    this.config = config;
+    this.authToken = authToken;
+  }
+
+  private config: ClN8nMcpConfig;
 
   private async sendRequest(method: string, params: Record<string, unknown>): Promise<any> {
     const mcpEndpoint = `${this.config.mcpUrl.replace(/\/$/, '')}/mcp`;
@@ -18,8 +24,8 @@ export class ClN8nMcpClient {
       'Accept': 'application/json, text/event-stream',
     };
 
-    if (this.config.authToken) {
-      headers['Authorization'] = `Bearer ${this.config.authToken}`;
+    if (this.authToken) {
+      headers['Authorization'] = `Bearer ${this.authToken}`;
     }
 
     if (this.sessionId) {
