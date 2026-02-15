@@ -1561,7 +1561,7 @@ Added 3 community MCP packages as Gateway plugins + Dashboard pages. Platform no
 **Deployed**: Gateway `13ad2386` (`mcp.node2flow.net`) + Dashboard `9fdb3533` (`app.node2flow.net`)
 **Date**: 2026-02-15
 
-### Session 56: Bitkub + Binance + Binance TH Crypto Exchange Plugins (2026-02-15)
+### Session 56a: Bitkub + Binance + Binance TH Crypto Exchange Plugins (2026-02-15)
 
 Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platform now has **18 plugins (382 tools)** — up from 15 plugins (352 tools).
 
@@ -1627,7 +1627,7 @@ Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platf
 
 ---
 
-### Session 56 — Google Sheets, Drive, Docs Plugins (2026-02-15)
+### Session 56b — Google Sheets, Drive, Docs Plugins (2026-02-15)
 
 **Summary**: Added 3 Google community MCP packages as Gateway plugins + Dashboard pages. **21 plugins, 501 tools**.
 
@@ -1659,6 +1659,29 @@ Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platf
    - EDIT (3): `plugin-registry.ts`, `registry.ts`, `gateway-api.ts`
 
 **Typecheck**: 0 errors in new plugins (both Gateway + Dashboard)
-**Deployed**: `mcp.node2flow.net` (Worker) + `app.node2flow.net` (CF Pages)
 **Commit**: `f8aa192`
+**Date**: 2026-02-15
+
+### Session 56c — Supabase Plugin (2026-02-15)
+
+Added Supabase plugin to Gateway. Platform now has **22 plugins, ~532 tools**.
+
+1. **Gateway — Supabase Plugin** (31 tools, `sb_` prefix):
+   - Database (6): list, insert, update, upsert, delete records, call RPC function
+   - Storage (5): list/create/delete buckets, list/delete objects, create signed URL
+   - Auth (5): list/get/create/update/delete users
+   - Management (7): list/get/create/pause/restore projects, run SQL query, list migrations
+   - Edge Functions (2): list functions, get function
+   - TypeScript (1): get TypeScript types
+   - Secrets (3): list/create/delete secrets
+   - API Keys (1): list API keys
+   - Config: `{ supabase_url, anon_key, service_role_key, access_token }` — dual client (Supabase JS + Management API)
+   - Files: `apps/mcp-gateway/src/plugins/supabase/{types,supabase-client,management-client,tools,index}.ts`
+
+2. **Files changed** (6 total):
+   - NEW (5): Gateway plugin files
+   - EDIT (1): `plugin-registry.ts`
+
+**Deployed**: Gateway `95a5793c` (`mcp.node2flow.net`) + Dashboard `9fe00e7d` (`app.node2flow.net`)
+**Commit**: `9e8bae3`
 **Date**: 2026-02-15
