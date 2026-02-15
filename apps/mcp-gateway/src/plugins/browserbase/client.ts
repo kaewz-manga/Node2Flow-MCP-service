@@ -23,13 +23,12 @@ export class BrowserbaseClient {
     headers['x-service-token'] = this.config.apiKey;
     headers['x-service-token-env'] = 'BROWSERBASE_API_KEY';
 
-    const extraEnv: Record<string, string> = {
-      BROWSERBASE_PROJECT_ID: this.config.projectId,
-    };
+    // Bridge expects comma-separated KEY=VALUE format
+    const extraParts = [`BROWSERBASE_PROJECT_ID=${this.config.projectId}`];
     if (this.config.geminiApiKey) {
-      extraEnv.GEMINI_API_KEY = this.config.geminiApiKey;
+      extraParts.push(`GEMINI_API_KEY=${this.config.geminiApiKey}`);
     }
-    headers['x-service-extra-env'] = JSON.stringify(extraEnv);
+    headers['x-service-extra-env'] = extraParts.join(',');
 
     const response = await fetch(mcpEndpoint, {
       method: 'POST',
