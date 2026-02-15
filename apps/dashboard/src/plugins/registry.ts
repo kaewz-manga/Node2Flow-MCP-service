@@ -669,7 +669,32 @@ const googleDocsPlugin: AppPlugin = {
 };
 
 // ============================================
+// Supabase Plugin
+// ============================================
+
+import { supabaseContent } from './supabase/content';
+import {
+  Database as SupabaseIcon,
+  Link as SupabaseLinkIcon,
+} from 'lucide-react';
+
+const supabasePlugin: AppPlugin = {
+  id: 'supabase',
+  name: 'Supabase',
+  icon: SupabaseIcon,
+  logo: '/logos/supabase.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/supabase/connections', icon: SupabaseLinkIcon },
+  ],
+  routes: [
+    { path: '/supabase/connections', component: lazy(() => import('./supabase/Connections')) },
+  ],
+  content: supabaseContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin];

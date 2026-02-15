@@ -1228,3 +1228,122 @@ export function gdocSetColumnsStyle(connectionId: string, documentId: string, st
 export function gdocSetPageOrientation(connectionId: string, documentId: string, orientation: string) {
   return gdocCall(connectionId, 'gdoc_set_page_orientation', { document_id: documentId, orientation });
 }
+
+// ============================================
+// Supabase Proxy (31 tools)
+// ============================================
+
+function sbCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('supabase', connectionId, tool, args);
+}
+
+// Database REST
+export function sbListRecords(connectionId: string, table: string, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_list_records', { table, ...opts });
+}
+export function sbInsertRecords(connectionId: string, table: string, records: unknown, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_insert_records', { table, records, ...opts });
+}
+export function sbUpdateRecords(connectionId: string, table: string, filter: Record<string, unknown>, data: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_update_records', { table, filter, data });
+}
+export function sbUpsertRecords(connectionId: string, table: string, records: unknown, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_upsert_records', { table, records, ...opts });
+}
+export function sbDeleteRecords(connectionId: string, table: string, filter: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_delete_records', { table, filter });
+}
+export function sbCallFunction(connectionId: string, functionName: string, params?: Record<string, unknown>) {
+  const args: Record<string, unknown> = { function_name: functionName };
+  if (params) args.params = params;
+  return sbCall(connectionId, 'sb_call_function', args);
+}
+
+// Storage
+export function sbListBuckets(connectionId: string) {
+  return sbCall(connectionId, 'sb_list_buckets');
+}
+export function sbCreateBucket(connectionId: string, name: string, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_create_bucket', { name, ...opts });
+}
+export function sbDeleteBucket(connectionId: string, id: string) {
+  return sbCall(connectionId, 'sb_delete_bucket', { id });
+}
+export function sbListObjects(connectionId: string, bucket: string, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_list_objects', { bucket, ...opts });
+}
+export function sbDeleteObjects(connectionId: string, bucket: string, paths: string[]) {
+  return sbCall(connectionId, 'sb_delete_objects', { bucket, paths });
+}
+export function sbCreateSignedUrl(connectionId: string, bucket: string, path: string, expiresIn?: number) {
+  const args: Record<string, unknown> = { bucket, path };
+  if (expiresIn) args.expires_in = expiresIn;
+  return sbCall(connectionId, 'sb_create_signed_url', args);
+}
+
+// Auth Admin
+export function sbListUsers(connectionId: string, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_list_users', opts || {});
+}
+export function sbGetUser(connectionId: string, userId: string) {
+  return sbCall(connectionId, 'sb_get_user', { user_id: userId });
+}
+export function sbCreateUser(connectionId: string, email: string, password: string, opts?: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_create_user', { email, password, ...opts });
+}
+export function sbUpdateUser(connectionId: string, userId: string, data: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_update_user', { user_id: userId, ...data });
+}
+export function sbDeleteUser(connectionId: string, userId: string) {
+  return sbCall(connectionId, 'sb_delete_user', { user_id: userId });
+}
+
+// Projects (Management API)
+export function sbListProjects(connectionId: string) {
+  return sbCall(connectionId, 'sb_list_projects');
+}
+export function sbGetProject(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_get_project', { project_ref: projectRef });
+}
+export function sbCreateProject(connectionId: string, data: Record<string, unknown>) {
+  return sbCall(connectionId, 'sb_create_project', data);
+}
+export function sbPauseProject(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_pause_project', { project_ref: projectRef });
+}
+export function sbRestoreProject(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_restore_project', { project_ref: projectRef });
+}
+
+// Database Management
+export function sbRunQuery(connectionId: string, projectRef: string, query: string) {
+  return sbCall(connectionId, 'sb_run_query', { project_ref: projectRef, query });
+}
+export function sbListMigrations(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_list_migrations', { project_ref: projectRef });
+}
+export function sbGetTypescriptTypes(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_get_typescript_types', { project_ref: projectRef });
+}
+
+// Edge Functions
+export function sbListFunctions(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_list_functions', { project_ref: projectRef });
+}
+export function sbGetFunction(connectionId: string, projectRef: string, slug: string) {
+  return sbCall(connectionId, 'sb_get_function', { project_ref: projectRef, slug });
+}
+
+// Secrets & Keys
+export function sbListSecrets(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_list_secrets', { project_ref: projectRef });
+}
+export function sbCreateSecrets(connectionId: string, projectRef: string, secrets: Array<{ name: string; value: string }>) {
+  return sbCall(connectionId, 'sb_create_secrets', { project_ref: projectRef, secrets });
+}
+export function sbDeleteSecrets(connectionId: string, projectRef: string, names: string[]) {
+  return sbCall(connectionId, 'sb_delete_secrets', { project_ref: projectRef, names });
+}
+export function sbListApiKeys(connectionId: string, projectRef: string) {
+  return sbCall(connectionId, 'sb_list_api_keys', { project_ref: projectRef });
+}
