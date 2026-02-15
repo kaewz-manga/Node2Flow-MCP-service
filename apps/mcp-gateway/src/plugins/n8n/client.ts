@@ -1,7 +1,7 @@
 /**
  * n8n API Client
  * Wrapper for n8n REST API v1 calls with error handling and timeout
- * Ported from @node2flow/n8n-management-mcp (community)
+ * Source: @node2flow/n8n-management-mcp (community)
  */
 
 import { N8nConfig } from './types';
@@ -9,13 +9,15 @@ import { N8nConfig } from './types';
 export class N8nClient {
   private config: N8nConfig;
   private apiBase: string;
+  private timeout: number;
 
   constructor(config: N8nConfig) {
     this.config = {
       ...config,
       apiUrl: config.apiUrl.replace(/\/+$/, ''),
     };
-    this.apiBase = '/api/v1';
+    this.apiBase = config.apiPath || '/api/v1';
+    this.timeout = config.timeout || 30000;
   }
 
   /**
@@ -29,7 +31,7 @@ export class N8nClient {
 
     const response = await fetch(url, {
       ...options,
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(this.timeout),
       headers: {
         'X-N8N-API-KEY': this.config.apiKey,
         'Content-Type': 'application/json',
@@ -177,6 +179,29 @@ export class N8nClient {
 
   async deleteTag(id: string) {
     return this.request(`${this.apiBase}/tags/${id}`, { method: 'DELETE' });
+  }
+
+  // Variable Methods
+  async listVariables() {
+    return this.request(`${this.apiBase}/variables`, { method: 'GET' });
+  }
+
+  async createVariable(key: string, value: string) {
+    return this.request(`${this.apiBase}/variables`, {
+      method: 'POST',
+      body: JSON.stringify({ key, value }),
+    });
+  }
+
+  async updateVariable(id: string, key: string, value: string) {
+    return this.request(`${this.apiBase}/variables/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ key, value }),
+    });
+  }
+
+  async deleteVariable(id: string) {
+    return this.request(`${this.apiBase}/variables/${id}`, { method: 'DELETE' });
   }
 
   // User Methods (requires owner permissions)
