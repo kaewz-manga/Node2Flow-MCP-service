@@ -719,7 +719,32 @@ const sqlitePlugin: AppPlugin = {
 };
 
 // ============================================
+// Gmail
+// ============================================
+
+import { gmailContent } from './gmail/content';
+import {
+  Mail as GmailIcon,
+  Link as GmailLinkIcon,
+} from 'lucide-react';
+
+const gmailPlugin: AppPlugin = {
+  id: 'gmail',
+  name: 'Gmail',
+  icon: GmailIcon,
+  logo: '/logos/gmail.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/gmail/connections', icon: GmailLinkIcon },
+  ],
+  routes: [
+    { path: '/gmail/connections', component: lazy(() => import('./gmail/Connections')) },
+  ],
+  content: gmailContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin];

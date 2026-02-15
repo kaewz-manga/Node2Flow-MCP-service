@@ -1410,3 +1410,105 @@ export function sqVacuum(connectionId: string) {
 export function sqIntegrityCheck(connectionId: string) {
   return sqCall(connectionId, 'sqlite_integrity_check');
 }
+
+// ============================================================
+// Gmail Proxy (28 tools)
+// ============================================================
+
+function gmCall<T = unknown>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('gmail', connectionId, tool, args);
+}
+
+// Messages (10)
+export function gmListMessages(connectionId: string, opts: { q?: string; label_ids?: string[]; max_results?: number; page_token?: string; include_spam_trash?: boolean } = {}) {
+  return gmCall(connectionId, 'gmail_list_messages', opts);
+}
+export function gmGetMessage(connectionId: string, id: string, opts: { format?: string; metadata_headers?: string[] } = {}) {
+  return gmCall(connectionId, 'gmail_get_message', { id, ...opts });
+}
+export function gmSendMessage(connectionId: string, to: string, subject: string, body: string, opts: { cc?: string; bcc?: string; html?: string; in_reply_to?: string; references?: string; thread_id?: string } = {}) {
+  return gmCall(connectionId, 'gmail_send_message', { to, subject, body, ...opts });
+}
+export function gmDeleteMessage(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_delete_message', { id });
+}
+export function gmTrashMessage(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_trash_message', { id });
+}
+export function gmUntrashMessage(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_untrash_message', { id });
+}
+export function gmModifyMessage(connectionId: string, id: string, opts: { add_label_ids?: string[]; remove_label_ids?: string[] } = {}) {
+  return gmCall(connectionId, 'gmail_modify_message', { id, ...opts });
+}
+export function gmBatchDelete(connectionId: string, ids: string[]) {
+  return gmCall(connectionId, 'gmail_batch_delete', { ids });
+}
+export function gmBatchModify(connectionId: string, ids: string[], opts: { add_label_ids?: string[]; remove_label_ids?: string[] } = {}) {
+  return gmCall(connectionId, 'gmail_batch_modify', { ids, ...opts });
+}
+export function gmGetAttachment(connectionId: string, messageId: string, attachmentId: string) {
+  return gmCall(connectionId, 'gmail_get_attachment', { message_id: messageId, attachment_id: attachmentId });
+}
+
+// Drafts (6)
+export function gmListDrafts(connectionId: string, opts: { max_results?: number; page_token?: string; q?: string } = {}) {
+  return gmCall(connectionId, 'gmail_list_drafts', opts);
+}
+export function gmGetDraft(connectionId: string, id: string, format?: string) {
+  return gmCall(connectionId, 'gmail_get_draft', { id, ...(format ? { format } : {}) });
+}
+export function gmCreateDraft(connectionId: string, to: string, subject: string, body: string, opts: { cc?: string; bcc?: string; html?: string; thread_id?: string } = {}) {
+  return gmCall(connectionId, 'gmail_create_draft', { to, subject, body, ...opts });
+}
+export function gmUpdateDraft(connectionId: string, id: string, to: string, subject: string, body: string, opts: { cc?: string; bcc?: string; html?: string; thread_id?: string } = {}) {
+  return gmCall(connectionId, 'gmail_update_draft', { id, to, subject, body, ...opts });
+}
+export function gmDeleteDraft(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_delete_draft', { id });
+}
+export function gmSendDraft(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_send_draft', { id });
+}
+
+// Labels (5)
+export function gmListLabels(connectionId: string) {
+  return gmCall(connectionId, 'gmail_list_labels');
+}
+export function gmGetLabel(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_get_label', { id });
+}
+export function gmCreateLabel(connectionId: string, name: string, opts: { message_list_visibility?: string; label_list_visibility?: string; background_color?: string; text_color?: string } = {}) {
+  return gmCall(connectionId, 'gmail_create_label', { name, ...opts });
+}
+export function gmUpdateLabel(connectionId: string, id: string, opts: { name?: string; message_list_visibility?: string; label_list_visibility?: string; background_color?: string; text_color?: string } = {}) {
+  return gmCall(connectionId, 'gmail_update_label', { id, ...opts });
+}
+export function gmDeleteLabel(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_delete_label', { id });
+}
+
+// Threads (5)
+export function gmListThreads(connectionId: string, opts: { q?: string; label_ids?: string[]; max_results?: number; page_token?: string; include_spam_trash?: boolean } = {}) {
+  return gmCall(connectionId, 'gmail_list_threads', opts);
+}
+export function gmGetThread(connectionId: string, id: string, format?: string) {
+  return gmCall(connectionId, 'gmail_get_thread', { id, ...(format ? { format } : {}) });
+}
+export function gmModifyThread(connectionId: string, id: string, opts: { add_label_ids?: string[]; remove_label_ids?: string[] } = {}) {
+  return gmCall(connectionId, 'gmail_modify_thread', { id, ...opts });
+}
+export function gmTrashThread(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_trash_thread', { id });
+}
+export function gmUntrashThread(connectionId: string, id: string) {
+  return gmCall(connectionId, 'gmail_untrash_thread', { id });
+}
+
+// Settings (2)
+export function gmGetProfile(connectionId: string) {
+  return gmCall(connectionId, 'gmail_get_profile');
+}
+export function gmUpdateVacation(connectionId: string, opts: { enable_auto_reply: boolean; response_subject?: string; response_body_plain_text?: string; response_body_html?: string; restrict_to_contacts?: boolean; restrict_to_domain?: boolean; start_time?: string; end_time?: string }) {
+  return gmCall(connectionId, 'gmail_update_vacation', opts);
+}
