@@ -794,7 +794,57 @@ const context7Plugin: AppPlugin = {
 };
 
 // ============================================
+// GitHub Plugin
+// ============================================
+
+import { githubContent } from './github/content';
+import {
+  GitBranch as GitHubIcon,
+  Link as GitHubLinkIcon,
+} from 'lucide-react';
+
+const githubPlugin: AppPlugin = {
+  id: 'github',
+  name: 'GitHub',
+  icon: GitHubIcon,
+  logo: '/logos/github.svg?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/github/connections', icon: GitHubLinkIcon },
+  ],
+  routes: [
+    { path: '/github/connections', component: lazy(() => import('./github/Connections')) },
+  ],
+  content: githubContent,
+};
+
+// ============================================
+// Cloudflare Plugin
+// ============================================
+
+import { cloudflareContent } from './cloudflare/content';
+import {
+  Cloud as CloudflareIcon,
+  Link as CloudflareLinkIcon,
+} from 'lucide-react';
+
+const cloudflarePlugin: AppPlugin = {
+  id: 'cloudflare',
+  name: 'Cloudflare',
+  icon: CloudflareIcon,
+  logo: '/logos/cloudflare.png?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/cloudflare/connections', icon: CloudflareLinkIcon },
+  ],
+  routes: [
+    { path: '/cloudflare/connections', component: lazy(() => import('./cloudflare/Connections')) },
+  ],
+  content: cloudflareContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin];

@@ -25,6 +25,8 @@ import { sqlitePlugin } from './plugins/sqlite';
 import { gmailPlugin } from './plugins/gmail';
 import { googleCalendarPlugin } from './plugins/google-calendar';
 import { context7Plugin } from './plugins/context7';
+import { githubPlugin } from './plugins/github';
+import { cloudflarePlugin } from './plugins/cloudflare';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -55,6 +57,8 @@ PLUGINS.set('sqlite', sqlitePlugin);
 PLUGINS.set('gmail', gmailPlugin);
 PLUGINS.set('google-calendar', googleCalendarPlugin);
 PLUGINS.set('context7', context7Plugin);
+PLUGINS.set('github', githubPlugin);
+PLUGINS.set('cloudflare', cloudflarePlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

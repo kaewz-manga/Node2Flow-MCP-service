@@ -54,6 +54,8 @@ const TOOL_COUNTS: Record<string, number> = {
   sqlite: 15,
   gmail: 20,
   'google-calendar': 28,
+  github: 26,
+  cloudflare: 25,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -84,6 +86,8 @@ const SERVICE_LOGOS: Record<string, string> = {
   gmail: '/logos/gmail.svg?v=2',
   'google-calendar': '/logos/google-calendar.svg?v=2',
   context7: '/logos/context7.png?v=3',
+  github: '/logos/github.svg?v=2',
+  cloudflare: '/logos/cloudflare.png?v=2',
 };
 
 export default function Dashboard() {
