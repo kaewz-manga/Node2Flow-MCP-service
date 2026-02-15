@@ -2,6 +2,8 @@
  * Gmail API v1 Client — OAuth 2.0 refresh token pattern
  */
 
+declare const Buffer: { from(str: string, enc: string): { toString(enc: string): string } } | undefined;
+
 import type {
   Message,
   MessageList,
@@ -132,6 +134,9 @@ export class GmailClient {
   }
 
   private base64Encode(str: string): string {
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(str, 'utf-8').toString('base64');
+    }
     const encoder = new TextEncoder();
     const bytes = encoder.encode(str);
     let binary = '';
@@ -142,6 +147,9 @@ export class GmailClient {
   }
 
   private base64UrlEncode(str: string): string {
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(str, 'utf-8').toString('base64url');
+    }
     const encoder = new TextEncoder();
     const bytes = encoder.encode(str);
     let binary = '';
