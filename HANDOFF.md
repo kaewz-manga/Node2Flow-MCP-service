@@ -218,7 +218,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (547 tools across 23 plugins) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (656 tools across 28 plugins) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -1757,3 +1757,69 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `75512f09` (`mcp.node2flow.net`) + Dashboard `4e86fec5` (`app.node2flow.net`)
 **Commit**: `f32b051`
 **Date**: 2026-02-15
+
+### Session 56f: Google Calendar Plugin (Gateway + Dashboard)
+
+**Goal**: Add Google Calendar community MCP as 25th Gateway plugin + Dashboard UI.
+**Total**: 25 plugins, 603 tools.
+
+- **Gateway**: 28 tools across 4 categories — Calendars (5), Events (12), Event Instances (3), Settings (8)
+- **Dashboard**: content.tsx + Connections.tsx (OAuth 2.0: Client ID, Client Secret, Refresh Token)
+- **Per-user OAuth**: Connect Google Account per connection → tokens in config_encrypted → auto-refresh
+
+**Commit**: `987ae8e` (includes context7 logo and sqlite logo fixes)
+**Date**: 2026-02-15
+
+### Session 57: Context7 + n8n Update + GitHub + Cloudflare Plugins (2026-02-16)
+
+**Goal**: Multiple plugin additions and updates in single session.
+**Total**: 28 plugins, 656 tools.
+
+1. **n8n Gateway plugin updated** (`c86136d`):
+   - Replaced client.ts with community version (configurable timeout/apiPath)
+   - Added 4 Variable methods (list, create, update, delete) — NOT exposed as tools (n8n CE returns 403)
+   - Updated index.ts with ok() helper pattern
+
+2. **CL Worker secrets verified** (`6b793ca`):
+   - All 11 secrets confirmed set via `wrangler secret list`
+   - Updated wrangler.toml comment to list all 11
+
+3. **Context7 plugin added** (`b321561` + `cd71ce3`):
+   - **Gateway**: 2 tools (resolve_library_id, query_docs) — MCP JSON-RPC proxy to public `mcp.context7.com/mcp`
+   - **Dashboard**: Simplified Connections page — no API key needed (public service)
+   - **Logo**: Proper brand logo (context7.png 460x460)
+
+4. **Logo fixes** (`987ae8e`):
+   - SQLite: Changed from .svg to .png (proper brand logo 512x512), updated all refs with `?v=3`
+   - Context7: Replaced with proper brand logo, `?v=3`
+
+5. **GitHub plugin added** (`a501911`):
+   - **Gateway**: `plugins/github/` — 26 tools via GitHub REST API v3
+     - Repositories (7): search, create, fork, get_file_contents, create_or_update_file, push_files, list_commits
+     - Branches (1): create_branch
+     - Pull Requests (8): list, create, get, get_comments, get_files, get_reviews, get_status, merge, update_branch, create_review
+     - Issues (5): list, get, create, update, add_comment
+     - Search (3): search_code, search_issues, search_users
+   - **Dashboard**: content.tsx + Connections.tsx (PAT auth — single token field)
+   - **Config**: `{ token }` → Bearer auth
+
+6. **Cloudflare plugin added** (`a501911`):
+   - **Gateway**: `plugins/cloudflare/` — 25 tools via Cloudflare REST API v4
+     - Accounts (2): list_accounts, set_active_account
+     - Workers (3): list, get, get_code
+     - D1 Databases (5): list, create, get, delete, query
+     - KV Namespaces (5): list, create, get, update, delete
+     - R2 Buckets (4): list, create, get, delete
+     - Hyperdrive (4): list, get, edit, delete
+     - Documentation (2): search_docs, migrate_pages_to_workers_guide
+   - **Dashboard**: content.tsx + Connections.tsx (API Token + optional Account ID)
+   - **Config**: `{ api_token, account_id? }` → Bearer auth
+   - **Logo**: cloudflare.png (460x460)
+
+7. **Files changed** (16 total):
+   - NEW (13): 4 GitHub Gateway + 4 Cloudflare Gateway + 2 GitHub Dashboard + 2 Cloudflare Dashboard + cloudflare.png
+   - EDIT (3): plugin-registry.ts (Gateway) + registry.ts (Dashboard) + Dashboard.tsx
+
+**Deployed**: Gateway `f690606b` (`mcp.node2flow.net`) + Dashboard `2564f712` (`app.node2flow.net`)
+**Commit**: `a501911`
+**Date**: 2026-02-16
