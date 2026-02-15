@@ -117,6 +117,7 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugins/google-docs/` | 4 files | Google Docs: 26 tools, Docs API v1 |
 | `plugins/supabase/` | 5 files | Supabase: 31 tools, Supabase REST + Management API |
 | `plugins/sqlite/` | 4 files | SQLite: 15 tools, LibSQL/Turso remote client |
+| `plugins/gmail/` | 4 files | Gmail: 28 tools, Gmail API v1 OAuth 2.0 |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -1725,4 +1726,34 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 
 **Deployed**: Gateway `c05f22fe` (`mcp.node2flow.net`) + Dashboard `9b26c7a1` (`app.node2flow.net`)
 **Commit**: `4f563a1`
+**Date**: 2026-02-15
+
+### Session 56e: Gmail Plugin (Gateway + Dashboard)
+
+**Goal**: Add Gmail community MCP as 24th Gateway plugin + Dashboard UI.
+**Total**: 24 plugins, 575 tools.
+
+1. **Gateway — Gmail Plugin** (28 tools):
+   - Messages (10): list, get, send, reply, delete, trash, untrash, modify_labels, batch_modify, get_attachment
+   - Drafts (6): list, get, create, update, send, delete
+   - Labels (5): list, get, create, update, delete
+   - Threads (5): list, get, modify, trash, untrash
+   - Settings (2): get_profile, update_vacation
+   - Config: `{ client_id, client_secret, refresh_token }` — OAuth 2.0 with auto token refresh
+   - Source: Ported from `node2flow-th/gmail-mcp-community`
+   - Files: `apps/mcp-gateway/src/plugins/gmail/{types,gmail-client,tools,index}.ts`
+
+2. **Dashboard — Gmail Plugin**:
+   - `content.tsx`: PluginContent with tagline, features (Messages & Drafts, Labels, Threads & Settings), FAQ
+   - `Connections.tsx`: 3 OAuth config fields — Client ID, Client Secret, Refresh Token
+   - `gmail.svg`: Gmail logo with Google brand colors
+   - `registry.ts`: Added `gmailPlugin` (Mail icon, /gmail/connections route)
+   - `gateway-api.ts`: Added `gmCall()` + 28 API helper functions (all 5 categories)
+
+3. **Files changed** (10 total):
+   - NEW (7): 4 Gateway plugin files + 3 Dashboard files (content, connections, logo)
+   - EDIT (3): `plugin-registry.ts` (Gateway) + `registry.ts` (Dashboard) + `gateway-api.ts`
+
+**Deployed**: Gateway `75512f09` (`mcp.node2flow.net`) + Dashboard `4e86fec5` (`app.node2flow.net`)
+**Commit**: `f32b051`
 **Date**: 2026-02-15
