@@ -81,7 +81,7 @@ const n8nPlugin: AppPlugin = {
   id: 'n8n',
   name: 'n8n Management',
   icon: Server,
-  logo: '/logos/n8n.svg',
+  logo: '/logos/n8n.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/n8n/connections', icon: LinkIcon },
@@ -120,7 +120,7 @@ const wordpressPlugin: AppPlugin = {
   id: 'wordpress',
   name: 'WordPress',
   icon: Globe,
-  logo: '/logos/wordpress.svg',
+  logo: '/logos/wordpress.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/wordpress/connections', icon: WPLinkIcon },
@@ -156,7 +156,7 @@ const clN8nMcpPlugin: AppPlugin = {
   id: 'cl-n8n-mcp',
   name: 'Workflow Builder',
   icon: Cpu,
-  logo: '/logos/n8n-alt.svg',
+  logo: '/logos/n8n-alt.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/cl-n8n-mcp/connections', icon: McpLinkIcon },
@@ -189,7 +189,7 @@ const geminiRagPlugin: AppPlugin = {
   id: 'gemini-rag',
   name: 'Gemini RAG',
   icon: Database,
-  logo: '/logos/gemini.png',
+  logo: '/logos/gemini.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/gemini-rag/connections', icon: GeminiLinkIcon },
@@ -221,7 +221,7 @@ const linePlugin: AppPlugin = {
   id: 'line',
   name: 'LINE Bot',
   icon: LineIcon,
-  logo: '/logos/line.png',
+  logo: '/logos/line.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/line/connections', icon: LineLinkIcon },
@@ -255,7 +255,7 @@ const telegramPlugin: AppPlugin = {
   id: 'telegram',
   name: 'Telegram Bot',
   icon: TelegramIcon,
-  logo: '/logos/telegram.svg',
+  logo: '/logos/telegram.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/telegram/connections', icon: TelegramLinkIcon },
@@ -289,7 +289,7 @@ const notionPlugin: AppPlugin = {
   id: 'notion',
   name: 'Notion',
   icon: NotionIcon,
-  logo: '/logos/notion.svg',
+  logo: '/logos/notion.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/notion/connections', icon: NotionLinkIcon },
@@ -320,7 +320,7 @@ const notionOfficialPlugin: AppPlugin = {
   id: 'notion-official',
   name: 'Notion (Official)',
   icon: NotionOffIcon,
-  logo: '/logos/notion.svg',
+  logo: '/logos/notion.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/notion-official/connections', icon: NotionOffLinkIcon },
@@ -345,7 +345,7 @@ const lineOfficialPlugin: AppPlugin = {
   id: 'line-official',
   name: 'LINE (Official)',
   icon: LineOffIcon,
-  logo: '/logos/line.png',
+  logo: '/logos/line.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/line-official/connections', icon: LineOffLinkIcon },
@@ -370,7 +370,7 @@ const playwrightPlugin: AppPlugin = {
   id: 'playwright',
   name: 'Browser Automation',
   icon: PlaywrightIcon,
-  logo: '/logos/playwright.svg',
+  logo: '/logos/playwright.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/playwright/connections', icon: PlaywrightLinkIcon },
@@ -395,7 +395,7 @@ const googleWorkspacePlugin: AppPlugin = {
   id: 'google-workspace',
   name: 'Google Workspace',
   icon: GWSIcon,
-  logo: '/logos/google.svg',
+  logo: '/logos/google.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-workspace/connections', icon: GWSLinkIcon },
@@ -424,7 +424,7 @@ const slackPlugin: AppPlugin = {
   id: 'slack',
   name: 'Slack',
   icon: SlackIcon,
-  logo: '/logos/slack.png',
+  logo: '/logos/slack.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/slack/connections', icon: SlackLinkIcon },
@@ -457,7 +457,7 @@ const airtablePlugin: AppPlugin = {
   id: 'airtable',
   name: 'Airtable',
   icon: AirtableIcon,
-  logo: '/logos/airtable.svg',
+  logo: '/logos/airtable.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/airtable/connections', icon: AirtableLinkIcon },
@@ -482,7 +482,7 @@ const youtubePlugin: AppPlugin = {
   id: 'youtube',
   name: 'YouTube',
   icon: YouTubeIcon,
-  logo: '/logos/youtube.svg',
+  logo: '/logos/youtube.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/youtube/connections', icon: YouTubeLinkIcon },
@@ -507,7 +507,7 @@ const postgrestPlugin: AppPlugin = {
   id: 'postgrest',
   name: 'PostgREST',
   icon: PostgrestIcon,
-  logo: '/logos/postgrest.png',
+  logo: '/logos/postgrest.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/postgrest/connections', icon: PostgrestLinkIcon },
@@ -532,7 +532,7 @@ const bitkubPlugin: AppPlugin = {
   id: 'bitkub',
   name: 'Bitkub',
   icon: BitkubIcon,
-  logo: '/logos/bitkub.png',
+  logo: '/logos/bitkub.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/bitkub/connections', icon: BitkubLinkIcon },
@@ -557,7 +557,7 @@ const binancePlugin: AppPlugin = {
   id: 'binance',
   name: 'Binance',
   icon: BinanceIcon,
-  logo: '/logos/binance.png',
+  logo: '/logos/binance.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/binance/connections', icon: BinanceLinkIcon },
@@ -582,7 +582,7 @@ const binanceThPlugin: AppPlugin = {
   id: 'binance-th',
   name: 'Binance TH',
   icon: BinanceThIcon,
-  logo: '/logos/binance.png',
+  logo: '/logos/binance.png?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/binance-th/connections', icon: BinanceThLinkIcon },
@@ -607,7 +607,7 @@ const googleSheetsPlugin: AppPlugin = {
   id: 'google-sheets',
   name: 'Google Sheets',
   icon: GoogleSheetsIcon,
-  logo: '/logos/google-sheets.svg',
+  logo: '/logos/google-sheets.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-sheets/connections', icon: GoogleSheetsLinkIcon },
@@ -632,7 +632,7 @@ const googleDrivePlugin: AppPlugin = {
   id: 'google-drive',
   name: 'Google Drive',
   icon: GoogleDriveIcon,
-  logo: '/logos/google-drive.svg',
+  logo: '/logos/google-drive.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-drive/connections', icon: GoogleDriveLinkIcon },
@@ -657,7 +657,7 @@ const googleDocsPlugin: AppPlugin = {
   id: 'google-docs',
   name: 'Google Docs',
   icon: GoogleDocsIcon,
-  logo: '/logos/google-docs.svg',
+  logo: '/logos/google-docs.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-docs/connections', icon: GoogleDocsLinkIcon },
@@ -682,7 +682,7 @@ const supabasePlugin: AppPlugin = {
   id: 'supabase',
   name: 'Supabase',
   icon: SupabaseIcon,
-  logo: '/logos/supabase.svg',
+  logo: '/logos/supabase.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/supabase/connections', icon: SupabaseLinkIcon },
@@ -707,7 +707,7 @@ const sqlitePlugin: AppPlugin = {
   id: 'sqlite',
   name: 'SQLite',
   icon: SqliteIcon,
-  logo: '/logos/sqlite.svg',
+  logo: '/logos/sqlite.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/sqlite/connections', icon: SqliteLinkIcon },
@@ -732,7 +732,7 @@ const gmailPlugin: AppPlugin = {
   id: 'gmail',
   name: 'Gmail',
   icon: GmailIcon,
-  logo: '/logos/gmail.svg',
+  logo: '/logos/gmail.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/gmail/connections', icon: GmailLinkIcon },
@@ -757,7 +757,7 @@ const googleCalendarPlugin: AppPlugin = {
   id: 'google-calendar',
   name: 'Google Calendar',
   icon: GoogleCalendarIcon,
-  logo: '/logos/google-calendar.svg',
+  logo: '/logos/google-calendar.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/google-calendar/connections', icon: GoogleCalendarLinkIcon },
