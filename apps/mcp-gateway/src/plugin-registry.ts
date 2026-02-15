@@ -14,6 +14,9 @@ import { slackPlugin } from './plugins/slack';
 import { airtablePlugin } from './plugins/airtable';
 import { youtubePlugin } from './plugins/youtube';
 import { postgrestPlugin } from './plugins/postgrest';
+import { bitkubPlugin } from './plugins/bitkub';
+import { binancePlugin } from './plugins/binance';
+import { binanceThPlugin } from './plugins/binance-th';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -33,6 +36,9 @@ PLUGINS.set('slack', slackPlugin);
 PLUGINS.set('airtable', airtablePlugin);
 PLUGINS.set('youtube', youtubePlugin);
 PLUGINS.set('postgrest', postgrestPlugin);
+PLUGINS.set('bitkub', bitkubPlugin);
+PLUGINS.set('binance', binancePlugin);
+PLUGINS.set('binance-th', binanceThPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

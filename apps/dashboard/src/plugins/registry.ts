@@ -519,7 +519,82 @@ const postgrestPlugin: AppPlugin = {
 };
 
 // ============================================
+// Bitkub Plugin
+// ============================================
+
+import { bitkubContent } from './bitkub/content';
+import {
+  TrendingUp as BitkubIcon,
+  Link as BitkubLinkIcon,
+} from 'lucide-react';
+
+const bitkubPlugin: AppPlugin = {
+  id: 'bitkub',
+  name: 'Bitkub',
+  icon: BitkubIcon,
+  logo: '/logos/bitkub.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/bitkub/connections', icon: BitkubLinkIcon },
+  ],
+  routes: [
+    { path: '/bitkub/connections', component: lazy(() => import('./bitkub/Connections')) },
+  ],
+  content: bitkubContent,
+};
+
+// ============================================
+// Binance Plugin
+// ============================================
+
+import { binanceContent } from './binance/content';
+import {
+  BarChart3 as BinanceIcon,
+  Link as BinanceLinkIcon,
+} from 'lucide-react';
+
+const binancePlugin: AppPlugin = {
+  id: 'binance',
+  name: 'Binance',
+  icon: BinanceIcon,
+  logo: '/logos/binance.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/binance/connections', icon: BinanceLinkIcon },
+  ],
+  routes: [
+    { path: '/binance/connections', component: lazy(() => import('./binance/Connections')) },
+  ],
+  content: binanceContent,
+};
+
+// ============================================
+// Binance TH Plugin
+// ============================================
+
+import { binanceThContent } from './binance-th/content';
+import {
+  Landmark as BinanceThIcon,
+  Link as BinanceThLinkIcon,
+} from 'lucide-react';
+
+const binanceThPlugin: AppPlugin = {
+  id: 'binance-th',
+  name: 'Binance TH',
+  icon: BinanceThIcon,
+  logo: '/logos/binance-th.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/binance-th/connections', icon: BinanceThLinkIcon },
+  ],
+  routes: [
+    { path: '/binance-th/connections', component: lazy(() => import('./binance-th/Connections')) },
+  ],
+  content: binanceThContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin];

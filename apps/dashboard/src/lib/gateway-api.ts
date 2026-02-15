@@ -903,3 +903,67 @@ export async function disconnectGoogleWorkspace(
     method: 'POST',
   });
 }
+
+// ============================================
+// Bitkub Proxy
+// ============================================
+
+function btkCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('bitkub', connectionId, tool, args);
+}
+
+export function btkGetTicker(connectionId: string, symbol?: string) {
+  const args: Record<string, unknown> = {};
+  if (symbol) args.symbol = symbol;
+  return btkCall(connectionId, 'btk_ticker', args);
+}
+export function btkGetBalances(connectionId: string) {
+  return btkCall(connectionId, 'btk_wallet_balances', {});
+}
+export function btkGetOpenOrders(connectionId: string, symbol: string) {
+  return btkCall(connectionId, 'btk_open_orders', { symbol });
+}
+
+// ============================================
+// Binance Proxy
+// ============================================
+
+function bnCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('binance', connectionId, tool, args);
+}
+
+export function bnGetTicker24hr(connectionId: string, symbol?: string) {
+  const args: Record<string, unknown> = {};
+  if (symbol) args.symbol = symbol;
+  return bnCall(connectionId, 'bn_ticker_24hr', args);
+}
+export function bnGetAccount(connectionId: string) {
+  return bnCall(connectionId, 'bn_account_info', {});
+}
+export function bnGetOpenOrders(connectionId: string, symbol?: string) {
+  const args: Record<string, unknown> = {};
+  if (symbol) args.symbol = symbol;
+  return bnCall(connectionId, 'bn_open_orders', args);
+}
+
+// ============================================
+// Binance TH Proxy
+// ============================================
+
+function bthCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('binance-th', connectionId, tool, args);
+}
+
+export function bthGetTicker24hr(connectionId: string, symbol?: string) {
+  const args: Record<string, unknown> = {};
+  if (symbol) args.symbol = symbol;
+  return bthCall(connectionId, 'bth_ticker_24hr', args);
+}
+export function bthGetAccount(connectionId: string) {
+  return bthCall(connectionId, 'bth_account_info', {});
+}
+export function bthGetOpenOrders(connectionId: string, symbol?: string) {
+  const args: Record<string, unknown> = {};
+  if (symbol) args.symbol = symbol;
+  return bthCall(connectionId, 'bth_open_orders', args);
+}

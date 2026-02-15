@@ -1552,6 +1552,55 @@ Added 3 community MCP packages as Gateway plugins + Dashboard pages. Platform no
 **Deployed**: Gateway `13ad2386` (`mcp.node2flow.net`) + Dashboard `9fdb3533` (`app.node2flow.net`)
 **Date**: 2026-02-15
 
+### Session 56: Bitkub + Binance + Binance TH Crypto Exchange Plugins (2026-02-15)
+
+Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platform now has **18 plugins (382 tools)** — up from 15 plugins (352 tools).
+
+1. **Shared Utility — `_crypto-utils.ts`**:
+   - `hmacSha256Hex()` using Web Crypto API (Cloudflare Workers compatible)
+   - Used by all 3 exchange clients for HMAC-SHA256 request signing
+
+2. **Gateway — Bitkub Plugin** (28 tools, `btk_` prefix):
+   - Market (8): ticker, symbols, trades, bids, asks, orderbook, depth, ohlcv
+   - Account (3): balances, trading credits, deposit history
+   - Trading (6): place bid/ask, cancel order, order info, open orders, order history
+   - Server (2): server time, status
+   - Wallet (5): crypto addresses, deposit history, withdraw, withdrawal history, fiat accounts
+   - Test (4): place bid/ask test, websocket tokens
+   - Auth: Custom headers (`X-BTK-APIKEY`, `X-BTK-TIMESTAMP`, `X-BTK-SIGN`)
+   - Files: `apps/mcp-gateway/src/plugins/bitkub/{types,client,tools,index}.ts`
+
+3. **Gateway — Binance Plugin** (23 tools, `bn_` prefix):
+   - Market (6): exchange info, orderbook, recent trades, klines, ticker 24hr, ticker price
+   - Account (4): account info, trade history, open orders, all orders
+   - Trading (4): new order, test order, cancel order, cancel all orders
+   - Wallet (5): deposit history, withdraw history, deposit address, withdraw, coin info
+   - User Streams (4): create/keepalive/close listen key, account status
+   - Auth: Query param signature + `X-MBX-APIKEY` header
+   - Files: `apps/mcp-gateway/src/plugins/binance/{types,client,tools,index}.ts`
+
+4. **Gateway — Binance TH Plugin** (27 tools, `bth_` prefix):
+   - Market (6): exchange info, orderbook, recent trades, klines, ticker 24hr, ticker price
+   - Account (5): account info, trade history, open orders, all orders, trade fees
+   - Trading (4): new order, test order, cancel order, cancel all orders
+   - Wallet (8): deposit history, withdraw history, deposit address, withdraw, coin info, sub-account list, transfer, transfer history
+   - User Streams (4): create/keepalive/close listen key, account status
+   - Auth: Same as Binance but base URL `api.binance.th` with API v1
+   - Files: `apps/mcp-gateway/src/plugins/binance-th/{types,client,tools,index}.ts`
+
+5. **Dashboard — 3 Plugin UIs**:
+   - `content.tsx` + `Connections.tsx` for each (bitkub, binance, binance-th)
+   - SVG logos: `apps/dashboard/public/logos/{bitkub,binance,binance-th}.svg`
+   - Registry entries + 9 API helpers in `gateway-api.ts`
+
+6. **Files changed** (25 total):
+   - NEW (1): `_crypto-utils.ts` (shared HMAC utility)
+   - NEW (12): Gateway plugin files (4 per plugin × 3)
+   - NEW (9): Dashboard plugin files (content + Connections × 3) + 3 SVGs
+   - EDIT (4): `plugin-registry.ts`, `registry.ts`, `Dashboard.tsx`, `gateway-api.ts`
+
+**Date**: 2026-02-15
+
 ### Planned: Per-User OAuth Flow (Other Providers)
 
 **Done**: Google Workspace — Per-user OAuth via Gateway Worker (Session 54)

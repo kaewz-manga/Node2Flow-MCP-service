@@ -40,6 +40,9 @@ const TOOL_COUNTS: Record<string, number> = {
   'line-official': 12,
   playwright: 22,
   'google-workspace': 54,
+  bitkub: 28,
+  binance: 23,
+  'binance-th': 27,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -56,6 +59,9 @@ const SERVICE_LOGOS: Record<string, string> = {
   'notion-official': '/logos/notion.svg',
   playwright: '/logos/playwright.svg',
   'google-workspace': '/logos/google.svg',
+  bitkub: '/logos/bitkub.svg',
+  binance: '/logos/binance.svg',
+  'binance-th': '/logos/binance-th.svg',
 };
 
 export default function Dashboard() {
