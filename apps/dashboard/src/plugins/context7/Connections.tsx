@@ -180,7 +180,7 @@ export default function Connections() {
       {error && (<Alert variant="destructive"><AlertCircle className="h-5 w-5" /><AlertDescription>{error}</AlertDescription></Alert>)}
 
       <Item variant="outline">
-        <ItemMedia><img src="/logos/context7.png?v=2" alt="Context7" className="h-10 w-10" /></ItemMedia>
+        <ItemMedia><img src="/logos/context7.png?v=3" alt="Context7" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
           <ItemDescription><code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code></ItemDescription>

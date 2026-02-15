@@ -80,10 +80,10 @@ const SERVICE_LOGOS: Record<string, string> = {
   'google-drive': '/logos/google-drive.svg?v=2',
   'google-docs': '/logos/google-docs.svg?v=2',
   supabase: '/logos/supabase.svg?v=2',
-  sqlite: '/logos/sqlite.svg?v=2',
+  sqlite: '/logos/sqlite.png?v=3',
   gmail: '/logos/gmail.svg?v=2',
   'google-calendar': '/logos/google-calendar.svg?v=2',
-  context7: '/logos/context7.png?v=2',
+  context7: '/logos/context7.png?v=3',
 };
 
 export default function Dashboard() {

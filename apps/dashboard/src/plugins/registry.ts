@@ -707,7 +707,7 @@ const sqlitePlugin: AppPlugin = {
   id: 'sqlite',
   name: 'SQLite',
   icon: SqliteIcon,
-  logo: '/logos/sqlite.svg?v=2',
+  logo: '/logos/sqlite.png?v=3',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/sqlite/connections', icon: SqliteLinkIcon },
@@ -782,7 +782,7 @@ const context7Plugin: AppPlugin = {
   id: 'context7',
   name: 'Context7',
   icon: Context7Icon,
-  logo: '/logos/context7.png?v=2',
+  logo: '/logos/context7.png?v=3',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/context7/connections', icon: Context7LinkIcon },
