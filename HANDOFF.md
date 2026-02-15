@@ -106,6 +106,15 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugins/playwright/` | 4 files | Playwright: 22 tools, VPS proxy |
 | `plugins/google-workspace/` | 4 files | Google Workspace: 54 tools, VPS proxy |
 | `plugins/slack/` | 4 files | Slack: 38 tools, Slack Web API |
+| `plugins/airtable/` | 4 files | Airtable: 18 tools, Airtable REST API |
+| `plugins/youtube/` | 4 files | YouTube: 20 tools, YouTube Data API v3 |
+| `plugins/postgrest/` | 4 files | PostgREST: 10 tools, PostgREST REST API |
+| `plugins/bitkub/` | 4 files | Bitkub: 28 tools, Bitkub API |
+| `plugins/binance/` | 4 files | Binance: 23 tools, Binance API |
+| `plugins/binance-th/` | 4 files | Binance TH: 27 tools, Binance TH API |
+| `plugins/google-sheets/` | 4 files | Google Sheets: 23 tools, Sheets API v4 |
+| `plugins/google-drive/` | 4 files | Google Drive: 23 tools, Drive API v3 |
+| `plugins/google-docs/` | 4 files | Google Docs: 26 tools, Docs API v1 |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -1615,3 +1624,41 @@ Added 3 crypto exchange MCP packages as Gateway plugins + Dashboard pages. Platf
 
 **Priority**: Notion Official → LINE Official
 **Status**: Google Workspace DONE, others NOT STARTED
+
+---
+
+### Session 56 — Google Sheets, Drive, Docs Plugins (2026-02-15)
+
+**Summary**: Added 3 Google community MCP packages as Gateway plugins + Dashboard pages. **21 plugins, 501 tools**.
+
+1. **Gateway — Google Sheets Plugin** (23 tools, `gs_` prefix):
+   - 4 files: `plugins/google-sheets/{types,client,tools,index}.ts`
+   - Ported from `@node2flow/google-sheets-mcp` community npm
+   - Categories: Spreadsheet(2), Values(6), Sheet Management(5), Formatting(4), Data Operations(4), Advanced(2)
+
+2. **Gateway — Google Drive Plugin** (23 tools, `gd_` prefix):
+   - 4 files: `plugins/google-drive/{types,client,tools,index}.ts`
+   - Ported from `@node2flow/google-drive-mcp` community npm
+   - Categories: Files(10), Permissions(3), Comments(3), Replies(2), Shared Drives(3), Revisions(1), About(1)
+
+3. **Gateway — Google Docs Plugin** (26 tools, `gdoc_` prefix):
+   - 4 files: `plugins/google-docs/{types,client,tools,index}.ts`
+   - Ported from `@node2flow/google-docs-mcp` community npm
+   - Categories: Document(2), Content(5), Text Formatting(2), Lists(2), Tables(7), Headers/Footers(4), Sections/Named Ranges(3), Advanced(1)
+
+4. **All 3 plugins use OAuth 2.0**: Client ID + Client Secret + Refresh Token → auto-refresh access token
+
+5. **Dashboard — 3 Plugin UIs**:
+   - `content.tsx` + `Connections.tsx` for each (google-sheets, google-drive, google-docs)
+   - SVG logos: `apps/dashboard/public/logos/{google-sheets,google-drive,google-docs}.svg`
+   - Registry entries + 72 API helpers in `gateway-api.ts`
+
+6. **Files changed** (24 total):
+   - NEW (12): Gateway plugin files (4 per plugin × 3)
+   - NEW (9): Dashboard plugin files (content + Connections × 3) + 3 SVGs
+   - EDIT (3): `plugin-registry.ts`, `registry.ts`, `gateway-api.ts`
+
+**Typecheck**: 0 errors in new plugins (both Gateway + Dashboard)
+**Deployed**: `mcp.node2flow.net` (Worker) + `app.node2flow.net` (CF Pages)
+**Commit**: `f8aa192`
+**Date**: 2026-02-15
