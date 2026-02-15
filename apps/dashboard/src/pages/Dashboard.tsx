@@ -83,6 +83,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   sqlite: '/logos/sqlite.svg?v=2',
   gmail: '/logos/gmail.svg?v=2',
   'google-calendar': '/logos/google-calendar.svg?v=2',
+  context7: '/logos/context7.png?v=2',
 };
 
 export default function Dashboard() {

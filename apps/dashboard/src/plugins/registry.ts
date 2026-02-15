@@ -769,7 +769,32 @@ const googleCalendarPlugin: AppPlugin = {
 };
 
 // ============================================
+// Context7 Plugin (Documentation)
+// ============================================
+
+import { context7Content } from './context7/content';
+import {
+  BookOpen as Context7Icon,
+  Link as Context7LinkIcon,
+} from 'lucide-react';
+
+const context7Plugin: AppPlugin = {
+  id: 'context7',
+  name: 'Context7',
+  icon: Context7Icon,
+  logo: '/logos/context7.png?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/context7/connections', icon: Context7LinkIcon },
+  ],
+  routes: [
+    { path: '/context7/connections', component: lazy(() => import('./context7/Connections')) },
+  ],
+  content: context7Content,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin];
