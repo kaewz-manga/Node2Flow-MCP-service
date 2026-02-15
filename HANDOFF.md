@@ -115,6 +115,8 @@ Extracted from `n8n-management-mcp/src/` — all platform-level code:
 | `plugins/google-sheets/` | 4 files | Google Sheets: 23 tools, Sheets API v4 |
 | `plugins/google-drive/` | 4 files | Google Drive: 23 tools, Drive API v3 |
 | `plugins/google-docs/` | 4 files | Google Docs: 26 tools, Docs API v1 |
+| `plugins/supabase/` | 5 files | Supabase: 31 tools, Supabase REST + Management API |
+| `plugins/sqlite/` | 4 files | SQLite: 15 tools, LibSQL/Turso remote client |
 | `plugins/_template/` | 1 file | Template for new plugins |
 
 **D1 Schema**: `migrations/001_unified_connections.sql` — 1 table (connections with `product_type` column)
@@ -215,7 +217,7 @@ All infrastructure deployed and verified:
 | Resource | URL / ID | Status |
 |----------|----------|--------|
 | Platform Worker | `platform.node2flow.net` | ✅ Live |
-| MCP Gateway | `mcp.node2flow.net` | ✅ Live (304 tools across 12 plugins) |
+| MCP Gateway | `mcp.node2flow.net` | ✅ Live (547 tools across 23 plugins) |
 | Dashboard | `app.node2flow.net` | ✅ Live (CF Pages) |
 | D1: platform-db | `9c73d346-da37-4152-9572-8499a969b8fb` | ✅ 10 tables |
 | D1: products-db | `d58d9176-0836-4e83-90d9-4450ca8b3bb9` | ✅ 1 table |
@@ -1690,4 +1692,37 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 
 **Deployed**: Gateway `306edcbe` (`mcp.node2flow.net`) + Dashboard `a125ed8d` (`app.node2flow.net`)
 **Commits**: `9e8bae3` (Gateway) → `b25c297` (Dashboard)
+**Date**: 2026-02-15
+
+---
+
+### Session 56d: SQLite Plugin (Gateway + Dashboard)
+
+**Goal**: Add SQLite community MCP as 23rd Gateway plugin + Dashboard UI.
+**Total**: 23 plugins, 547 tools.
+
+1. **Gateway — SQLite Plugin** (15 tools, `sqlite_` prefix):
+   - Query & Execute (3): query, execute, run_script
+   - Schema Inspection (4): list_tables, describe_table, list_indexes, list_foreign_keys
+   - Schema Management (3): create_table, alter_table, drop_table
+   - Index Management (2): create_index, drop_index
+   - Database Management (3): get_info, vacuum, integrity_check
+   - Config: `{ db_url, auth_token }` — LibSqlClient for remote SQLite/Turso (CF Worker compatible)
+   - Source: Ported from `@node2flow/sqlite-mcp-community`
+   - Dependency: Added `@libsql/client` to Gateway package.json
+   - Files: `apps/mcp-gateway/src/plugins/sqlite/{types,libsql-client,tools,index}.ts`
+
+2. **Dashboard — SQLite Plugin**:
+   - `content.tsx`: PluginContent with tagline, features (Query, Schema, DB Mgmt), FAQ (3 items)
+   - `Connections.tsx`: 2 config fields — Database URL (required), Auth Token (optional)
+   - `sqlite.svg`: SQLite logo
+   - `registry.ts`: Added `sqlitePlugin` (Database icon, /sqlite/connections route)
+   - `gateway-api.ts`: Added `sqCall()` + 15 API helper functions (all 5 categories)
+
+3. **Files changed** (12 total):
+   - NEW (7): 4 Gateway plugin files + 3 Dashboard files (content, connections, logo)
+   - EDIT (5): `plugin-registry.ts` (Gateway) + `registry.ts` (Dashboard) + `gateway-api.ts` + `package.json` + `pnpm-lock.yaml`
+
+**Deployed**: Gateway `c05f22fe` (`mcp.node2flow.net`) + Dashboard `9b26c7a1` (`app.node2flow.net`)
+**Commit**: `4f563a1`
 **Date**: 2026-02-15
