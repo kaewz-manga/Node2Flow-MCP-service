@@ -1,6 +1,6 @@
 /**
  * WordPress REST API Client
- * Uses Application Password authentication
+ * Uses Application Password authentication (HTTP Basic Auth)
  */
 
 import type { WordPressConfig } from './types';
@@ -9,7 +9,11 @@ export class WordPressClient {
   private config: WordPressConfig;
 
   constructor(config: WordPressConfig) {
-    this.config = config;
+    this.config = {
+      ...config,
+      siteUrl: config.siteUrl.replace(/\/+$/, ''),
+      applicationPassword: config.applicationPassword.replace(/\s+/g, ''),
+    };
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -30,7 +34,7 @@ export class WordPressClient {
       throw new Error(`WordPress API Error (${response.status}): ${error}`);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   // Posts
@@ -119,38 +123,28 @@ export class WordPressClient {
   }
 
   // Categories
-  async listCategories() {
-    return this.request('/wp/v2/categories?per_page=100');
-  }
-
-  async createCategory(data: { name: string; parent?: number; description?: string }) {
-    return this.request('/wp/v2/categories', { method: 'POST', body: JSON.stringify(data) });
-  }
-
-  async deleteCategory(id: number) {
-    return this.request(`/wp/v2/categories/${id}?force=true`, { method: 'DELETE' });
+  async listCategories(params?: { per_page?: number; search?: string }) {
+    const query = new URLSearchParams();
+    query.set('per_page', String(params?.per_page ?? 100));
+    if (params?.search) query.set('search', params.search);
+    return this.request(`/wp/v2/categories?${query.toString()}`);
   }
 
   // Tags
-  async listTags() {
-    return this.request('/wp/v2/tags?per_page=100');
-  }
-
-  async createTag(data: { name: string; description?: string }) {
-    return this.request('/wp/v2/tags', { method: 'POST', body: JSON.stringify(data) });
-  }
-
-  async deleteTag(id: number) {
-    return this.request(`/wp/v2/tags/${id}?force=true`, { method: 'DELETE' });
+  async listTags(params?: { per_page?: number; search?: string }) {
+    const query = new URLSearchParams();
+    query.set('per_page', String(params?.per_page ?? 100));
+    if (params?.search) query.set('search', params.search);
+    return this.request(`/wp/v2/tags?${query.toString()}`);
   }
 
   // Users
-  async listUsers() {
-    return this.request('/wp/v2/users');
-  }
-
-  async getUser(id: number) {
-    return this.request(`/wp/v2/users/${id}`);
+  async listUsers(params?: { per_page?: number; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.per_page) query.set('per_page', String(params.per_page));
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString();
+    return this.request(`/wp/v2/users${qs ? `?${qs}` : ''}`);
   }
 
   // Site info

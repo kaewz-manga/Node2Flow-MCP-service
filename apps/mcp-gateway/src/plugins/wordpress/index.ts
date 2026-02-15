@@ -1,11 +1,15 @@
 /**
  * WordPress Plugin - MCP Gateway
- * Manages WordPress sites via REST API
+ * Source: @node2flow/wordpress-mcp community package
  */
 
 import type { MCPPlugin } from '../../types';
 import { TOOLS } from './tools';
 import { WordPressClient } from './client';
+
+function ok(data: unknown) {
+  return { content: [{ type: 'text' as const, text: JSON.stringify(data ?? { success: true }, null, 2) }], isError: false };
+}
 
 export const wordpressPlugin: MCPPlugin = {
   id: 'wordpress',
@@ -25,97 +29,44 @@ export const wordpressPlugin: MCPPlugin = {
     const wp = client as WordPressClient;
 
     try {
-      let result: unknown;
-
       switch (toolName) {
-        // ========== Post Operations ==========
-        case 'wp_list_posts':
-          result = await wp.listPosts(args as any);
-          break;
-        case 'wp_get_post':
-          result = await wp.getPost(args.id as number);
-          break;
-        case 'wp_create_post':
-          result = await wp.createPost(args as any);
-          break;
-        case 'wp_update_post':
-          result = await wp.updatePost(args.id as number, args as any);
-          break;
-        case 'wp_delete_post':
-          result = await wp.deletePost(args.id as number);
-          break;
+        // Posts
+        case 'wp_list_posts':   return ok(await wp.listPosts(args as any));
+        case 'wp_get_post':     return ok(await wp.getPost(args.id as number));
+        case 'wp_create_post':  return ok(await wp.createPost(args as any));
+        case 'wp_update_post':  return ok(await wp.updatePost(args.id as number, args as any));
+        case 'wp_delete_post':  return ok(await wp.deletePost(args.id as number));
 
-        // ========== Page Operations ==========
-        case 'wp_list_pages':
-          result = await wp.listPages(args as any);
-          break;
-        case 'wp_get_page':
-          result = await wp.getPage(args.id as number);
-          break;
-        case 'wp_create_page':
-          result = await wp.createPage(args as any);
-          break;
-        case 'wp_update_page':
-          result = await wp.updatePage(args.id as number, args as any);
-          break;
-        case 'wp_delete_page':
-          result = await wp.deletePage(args.id as number);
-          break;
+        // Pages
+        case 'wp_list_pages':   return ok(await wp.listPages(args as any));
+        case 'wp_get_page':     return ok(await wp.getPage(args.id as number));
+        case 'wp_create_page':  return ok(await wp.createPage(args as any));
+        case 'wp_update_page':  return ok(await wp.updatePage(args.id as number, args as any));
+        case 'wp_delete_page':  return ok(await wp.deletePage(args.id as number));
 
-        // ========== Media Operations ==========
-        case 'wp_list_media':
-          result = await wp.listMedia(args as any);
-          break;
-        case 'wp_delete_media':
-          result = await wp.deleteMedia(args.id as number);
-          break;
+        // Media
+        case 'wp_list_media':   return ok(await wp.listMedia(args as any));
+        case 'wp_delete_media': return ok(await wp.deleteMedia(args.id as number));
 
-        // ========== Comment Operations ==========
-        case 'wp_list_comments':
-          result = await wp.listComments(args as any);
-          break;
-        case 'wp_create_comment':
-          result = await wp.createComment(args as any);
-          break;
-        case 'wp_update_comment':
-          result = await wp.updateComment(args.id as number, args as any);
-          break;
-        case 'wp_delete_comment':
-          result = await wp.deleteComment(args.id as number);
-          break;
+        // Comments
+        case 'wp_list_comments':   return ok(await wp.listComments(args as any));
+        case 'wp_create_comment':  return ok(await wp.createComment(args as any));
+        case 'wp_update_comment':  return ok(await wp.updateComment(args.id as number, args as any));
+        case 'wp_delete_comment':  return ok(await wp.deleteComment(args.id as number));
 
-        // ========== Taxonomy Operations ==========
-        case 'wp_list_categories':
-          result = await wp.listCategories();
-          break;
-        case 'wp_list_tags':
-          result = await wp.listTags();
-          break;
+        // Taxonomy
+        case 'wp_list_categories': return ok(await wp.listCategories(args as any));
+        case 'wp_list_tags':       return ok(await wp.listTags(args as any));
 
-        // ========== User & Site Operations ==========
-        case 'wp_list_users':
-          result = await wp.listUsers();
-          break;
-        case 'wp_get_site_info':
-          result = await wp.getSiteInfo();
-          break;
+        // Users & Site
+        case 'wp_list_users':    return ok(await wp.listUsers(args as any));
+        case 'wp_get_site_info': return ok(await wp.getSiteInfo());
 
         default:
-          return {
-            content: [{ type: 'text' as const, text: `Unknown tool: ${toolName}` }],
-            isError: true,
-          };
+          return { content: [{ type: 'text' as const, text: `Unknown tool: ${toolName}` }], isError: true };
       }
-
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-        isError: false,
-      };
     } catch (error) {
-      return {
-        content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
-        isError: true,
-      };
+      return { content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
     }
   },
 };

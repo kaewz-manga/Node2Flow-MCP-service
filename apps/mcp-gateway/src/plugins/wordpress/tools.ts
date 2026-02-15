@@ -1,6 +1,6 @@
 /**
  * WordPress MCP Tool Definitions (20 tools)
- * Ported from @node2flow/wordpress-mcp (community, Smithery quality 85/100)
+ * Source: @node2flow/wordpress-mcp community package
  */
 
 import type { MCPToolDefinition } from '../../types';
