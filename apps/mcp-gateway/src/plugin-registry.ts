@@ -17,6 +17,9 @@ import { postgrestPlugin } from './plugins/postgrest';
 import { bitkubPlugin } from './plugins/bitkub';
 import { binancePlugin } from './plugins/binance';
 import { binanceThPlugin } from './plugins/binance-th';
+import { googleSheetsPlugin } from './plugins/google-sheets';
+import { googleDrivePlugin } from './plugins/google-drive';
+import { googleDocsPlugin } from './plugins/google-docs';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -39,6 +42,9 @@ PLUGINS.set('postgrest', postgrestPlugin);
 PLUGINS.set('bitkub', bitkubPlugin);
 PLUGINS.set('binance', binancePlugin);
 PLUGINS.set('binance-th', binanceThPlugin);
+PLUGINS.set('google-sheets', googleSheetsPlugin);
+PLUGINS.set('google-drive', googleDrivePlugin);
+PLUGINS.set('google-docs', googleDocsPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

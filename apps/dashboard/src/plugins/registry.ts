@@ -594,7 +594,82 @@ const binanceThPlugin: AppPlugin = {
 };
 
 // ============================================
+// Google Sheets Plugin
+// ============================================
+
+import { googleSheetsContent } from './google-sheets/content';
+import {
+  FileSpreadsheet as GoogleSheetsIcon,
+  Link as GoogleSheetsLinkIcon,
+} from 'lucide-react';
+
+const googleSheetsPlugin: AppPlugin = {
+  id: 'google-sheets',
+  name: 'Google Sheets',
+  icon: GoogleSheetsIcon,
+  logo: '/logos/google-sheets.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/google-sheets/connections', icon: GoogleSheetsLinkIcon },
+  ],
+  routes: [
+    { path: '/google-sheets/connections', component: lazy(() => import('./google-sheets/Connections')) },
+  ],
+  content: googleSheetsContent,
+};
+
+// ============================================
+// Google Drive Plugin
+// ============================================
+
+import { googleDriveContent } from './google-drive/content';
+import {
+  HardDrive as GoogleDriveIcon,
+  Link as GoogleDriveLinkIcon,
+} from 'lucide-react';
+
+const googleDrivePlugin: AppPlugin = {
+  id: 'google-drive',
+  name: 'Google Drive',
+  icon: GoogleDriveIcon,
+  logo: '/logos/google-drive.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/google-drive/connections', icon: GoogleDriveLinkIcon },
+  ],
+  routes: [
+    { path: '/google-drive/connections', component: lazy(() => import('./google-drive/Connections')) },
+  ],
+  content: googleDriveContent,
+};
+
+// ============================================
+// Google Docs Plugin
+// ============================================
+
+import { googleDocsContent } from './google-docs/content';
+import {
+  FileText as GoogleDocsIcon,
+  Link as GoogleDocsLinkIcon,
+} from 'lucide-react';
+
+const googleDocsPlugin: AppPlugin = {
+  id: 'google-docs',
+  name: 'Google Docs',
+  icon: GoogleDocsIcon,
+  logo: '/logos/google-docs.svg',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/google-docs/connections', icon: GoogleDocsLinkIcon },
+  ],
+  routes: [
+    { path: '/google-docs/connections', component: lazy(() => import('./google-docs/Connections')) },
+  ],
+  content: googleDocsContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin];

@@ -967,3 +967,264 @@ export function bthGetOpenOrders(connectionId: string, symbol?: string) {
   if (symbol) args.symbol = symbol;
   return bthCall(connectionId, 'bth_open_orders', args);
 }
+
+// ============================================
+// Google Sheets Proxy (23 tools)
+// ============================================
+
+function gsCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('google-sheets', connectionId, tool, args);
+}
+
+export function gsCreateSpreadsheet(connectionId: string, title: string, sheetTitles?: string[]) {
+  const args: Record<string, unknown> = { title };
+  if (sheetTitles) args.sheet_titles = sheetTitles;
+  return gsCall(connectionId, 'gs_create_spreadsheet', args);
+}
+export function gsGetSpreadsheet(connectionId: string, spreadsheetId: string) {
+  return gsCall(connectionId, 'gs_get_spreadsheet', { spreadsheet_id: spreadsheetId });
+}
+export function gsReadValues(connectionId: string, spreadsheetId: string, range: string) {
+  return gsCall(connectionId, 'gs_read_values', { spreadsheet_id: spreadsheetId, range });
+}
+export function gsBatchRead(connectionId: string, spreadsheetId: string, ranges: string[]) {
+  return gsCall(connectionId, 'gs_batch_read', { spreadsheet_id: spreadsheetId, ranges });
+}
+export function gsWriteValues(connectionId: string, spreadsheetId: string, range: string, values: unknown[][]) {
+  return gsCall(connectionId, 'gs_write_values', { spreadsheet_id: spreadsheetId, range, values });
+}
+export function gsAppendValues(connectionId: string, spreadsheetId: string, range: string, values: unknown[][]) {
+  return gsCall(connectionId, 'gs_append_values', { spreadsheet_id: spreadsheetId, range, values });
+}
+export function gsClearValues(connectionId: string, spreadsheetId: string, range: string) {
+  return gsCall(connectionId, 'gs_clear_values', { spreadsheet_id: spreadsheetId, range });
+}
+export function gsBatchWrite(connectionId: string, spreadsheetId: string, data: Array<{ range: string; values: unknown[][] }>) {
+  return gsCall(connectionId, 'gs_batch_write', { spreadsheet_id: spreadsheetId, data });
+}
+export function gsAddSheet(connectionId: string, spreadsheetId: string, title: string) {
+  return gsCall(connectionId, 'gs_add_sheet', { spreadsheet_id: spreadsheetId, title });
+}
+export function gsDeleteSheet(connectionId: string, spreadsheetId: string, sheetId: number) {
+  return gsCall(connectionId, 'gs_delete_sheet', { spreadsheet_id: spreadsheetId, sheet_id: sheetId });
+}
+export function gsRenameSheet(connectionId: string, spreadsheetId: string, sheetId: number, title: string) {
+  return gsCall(connectionId, 'gs_rename_sheet', { spreadsheet_id: spreadsheetId, sheet_id: sheetId, title });
+}
+export function gsCopySheet(connectionId: string, spreadsheetId: string, sheetId: number, destId: string) {
+  return gsCall(connectionId, 'gs_copy_sheet', { spreadsheet_id: spreadsheetId, sheet_id: sheetId, destination_spreadsheet_id: destId });
+}
+export function gsDuplicateSheet(connectionId: string, spreadsheetId: string, sheetId: number) {
+  return gsCall(connectionId, 'gs_duplicate_sheet', { spreadsheet_id: spreadsheetId, sheet_id: sheetId });
+}
+export function gsFormatCells(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_format_cells', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsMergeCells(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_merge_cells', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsUnmergeCells(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_unmerge_cells', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsAutoResize(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_auto_resize', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsSortRange(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_sort_range', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsFindReplace(connectionId: string, spreadsheetId: string, find: string, replacement: string) {
+  return gsCall(connectionId, 'gs_find_replace', { spreadsheet_id: spreadsheetId, find, replacement });
+}
+export function gsSetBasicFilter(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_set_basic_filter', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsAddProtectedRange(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_add_protected_range', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsAddChart(connectionId: string, spreadsheetId: string, args: Record<string, unknown>) {
+  return gsCall(connectionId, 'gs_add_chart', { spreadsheet_id: spreadsheetId, ...args });
+}
+export function gsBatchUpdate(connectionId: string, spreadsheetId: string, requests: Record<string, unknown>[]) {
+  return gsCall(connectionId, 'gs_batch_update', { spreadsheet_id: spreadsheetId, requests });
+}
+
+// ============================================
+// Google Drive Proxy (23 tools)
+// ============================================
+
+function gdCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('google-drive', connectionId, tool, args);
+}
+
+export function gdListFiles(connectionId: string, query?: string, pageSize?: number) {
+  const args: Record<string, unknown> = {};
+  if (query) args.query = query;
+  if (pageSize) args.page_size = pageSize;
+  return gdCall(connectionId, 'gd_list_files', args);
+}
+export function gdSearchFiles(connectionId: string, query: string) {
+  return gdCall(connectionId, 'gd_search_files', { query });
+}
+export function gdGetFile(connectionId: string, fileId: string) {
+  return gdCall(connectionId, 'gd_get_file', { file_id: fileId });
+}
+export function gdCreateFile(connectionId: string, name: string, mimeType?: string, parents?: string[]) {
+  const args: Record<string, unknown> = { name };
+  if (mimeType) args.mime_type = mimeType;
+  if (parents) args.parents = parents;
+  return gdCall(connectionId, 'gd_create_file', args);
+}
+export function gdCopyFile(connectionId: string, fileId: string, name?: string) {
+  const args: Record<string, unknown> = { file_id: fileId };
+  if (name) args.name = name;
+  return gdCall(connectionId, 'gd_copy_file', args);
+}
+export function gdMoveFile(connectionId: string, fileId: string, newParentId: string) {
+  return gdCall(connectionId, 'gd_move_file', { file_id: fileId, new_parent_id: newParentId });
+}
+export function gdRenameFile(connectionId: string, fileId: string, newName: string) {
+  return gdCall(connectionId, 'gd_rename_file', { file_id: fileId, new_name: newName });
+}
+export function gdTrashFile(connectionId: string, fileId: string) {
+  return gdCall(connectionId, 'gd_trash_file', { file_id: fileId });
+}
+export function gdUploadFile(connectionId: string, name: string, content: string) {
+  return gdCall(connectionId, 'gd_upload_file', { name, content });
+}
+export function gdExportFile(connectionId: string, fileId: string, mimeType: string) {
+  return gdCall(connectionId, 'gd_export_file', { file_id: fileId, mime_type: mimeType });
+}
+export function gdCreatePermission(connectionId: string, fileId: string, role: string, type: string, emailAddress?: string) {
+  const args: Record<string, unknown> = { file_id: fileId, role, type };
+  if (emailAddress) args.email_address = emailAddress;
+  return gdCall(connectionId, 'gd_create_permission', args);
+}
+export function gdListPermissions(connectionId: string, fileId: string) {
+  return gdCall(connectionId, 'gd_list_permissions', { file_id: fileId });
+}
+export function gdDeletePermission(connectionId: string, fileId: string, permissionId: string) {
+  return gdCall(connectionId, 'gd_delete_permission', { file_id: fileId, permission_id: permissionId });
+}
+export function gdCreateComment(connectionId: string, fileId: string, content: string) {
+  return gdCall(connectionId, 'gd_create_comment', { file_id: fileId, content });
+}
+export function gdListComments(connectionId: string, fileId: string) {
+  return gdCall(connectionId, 'gd_list_comments', { file_id: fileId });
+}
+export function gdResolveComment(connectionId: string, fileId: string, commentId: string) {
+  return gdCall(connectionId, 'gd_resolve_comment', { file_id: fileId, comment_id: commentId });
+}
+export function gdCreateReply(connectionId: string, fileId: string, commentId: string, content: string) {
+  return gdCall(connectionId, 'gd_create_reply', { file_id: fileId, comment_id: commentId, content });
+}
+export function gdListReplies(connectionId: string, fileId: string, commentId: string) {
+  return gdCall(connectionId, 'gd_list_replies', { file_id: fileId, comment_id: commentId });
+}
+export function gdListSharedDrives(connectionId: string) {
+  return gdCall(connectionId, 'gd_list_shared_drives', {});
+}
+export function gdGetSharedDrive(connectionId: string, driveId: string) {
+  return gdCall(connectionId, 'gd_get_shared_drive', { drive_id: driveId });
+}
+export function gdCreateSharedDrive(connectionId: string, name: string) {
+  return gdCall(connectionId, 'gd_create_shared_drive', { name });
+}
+export function gdListRevisions(connectionId: string, fileId: string) {
+  return gdCall(connectionId, 'gd_list_revisions', { file_id: fileId });
+}
+export function gdGetAbout(connectionId: string) {
+  return gdCall(connectionId, 'gd_get_about', {});
+}
+
+// ============================================
+// Google Docs Proxy (26 tools)
+// ============================================
+
+function gdocCall<T>(connectionId: string, tool: string, args: Record<string, unknown> = {}) {
+  return toolProxy<T>('google-docs', connectionId, tool, args);
+}
+
+export function gdocCreateDocument(connectionId: string, title: string) {
+  return gdocCall(connectionId, 'gdoc_create_document', { title });
+}
+export function gdocGetDocument(connectionId: string, documentId: string) {
+  return gdocCall(connectionId, 'gdoc_get_document', { document_id: documentId });
+}
+export function gdocBatchUpdate(connectionId: string, documentId: string, requests: Record<string, unknown>[]) {
+  return gdocCall(connectionId, 'gdoc_batch_update', { document_id: documentId, requests });
+}
+export function gdocInsertText(connectionId: string, documentId: string, text: string, index: number) {
+  return gdocCall(connectionId, 'gdoc_insert_text', { document_id: documentId, text, index });
+}
+export function gdocDeleteContent(connectionId: string, documentId: string, startIndex: number, endIndex: number) {
+  return gdocCall(connectionId, 'gdoc_delete_content', { document_id: documentId, start_index: startIndex, end_index: endIndex });
+}
+export function gdocReplaceText(connectionId: string, documentId: string, searchText: string, replaceText: string) {
+  return gdocCall(connectionId, 'gdoc_replace_text', { document_id: documentId, search_text: searchText, replace_text: replaceText });
+}
+export function gdocInsertImage(connectionId: string, documentId: string, imageUri: string, index: number) {
+  return gdocCall(connectionId, 'gdoc_insert_image', { document_id: documentId, image_uri: imageUri, index });
+}
+export function gdocInsertPageBreak(connectionId: string, documentId: string, index: number) {
+  return gdocCall(connectionId, 'gdoc_insert_page_break', { document_id: documentId, index });
+}
+export function gdocSetParagraphStyle(connectionId: string, documentId: string, args: Record<string, unknown>) {
+  return gdocCall(connectionId, 'gdoc_set_paragraph_style', { document_id: documentId, ...args });
+}
+export function gdocSetTextStyle(connectionId: string, documentId: string, args: Record<string, unknown>) {
+  return gdocCall(connectionId, 'gdoc_set_text_style', { document_id: documentId, ...args });
+}
+export function gdocCreateTable(connectionId: string, documentId: string, rows: number, columns: number, index: number) {
+  return gdocCall(connectionId, 'gdoc_create_table', { document_id: documentId, rows, columns, index });
+}
+export function gdocInsertTableRow(connectionId: string, documentId: string, tableIndex: number, rowIndex: number) {
+  return gdocCall(connectionId, 'gdoc_insert_table_row', { document_id: documentId, table_index: tableIndex, row_index: rowIndex });
+}
+export function gdocInsertTableColumn(connectionId: string, documentId: string, tableIndex: number, columnIndex: number) {
+  return gdocCall(connectionId, 'gdoc_insert_table_column', { document_id: documentId, table_index: tableIndex, column_index: columnIndex });
+}
+export function gdocDeleteTableRow(connectionId: string, documentId: string, tableStartIndex: number, rowIndex: number) {
+  return gdocCall(connectionId, 'gdoc_delete_table_row', { document_id: documentId, table_start_index: tableStartIndex, row_index: rowIndex });
+}
+export function gdocDeleteTableColumn(connectionId: string, documentId: string, tableStartIndex: number, columnIndex: number) {
+  return gdocCall(connectionId, 'gdoc_delete_table_column', { document_id: documentId, table_start_index: tableStartIndex, column_index: columnIndex });
+}
+export function gdocMergeTableCells(connectionId: string, documentId: string, args: Record<string, unknown>) {
+  return gdocCall(connectionId, 'gdoc_merge_table_cells', { document_id: documentId, ...args });
+}
+export function gdocCreateList(connectionId: string, documentId: string, startIndex: number, endIndex: number, bulletPreset?: string) {
+  const args: Record<string, unknown> = { document_id: documentId, start_index: startIndex, end_index: endIndex };
+  if (bulletPreset) args.bullet_preset = bulletPreset;
+  return gdocCall(connectionId, 'gdoc_create_list', args);
+}
+export function gdocDeleteList(connectionId: string, documentId: string, startIndex: number, endIndex: number) {
+  return gdocCall(connectionId, 'gdoc_delete_list', { document_id: documentId, start_index: startIndex, end_index: endIndex });
+}
+export function gdocUpdateHeader(connectionId: string, documentId: string, headerId: string, text: string) {
+  return gdocCall(connectionId, 'gdoc_update_header', { document_id: documentId, header_id: headerId, text });
+}
+export function gdocUpdateFooter(connectionId: string, documentId: string, footerId: string, text: string) {
+  return gdocCall(connectionId, 'gdoc_update_footer', { document_id: documentId, footer_id: footerId, text });
+}
+export function gdocCreateHeader(connectionId: string, documentId: string, sectionType?: string) {
+  const args: Record<string, unknown> = { document_id: documentId };
+  if (sectionType) args.section_type = sectionType;
+  return gdocCall(connectionId, 'gdoc_create_header', args);
+}
+export function gdocCreateFooter(connectionId: string, documentId: string, sectionType?: string) {
+  const args: Record<string, unknown> = { document_id: documentId };
+  if (sectionType) args.section_type = sectionType;
+  return gdocCall(connectionId, 'gdoc_create_footer', args);
+}
+export function gdocSetPageSize(connectionId: string, documentId: string, width: number, height: number) {
+  return gdocCall(connectionId, 'gdoc_set_page_size', { document_id: documentId, width, height });
+}
+export function gdocSetMargins(connectionId: string, documentId: string, top: number, bottom: number, left: number, right: number) {
+  return gdocCall(connectionId, 'gdoc_set_margins', { document_id: documentId, top, bottom, left, right });
+}
+export function gdocSetColumnsStyle(connectionId: string, documentId: string, startIndex: number, endIndex: number, columnCount: number) {
+  return gdocCall(connectionId, 'gdoc_set_columns_style', { document_id: documentId, start_index: startIndex, end_index: endIndex, column_count: columnCount });
+}
+export function gdocSetPageOrientation(connectionId: string, documentId: string, orientation: string) {
+  return gdocCall(connectionId, 'gdoc_set_page_orientation', { document_id: documentId, orientation });
+}
