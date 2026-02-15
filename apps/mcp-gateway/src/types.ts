@@ -76,6 +76,8 @@ export interface Env {
   LINE_OFFICIAL_MCP_URL?: string;
   PLAYWRIGHT_MCP_URL?: string;
   GOOGLE_WORKSPACE_MCP_URL?: string;
+  BROWSERBASE_MCP_URL?: string;
+  BROWSERBASE_MCP_AUTH_TOKEN?: string;
   DASHBOARD_URL?: string;
 }
 

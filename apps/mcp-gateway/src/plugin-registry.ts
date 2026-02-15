@@ -27,6 +27,7 @@ import { googleCalendarPlugin } from './plugins/google-calendar';
 import { context7Plugin } from './plugins/context7';
 import { githubPlugin } from './plugins/github';
 import { cloudflarePlugin } from './plugins/cloudflare';
+import { browserbasePlugin } from './plugins/browserbase';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -59,6 +60,7 @@ PLUGINS.set('google-calendar', googleCalendarPlugin);
 PLUGINS.set('context7', context7Plugin);
 PLUGINS.set('github', githubPlugin);
 PLUGINS.set('cloudflare', cloudflarePlugin);
+PLUGINS.set('browserbase', browserbasePlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

@@ -844,7 +844,32 @@ const cloudflarePlugin: AppPlugin = {
 };
 
 // ============================================
+// Browserbase Plugin (Cloud Browser Automation)
+// ============================================
+
+import { browserbaseContent } from './browserbase/content';
+import {
+  Globe as BrowserbaseIcon,
+  Link as BrowserbaseLinkIcon,
+} from 'lucide-react';
+
+const browserbasePlugin: AppPlugin = {
+  id: 'browserbase',
+  name: 'Browserbase',
+  icon: BrowserbaseIcon,
+  logo: '/logos/browserbase.svg?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/browserbase/connections', icon: BrowserbaseLinkIcon },
+  ],
+  routes: [
+    { path: '/browserbase/connections', component: lazy(() => import('./browserbase/Connections')) },
+  ],
+  content: browserbaseContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin];

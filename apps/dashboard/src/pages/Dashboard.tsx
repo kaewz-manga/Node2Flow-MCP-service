@@ -56,6 +56,7 @@ const TOOL_COUNTS: Record<string, number> = {
   'google-calendar': 28,
   github: 26,
   cloudflare: 25,
+  browserbase: 9,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -88,6 +89,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   context7: '/logos/context7.png?v=3',
   github: '/logos/github.svg?v=2',
   cloudflare: '/logos/cloudflare.png?v=2',
+  browserbase: '/logos/browserbase.svg?v=2',
 };
 
 export default function Dashboard() {
