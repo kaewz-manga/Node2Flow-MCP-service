@@ -1845,11 +1845,18 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
    - NEW (7): 4 Gateway files + 2 Dashboard files + browserbase.svg logo
    - EDIT (4): plugin-registry.ts + types.ts (Gateway) + registry.ts + Dashboard.tsx (Dashboard)
 
-3. **VPS Docker setup** (pending separate task):
-   - Port 3018, URL: browserbase-mcp.node2flow.net
-   - mcp-http-bridge + @browserbasehq/mcp-server-browserbase per-token
-   - mem_limit: 1g
+3. **VPS Docker deployed** (`fe1eb05`):
+   - Container: `browserbase-mcp` on port 3018
+   - URL: `https://browserbase-mcp.node2flow.net/mcp` (tested, 9 tools confirmed)
+   - mcp-http-bridge + `@browserbasehq/mcp-server-browserbase` v2.4.3 per-token
+   - mem_limit: 1g, mem_reservation: 512m
+   - Cloudflare Tunnel route added + DNS CNAME added
+   - Gateway secrets: `BROWSERBASE_MCP_URL` + `BROWSERBASE_MCP_AUTH_TOKEN`
 
-**Deployed**: Gateway `9bc45eaa` (`mcp.node2flow.net`) + Dashboard `8a755dcd` (`app.node2flow.net`)
-**Commit**: `62fdc26`
+4. **Client fix** (`fe1eb05`):
+   - Changed `x-service-extra-env` from JSON to comma-separated `KEY=VALUE` format
+   - Bridge expects `BROWSERBASE_PROJECT_ID=xxx,GEMINI_API_KEY=yyy` not JSON
+
+**Deployed**: Gateway `4026d045` (`mcp.node2flow.net`) + Dashboard `8a755dcd` (`app.node2flow.net`) + VPS `browserbase-mcp` (port 3018)
+**Commits**: `62fdc26`, `fe1eb05`
 **Date**: 2026-02-16
