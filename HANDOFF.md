@@ -1860,3 +1860,39 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `4026d045` (`mcp.node2flow.net`) + Dashboard `8a755dcd` (`app.node2flow.net`) + VPS `browserbase-mcp` (port 3018)
 **Commits**: `62fdc26`, `fe1eb05`
 **Date**: 2026-02-16
+
+## Session 59: Qdrant MCP Plugin (2026-02-16)
+
+**Added**: Qdrant vector database plugin — semantic store/find with automatic embeddings.
+
+**Plugin**: `qdrant` — 2 tools (`qd_store`, `qd_find`), VPS Docker proxy pattern.
+
+**Source**: [qdrant/mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) — Apache 2.0, Python (FastMCP + FastEmbed)
+
+1. **Gateway + Dashboard** (`ad666d1`):
+   - **Gateway**: types.ts, client.ts, tools.ts, index.ts — VPS proxy with TOOL_NAME_MAP (`qd_store` → `qdrant-store`, `qd_find` → `qdrant-find`)
+   - **Dashboard**: content.tsx + Connections.tsx (4 fields: Qdrant URL, API Key, Collection Name, Embedding Model)
+   - **Config**: `{ qdrant_url, api_key?, collection_name, embedding_model? }`
+   - **Env types**: Added QDRANT_MCP_URL + QDRANT_MCP_AUTH_TOKEN to Env interface
+
+2. **Files changed** (11 total):
+   - NEW (7): 4 Gateway files + 2 Dashboard files + qdrant.svg logo
+   - EDIT (4): plugin-registry.ts + types.ts (Gateway) + registry.ts + Dashboard.tsx (Dashboard)
+
+3. **VPS Docker deployed**:
+   - Container: `qdrant-mcp` on port 3019
+   - URL: `https://qdrant-mcp.node2flow.net/mcp` (DNS CNAME pending)
+   - mcp-http-bridge + `mcp-server-qdrant` v0.8.1 (Python) per-token
+   - mem_limit: 2g (ML model ~1g for sentence-transformers), mem_reservation: 1g
+   - Cloudflare Tunnel route added
+   - Gateway secrets: `QDRANT_MCP_URL` + `QDRANT_MCP_AUTH_TOKEN`
+
+4. **Per-user credential routing**:
+   - `x-service-token`: QDRANT_URL (always present, process key)
+   - `x-service-token-env`: `QDRANT_URL`
+   - `x-service-extra-env`: `COLLECTION_NAME=xxx,QDRANT_API_KEY=yyy,EMBEDDING_MODEL=zzz`
+
+**Result**: 30 plugins, 667 tools
+**Deployed**: Gateway `6a864bcd` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`) + VPS `qdrant-mcp` (port 3019)
+**Commit**: `ad666d1`
+**Date**: 2026-02-16
