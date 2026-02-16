@@ -894,7 +894,32 @@ const qdrantPlugin: AppPlugin = {
 };
 
 // ============================================
+// Facebook Pages Plugin
+// ============================================
+
+import { facebookPagesContent } from './facebook-pages/content';
+import {
+  Facebook as FacebookIcon,
+  Link as FacebookLinkIcon,
+} from 'lucide-react';
+
+const facebookPagesPlugin: AppPlugin = {
+  id: 'facebook-pages',
+  name: 'Facebook Pages',
+  icon: FacebookIcon,
+  logo: '/logos/facebook.svg?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/facebook-pages/connections', icon: FacebookLinkIcon },
+  ],
+  routes: [
+    { path: '/facebook-pages/connections', component: lazy(() => import('./facebook-pages/Connections')) },
+  ],
+  content: facebookPagesContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin, qdrantPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin, qdrantPlugin, facebookPagesPlugin];

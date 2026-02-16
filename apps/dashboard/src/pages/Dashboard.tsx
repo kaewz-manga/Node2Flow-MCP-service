@@ -58,6 +58,7 @@ const TOOL_COUNTS: Record<string, number> = {
   cloudflare: 25,
   browserbase: 9,
   qdrant: 2,
+  'facebook-pages': 28,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -92,6 +93,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   cloudflare: '/logos/cloudflare.svg?v=2',
   browserbase: '/logos/browserbase.svg?v=3',
   qdrant: '/logos/qdrant.svg?v=3',
+  'facebook-pages': '/logos/facebook.svg?v=2',
 };
 
 export default function Dashboard() {
