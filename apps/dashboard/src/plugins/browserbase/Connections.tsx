@@ -201,7 +201,7 @@ export default function Connections() {
       )}
 
       <Item>
-        <ItemMedia><img src="/logos/browserbase.svg?v=2" alt="Browserbase" className="h-10 w-10" /></ItemMedia>
+        <ItemMedia><img src="/logos/browserbase.svg?v=3" alt="Browserbase" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
           <ItemDescription className="font-mono text-xs">https://mcp.node2flow.net/mcp</ItemDescription>

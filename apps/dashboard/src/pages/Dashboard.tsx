@@ -90,7 +90,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   context7: '/logos/context7.png?v=3',
   github: '/logos/github.svg?v=2',
   cloudflare: '/logos/cloudflare.svg?v=2',
-  browserbase: '/logos/browserbase.svg?v=2',
+  browserbase: '/logos/browserbase.svg?v=3',
   qdrant: '/logos/qdrant.svg?v=3',
 };
 

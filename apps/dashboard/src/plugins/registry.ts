@@ -857,7 +857,7 @@ const browserbasePlugin: AppPlugin = {
   id: 'browserbase',
   name: 'Browserbase',
   icon: BrowserbaseIcon,
-  logo: '/logos/browserbase.svg?v=2',
+  logo: '/logos/browserbase.svg?v=3',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/browserbase/connections', icon: BrowserbaseLinkIcon },
