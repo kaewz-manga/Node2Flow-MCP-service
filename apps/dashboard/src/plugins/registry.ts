@@ -782,7 +782,7 @@ const context7Plugin: AppPlugin = {
   id: 'context7',
   name: 'Context7',
   icon: Context7Icon,
-  logo: '/logos/context7.png?v=3',
+  logo: '/logos/context7.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/context7/connections', icon: Context7LinkIcon },
