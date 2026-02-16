@@ -1923,3 +1923,26 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `d42c726d` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`)
 **Commit**: `c9c88f1`
 **Date**: 2026-02-16
+
+## Session 61: Instagram MCP Plugin (2026-02-16)
+
+**Added**: Instagram plugin — publish photos/reels/carousels/stories, manage comments, track insights, search hashtags, discover users.
+
+**Plugin**: `instagram` — 25 tools, in-worker (direct HTTP to Instagram Graph API v21.0 via graph.facebook.com).
+
+**Source**: `@node2flow/instagram-mcp` v1.0.1 — MIT, own community package
+
+1. **Gateway + Dashboard** (`f0252dd`):
+   - **Gateway**: types.ts, client.ts (Graph API v21.0), tools.ts (25 defs), index.ts (switch/case)
+   - **Dashboard**: content.tsx + Connections.tsx (2 fields: Access Token, optional Account ID)
+   - **Config**: `{ access_token, account_id? }`
+   - 9 categories: Account(3), Publishing(4), Media(3), Comments(6), Stories(2), Hashtags(3), Discovery(1), Publishing Limit(1), Mentions(2)
+
+2. **Files changed** (10 total):
+   - NEW (7): 4 Gateway files + 2 Dashboard files + instagram.svg logo
+   - EDIT (3): plugin-registry.ts + registry.ts + Dashboard.tsx
+
+**Result**: 32 plugins, 720 tools
+**Deployed**: Gateway `5f6e9a6a` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`)
+**Commit**: `f0252dd`
+**Date**: 2026-02-16
