@@ -30,6 +30,7 @@ import { cloudflarePlugin } from './plugins/cloudflare';
 import { browserbasePlugin } from './plugins/browserbase';
 import { qdrantPlugin } from './plugins/qdrant';
 import { facebookPagesPlugin } from './plugins/facebook-pages';
+import { instagramPlugin } from './plugins/instagram';
 
 const PLUGINS = new Map<string, MCPPlugin>();
 
@@ -65,6 +66,7 @@ PLUGINS.set('cloudflare', cloudflarePlugin);
 PLUGINS.set('browserbase', browserbasePlugin);
 PLUGINS.set('qdrant', qdrantPlugin);
 PLUGINS.set('facebook-pages', facebookPagesPlugin);
+PLUGINS.set('instagram', instagramPlugin);
 
 export function getPlugin(productType: string): MCPPlugin | undefined {
   return PLUGINS.get(productType);

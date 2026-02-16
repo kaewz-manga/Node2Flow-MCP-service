@@ -919,7 +919,32 @@ const facebookPagesPlugin: AppPlugin = {
 };
 
 // ============================================
+// Instagram
+// ============================================
+
+import { instagramContent } from './instagram/content';
+import {
+  Camera as InstagramIcon,
+  Link as InstagramLinkIcon,
+} from 'lucide-react';
+
+const instagramPlugin: AppPlugin = {
+  id: 'instagram',
+  name: 'Instagram',
+  icon: InstagramIcon,
+  logo: '/logos/instagram.svg?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/instagram/connections', icon: InstagramLinkIcon },
+  ],
+  routes: [
+    { path: '/instagram/connections', component: lazy(() => import('./instagram/Connections')) },
+  ],
+  content: instagramContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin, qdrantPlugin, facebookPagesPlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin, qdrantPlugin, facebookPagesPlugin, instagramPlugin];
