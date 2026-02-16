@@ -832,7 +832,7 @@ const cloudflarePlugin: AppPlugin = {
   id: 'cloudflare',
   name: 'Cloudflare',
   icon: CloudflareIcon,
-  logo: '/logos/cloudflare.png?v=2',
+  logo: '/logos/cloudflare.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/cloudflare/connections', icon: CloudflareLinkIcon },

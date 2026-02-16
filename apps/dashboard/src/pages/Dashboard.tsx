@@ -88,7 +88,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   'google-calendar': '/logos/google-calendar.svg?v=2',
   context7: '/logos/context7.png?v=3',
   github: '/logos/github.svg?v=2',
-  cloudflare: '/logos/cloudflare.png?v=2',
+  cloudflare: '/logos/cloudflare.svg?v=2',
   browserbase: '/logos/browserbase.svg?v=2',
 };
 

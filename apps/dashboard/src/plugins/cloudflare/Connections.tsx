@@ -194,7 +194,7 @@ export default function Connections() {
       )}
 
       <Item>
-        <ItemMedia><img src="/logos/cloudflare.png?v=2" alt="Cloudflare" className="h-10 w-10" /></ItemMedia>
+        <ItemMedia><img src="/logos/cloudflare.svg?v=2" alt="Cloudflare" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
           <ItemDescription className="font-mono text-xs">https://mcp.node2flow.net/mcp</ItemDescription>
