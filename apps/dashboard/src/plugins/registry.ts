@@ -882,7 +882,7 @@ const qdrantPlugin: AppPlugin = {
   id: 'qdrant',
   name: 'Qdrant',
   icon: QdrantIcon,
-  logo: '/logos/qdrant.svg?v=2',
+  logo: '/logos/qdrant.svg?v=3',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/qdrant/connections', icon: QdrantLinkIcon },

@@ -91,7 +91,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   github: '/logos/github.svg?v=2',
   cloudflare: '/logos/cloudflare.svg?v=2',
   browserbase: '/logos/browserbase.svg?v=2',
-  qdrant: '/logos/qdrant.svg?v=2',
+  qdrant: '/logos/qdrant.svg?v=3',
 };
 
 export default function Dashboard() {
