@@ -1896,3 +1896,30 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `6a864bcd` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`) + VPS `qdrant-mcp` (port 3019)
 **Commit**: `ad666d1`
 **Date**: 2026-02-16
+
+## Session 60: Facebook Pages MCP Plugin (2026-02-16)
+
+**Added**: Facebook Pages plugin — manage posts, comments, photos, videos, insights, and Messenger.
+
+**Plugin**: `facebook-pages` — 28 tools, in-worker (direct HTTP to Facebook Graph API v21.0).
+
+**Source**: `@node2flow/facebook-pages-mcp` v1.0.0 — MIT, own community package
+
+1. **Gateway + Dashboard** (`c9c88f1`):
+   - **Gateway**: types.ts, client.ts (Graph API v21.0), tools.ts (28 defs), index.ts (switch/case)
+   - **Dashboard**: content.tsx + Connections.tsx (2 fields: Page Access Token, optional Page ID)
+   - **Config**: `{ page_access_token, page_id? }`
+   - 7 categories: Pages(3), Posts(6), Comments(5), Photos(3), Videos(3), Insights(4), Conversations(4)
+
+2. **Files changed** (10 total):
+   - NEW (7): 4 Gateway files + 2 Dashboard files + facebook.svg logo
+   - EDIT (3): plugin-registry.ts + registry.ts + Dashboard.tsx
+
+3. **Also in this session**:
+   - Replaced Browserbase logo with official brand SVG (`75248d9`)
+   - Replaced Context7 logo with official SVG from context7.com (`91051cf`)
+
+**Result**: 31 plugins, 695 tools
+**Deployed**: Gateway `d42c726d` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`)
+**Commit**: `c9c88f1`
+**Date**: 2026-02-16
