@@ -869,7 +869,32 @@ const browserbasePlugin: AppPlugin = {
 };
 
 // ============================================
+// Qdrant Plugin (Vector Search)
+// ============================================
+
+import { qdrantContent } from './qdrant/content';
+import {
+  Database as QdrantIcon,
+  Link as QdrantLinkIcon,
+} from 'lucide-react';
+
+const qdrantPlugin: AppPlugin = {
+  id: 'qdrant',
+  name: 'Qdrant',
+  icon: QdrantIcon,
+  logo: '/logos/qdrant.svg?v=2',
+  requiresConnection: true,
+  sidebarItems: [
+    { name: 'Connections', href: '/qdrant/connections', icon: QdrantLinkIcon },
+  ],
+  routes: [
+    { path: '/qdrant/connections', component: lazy(() => import('./qdrant/Connections')) },
+  ],
+  content: qdrantContent,
+};
+
+// ============================================
 // All Plugins
 // ============================================
 
-export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin];
+export const plugins: AppPlugin[] = [n8nPlugin, wordpressPlugin, clN8nMcpPlugin, geminiRagPlugin, linePlugin, telegramPlugin, notionPlugin, notionOfficialPlugin, lineOfficialPlugin, playwrightPlugin, googleWorkspacePlugin, slackPlugin, airtablePlugin, youtubePlugin, postgrestPlugin, bitkubPlugin, binancePlugin, binanceThPlugin, googleSheetsPlugin, googleDrivePlugin, googleDocsPlugin, supabasePlugin, sqlitePlugin, gmailPlugin, googleCalendarPlugin, context7Plugin, githubPlugin, cloudflarePlugin, browserbasePlugin, qdrantPlugin];

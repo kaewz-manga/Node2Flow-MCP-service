@@ -57,6 +57,7 @@ const TOOL_COUNTS: Record<string, number> = {
   github: 26,
   cloudflare: 25,
   browserbase: 9,
+  qdrant: 2,
 };
 
 // Brand logos — local for custom, CDN for standard
@@ -90,6 +91,7 @@ const SERVICE_LOGOS: Record<string, string> = {
   github: '/logos/github.svg?v=2',
   cloudflare: '/logos/cloudflare.svg?v=2',
   browserbase: '/logos/browserbase.svg?v=2',
+  qdrant: '/logos/qdrant.svg?v=2',
 };
 
 export default function Dashboard() {
