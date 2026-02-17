@@ -223,19 +223,19 @@ export default function Services() {
 
       {/* Connections Table */}
       <Card className="bg-black border-border/60 max-w-4xl mx-auto">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Your Connections</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 pt-4 pb-2">
+          <CardTitle className="text-base">Your Connections</CardTitle>
+          <CardDescription className="text-xs">
             {connections.length > 0
               ? `${connections.length} active connection${connections.length > 1 ? 's' : ''} across ${connectedServices} service${connectedServices > 1 ? 's' : ''}`
               : 'No connections yet. Choose a service above to get started.'}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           {connections.length > 0 ? (
             <>
               {/* Search filter */}
-              <div className="relative mb-4">
+              <div className="relative mb-3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by connection name or service..."
