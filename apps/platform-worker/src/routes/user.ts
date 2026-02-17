@@ -387,5 +387,22 @@ export async function handleUserRoutes(
     });
   }
 
+  // GET /api/usage/history?months=12
+  if (path === '/api/usage/history' && method === 'GET') {
+    const reqUrl = new URL(request.url);
+    const months = Math.min(Math.max(parseInt(reqUrl.searchParams.get('months') || '12', 10) || 12, 1), 24);
+    const rows = await env.DB
+      .prepare('SELECT year_month, request_count, success_count, error_count FROM usage_monthly WHERE user_id = ? ORDER BY year_month DESC LIMIT ?')
+      .bind(authUser.userId, months)
+      .all();
+    const history = (rows.results || []).map((r: any) => ({
+      year_month: r.year_month,
+      requests: r.request_count,
+      successes: r.success_count,
+      errors: r.error_count,
+    })).reverse();
+    return apiResponse({ success: true, data: { history } });
+  }
+
   return null;
 }

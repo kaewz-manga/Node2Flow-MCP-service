@@ -99,6 +99,13 @@ export interface UsageTimeseries {
   errors: number;
 }
 
+export interface UsageMonthlyHistory {
+  year_month: string;
+  requests: number;
+  successes: number;
+  errors: number;
+}
+
 export interface TopTool {
   tool_name: string;
   count: number;
@@ -235,6 +242,10 @@ export async function getPlans(): Promise<ApiResponse<{ plans: Plan[] }>> {
 
 export async function getPlatformStats(): Promise<ApiResponse<PlatformStats>> {
   return platformRequest('/api/platform-stats');
+}
+
+export async function getUserUsageHistory(months = 12): Promise<ApiResponse<{ history: UsageMonthlyHistory[] }>> {
+  return platformRequest(`/api/usage/history?months=${months}`);
 }
 
 // ============================================
