@@ -180,7 +180,7 @@ export default function Services() {
   const connectedServices = new Set(connections.map(c => c.product_type)).size;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">Services</h1>
@@ -245,8 +245,8 @@ export default function Services() {
                 />
               </div>
 
-              <div className="rounded-md border border-border/60">
-                <Table>
+              <div className="rounded-md border border-border/60 overflow-x-auto">
+                <Table className="min-w-0">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[1%] text-center">Status</TableHead>
@@ -312,9 +312,9 @@ export default function Services() {
 
               {/* Pagination */}
               {filteredConnections.length > 0 && (
-                <div className="flex items-center justify-between gap-4 mt-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
                     <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
                       <SelectTrigger className="w-18 h-8">
                         <SelectValue />

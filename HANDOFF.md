@@ -2008,4 +2008,18 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 
 **Files changed**: 4 (1 new Services.tsx + 3 edits: Dashboard.tsx, Layout.tsx, App.tsx)
 **Deployed**: Dashboard (`app.node2flow.net`) — 4 deploys
+
+5. **Remove tool count from cards** (`a6572b8`):
+   - Removed tool count text for narrower cards
+
+6. **Data table enhancements** (`03e7077`):
+   - Search filter (by connection name or plugin name)
+   - Sort by name (click header to toggle A-Z / Z-A)
+   - Pagination with rows per page selector (10/25/50) + page numbers
+
+7. **Fix mobile horizontal scroll** (pending commit):
+   - Root div `overflow-x-hidden`
+   - Table wrapper `overflow-x-auto`
+   - Pagination row stacks vertically on mobile (`flex-col sm:flex-row`)
+
 **Date**: 2026-02-17
