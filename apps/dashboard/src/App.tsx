@@ -17,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 // Platform pages (lazy-loaded)
 const Landing = lazy(() => import('./pages/Landing'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Services = lazy(() => import('./pages/Services'));
 const Usage = lazy(() => import('./pages/Usage'));
 const Settings = lazy(() => import('./pages/Settings'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
@@ -98,6 +99,7 @@ function AppRoutes() {
 
         {/* Protected routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
         <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 

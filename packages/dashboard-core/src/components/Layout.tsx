@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import {
   Zap,
   LayoutDashboard,
+  Blocks,
   BarChart3,
   Settings,
   LogOut,
@@ -73,6 +74,7 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Services', href: '/services', icon: Blocks },
 ];
 
 function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
