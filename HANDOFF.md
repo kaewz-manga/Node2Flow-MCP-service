@@ -1981,3 +1981,31 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Files changed**: ~50 (1 new shared component, 8 new PluginPage files, 32 Connection pages edited, registry/layout/app edits)
 **Deployed**: Dashboard (`app.node2flow.net`) — 3 deploys during session
 **Date**: 2026-02-17
+
+## Session 62b: Add Services Page + Card Refinements (2026-02-17)
+
+**Added**: Dedicated Services page — moved service cards, connections table, and quick start from Dashboard to `/services`.
+
+### Changes (4 commits):
+
+1. **Services page + sidebar** (`a701f91`):
+   - Created `apps/dashboard/src/pages/Services.tsx` — services grid + connections table + quick start guide
+   - Cleaned `Dashboard.tsx` — now only shows plan/rate limit card + platform stats
+   - Added "Services" button (Blocks icon) to sidebar under Dashboard in `Layout.tsx`
+   - Added `/services` route in `App.tsx`
+
+2. **Fix service card links** (`00ac134`):
+   - 8 PluginTabs plugins (n8n, WordPress, etc.) had sidebarItem name != 'Connections'
+   - `.find(i => i.name === 'Connections')` failed → fallback to `/dashboard`
+   - Fixed: use `sidebarItems[0]?.href` instead (all 3 occurrences)
+
+3. **Smaller cards + border-left green** (`b9a93c9`):
+   - Cards: `p-2`, logo `h-5 w-5`, text `text-xs`/`text-[10px]`
+   - Connected style: `border-l-[3px] border-l-emerald-500` (not full green border)
+
+4. **Remove green dot** (`8364ae4`):
+   - Removed emerald dot indicator from service cards
+
+**Files changed**: 4 (1 new Services.tsx + 3 edits: Dashboard.tsx, Layout.tsx, App.tsx)
+**Deployed**: Dashboard (`app.node2flow.net`) — 4 deploys
+**Date**: 2026-02-17
