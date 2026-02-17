@@ -1,11 +1,14 @@
 import tailwindcssAnimate from "tailwindcss-animate"
+import { heroui } from "@heroui/theme"
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/dashboard-core/src/**/*.{js,ts,jsx,tsx}",
+    "../../node_modules/@heroui/theme/dist/components/(navbar|button|card|chip|divider|link|snippet|spacer|accordion).js",
   ],
   theme: {
     extend: {
@@ -98,5 +101,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, heroui()],
 }
