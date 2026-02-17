@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from 'react';
+import { useMemo, type ComponentType, type ReactNode } from 'react';
 import { Toaster } from './ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Activity,
   ChevronsUpDown,
+  ChevronRight,
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { Separator } from './ui/separator';
@@ -33,6 +34,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
@@ -43,6 +45,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from './ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { TooltipProvider } from './ui/tooltip';
 
 // ============================================
@@ -109,6 +112,15 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
   const avatarUrl = user?.avatar_url || (user?.email ? getGravatarUrl(user.email) : undefined);
 
+  const isOnServicePage = useMemo(() => {
+    return plugins.some((plugin) => {
+      const href = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
+      return location.pathname === href
+        || location.pathname.startsWith(href + '/')
+        || location.pathname.startsWith(`/${plugin.id}`);
+    });
+  }, [location.pathname, plugins]);
+
   return (
     <Sidebar variant="inset" collapsible="icon">
       {/* Header — Logo */}
@@ -152,38 +164,49 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Plugin Services — single entry per plugin */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Services</SidebarGroupLabel>
-          <SidebarMenu>
-            {plugins.map((plugin) => {
-              const pluginHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
-              const isPluginActive = location.pathname === pluginHref
-                || location.pathname.startsWith(pluginHref + '/')
-                || location.pathname.startsWith(`/${plugin.id}`);
-              return (
-                <SidebarMenuItem key={plugin.id}>
-                  <SidebarMenuButton
-                    tooltip={plugin.name}
-                    isActive={isPluginActive}
-                    asChild
-                  >
-                    <Link to={pluginHref}>
-                      {plugin.logo ? (
-                        <img src={plugin.logo} alt={plugin.name} className="h-4 w-4 shrink-0" />
-                      ) : (
-                        <plugin.icon />
-                      )}
-                      <span>{plugin.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
+        {/* Plugin Services — collapsible */}
+        <Collapsible defaultOpen={isOnServicePage} className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                Services
+                <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {plugins.map((plugin) => {
+                    const pluginHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
+                    const isPluginActive = location.pathname === pluginHref
+                      || location.pathname.startsWith(pluginHref + '/')
+                      || location.pathname.startsWith(`/${plugin.id}`);
+                    return (
+                      <SidebarMenuItem key={plugin.id}>
+                        <SidebarMenuButton
+                          tooltip={plugin.name}
+                          isActive={isPluginActive}
+                          asChild
+                        >
+                          <Link to={pluginHref}>
+                            {plugin.logo ? (
+                              <img src={plugin.logo} alt={plugin.name} className="h-4 w-4 shrink-0" />
+                            ) : (
+                              <plugin.icon />
+                            )}
+                            <span>{plugin.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
 
-        {/* Secondary Nav — pushed to bottom */}
+        {/* Secondary Nav */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel>Support</SidebarGroupLabel>
           <SidebarMenu>
