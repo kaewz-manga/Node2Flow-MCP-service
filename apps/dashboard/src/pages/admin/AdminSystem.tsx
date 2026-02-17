@@ -7,7 +7,8 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Switch, Separator } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Switch } from '@node2flow/dashboard-core';
+import { AdminNav } from '../../components/admin-nav';
 
 import { Loader2, RotateCcw, Trash2, AlertTriangle, Power, Server, Shield, Wrench } from 'lucide-react';
 
@@ -143,12 +144,8 @@ export default function AdminSystem() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">System Controls</h1>
-        <p className="text-muted-foreground mt-1">Maintenance, recalculation, and reset tools</p>
-      </div>
-      <Separator />
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+      <AdminNav />
 
       {/* Status Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

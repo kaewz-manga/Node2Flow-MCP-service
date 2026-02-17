@@ -13,7 +13,6 @@ import {
   Badge, Button,
 } from '@node2flow/dashboard-core';
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { Connection } from '@node2flow/dashboard-core';
 import type { ConnectionUsageStats } from '@/lib/platform-api';
 
@@ -136,16 +135,12 @@ interface ConnectionsDataTableProps {
   connections: Connection[];
   usageStats: ConnectionUsageStats[];
   pluginMap: Map<string, { name: string; logo?: string }>;
-  period: 7 | 30 | 90;
-  onPeriodChange: (days: 7 | 30 | 90) => void;
 }
 
 export function ConnectionsDataTable({
   connections,
   usageStats,
   pluginMap,
-  period,
-  onPeriodChange,
 }: ConnectionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -167,21 +162,6 @@ export function ConnectionsDataTable({
 
   return (
     <div className="space-y-4 px-4 lg:px-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Connection Usage</h2>
-        <ToggleGroup
-          type="single"
-          value={period.toString()}
-          onValueChange={(v) => v && onPeriodChange(parseInt(v) as 7 | 30 | 90)}
-          variant="outline"
-          className="h-8"
-        >
-          <ToggleGroupItem value="7" className="h-8 px-2.5 text-xs">7 days</ToggleGroupItem>
-          <ToggleGroupItem value="30" className="h-8 px-2.5 text-xs">30 days</ToggleGroupItem>
-          <ToggleGroupItem value="90" className="h-8 px-2.5 text-xs">90 days</ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>

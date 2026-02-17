@@ -88,6 +88,12 @@ const secondaryNav = [
   { name: 'Status', href: '/status', icon: Activity },
 ];
 
+const dropdownSupportNav = [
+  { name: 'Documentation', href: '/docs', icon: FileText },
+  { name: 'FAQ', href: '/faq', icon: HelpCircle },
+  { name: 'Status', href: '/status', icon: Activity },
+];
+
 function getPageTitle(pathname: string, plugins: DashboardPlugin[]): string {
   for (const nav of platformNav) {
     if (pathname === nav.href) return nav.name;
@@ -96,6 +102,13 @@ function getPageTitle(pathname: string, plugins: DashboardPlugin[]): string {
     if (pathname === nav.href) return nav.name;
   }
   if (pathname === '/usage') return 'Usage';
+  if (pathname === '/admin') return 'Admin Overview';
+  if (pathname === '/admin/users') return 'Admin Users';
+  if (pathname === '/admin/analytics') return 'Admin Analytics';
+  if (pathname === '/admin/revenue') return 'Admin Revenue';
+  if (pathname === '/admin/health') return 'Admin Health';
+  if (pathname === '/admin/feedback') return 'Admin Feedback';
+  if (pathname === '/admin/system') return 'Admin System';
   if (pathname.startsWith('/admin')) return 'Admin';
   for (const plugin of plugins) {
     const pluginHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
@@ -206,26 +219,6 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
           </SidebarGroup>
         </Collapsible>
 
-        {/* Secondary Nav */}
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel>Support</SidebarGroupLabel>
-          <SidebarMenu>
-            {secondaryNav.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton
-                  tooltip={item.name}
-                  isActive={location.pathname === item.href}
-                  asChild
-                >
-                  <Link to={item.href}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
       </SidebarContent>
 
       {/* Footer — User Avatar + Dropdown */}
@@ -281,6 +274,17 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                       Settings
                     </Link>
                   </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  {dropdownSupportNav.map((item) => (
+                    <DropdownMenuItem key={item.name} asChild>
+                      <Link to={item.href}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {item.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuGroup>
                 {isAdmin && (
                   <>

@@ -6,7 +6,8 @@ import {
   deleteAdminUser,
   type AdminUser,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Separator } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Alert, AlertDescription, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@node2flow/dashboard-core';
+import { AdminNav } from '../../components/admin-nav';
 import { toast } from 'sonner';
 
 import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield, Users, UserCheck, Crown, UserX } from 'lucide-react';
@@ -101,12 +102,8 @@ export default function AdminUsers() {
   }, [users]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Users</h1>
-        <p className="text-muted-foreground mt-1">Manage platform users, plans, and access</p>
-      </div>
-      <Separator />
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+      <AdminNav />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

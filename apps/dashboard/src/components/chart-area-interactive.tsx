@@ -1,7 +1,6 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-import { useIsMobile } from "@node2flow/dashboard-core"
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -34,26 +33,20 @@ const chartConfig = {
 
 interface DashboardUsageChartProps {
   data: UsageMonthlyHistory[]
+  connectionPeriod: 7 | 30 | 90
+  onConnectionPeriodChange: (days: 7 | 30 | 90) => void
 }
 
-export function DashboardUsageChart({ data }: DashboardUsageChartProps) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("12m")
-
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("6m")
-    }
-  }, [isMobile])
-
+export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriodChange }: DashboardUsageChartProps) {
   const filteredData = React.useMemo(() => {
-    const months = timeRange === "3m" ? 3 : timeRange === "6m" ? 6 : 12
+    // Map connection period to chart months: 7d→3m, 30d→6m, 90d→12m
+    const months = connectionPeriod <= 7 ? 3 : connectionPeriod <= 30 ? 6 : 12
     return data.slice(-months)
-  }, [data, timeRange])
+  }, [data, connectionPeriod])
 
   if (data.length === 0) {
     return (
-      <Card>
+      <Card className="border-0">
         <CardHeader>
           <CardTitle>Usage History</CardTitle>
           <CardDescription>No usage data yet</CardDescription>
@@ -66,51 +59,51 @@ export function DashboardUsageChart({ data }: DashboardUsageChartProps) {
   }
 
   return (
-    <Card className="@container/card">
+    <Card className="@container/card border-0">
       <CardHeader className="relative">
         <CardTitle>Usage History</CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Monthly requests for the last {timeRange === "3m" ? "3" : timeRange === "6m" ? "6" : "12"} months
+            Monthly requests for the last {connectionPeriod <= 7 ? "3" : connectionPeriod <= 30 ? "6" : "12"} months
           </span>
           <span className="@[540px]/card:hidden">
-            Last {timeRange === "3m" ? "3" : timeRange === "6m" ? "6" : "12"} months
+            Last {connectionPeriod <= 7 ? "3" : connectionPeriod <= 30 ? "6" : "12"} months
           </span>
         </CardDescription>
         <div className="absolute right-4 top-4">
           <ToggleGroup
             type="single"
-            value={timeRange}
-            onValueChange={setTimeRange}
+            value={connectionPeriod.toString()}
+            onValueChange={(v) => v && onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90)}
             variant="outline"
-            className="@[767px]/card:flex hidden"
+            className="@[540px]/card:flex hidden"
           >
-            <ToggleGroupItem value="12m" className="h-8 px-2.5">
-              12 months
+            <ToggleGroupItem value="7" className="h-8 px-2.5">
+              7 days
             </ToggleGroupItem>
-            <ToggleGroupItem value="6m" className="h-8 px-2.5">
-              6 months
+            <ToggleGroupItem value="30" className="h-8 px-2.5">
+              30 days
             </ToggleGroupItem>
-            <ToggleGroupItem value="3m" className="h-8 px-2.5">
-              3 months
+            <ToggleGroupItem value="90" className="h-8 px-2.5">
+              90 days
             </ToggleGroupItem>
           </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90)}>
             <SelectTrigger
-              className="@[767px]/card:hidden flex w-40"
+              className="@[540px]/card:hidden flex w-40"
               aria-label="Select time range"
             >
-              <SelectValue placeholder="12 months" />
+              <SelectValue placeholder="7 days" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
-              <SelectItem value="12m" className="rounded-lg">
-                12 months
+              <SelectItem value="7" className="rounded-lg">
+                7 days
               </SelectItem>
-              <SelectItem value="6m" className="rounded-lg">
-                6 months
+              <SelectItem value="30" className="rounded-lg">
+                30 days
               </SelectItem>
-              <SelectItem value="3m" className="rounded-lg">
-                3 months
+              <SelectItem value="90" className="rounded-lg">
+                90 days
               </SelectItem>
             </SelectContent>
           </Select>

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, type AdminStats } from '../../lib/platform-api';
 import { Users, DollarSign, Activity, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Separator } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@node2flow/dashboard-core';
+import { AdminNav } from '../../components/admin-nav';
 
 
 export default function AdminOverview() {
@@ -42,13 +43,8 @@ export default function AdminOverview() {
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Admin Overview</h1>
-        <p className="text-muted-foreground mt-1">Platform metrics at a glance</p>
-      </div>
-      <Separator />
-
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+      <AdminNav />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => {
           const colors = colorMap[card.color];

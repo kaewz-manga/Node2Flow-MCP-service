@@ -100,6 +100,7 @@ export default function Dashboard() {
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="px-4 lg:px-6">
         <DashboardSectionCards
           plan={user?.plan || 'free'}
           dailyUsed={usage?.requests.used || 0}
@@ -111,15 +112,18 @@ export default function Dashboard() {
           monthlyErrors={usage?.monthly?.error_count || 0}
           resetAt={usage?.reset_at || ''}
         />
+        </div>
         <div className="px-4 lg:px-6">
-          <DashboardUsageChart data={usageHistory} />
+          <DashboardUsageChart
+            data={usageHistory}
+            connectionPeriod={connectionPeriod}
+            onConnectionPeriodChange={handlePeriodChange}
+          />
         </div>
         <ConnectionsDataTable
           connections={connections}
           usageStats={connectionUsage}
           pluginMap={pluginMap}
-          period={connectionPeriod}
-          onPeriodChange={handlePeriodChange}
         />
       </div>
     </div>

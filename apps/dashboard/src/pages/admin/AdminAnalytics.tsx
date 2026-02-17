@@ -10,7 +10,8 @@ import {
   type ProductUsage,
 } from '../../lib/platform-api';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Separator } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@node2flow/dashboard-core';
+import { AdminNav } from '../../components/admin-nav';
 
 
 
@@ -68,12 +69,9 @@ export default function AdminAnalytics() {
   const totalProductRequests = productUsage.reduce((sum, p) => sum + p.requests, 0);
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-          <p className="text-muted-foreground mt-1">Usage trends and tool popularity</p>
-        </div>
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+      <AdminNav />
+      <div className="flex items-center justify-end">
         <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
           <SelectTrigger className="w-[160px]">
             <SelectValue />
@@ -85,7 +83,6 @@ export default function AdminAnalytics() {
           </SelectContent>
         </Select>
       </div>
-      <Separator />
 
       {/* Usage by Product */}
       <Card>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getAdminRevenueOverview, type PlanDist } from '../../lib/platform-api';
 import { Loader2, DollarSign, Users, TrendingUp, CreditCard } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Separator, Badge } from '@node2flow/dashboard-core';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Badge } from '@node2flow/dashboard-core';
+import { AdminNav } from '../../components/admin-nav';
 
 
 
@@ -36,12 +37,8 @@ export default function AdminRevenue() {
   const avgRevenuePerUser = totalUsers > 0 ? mrr / totalUsers : 0;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Revenue</h1>
-        <p className="text-muted-foreground mt-1">Monthly recurring revenue and plan distribution</p>
-      </div>
-      <Separator />
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+      <AdminNav />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
