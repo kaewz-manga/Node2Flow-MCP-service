@@ -1,30 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { createConnection, updateConnection, deleteConnection } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, deleteApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import {
-  getConnections, useConnection, useSudoContext, type Connection,
-  Field, FieldLabel, FieldDescription,
-  InputGroup, InputGroupInput, InputGroupAddon,
-  Button, Card, CardContent,
-  Alert, AlertTitle, AlertDescription, Badge,
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
-  Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions,
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
-  Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent,
-  useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose,
-} from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
 
 import {
-  Plus, Trash2, Key, Copy, Check, Loader2, AlertCircle, RefreshCw,
-  CalendarDays, Lock, Tag, MoreHorizontal, Pencil, Info,
+  Plus,
+  Trash2,
+  Key,
+  Copy,
+  Check,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  Shield,
+  CalendarDays,
+  Lock,
+  Tag,
+  MoreHorizontal,
+  Pencil,
+  Info,
 } from 'lucide-react';
-
-const PRODUCT_TYPE = 'google-calendar';
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
@@ -58,7 +56,7 @@ export default function Connections() {
   const fetchConnections = async () => {
     setLoading(true);
     const [connRes, keysRes] = await Promise.all([
-      getConnections(PRODUCT_TYPE),
+      getConnections('google-calendar'),
       getApiKeys(),
     ]);
     if (connRes.success && connRes.data) {
@@ -85,13 +83,11 @@ export default function Connections() {
       return;
     }
 
-    const config: Record<string, unknown> = {
+    const res = await createConnection('google-calendar', formName, {
       client_id: formClientId.trim(),
       client_secret: formClientSecret.trim(),
       refresh_token: formRefreshToken.trim(),
-    };
-
-    const res = await createConnection(PRODUCT_TYPE, formName, config);
+    });
 
     if (res.success && res.data) {
       const keyRes = await createApiKey((res.data as any).id || (res.data as any).connection?.id);
@@ -108,341 +104,280 @@ export default function Connections() {
     setFormLoading(false);
   };
 
-  const handleEditName = async () => {
-    if (!editTarget) return;
-    const res = await updateConnection(editTarget.id, { name: editName });
-    if (res.success) {
-      toast.success('Connection renamed');
-      setEditTarget(null);
-      fetchConnections();
-    } else {
-      toast.error(res.error?.message || 'Failed to rename');
+  const handleDeleteConnection = async (id: string) => {
+    if (!totpEnabled) {
+      toast.error('Please enable Two-Factor Authentication in Settings to perform this action.');
+      return;
     }
+    setDeleteTarget(id);
   };
 
-  const handleDeleteConnection = async () => {
+  const confirmDeleteConnection = async () => {
     if (!deleteTarget) return;
-    withSudo(async () => {
-      const res = await deleteConnection(deleteTarget);
-      if (res.success) {
-        toast.success('Connection deleted');
-        setDeleteTarget(null);
-        fetchConnections();
-      } else {
-        toast.error(res.error?.message || 'Failed to delete');
-      }
+    const id = deleteTarget;
+    setDeleteTarget(null);
+    await withSudo(async () => {
+      const res = await deleteConnection(id);
+      if (res.success) { fetchConnections(); } else { toast.error(res.error?.message || 'Failed to delete connection'); }
+      return true;
     });
   };
 
-  const handleGenerateKey = async () => {
+  const confirmGenerateApiKey = async () => {
     if (!generateKeyTarget) return;
-    const res = await createApiKey(generateKeyTarget);
+    const connectionId = generateKeyTarget;
+    setGenerateKeyTarget(null);
+    const res = await createApiKey(connectionId);
     if (res.success && res.data) {
       setNewApiKey(res.data.api_key);
       setShowApiKeyModal(true);
-      setGenerateKeyTarget(null);
       fetchConnections();
     } else {
-      toast.error('Failed to generate API key');
+      toast.error(res.error?.message || 'Failed to generate API key');
     }
   };
 
-  const handleDeleteKey = async () => {
+  const confirmRevokeApiKey = async () => {
     if (!deleteKeyTarget) return;
-    withSudo(async () => {
-      const res = await deleteApiKey(deleteKeyTarget);
-      if (res.success) {
-        toast.success('API key deleted');
-        setDeleteKeyTarget(null);
-        fetchConnections();
-      } else {
-        toast.error('Failed to delete API key');
-      }
-    });
+    const keyId = deleteKeyTarget;
+    setDeleteKeyTarget(null);
+    const res = await deleteApiKey(keyId);
+    if (res.success) { fetchConnections(); } else { toast.error(res.error?.message || 'Failed to revoke API key'); }
   };
 
-  const copyText = (text: string, setter: (v: boolean) => void) => {
-    navigator.clipboard.writeText(text);
-    setter(true);
-    setTimeout(() => setter(false), 2000);
+  const confirmEditConnection = async () => {
+    if (!editTarget || !editName.trim()) return;
+    const res = await updateConnection(editTarget.id, { name: editName.trim() });
+    if (res.success) { toast.success('Connection renamed'); fetchConnections(); } else { toast.error(res.error?.message || 'Failed to rename connection'); }
+    setEditTarget(null);
   };
 
-  // --- 2FA warning ---
-  const show2faAlert = statusLoaded && !totpEnabled;
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  // --- Dialog/Sheet wrapper ---
-  const AddModal = isMobile ? Sheet : Dialog;
-  const AddModalContent = isMobile ? SheetContent : DialogContent;
-  const AddModalHeader = isMobile ? SheetHeader : DialogHeader;
-  const AddModalTitle = isMobile ? SheetTitle : DialogTitle;
+  const getKeysForConnection = (connectionId: string) =>
+    apiKeys.filter((k) => k.connection_id === connectionId);
+
+  const mcpUrl = `${import.meta.env.VITE_GATEWAY_URL || 'https://mcp.node2flow.net'}/mcp`;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading connections...
-      </div>
-    );
+    return (<div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>);
   }
 
   return (
     <div className="space-y-6">
-      {/* MCP Endpoint */}
       <Item>
         <ItemMedia><img src="/logos/google-calendar.svg?v=2" alt="Google Calendar" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>
-          <ItemDescription className="font-mono text-xs">https://mcp.node2flow.net/mcp</ItemDescription>
+          <ItemDescription><code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code></ItemDescription>
         </ItemContent>
         <ItemActions>
-          <Button variant="ghost" size="icon" onClick={() => copyText('https://mcp.node2flow.net/mcp', setCopiedMcp)}>
-            {copiedMcp ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
           </Button>
         </ItemActions>
       </Item>
 
-      {/* 2FA Alert */}
-      {show2faAlert && (
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Google Calendar Connections</h1>
+          <p className="text-muted-foreground mt-1">Manage your Google Calendar OAuth connections</p>
+        </div>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Connection
+        </Button>
+      </div>
+
+      {statusLoaded && !totpEnabled && (
         <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Enable 2FA for better security</AlertTitle>
-          <AlertDescription>
-            Two-factor authentication protects your Google Calendar connections. Enable it in Settings.
+          <Shield className="h-5 w-5" />
+          <AlertTitle>Enable Two-Factor Authentication</AlertTitle>
+          <AlertDescription className="flex items-center justify-between">
+            <span>Set up 2FA to manage connections securely</span>
+            <Button size="sm" asChild className="shrink-0 ml-4"><Link to="/settings?tab=security">Enable</Link></Button>
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Google Calendar Connections</h2>
-          <p className="text-sm text-muted-foreground">Manage your Google Calendar OAuth connections</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={fetchConnections}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button onClick={() => setShowAddModal(true)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="h-4 w-4 mr-2" /> Add Connection
-          </Button>
-        </div>
-      </div>
+      {error && (<Alert variant="destructive"><AlertCircle className="h-5 w-5" /><AlertDescription>{error}</AlertDescription></Alert>)}
 
-      {/* Error */}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      <Alert className="bg-blue-950/20 border-blue-900/50">
+        <Info className="h-4 w-4 text-blue-400" />
+        <AlertDescription className="text-sm text-muted-foreground">
+          <strong className="text-foreground">Connection key</strong> — Each connection has its own API key that only accesses this plugin.
+          For a single key that works across all plugins, create a <strong className="text-foreground">Global API Key</strong> in Settings &rarr; API Keys.
+          You can also use <strong className="text-foreground">OAuth login</strong> (Google/GitHub) from MCP clients like Claude Desktop.
+        </AlertDescription>
+      </Alert>
 
-      {/* Empty State */}
-      {connections.length === 0 && !error && (
+      {connections.length === 0 ? (
         <Empty>
           <EmptyHeader>
-            <EmptyMedia><CalendarDays className="h-10 w-10 text-muted-foreground" /></EmptyMedia>
-            <EmptyTitle>No Google Calendar connections</EmptyTitle>
-            <EmptyDescription>Add your Google Calendar OAuth credentials to get started.</EmptyDescription>
+            <EmptyMedia variant="icon"><CalendarDays /></EmptyMedia>
+            <EmptyTitle>No connections yet</EmptyTitle>
+            <EmptyDescription>Add your Google Calendar OAuth credentials to start managing your calendars.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button onClick={() => setShowAddModal(true)} className="bg-green-600 hover:bg-green-700">
-              <Plus className="h-4 w-4 mr-2" /> Add Connection
-            </Button>
+            <Button variant="outline" onClick={() => setShowAddModal(true)}><Plus className="h-4 w-4 mr-2" />Add Connection</Button>
+            <p className="text-xs text-muted-foreground">
+              By connecting, you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms</Link> and <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
+            </p>
           </EmptyContent>
         </Empty>
+      ) : (
+        <div className="rounded-md border max-w-4xl mx-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Name</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">API Key</TableHead>
+                <TableHead className="text-center">Created</TableHead>
+                <TableHead className="text-center"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {connections.map((conn) => {
+                const connKeys = getKeysForConnection(conn.id);
+                return (
+                  <TableRow key={conn.id}>
+                    <TableCell className="font-medium text-center">{conn.name}</TableCell>
+                    <TableCell className="text-center">
+                      <div className={`w-2.5 h-2.5 rounded-full mx-auto ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {connKeys.map((key) => (<code key={key.id} className="text-xs font-mono text-muted-foreground">{key.prefix}...</code>))}
+                      {connKeys.length === 0 && <span className="text-xs text-muted-foreground">No keys</span>}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground text-center">{new Date(conn.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8"><MoreHorizontal /><span className="sr-only">Open menu</span></Button></DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => { setEditTarget({ id: conn.id, name: conn.name }); setEditName(conn.name); }}><Pencil className="h-4 w-4" /> Edit Name</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setGenerateKeyTarget(conn.id)}><RefreshCw className="h-4 w-4" /> New Key</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {connKeys.filter(k => k.status === 'active').map(key => (
+                            <DropdownMenuItem key={key.id} className="text-red-400 focus:text-red-400" onClick={() => setDeleteKeyTarget(key.id)}><Key className="h-4 w-4" /> Revoke Key</DropdownMenuItem>
+                          ))}
+                          <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteConnection(conn.id)}><Trash2 className="h-4 w-4" /> Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
-      {/* Connections Table */}
-      {connections.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center">Name</TableHead>
-              <TableHead className="text-center">Connection ID</TableHead>
-              <TableHead className="text-center">API Key</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-center w-[60px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {connections.map((c) => {
-              const connKey = apiKeys.find(k => k.connection_id === c.id);
-              return (
-                <TableRow key={c.id} className={activeConnection?.id === c.id ? 'bg-muted/50' : ''}>
-                  <TableCell className="text-center font-medium">{c.name}</TableCell>
-                  <TableCell className="text-center font-mono text-xs">
-                    {c.id.slice(0, 12)}...
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {connKey ? (
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {connKey.prefix}...
-                      </Badge>
-                    ) : (
-                      <Button variant="ghost" size="sm" onClick={() => setGenerateKeyTarget(c.id)}>
-                        <Key className="h-3 w-3 mr-1" /> Generate
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <span className={`inline-block w-2 h-2 rounded-full ${c.status === 'active' ? 'bg-green-400' : 'bg-gray-400'}`} />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setActiveConnectionId(c.id)}>
-                          <Check className="h-4 w-4 mr-2" /> Set Active
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => { setEditTarget({ id: c.id, name: c.name }); setEditName(c.name); }}>
-                          <Pencil className="h-4 w-4 mr-2" /> Rename
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {connKey && (
-                          <DropdownMenuItem onClick={() => setDeleteKeyTarget(connKey.id)} className="text-red-400">
-                            <Trash2 className="h-4 w-4 mr-2" /> Delete API Key
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => setDeleteTarget(c.id)} className="text-red-400">
-                          <Trash2 className="h-4 w-4 mr-2" /> Delete Connection
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      )}
-
-      {/* Add Connection Modal */}
-      <AddModal open={showAddModal} onOpenChange={setShowAddModal}>
-        <AddModalContent>
-          <AddModalHeader>
-            <AddModalTitle>Add Google Calendar Connection</AddModalTitle>
-          </AddModalHeader>
-          <form onSubmit={handleAddConnection} className="space-y-4 py-4">
-            {formError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            )}
+      {/* Add Connection Dialog */}
+      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Add Google Calendar Connection</DialogTitle></DialogHeader>
+          <form onSubmit={handleAddConnection} className="space-y-4">
+            {formError && (<Alert variant="destructive"><AlertDescription>{formError}</AlertDescription></Alert>)}
             <Field>
               <FieldLabel>Connection Name</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Tag className="h-4 w-4" /></InputGroupAddon>
-                <InputGroupInput placeholder="My Calendar" value={formName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormName(e.target.value)} required />
-              </InputGroup>
+              <InputGroup><InputGroupAddon><Tag /></InputGroupAddon><InputGroupInput type="text" placeholder="My Calendar" value={formName} onChange={(e) => setFormName(e.target.value)} required /></InputGroup>
             </Field>
             <Field>
               <FieldLabel>Client ID</FieldLabel>
-              <FieldDescription>From Google Cloud Console &gt; Credentials</FieldDescription>
-              <InputGroup>
-                <InputGroupAddon><CalendarDays className="h-4 w-4" /></InputGroupAddon>
-                <InputGroupInput placeholder="xxxx.apps.googleusercontent.com" value={formClientId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormClientId(e.target.value)} required />
-              </InputGroup>
+              <InputGroup><InputGroupAddon><CalendarDays /></InputGroupAddon><InputGroupInput type="text" placeholder="xxxx.apps.googleusercontent.com" value={formClientId} onChange={(e) => setFormClientId(e.target.value)} required /></InputGroup>
+              <FieldDescription>
+                From Google Cloud Console &gt; Credentials
+              </FieldDescription>
             </Field>
             <Field>
               <FieldLabel>Client Secret</FieldLabel>
-              <InputGroup>
-                <InputGroupAddon><Lock className="h-4 w-4" /></InputGroupAddon>
-                <InputGroupInput type="password" placeholder="GOCSPX-..." value={formClientSecret} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormClientSecret(e.target.value)} required />
-              </InputGroup>
+              <InputGroup><InputGroupAddon><Lock /></InputGroupAddon><InputGroupInput type="password" placeholder="GOCSPX-..." value={formClientSecret} onChange={(e) => setFormClientSecret(e.target.value)} required /></InputGroup>
             </Field>
             <Field>
               <FieldLabel>Refresh Token</FieldLabel>
-              <FieldDescription>Generated via OAuth Playground with Calendar scopes</FieldDescription>
-              <InputGroup>
-                <InputGroupAddon><Key className="h-4 w-4" /></InputGroupAddon>
-                <InputGroupInput type="password" placeholder="1//0..." value={formRefreshToken} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormRefreshToken(e.target.value)} required />
-              </InputGroup>
+              <InputGroup><InputGroupAddon><Key /></InputGroupAddon><InputGroupInput type="password" placeholder="1//0..." value={formRefreshToken} onChange={(e) => setFormRefreshToken(e.target.value)} required /></InputGroup>
+              <FieldDescription>
+                Generated via OAuth Playground with Calendar scopes
+              </FieldDescription>
             </Field>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
-              <Button type="submit" disabled={formLoading} className="bg-green-600 hover:bg-green-700">
-                {formLoading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...</> : <><Plus className="h-4 w-4 mr-2" /> Create</>}
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setShowAddModal(false)}>Cancel</Button>
+              <Button type="submit" disabled={formLoading} className="flex-1">
+                {formLoading ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connecting...</>) : 'Add Connection'}
               </Button>
             </div>
           </form>
-        </AddModalContent>
-      </AddModal>
+        </DialogContent>
+      </Dialog>
 
-      {/* API Key Display Modal */}
-      <Dialog open={showApiKeyModal} onOpenChange={setShowApiKeyModal}>
+      {/* API Key Display Dialog */}
+      <Dialog open={showApiKeyModal} onOpenChange={(open) => { if (!open) { setShowApiKeyModal(false); setNewApiKey(''); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Check className="h-5 w-5 text-green-400" /> API Key Generated</DialogTitle>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-900/30 p-2 rounded-full"><Check className="h-6 w-6 text-green-400" /></div>
+              <DialogTitle>Your API Key</DialogTitle>
+            </div>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-sm text-muted-foreground">Copy this API key now. It won't be shown again.</p>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono break-all">{newApiKey}</code>
-              <Button variant="ghost" size="icon" onClick={() => copyText(newApiKey, setCopied)}>
-                {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
+          <Alert className="bg-yellow-900/30 border-yellow-600"><AlertDescription className="text-yellow-300"><strong>Important:</strong> Copy this API key now. You won't be able to see it again!</AlertDescription></Alert>
+          <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
+            <code className="flex-1 text-sm font-mono break-all text-foreground">{newApiKey}</code>
+            <Button variant="secondary" size="icon" onClick={() => copyToClipboard(newApiKey)}>{copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}</Button>
           </div>
+          <Button onClick={() => { setShowApiKeyModal(false); setNewApiKey(''); }} className="w-full">I've saved my API key</Button>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Name Dialog */}
-      <Dialog open={!!editTarget} onOpenChange={() => setEditTarget(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Rename Connection</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-4">
-            <InputGroup>
-              <InputGroupInput placeholder="Connection name" value={editName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)} />
-            </InputGroup>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditTarget(null)}>Cancel</Button>
-              <Button onClick={handleEditName} className="bg-green-600 hover:bg-green-700">Save</Button>
+      {/* Edit Connection Name */}
+      {isMobile ? (
+        <Sheet open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+          <SheetContent side="bottom">
+            <SheetHeader><SheetTitle>Edit Connection Name</SheetTitle></SheetHeader>
+            <div className="px-4 py-3">
+              <Field><FieldLabel>Connection Name</FieldLabel><InputGroup><InputGroupAddon><Tag /></InputGroupAddon><InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" /></InputGroup></Field>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+            <SheetFooter className="px-4 pb-4">
+              <SheetClose asChild><Button variant="outline" className="flex-1">Cancel</Button></SheetClose>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Edit Connection Name</DialogTitle></DialogHeader>
+            <Field><FieldLabel>Connection Name</FieldLabel><InputGroup><InputGroupAddon><Tag /></InputGroupAddon><InputGroupInput type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Connection name" /></InputGroup></Field>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setEditTarget(null)}>Cancel</Button>
+              <Button className="flex-1" onClick={confirmEditConnection} disabled={!editName.trim() || editName === editTarget?.name}>Save</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
-      {/* Delete Connection Alert */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Connection</AlertDialogTitle>
-            <AlertDialogDescription>This will permanently delete this Google Calendar connection and its API key.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConnection} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-          </AlertDialogFooter>
+      {/* Delete Connection Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete Connection</AlertDialogTitle><AlertDialogDescription>Are you sure you want to delete this connection? All API keys will be deleted. This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteConnection}>Delete</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete API Key Alert */}
-      <AlertDialog open={!!deleteKeyTarget} onOpenChange={() => setDeleteKeyTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete API Key</AlertDialogTitle>
-            <AlertDialogDescription>This API key will stop working immediately.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteKey} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-          </AlertDialogFooter>
+      {/* Revoke API Key Confirmation */}
+      <AlertDialog open={!!deleteKeyTarget} onOpenChange={(open) => !open && setDeleteKeyTarget(null)}>
+        <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Revoke API Key</AlertDialogTitle><AlertDialogDescription>Are you sure you want to revoke this API key? This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmRevokeApiKey}>Revoke</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Generate Key Alert */}
-      <AlertDialog open={!!generateKeyTarget} onOpenChange={() => setGenerateKeyTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Generate API Key</AlertDialogTitle>
-            <AlertDialogDescription>Create a new API key for this connection?</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleGenerateKey} className="bg-green-600 hover:bg-green-700">Generate</AlertDialogAction>
-          </AlertDialogFooter>
+      {/* Generate API Key Confirmation */}
+      <AlertDialog open={!!generateKeyTarget} onOpenChange={(open) => !open && setGenerateKeyTarget(null)}>
+        <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Generate New API Key</AlertDialogTitle><AlertDialogDescription>A new API key will be generated for this connection. Make sure to copy it — you won't be able to see it again.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={confirmGenerateApiKey}>Generate</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
