@@ -2,7 +2,6 @@ import type { ComponentType, ReactNode } from 'react';
 import { Toaster } from './ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useConnection } from '../contexts/ConnectionContext';
 import {
   Zap,
   LayoutDashboard,
@@ -10,7 +9,6 @@ import {
   Settings,
   LogOut,
   Shield,
-  ChevronRight,
   FileText,
   HelpCircle,
   Activity,
@@ -19,8 +17,6 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { getGravatarUrl } from '../lib/gravatar';
 import FeedbackBubble from './FeedbackBubble';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from './ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,9 +37,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -83,8 +76,6 @@ const navigation = [
 ];
 
 function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
-  const { user, logout, isAdmin } = useAuth();
-  const { connections, activeConnection, setActiveConnectionId } = useConnection();
   const location = useLocation();
 
   return (
@@ -130,72 +121,31 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
           </SidebarMenu>
         </SidebarGroup>
 
-        {/* Plugin Sections — collapsible dropdowns */}
+        {/* Plugin Services — single entry per plugin */}
         <SidebarGroup>
           <SidebarGroupLabel>Services</SidebarGroupLabel>
           <SidebarMenu>
             {plugins.map((plugin) => {
-              const isPluginActive = plugin.sidebarItems.some(item =>
-                location.pathname.startsWith(item.href)
-              );
+              const pluginHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
+              const isPluginActive = location.pathname === pluginHref
+                || location.pathname.startsWith(pluginHref + '/');
               return (
-                <Collapsible
-                  key={plugin.id}
-                  asChild
-                  defaultOpen={isPluginActive}
-                  className="group/collapsible"
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={plugin.name} isActive={isPluginActive}>
-                        {plugin.logo ? (
-                          <img src={plugin.logo} alt={plugin.name} className="h-4 w-4 shrink-0" />
-                        ) : (
-                          <plugin.icon />
-                        )}
-                        <span>{plugin.name}</span>
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {/* Connection selector */}
-                        {plugin.requiresConnection && connections.filter(c => c.product_type === plugin.id).length > 0 && (
-                          <li className="px-1 py-1">
-                            <Select
-                              value={activeConnection?.id || ''}
-                              onValueChange={(val) => setActiveConnectionId(val)}
-                            >
-                              <SelectTrigger className="h-6 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {connections
-                                  .filter(c => c.product_type === plugin.id)
-                                  .map((c) => (
-                                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </li>
-                        )}
-                        {plugin.sidebarItems.map((item) => (
-                          <SidebarMenuSubItem key={item.name}>
-                            <SidebarMenuSubButton
-                              isActive={location.pathname.startsWith(item.href)}
-                              asChild
-                            >
-                              <Link to={item.href}>
-                                <item.icon />
-                                <span>{item.name}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+                <SidebarMenuItem key={plugin.id}>
+                  <SidebarMenuButton
+                    tooltip={plugin.name}
+                    isActive={isPluginActive}
+                    asChild
+                  >
+                    <Link to={pluginHref}>
+                      {plugin.logo ? (
+                        <img src={plugin.logo} alt={plugin.name} className="h-4 w-4 shrink-0" />
+                      ) : (
+                        <plugin.icon />
+                      )}
+                      <span>{plugin.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               );
             })}
           </SidebarMenu>

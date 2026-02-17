@@ -84,20 +84,10 @@ const n8nPlugin: AppPlugin = {
   logo: '/logos/n8n.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/n8n/connections', icon: LinkIcon },
-    { name: 'Workflows', href: '/n8n/workflows', icon: Workflow },
-    { name: 'Executions', href: '/n8n/executions', icon: PlayCircle },
-    { name: 'Credentials', href: '/n8n/credentials', icon: Key },
-    { name: 'Tags', href: '/n8n/tags', icon: Tag },
-    { name: 'Users', href: '/n8n/users', icon: Users },
+    { name: 'n8n Management', href: '/n8n', icon: LinkIcon },
   ],
   routes: [
-    { path: '/n8n/connections', component: lazy(() => import('./n8n/Connections')) },
-    { path: '/n8n/workflows', component: lazy(() => import('./n8n/WorkflowList')) },
-    { path: '/n8n/executions', component: lazy(() => import('./n8n/ExecutionList')) },
-    { path: '/n8n/credentials', component: lazy(() => import('./n8n/CredentialList')) },
-    { path: '/n8n/tags', component: lazy(() => import('./n8n/TagList')) },
-    { path: '/n8n/users', component: lazy(() => import('./n8n/N8nUserList')) },
+    { path: '/n8n', component: lazy(() => import('./n8n/PluginPage')) },
   ],
   content: n8nContent,
 };
@@ -123,18 +113,10 @@ const wordpressPlugin: AppPlugin = {
   logo: '/logos/wordpress.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/wordpress/connections', icon: WPLinkIcon },
-    { name: 'Posts', href: '/wordpress/posts', icon: FileText },
-    { name: 'Pages', href: '/wordpress/pages', icon: File },
-    { name: 'Media', href: '/wordpress/media', icon: Image },
-    { name: 'Comments', href: '/wordpress/comments', icon: MessageCircle },
+    { name: 'WordPress', href: '/wordpress', icon: WPLinkIcon },
   ],
   routes: [
-    { path: '/wordpress/connections', component: lazy(() => import('./wordpress/Connections')) },
-    { path: '/wordpress/posts', component: lazy(() => import('./wordpress/PostList')) },
-    { path: '/wordpress/pages', component: lazy(() => import('./wordpress/PageList')) },
-    { path: '/wordpress/media', component: lazy(() => import('./wordpress/MediaList')) },
-    { path: '/wordpress/comments', component: lazy(() => import('./wordpress/CommentList')) },
+    { path: '/wordpress', component: lazy(() => import('./wordpress/PluginPage')) },
   ],
   content: wordpressContent,
 };
@@ -159,16 +141,10 @@ const clN8nMcpPlugin: AppPlugin = {
   logo: '/logos/n8n-alt.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/cl-n8n-mcp/connections', icon: McpLinkIcon },
-    { name: 'Node Explorer', href: '/cl-n8n-mcp/nodes', icon: Search },
-    { name: 'Templates', href: '/cl-n8n-mcp/templates', icon: FileCode },
-    { name: 'Workflow Tools', href: '/cl-n8n-mcp/tools', icon: Wrench },
+    { name: 'Workflow Builder', href: '/cl-n8n-mcp', icon: McpLinkIcon },
   ],
   routes: [
-    { path: '/cl-n8n-mcp/connections', component: lazy(() => import('./cl-n8n-mcp/Connections')) },
-    { path: '/cl-n8n-mcp/nodes', component: lazy(() => import('./cl-n8n-mcp/NodeExplorer')) },
-    { path: '/cl-n8n-mcp/templates', component: lazy(() => import('./cl-n8n-mcp/Templates')) },
-    { path: '/cl-n8n-mcp/tools', component: lazy(() => import('./cl-n8n-mcp/WorkflowTools')) },
+    { path: '/cl-n8n-mcp', component: lazy(() => import('./cl-n8n-mcp/PluginPage')) },
   ],
   content: clN8nMcpContent,
 };
@@ -192,14 +168,10 @@ const geminiRagPlugin: AppPlugin = {
   logo: '/logos/gemini.png?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/gemini-rag/connections', icon: GeminiLinkIcon },
-    { name: 'Stores', href: '/gemini-rag/stores', icon: FolderOpen },
-    { name: 'Documents', href: '/gemini-rag/documents', icon: FileSearch },
+    { name: 'Gemini RAG', href: '/gemini-rag', icon: GeminiLinkIcon },
   ],
   routes: [
-    { path: '/gemini-rag/connections', component: lazy(() => import('./gemini-rag/Connections')) },
-    { path: '/gemini-rag/stores', component: lazy(() => import('./gemini-rag/StoreList')) },
-    { path: '/gemini-rag/documents', component: lazy(() => import('./gemini-rag/DocumentList')) },
+    { path: '/gemini-rag', component: lazy(() => import('./gemini-rag/PluginPage')) },
   ],
   content: geminiRagContent,
 };
@@ -224,16 +196,10 @@ const linePlugin: AppPlugin = {
   logo: '/logos/line.png?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/line/connections', icon: LineLinkIcon },
-    { name: 'Messages', href: '/line/messages', icon: Send },
-    { name: 'Rich Menus', href: '/line/richmenus', icon: LineMenu },
-    { name: 'Users & Groups', href: '/line/users', icon: LineUsers },
+    { name: 'LINE Bot', href: '/line', icon: LineLinkIcon },
   ],
   routes: [
-    { path: '/line/connections', component: lazy(() => import('./line/Connections')) },
-    { path: '/line/messages', component: lazy(() => import('./line/MessageTools')) },
-    { path: '/line/richmenus', component: lazy(() => import('./line/RichMenuList')) },
-    { path: '/line/users', component: lazy(() => import('./line/UserList')) },
+    { path: '/line', component: lazy(() => import('./line/PluginPage')) },
   ],
   content: lineContent,
 };
@@ -258,16 +224,10 @@ const telegramPlugin: AppPlugin = {
   logo: '/logos/telegram.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/telegram/connections', icon: TelegramLinkIcon },
-    { name: 'Messages', href: '/telegram/messages', icon: TelegramSend },
-    { name: 'Chats', href: '/telegram/chats', icon: TelegramUsers },
-    { name: 'Webhooks', href: '/telegram/webhooks', icon: TelegramWebhook },
+    { name: 'Telegram Bot', href: '/telegram', icon: TelegramLinkIcon },
   ],
   routes: [
-    { path: '/telegram/connections', component: lazy(() => import('./telegram/Connections')) },
-    { path: '/telegram/messages', component: lazy(() => import('./telegram/MessageTools')) },
-    { path: '/telegram/chats', component: lazy(() => import('./telegram/ChatManagement')) },
-    { path: '/telegram/webhooks', component: lazy(() => import('./telegram/WebhookSettings')) },
+    { path: '/telegram', component: lazy(() => import('./telegram/PluginPage')) },
   ],
   content: telegramContent,
 };
@@ -292,16 +252,10 @@ const notionPlugin: AppPlugin = {
   logo: '/logos/notion.svg?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/notion/connections', icon: NotionLinkIcon },
-    { name: 'Databases', href: '/notion/databases', icon: NotionDB },
-    { name: 'Pages', href: '/notion/pages', icon: NotionPages },
-    { name: 'Blocks', href: '/notion/blocks', icon: LayoutList },
+    { name: 'Notion', href: '/notion', icon: NotionLinkIcon },
   ],
   routes: [
-    { path: '/notion/connections', component: lazy(() => import('./notion/Connections')) },
-    { path: '/notion/databases', component: lazy(() => import('./notion/DatabaseList')) },
-    { path: '/notion/pages', component: lazy(() => import('./notion/PageList')) },
-    { path: '/notion/blocks', component: lazy(() => import('./notion/BlockList')) },
+    { path: '/notion', component: lazy(() => import('./notion/PluginPage')) },
   ],
   content: notionContent,
 };
@@ -427,18 +381,10 @@ const slackPlugin: AppPlugin = {
   logo: '/logos/slack.png?v=2',
   requiresConnection: true,
   sidebarItems: [
-    { name: 'Connections', href: '/slack/connections', icon: SlackLinkIcon },
-    { name: 'Messages', href: '/slack/messages', icon: SlackSend },
-    { name: 'Channels', href: '/slack/channels', icon: SlackHash },
-    { name: 'Files & Pins', href: '/slack/files', icon: SlackFiles },
-    { name: 'Users & Tools', href: '/slack/users', icon: SlackUsers },
+    { name: 'Slack', href: '/slack', icon: SlackLinkIcon },
   ],
   routes: [
-    { path: '/slack/connections', component: lazy(() => import('./slack/Connections')) },
-    { path: '/slack/messages', component: lazy(() => import('./slack/MessageTools')) },
-    { path: '/slack/channels', component: lazy(() => import('./slack/ChannelList')) },
-    { path: '/slack/files', component: lazy(() => import('./slack/FileManager')) },
-    { path: '/slack/users', component: lazy(() => import('./slack/UserList')) },
+    { path: '/slack', component: lazy(() => import('./slack/PluginPage')) },
   ],
   content: slackContent,
 };

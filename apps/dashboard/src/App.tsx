@@ -125,6 +125,43 @@ function AppRoutes() {
           ))
         )}
 
+        {/* Legacy plugin sub-page redirects → tabbed pages */}
+        <Route path="/n8n/connections" element={<Navigate to="/n8n?tab=connections" replace />} />
+        <Route path="/n8n/workflows" element={<Navigate to="/n8n?tab=workflows" replace />} />
+        <Route path="/n8n/executions" element={<Navigate to="/n8n?tab=executions" replace />} />
+        <Route path="/n8n/credentials" element={<Navigate to="/n8n?tab=credentials" replace />} />
+        <Route path="/n8n/tags" element={<Navigate to="/n8n?tab=tags" replace />} />
+        <Route path="/n8n/users" element={<Navigate to="/n8n?tab=users" replace />} />
+        <Route path="/wordpress/connections" element={<Navigate to="/wordpress?tab=connections" replace />} />
+        <Route path="/wordpress/posts" element={<Navigate to="/wordpress?tab=posts" replace />} />
+        <Route path="/wordpress/pages" element={<Navigate to="/wordpress?tab=pages" replace />} />
+        <Route path="/wordpress/media" element={<Navigate to="/wordpress?tab=media" replace />} />
+        <Route path="/wordpress/comments" element={<Navigate to="/wordpress?tab=comments" replace />} />
+        <Route path="/cl-n8n-mcp/connections" element={<Navigate to="/cl-n8n-mcp?tab=connections" replace />} />
+        <Route path="/cl-n8n-mcp/nodes" element={<Navigate to="/cl-n8n-mcp?tab=nodes" replace />} />
+        <Route path="/cl-n8n-mcp/templates" element={<Navigate to="/cl-n8n-mcp?tab=templates" replace />} />
+        <Route path="/cl-n8n-mcp/tools" element={<Navigate to="/cl-n8n-mcp?tab=tools" replace />} />
+        <Route path="/gemini-rag/connections" element={<Navigate to="/gemini-rag?tab=connections" replace />} />
+        <Route path="/gemini-rag/stores" element={<Navigate to="/gemini-rag?tab=stores" replace />} />
+        <Route path="/gemini-rag/documents" element={<Navigate to="/gemini-rag?tab=documents" replace />} />
+        <Route path="/line/connections" element={<Navigate to="/line?tab=connections" replace />} />
+        <Route path="/line/messages" element={<Navigate to="/line?tab=messages" replace />} />
+        <Route path="/line/richmenus" element={<Navigate to="/line?tab=richmenus" replace />} />
+        <Route path="/line/users" element={<Navigate to="/line?tab=users" replace />} />
+        <Route path="/telegram/connections" element={<Navigate to="/telegram?tab=connections" replace />} />
+        <Route path="/telegram/messages" element={<Navigate to="/telegram?tab=messages" replace />} />
+        <Route path="/telegram/chats" element={<Navigate to="/telegram?tab=chats" replace />} />
+        <Route path="/telegram/webhooks" element={<Navigate to="/telegram?tab=webhooks" replace />} />
+        <Route path="/notion/connections" element={<Navigate to="/notion?tab=connections" replace />} />
+        <Route path="/notion/databases" element={<Navigate to="/notion?tab=databases" replace />} />
+        <Route path="/notion/pages" element={<Navigate to="/notion?tab=pages" replace />} />
+        <Route path="/notion/blocks" element={<Navigate to="/notion?tab=blocks" replace />} />
+        <Route path="/slack/connections" element={<Navigate to="/slack?tab=connections" replace />} />
+        <Route path="/slack/messages" element={<Navigate to="/slack?tab=messages" replace />} />
+        <Route path="/slack/channels" element={<Navigate to="/slack?tab=channels" replace />} />
+        <Route path="/slack/files" element={<Navigate to="/slack?tab=files" replace />} />
+        <Route path="/slack/users" element={<Navigate to="/slack?tab=users" replace />} />
+
         {/* Landing page */}
         <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
 
