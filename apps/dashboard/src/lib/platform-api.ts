@@ -256,7 +256,7 @@ export async function getUserUsageHistory(months = 12): Promise<ApiResponse<{ hi
   return platformRequest(`/api/usage/history?months=${months}`);
 }
 
-export async function getConnectionUsage(days: 7 | 30 | 90 = 7): Promise<ApiResponse<{ connections: ConnectionUsageStats[]; period_days: number }>> {
+export async function getConnectionUsage(days: number = 7): Promise<ApiResponse<{ connections: ConnectionUsageStats[]; period_days: number }>> {
   return platformRequest(`/api/usage/by-connection?days=${days}`);
 }
 

@@ -33,14 +33,14 @@ const chartConfig = {
 
 interface DashboardUsageChartProps {
   data: UsageMonthlyHistory[]
-  connectionPeriod: 7 | 30 | 90
-  onConnectionPeriodChange: (days: 7 | 30 | 90) => void
+  connectionPeriod: 7 | 90 | 180
+  onConnectionPeriodChange: (days: 7 | 90 | 180) => void
 }
 
 export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriodChange }: DashboardUsageChartProps) {
   const filteredData = React.useMemo(() => {
-    // Map connection period to chart months: 7d→3m, 30d→6m, 90d→12m
-    const months = connectionPeriod <= 7 ? 3 : connectionPeriod <= 30 ? 6 : 12
+    // Map connection period to chart months: 7d→3m, 3m→3m, 6m→6m
+    const months = connectionPeriod <= 90 ? 3 : 6
     return data.slice(-months)
   }, [data, connectionPeriod])
 
@@ -64,46 +64,46 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
         <CardTitle>Usage History</CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Monthly requests for the last {connectionPeriod <= 7 ? "3" : connectionPeriod <= 30 ? "6" : "12"} months
+            Monthly requests for the last {connectionPeriod <= 90 ? "3" : "6"} months
           </span>
           <span className="@[540px]/card:hidden">
-            Last {connectionPeriod <= 7 ? "3" : connectionPeriod <= 30 ? "6" : "12"} months
+            Last {connectionPeriod <= 90 ? "3" : "6"} months
           </span>
         </CardDescription>
         <div className="absolute right-4 top-4">
           <ToggleGroup
             type="single"
             value={connectionPeriod.toString()}
-            onValueChange={(v) => v && onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90)}
+            onValueChange={(v) => v && onConnectionPeriodChange(parseInt(v) as 7 | 90 | 180)}
             variant="outline"
             className="@[540px]/card:flex hidden"
           >
             <ToggleGroupItem value="7" className="h-8 px-2.5">
-              7 days
-            </ToggleGroupItem>
-            <ToggleGroupItem value="30" className="h-8 px-2.5">
-              30 days
+              7d
             </ToggleGroupItem>
             <ToggleGroupItem value="90" className="h-8 px-2.5">
-              90 days
+              3m
+            </ToggleGroupItem>
+            <ToggleGroupItem value="180" className="h-8 px-2.5">
+              6m
             </ToggleGroupItem>
           </ToggleGroup>
-          <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90)}>
+          <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 90 | 180)}>
             <SelectTrigger
               className="@[540px]/card:hidden flex w-40"
               aria-label="Select time range"
             >
-              <SelectValue placeholder="7 days" />
+              <SelectValue placeholder="7d" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="7" className="rounded-lg">
-                7 days
-              </SelectItem>
-              <SelectItem value="30" className="rounded-lg">
-                30 days
+                7d
               </SelectItem>
               <SelectItem value="90" className="rounded-lg">
-                90 days
+                3m
+              </SelectItem>
+              <SelectItem value="180" className="rounded-lg">
+                6m
               </SelectItem>
             </SelectContent>
           </Select>

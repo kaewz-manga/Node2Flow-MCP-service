@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [usageHistory, setUsageHistory] = useState<UsageMonthlyHistory[]>([]);
   const [connectionUsage, setConnectionUsage] = useState<ConnectionUsageStats[]>([]);
-  const [connectionPeriod, setConnectionPeriod] = useState<7 | 30 | 90>(7);
+  const [connectionPeriod, setConnectionPeriod] = useState<7 | 90 | 180>(7);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -70,7 +70,7 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const handlePeriodChange = useCallback(async (days: 7 | 30 | 90) => {
+  const handlePeriodChange = useCallback(async (days: 7 | 90 | 180) => {
     setConnectionPeriod(days);
     const res = await getConnectionUsage(days);
     if (res.success && res.data) {
