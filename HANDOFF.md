@@ -2017,9 +2017,20 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
    - Sort by name (click header to toggle A-Z / Z-A)
    - Pagination with rows per page selector (10/25/50) + page numbers
 
-7. **Fix mobile horizontal scroll** (pending commit):
+7. **Fix mobile horizontal scroll** (`8aabc50`):
    - Root div `overflow-x-hidden`
    - Table wrapper `overflow-x-auto`
    - Pagination row stacks vertically on mobile (`flex-col sm:flex-row`)
 
+8. **Compact table rows + header** (`edb19e8`, `a7d9760`):
+   - Header: `h-7 px-2 text-xs` (was `h-10 px-4`)
+   - Cells: `py-2 px-2` (was `p-4`)
+   - Badge: `text-[11px] px-1.5 py-0`, Manage button: `h-6 px-2`
+
+9. **Compact Card header padding** (`48247f2`, `6b9b6bc`):
+   - CardHeader: `px-4 pt-4 pb-2` (was `p-6 pb-3`)
+   - CardContent: `px-4 pb-4` (was `p-6`)
+   - Font size kept original (`text-lg` title, default description)
+
+**Commits**: `a701f91`, `00ac134`, `b9a93c9`, `8364ae4`, `a6572b8`, `03e7077`, `8aabc50`, `edb19e8`, `a7d9760`, `48247f2`, `6b9b6bc`
 **Date**: 2026-02-17
