@@ -2034,3 +2034,92 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 
 **Commits**: `a701f91`, `00ac134`, `b9a93c9`, `8364ae4`, `a6572b8`, `03e7077`, `8aabc50`, `edb19e8`, `a7d9760`, `48247f2`, `6b9b6bc`
 **Date**: 2026-02-17
+
+## Session 64: Dashboard shadcn dashboard-01 Full Redesign (2026-02-17)
+
+Full dashboard-01 template redesign — backend APIs, section cards, usage chart, connections data table, collapsible sidebar, CSS dark theme fixes, and platform-worker type fix.
+
+### Session 64a: shadcn Setup + Cleanup
+
+- Ran `npx shadcn add dashboard-01` → 33 files installed
+- Cleaned up 28 conflicting files (19 UI components, 7 composites, 1 hook, 1 data dir)
+- Kept 3 new UI: `chart.tsx`, `toggle.tsx`, `toggle-group.tsx` + 2 composites
+- Installed `@tailwindcss/container-queries` plugin
+
+### Session 64b: Backend + Components + Sidebar + CSS + Deploy
+
+**1. Backend — Per-Connection Usage API** (`apps/platform-worker/src/routes/user.ts`):
+
+Two new endpoints:
+- `GET /api/usage/history?months=12` — Monthly request/error history from `usage_monthly` table
+- `GET /api/usage/by-connection?days=7` — Per-connection usage stats (GROUP BY connection_id)
+
+New types in `apps/dashboard/src/lib/platform-api.ts`:
+- `UsageMonthlyHistory`: `{ year_month, total_requests, error_count }`
+- `ConnectionUsageStats`: `{ connection_id, total_requests, successes, errors, last_request_at }`
+
+**2. Dashboard Components** (3 components rewritten/created):
+
+| Component | File | Description |
+|-----------|------|-------------|
+| `DashboardSectionCards` | `section-cards.tsx` | 4 stat cards (Plan, Daily Requests, Services, Monthly) with `@container` responsive grid |
+| `DashboardUsageChart` | `chart-area-interactive.tsx` | Area chart (recharts) with 3m/6m/12m toggle, requests + errors series |
+| `ConnectionsDataTable` | `connections-table.tsx` | NEW — @tanstack/react-table, sorting, pagination (10 rows), period toggle (7d/30d/90d) |
+
+Dashboard.tsx rewritten to integrate all 3 components with `@container/main` layout.
+
+**3. Collapsible Sidebar Services** (commit `8c70519`):
+
+32 plugin services overwhelmed the sidebar — Support section (Settings, Docs, FAQ, Status) was hidden below fold.
+
+Fix:
+- Wrapped Services group in `Collapsible` + `CollapsibleTrigger` + `CollapsibleContent`
+- Added `ChevronRight` icon with rotation animation (`group-data-[state=open]/collapsible:rotate-90`)
+- Added `SidebarGroupContent` wrapper
+- Added `isOnServicePage` memo — auto-opens when navigating to a service page
+- Default collapsed — sidebar now shows: Dashboard, Services >, Settings, Docs, FAQ, Status (6 items)
+
+**4. CSS Dark Theme Fixes** (commits `988fb32`, `42f3beb`):
+
+Problem: Sidebar was white/light despite dark theme background.
+
+Root cause 1: `:root` had dark main vars but LIGHT sidebar vars (`--sidebar-background: 0 0% 98%`). Dark sidebar vars were in `.dark` block which was never applied (no `dark` class on HTML).
+→ Fix: Moved dark sidebar vars from `.dark` to `:root`, removed `.dark` block.
+
+Root cause 2: `--sidebar-background: 240 5.9% 10%` (dark blue-gray) ≠ `--background: 0 0% 0%` (pure black).
+→ Fix: Changed `--sidebar-background` to `0 0% 0%` to match page background.
+
+**5. Platform Worker Type Fix** (commit `4f9de3f`):
+
+`ScheduledEvent` → `ScheduledController` in `apps/platform-worker/src/index.ts` (CF Workers API changed the scheduled handler parameter type).
+
+### Commits (7):
+
+| Commit | Description |
+|--------|-------------|
+| `31c3ba9` | feat: backend API + section cards + chart + data table + dashboard rewrite |
+| `ed069fe` | fix: template layout padding/gap + sidebar inset |
+| `8c70519` | feat: collapsible sidebar services |
+| `988fb32` | fix: dark sidebar CSS vars in root |
+| `42f3beb` | fix: match sidebar background to page background |
+| `4f9de3f` | fix: ScheduledEvent → ScheduledController type |
+
+### Files Changed (9):
+
+| File | Change |
+|------|--------|
+| `packages/dashboard-core/src/components/Layout.tsx` | Collapsible services + imports (useMemo, ChevronRight, Collapsible, SidebarGroupContent) |
+| `apps/dashboard/src/index.css` | Dark sidebar CSS vars in `:root` + match background |
+| `apps/dashboard/src/components/section-cards.tsx` | Rewritten — props-driven with real data |
+| `apps/dashboard/src/components/chart-area-interactive.tsx` | Rewritten — props-driven area chart |
+| `apps/dashboard/src/components/connections-table.tsx` | NEW — @tanstack/react-table data table |
+| `apps/dashboard/src/pages/Dashboard.tsx` | Rewritten — 3 components + @container layout |
+| `apps/dashboard/src/lib/platform-api.ts` | New types + `getUserUsageHistory()` + `getConnectionUsage()` |
+| `apps/platform-worker/src/routes/user.ts` | 2 new endpoints (usage history + connection usage) |
+| `apps/platform-worker/src/index.ts` | ScheduledController type fix |
+
+### Deployed:
+- Dashboard `app.node2flow.net` — 4 CF Pages deploys
+- Platform Worker `platform.node2flow.net` — 1 wrangler deploy
+
+**Date**: 2026-02-17
