@@ -170,12 +170,7 @@ export default function Services() {
                   )}
                   <span className="text-xs font-medium truncate">{plugin.name}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">{toolCount} tools</span>
-                  {isConnected && (
-                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                  )}
-                </div>
+                <span className="text-[10px] text-muted-foreground">{toolCount} tools</span>
               </Link>
             );
           })}
