@@ -160,16 +160,21 @@ export default function Services() {
               <Link
                 key={plugin.id}
                 to={connectionsHref}
-                className={`block rounded-md border bg-card p-2.5 transition-all hover:shadow-md ${isConnected ? 'border-green-400 hover:border-green-300' : 'border-border/60 hover:border-primary/40'}`}
+                className={`block rounded-md border bg-card p-2 transition-all hover:shadow-md hover:border-primary/40 ${isConnected ? 'border-l-[3px] border-l-emerald-500' : 'border-border/60'}`}
               >
-                <div className="flex flex-col items-center text-center gap-1.5">
+                <div className="flex items-center gap-2 mb-1">
                   {logoUrl ? (
-                    <img src={logoUrl} alt={plugin.name} className="h-8 w-8 shrink-0" />
+                    <img src={logoUrl} alt={plugin.name} className="h-5 w-5 shrink-0" />
                   ) : (
-                    <PluginIcon className="h-8 w-8 shrink-0 text-muted-foreground" />
+                    <PluginIcon className={`h-5 w-5 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
                   )}
-                  <span className="text-xs font-medium truncate w-full">{plugin.name}</span>
-                  <Badge variant="outline" className="text-[10px]">{toolCount} tools</Badge>
+                  <span className="text-xs font-medium truncate">{plugin.name}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">{toolCount} tools</span>
+                  {isConnected && (
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  )}
                 </div>
               </Link>
             );
