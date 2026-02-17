@@ -118,7 +118,7 @@ export default {
     }
   },
 
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log(`[CRON] Running scheduled tasks at ${new Date().toISOString()}`);
 
     // Task 1: Delete old usage logs (90 days retention)
