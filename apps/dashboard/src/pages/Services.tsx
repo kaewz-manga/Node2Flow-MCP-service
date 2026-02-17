@@ -224,8 +224,8 @@ export default function Services() {
       {/* Connections Table */}
       <Card className="bg-black border-border/60 max-w-4xl mx-auto">
         <CardHeader className="px-4 pt-4 pb-2">
-          <CardTitle className="text-base">Your Connections</CardTitle>
-          <CardDescription className="text-xs">
+          <CardTitle className="text-lg">Your Connections</CardTitle>
+          <CardDescription>
             {connections.length > 0
               ? `${connections.length} active connection${connections.length > 1 ? 's' : ''} across ${connectedServices} service${connectedServices > 1 ? 's' : ''}`
               : 'No connections yet. Choose a service above to get started.'}
