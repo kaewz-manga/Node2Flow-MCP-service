@@ -152,8 +152,6 @@ export default function Services() {
             const isConnected = pluginConns.length > 0;
             const connectionsHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
             const PluginIcon = plugin.icon;
-            const toolCount = TOOL_COUNTS[plugin.id] || 0;
-
             const logoUrl = SERVICE_LOGOS[plugin.id];
 
             return (
@@ -162,7 +160,7 @@ export default function Services() {
                 to={connectionsHref}
                 className={`block rounded-md border bg-card p-2 transition-all hover:shadow-md hover:border-primary/40 ${isConnected ? 'border-l-[3px] border-l-emerald-500' : 'border-border/60'}`}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2">
                   {logoUrl ? (
                     <img src={logoUrl} alt={plugin.name} className="h-5 w-5 shrink-0" />
                   ) : (
@@ -170,7 +168,6 @@ export default function Services() {
                   )}
                   <span className="text-xs font-medium truncate">{plugin.name}</span>
                 </div>
-                <span className="text-[10px] text-muted-foreground">{toolCount} tools</span>
               </Link>
             );
           })}
