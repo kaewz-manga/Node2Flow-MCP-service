@@ -16,7 +16,6 @@ import {
   ChevronsUpDown,
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
-import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { getGravatarUrl } from '../lib/gravatar';
 import FeedbackBubble from './FeedbackBubble';
@@ -287,70 +286,16 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
   );
 }
 
-function HeaderBar({ plugins }: { plugins: DashboardPlugin[] }) {
-  const { user, logout, isAdmin } = useAuth();
+function SiteHeader({ plugins }: { plugins: DashboardPlugin[] }) {
   const location = useLocation();
-  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
-  const avatarUrl = user?.avatar_url || (user?.email ? getGravatarUrl(user.email) : undefined);
   const pageTitle = getPageTitle(location.pathname, plugins);
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-      <div className="flex items-center gap-2 px-4">
+      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+        <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <h1 className="text-base font-medium">{pageTitle}</h1>
-      </div>
-      <div className="ml-auto flex items-center gap-2 px-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Avatar className="h-8 w-8">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.email || ''} />}
-                <AvatarFallback className="bg-sidebar-accent text-xs">{initials}</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-56">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.email}</p>
-                <p className="text-xs leading-none text-muted-foreground capitalize">{user?.plan} plan</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link to="/usage">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Usage
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            {isAdmin && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/admin" className="text-red-400">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin Panel
-                  </Link>
-                </DropdownMenuItem>
-              </>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );
@@ -359,11 +304,18 @@ function HeaderBar({ plugins }: { plugins: DashboardPlugin[] }) {
 export default function Layout({ children, plugins = [] }: LayoutProps) {
   return (
     <TooltipProvider delayDuration={0}>
-      <SidebarProvider>
+      <SidebarProvider
+        style={
+          {
+            '--sidebar-width': '18rem',
+            '--header-height': '3rem',
+          } as React.CSSProperties
+        }
+      >
         <AppSidebar plugins={plugins} />
         <SidebarInset>
-          <HeaderBar plugins={plugins} />
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <SiteHeader plugins={plugins} />
+          <div className="flex flex-1 flex-col">
             {children}
           </div>
         </SidebarInset>
