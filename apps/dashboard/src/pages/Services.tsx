@@ -150,7 +150,7 @@ export default function Services() {
           {plugins.map((plugin) => {
             const pluginConns = connections.filter(c => c.product_type === plugin.id);
             const isConnected = pluginConns.length > 0;
-            const connectionsHref = plugin.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
+            const connectionsHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
             const PluginIcon = plugin.icon;
             const toolCount = TOOL_COUNTS[plugin.id] || 0;
 
@@ -203,7 +203,7 @@ export default function Services() {
                   {connections.map((conn) => {
                     const plugin = getPlugin(conn.product_type);
                     const ConnIcon = plugin?.icon;
-                    const connHref = plugin?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard';
+                    const connHref = plugin?.sidebarItems[0]?.href || '/dashboard';
                     return (
                       <TableRow key={conn.id}>
                         <TableCell className="text-center">
@@ -274,7 +274,7 @@ export default function Services() {
           </CardContent>
           <CardFooter>
             <Button size="sm" className="w-full" asChild>
-              <Link to={plugins[0]?.sidebarItems.find(i => i.name === 'Connections')?.href || '/dashboard'}>
+              <Link to={plugins[0]?.sidebarItems[0]?.href || '/dashboard'}>
                 Get Started
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </Link>
