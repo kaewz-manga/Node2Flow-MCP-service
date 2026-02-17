@@ -371,7 +371,7 @@ export function generateTOTPSecret(): string {
 export function generateTOTPUri(
   secret: string,
   email: string,
-  issuer: string = 'n8n Management MCP'
+  issuer: string = 'Node2Flow'
 ): string {
   const encodedIssuer = encodeURIComponent(issuer);
   const encodedEmail = encodeURIComponent(email);

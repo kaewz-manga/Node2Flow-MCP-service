@@ -291,7 +291,7 @@ export default function BitkubConnections() {
       {/* MCP Endpoint */}
       <Item variant="outline">
         <ItemMedia>
-          <img src="/logos/bitkub.png?v=2" alt="Bitkub" className="h-10 w-10" />
+          <img src="/logos/bitkub.png?v=3" alt="Bitkub" className="h-10 w-10" />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>MCP Endpoint</ItemTitle>

@@ -295,7 +295,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-2xl mx-auto overflow-x-hidden">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your account settings</p>
@@ -343,7 +343,7 @@ export default function Settings() {
       )}
 
       <Tabs defaultValue={defaultTab}>
-        <TabsList variant="line">
+        <TabsList variant="line" className="overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="api-keys">API Keys</TabsTrigger>

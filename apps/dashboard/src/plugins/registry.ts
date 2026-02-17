@@ -532,7 +532,7 @@ const bitkubPlugin: AppPlugin = {
   id: 'bitkub',
   name: 'Bitkub',
   icon: BitkubIcon,
-  logo: '/logos/bitkub.png?v=2',
+  logo: '/logos/bitkub.png?v=3',
   requiresConnection: true,
   sidebarItems: [
     { name: 'Connections', href: '/bitkub/connections', icon: BitkubLinkIcon },
