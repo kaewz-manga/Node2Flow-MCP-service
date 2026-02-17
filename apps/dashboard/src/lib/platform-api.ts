@@ -106,6 +106,14 @@ export interface UsageMonthlyHistory {
   errors: number;
 }
 
+export interface ConnectionUsageStats {
+  connection_id: string;
+  total_requests: number;
+  successes: number;
+  errors: number;
+  last_request_at: string | null;
+}
+
 export interface TopTool {
   tool_name: string;
   count: number;
@@ -246,6 +254,10 @@ export async function getPlatformStats(): Promise<ApiResponse<PlatformStats>> {
 
 export async function getUserUsageHistory(months = 12): Promise<ApiResponse<{ history: UsageMonthlyHistory[] }>> {
   return platformRequest(`/api/usage/history?months=${months}`);
+}
+
+export async function getConnectionUsage(days: 7 | 30 | 90 = 7): Promise<ApiResponse<{ connections: ConnectionUsageStats[]; period_days: number }>> {
+  return platformRequest(`/api/usage/by-connection?days=${days}`);
 }
 
 // ============================================

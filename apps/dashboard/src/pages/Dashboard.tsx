@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import type { Usage, PlatformStats, UsageMonthlyHistory } from '../lib/platform-api';
-import { getUsage, getPlatformStats, getUserUsageHistory } from '../lib/platform-api';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Usage, PlatformStats, UsageMonthlyHistory, ConnectionUsageStats } from '../lib/platform-api';
+import { getUsage, getPlatformStats, getUserUsageHistory, getConnectionUsage } from '../lib/platform-api';
 import type { Connection } from '@node2flow/dashboard-core';
 import {
   getConnections,
@@ -19,6 +19,7 @@ import {
 import { Alert, AlertDescription } from '@node2flow/dashboard-core';
 import { DashboardSectionCards } from '../components/section-cards';
 import { DashboardUsageChart } from '../components/chart-area-interactive';
+import { ConnectionsDataTable } from '../components/connections-table';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -26,17 +27,29 @@ export default function Dashboard() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
   const [usageHistory, setUsageHistory] = useState<UsageMonthlyHistory[]>([]);
+  const [connectionUsage, setConnectionUsage] = useState<ConnectionUsageStats[]>([]);
+  const [connectionPeriod, setConnectionPeriod] = useState<7 | 30 | 90>(7);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Build pluginMap once: product_type → { name, logo }
+  const pluginMap = useMemo(() => {
+    const map = new Map<string, { name: string; logo?: string }>();
+    for (const p of plugins) {
+      map.set(p.id, { name: p.name, logo: p.logo });
+    }
+    return map;
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageRes, connectionsRes, statsRes, historyRes] = await Promise.all([
+        const [usageRes, connectionsRes, statsRes, historyRes, connUsageRes] = await Promise.all([
           getUsage(),
           getConnections(),
           getPlatformStats(),
           getUserUsageHistory(12),
+          getConnectionUsage(7),
         ]);
 
         if (connectionsRes.success && connectionsRes.data) {
@@ -59,6 +72,10 @@ export default function Dashboard() {
         if (historyRes.success && historyRes.data) {
           setUsageHistory(historyRes.data.history);
         }
+
+        if (connUsageRes.success && connUsageRes.data) {
+          setConnectionUsage(connUsageRes.data.connections);
+        }
       } catch {
         setError('Failed to load dashboard data');
       } finally {
@@ -67,6 +84,15 @@ export default function Dashboard() {
     }
 
     fetchData();
+  }, []);
+
+  // Re-fetch connection usage when period changes
+  const handlePeriodChange = useCallback(async (days: 7 | 30 | 90) => {
+    setConnectionPeriod(days);
+    const res = await getConnectionUsage(days);
+    if (res.success && res.data) {
+      setConnectionUsage(res.data.connections);
+    }
   }, []);
 
   if (loading) {
@@ -90,14 +116,6 @@ export default function Dashboard() {
 
   return (
     <div className="@container/main flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-      {/* Header */}
-      <div className="px-4 lg:px-6">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Welcome back! Here's an overview of your account.
-        </p>
-      </div>
-
       {/* Section Cards */}
       <DashboardSectionCards
         plan={user?.plan || 'free'}
@@ -115,6 +133,15 @@ export default function Dashboard() {
       <div className="px-4 lg:px-6">
         <DashboardUsageChart data={usageHistory} />
       </div>
+
+      {/* Connection Usage Data Table */}
+      <ConnectionsDataTable
+        connections={connections}
+        usageStats={connectionUsage}
+        pluginMap={pluginMap}
+        period={connectionPeriod}
+        onPeriodChange={handlePeriodChange}
+      />
 
       {/* Platform Stats Strip */}
       {platformStats && (

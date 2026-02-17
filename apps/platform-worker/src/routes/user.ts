@@ -404,5 +404,19 @@ export async function handleUserRoutes(
     return apiResponse({ success: true, data: { history } });
   }
 
+  // GET /api/usage/by-connection?days=7|30|90
+  if (path === '/api/usage/by-connection' && method === 'GET') {
+    const reqUrl = new URL(request.url);
+    const days = parseInt(reqUrl.searchParams.get('days') || '7', 10);
+    if (![7, 30, 90].includes(days)) {
+      return apiResponse({ success: false, error: { code: 'INVALID_DAYS', message: 'days must be 7, 30, or 90' } }, 400);
+    }
+    const rows = await env.DB
+      .prepare(`SELECT connection_id, COUNT(*) as total_requests, SUM(CASE WHEN status='success' THEN 1 ELSE 0 END) as successes, SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) as errors, MAX(created_at) as last_request_at FROM usage_logs WHERE user_id = ? AND created_at >= datetime('now', '-' || ? || ' days') GROUP BY connection_id ORDER BY total_requests DESC`)
+      .bind(authUser.userId, days)
+      .all();
+    return apiResponse({ success: true, data: { connections: rows.results || [], period_days: days } });
+  }
+
   return null;
 }
