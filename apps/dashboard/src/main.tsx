@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { HeroUIProvider } from '@heroui/system';
 import { configureApi } from '@node2flow/dashboard-core';
 import './index.css';
 import App from './App';
@@ -13,8 +12,6 @@ configureApi({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HeroUIProvider>
-      <App />
-    </HeroUIProvider>
+    <App />
   </StrictMode>,
 );
