@@ -1946,3 +1946,38 @@ Added Supabase plugin to Gateway + Dashboard. Platform now has **22 plugins, ~53
 **Deployed**: Gateway `5f6e9a6a` (`mcp.node2flow.net`) + Dashboard (`app.node2flow.net`)
 **Commit**: `f0252dd`
 **Date**: 2026-02-16
+
+## Session 62: Dashboard UI Restructure — Tabs + Connection Page Consistency (2026-02-17)
+
+**Major dashboard overhaul**: Moved plugin sub-pages from sidebar to tabbed navigation, standardized all 32 Connection pages to a single consistent pattern, and improved UX.
+
+### Changes (5 commits):
+
+1. **TOTP issuer + Settings mobile fix** (`ba8aca0`):
+   - Changed TOTP issuer from "n8n-management MCP" to "Node2Flow"
+   - Fixed Settings page horizontal scroll on mobile
+
+2. **PluginTabs — sidebar to tabs** (`3da3b3d`):
+   - Created `packages/dashboard-core/src/components/PluginTabs.tsx` — reusable tab wrapper with URL sync (`?tab=`)
+   - Created 8 `PluginPage.tsx` files for multi-page plugins (n8n, WordPress, cl-n8n-mcp, Gemini RAG, LINE, Telegram, Notion, Slack)
+   - Simplified `registry.ts` — 8 plugins from multiple routes/sidebarItems to single entry
+   - Simplified `Layout.tsx` — removed Collapsible dropdowns, single entry per plugin
+   - Added redirect routes in `App.tsx` for old URLs (`/n8n/workflows` → `/n8n?tab=workflows`)
+   - **Sidebar now shows 32 single entries** (no expandable submenus)
+
+3. **MCP Endpoint card to top** (`6fe33c7`):
+   - Moved MCP Endpoint copy-URL card to first position in all 32 Connection pages
+   - Removed `variant="outline"` from MCP Item (borderless)
+
+4. **Standardize 8 Connection pages** (`c25ce5a`):
+   - Rewrote 8 "new pattern" files (gmail, google-calendar, github, cloudflare, facebook-pages, instagram, browserbase, qdrant) to match the 24 "old pattern" files
+   - Key changes: `Dialog` (not computed AddModal), `isMobile ? Sheet : Dialog` ternary for Edit, `Shield` icon + Link for 2FA, blue Info alert, ternary empty/table, `EmptyMedia variant="icon"`, Terms/Privacy links, `mcpUrl` via env var
+   - **All 32 Connection pages now fully consistent**
+
+5. **Hide header Add button when empty** (`c4f8427`):
+   - Wrapped header "Add Connection" button with `{connections.length > 0 && (...)}`
+   - Empty state shows only centered button; header button appears after first connection
+
+**Files changed**: ~50 (1 new shared component, 8 new PluginPage files, 32 Connection pages edited, registry/layout/app edits)
+**Deployed**: Dashboard (`app.node2flow.net`) — 3 deploys during session
+**Date**: 2026-02-17
