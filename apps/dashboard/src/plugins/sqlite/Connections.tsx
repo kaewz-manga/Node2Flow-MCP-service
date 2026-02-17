@@ -170,6 +170,19 @@ export default function Connections() {
 
   return (
     <div className="space-y-6">
+      <Item>
+        <ItemMedia><img src="/logos/sqlite.png?v=3" alt="SQLite" className="h-10 w-10" /></ItemMedia>
+        <ItemContent>
+          <ItemTitle>MCP Endpoint</ItemTitle>
+          <ItemDescription><code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code></ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
+          </Button>
+        </ItemActions>
+      </Item>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">SQLite Connections</h1>
@@ -193,19 +206,6 @@ export default function Connections() {
       )}
 
       {error && (<Alert variant="destructive"><AlertCircle className="h-5 w-5" /><AlertDescription>{error}</AlertDescription></Alert>)}
-
-      <Item variant="outline">
-        <ItemMedia><img src="/logos/sqlite.png?v=3" alt="SQLite" className="h-10 w-10" /></ItemMedia>
-        <ItemContent>
-          <ItemTitle>MCP Endpoint</ItemTitle>
-          <ItemDescription><code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code></ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
-            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
-          </Button>
-        </ItemActions>
-      </Item>
 
       <Alert className="bg-blue-950/20 border-blue-900/50">
         <Info className="h-4 w-4 text-blue-400" />

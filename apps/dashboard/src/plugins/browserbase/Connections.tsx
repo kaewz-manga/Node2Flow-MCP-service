@@ -190,16 +190,7 @@ export default function Connections() {
 
   return (
     <div className="space-y-6">
-      {show2faAlert && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Enable 2FA for better security</AlertTitle>
-          <AlertDescription>
-            Two-factor authentication protects your Browserbase connections. Enable it in Settings.
-          </AlertDescription>
-        </Alert>
-      )}
-
+      {/* MCP Endpoint */}
       <Item>
         <ItemMedia><img src="/logos/browserbase.svg?v=3" alt="Browserbase" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
@@ -212,6 +203,16 @@ export default function Connections() {
           </Button>
         </ItemActions>
       </Item>
+
+      {show2faAlert && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Enable 2FA for better security</AlertTitle>
+          <AlertDescription>
+            Two-factor authentication protects your Browserbase connections. Enable it in Settings.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="flex items-center justify-between">
         <div>

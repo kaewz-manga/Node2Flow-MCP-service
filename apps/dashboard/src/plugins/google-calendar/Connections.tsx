@@ -186,17 +186,6 @@ export default function Connections() {
 
   return (
     <div className="space-y-6">
-      {/* 2FA Alert */}
-      {show2faAlert && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Enable 2FA for better security</AlertTitle>
-          <AlertDescription>
-            Two-factor authentication protects your Google Calendar connections. Enable it in Settings.
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* MCP Endpoint */}
       <Item>
         <ItemMedia><img src="/logos/google-calendar.svg?v=2" alt="Google Calendar" className="h-10 w-10" /></ItemMedia>
@@ -210,6 +199,17 @@ export default function Connections() {
           </Button>
         </ItemActions>
       </Item>
+
+      {/* 2FA Alert */}
+      {show2faAlert && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Enable 2FA for better security</AlertTitle>
+          <AlertDescription>
+            Two-factor authentication protects your Google Calendar connections. Enable it in Settings.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between">

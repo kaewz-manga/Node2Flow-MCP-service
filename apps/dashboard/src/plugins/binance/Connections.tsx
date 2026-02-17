@@ -256,6 +256,24 @@ export default function BinanceConnections() {
 
   return (
     <div className="space-y-6">
+      {/* MCP Endpoint */}
+      <Item>
+        <ItemMedia>
+          <img src="/logos/binance.png?v=2" alt="Binance" className="h-10 w-10" />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>MCP Endpoint</ItemTitle>
+          <ItemDescription>
+            <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
+          </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
+            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
+          </Button>
+        </ItemActions>
+      </Item>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Binance Connections</h1>
@@ -287,24 +305,6 @@ export default function BinanceConnections() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
-      {/* MCP Endpoint */}
-      <Item variant="outline">
-        <ItemMedia>
-          <img src="/logos/binance.png?v=2" alt="Binance" className="h-10 w-10" />
-        </ItemMedia>
-        <ItemContent>
-          <ItemTitle>MCP Endpoint</ItemTitle>
-          <ItemDescription>
-            <code className="font-mono text-xs text-foreground break-all">{mcpUrl}</code>
-          </ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(mcpUrl); setCopiedMcp(true); setTimeout(() => setCopiedMcp(false), 2000); }}>
-            {copiedMcp ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy URL</>}
-          </Button>
-        </ItemActions>
-      </Item>
 
       {/* Key Usage Info */}
       <Alert className="bg-blue-950/20 border-blue-900/50">
