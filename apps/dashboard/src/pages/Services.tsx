@@ -249,8 +249,8 @@ export default function Services() {
                 <Table className="min-w-0">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[1%] text-center h-8 px-2">Status</TableHead>
-                      <TableHead className="w-[40%] h-8 px-2">
+                      <TableHead className="w-[1%] text-center h-7 px-2 text-xs">Status</TableHead>
+                      <TableHead className="w-[40%] h-7 px-2 text-xs">
                         <button
                           onClick={() => setSortAsc(prev => !prev)}
                           className="flex items-center gap-1 hover:text-foreground transition-colors"
@@ -259,8 +259,8 @@ export default function Services() {
                           <ArrowUpDown className="h-3 w-3" />
                         </button>
                       </TableHead>
-                      <TableHead className="text-center h-8 px-2">Service</TableHead>
-                      <TableHead className="w-[1%] whitespace-nowrap text-center h-8 px-2"></TableHead>
+                      <TableHead className="text-center h-7 px-2 text-xs">Service</TableHead>
+                      <TableHead className="w-[1%] whitespace-nowrap text-center h-7 px-2"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
