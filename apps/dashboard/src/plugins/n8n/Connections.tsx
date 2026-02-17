@@ -229,10 +229,12 @@ export default function Connections() {
             Manage your n8n instance connections
           </p>
         </div>
-        <Button variant="outline" onClick={() => setShowAddModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Connection
-        </Button>
+        {connections.length > 0 && (
+          <Button variant="outline" onClick={() => setShowAddModal(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Connection
+          </Button>
+        )}
       </div>
 
       {/* 2FA Warning - hidden when enabled */}

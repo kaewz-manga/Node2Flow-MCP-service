@@ -275,10 +275,12 @@ export default function Connections() {
           <h1 className="text-2xl font-bold text-foreground">Google Workspace Connections</h1>
           <p className="text-muted-foreground mt-1">Manage your Google Workspace MCP connections</p>
         </div>
-        <Button variant="outline" onClick={() => setShowAddModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Connection
-        </Button>
+        {connections.length > 0 && (
+          <Button variant="outline" onClick={() => setShowAddModal(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Connection
+          </Button>
+        )}
       </div>
 
       {statusLoaded && !totpEnabled && (
