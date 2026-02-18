@@ -4,7 +4,7 @@ import type { Connection } from '@node2flow/dashboard-core';
 import {
   getConnections,
   Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
-  Button, Alert, AlertDescription, Badge, Separator, Input,
+  Button, Alert, AlertDescription, Badge, Input,
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
   Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis,
   Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
@@ -181,15 +181,10 @@ export default function Services() {
 
   return (
     <div className="space-y-6 overflow-x-hidden">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Services</h1>
-        <p className="text-muted-foreground mt-1">
-          {connectedServices}/{plugins.length} services connected — {plugins.reduce((sum, p) => sum + (TOOL_COUNTS[p.id] || 0), 0)} tools available
-        </p>
-      </div>
-
-      <Separator />
+      {/* Summary */}
+      <p className="text-muted-foreground">
+        {connectedServices}/{plugins.length} services connected — {plugins.reduce((sum, p) => sum + (TOOL_COUNTS[p.id] || 0), 0)} tools available
+      </p>
 
       {/* Services Grid — Compact cards */}
       <div>

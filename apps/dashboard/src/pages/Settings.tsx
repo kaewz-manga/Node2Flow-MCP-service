@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   useAuth,
@@ -97,8 +97,14 @@ const OAUTH_LOGOS: Record<string, string> = {
 export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const { withSudo, totpEnabled: contextTotpEnabled } = useSudoContext();
-  const [searchParams] = useSearchParams();
-  const defaultTab = useMemo(() => searchParams.get('tab') || 'profile', []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'profile';
+
+  const handleTabChange = (value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', value);
+    setSearchParams(newParams, { replace: true });
+  };
 
   // TOTP state
   const [totpEnabled, setTotpEnabled] = useState(false);
@@ -295,12 +301,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto overflow-x-hidden">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground mt-1">Manage your account settings</p>
-      </div>
-
+    <div className="space-y-6 px-4 lg:px-6 overflow-x-hidden">
       {/* Account Recovery Banner */}
       {isPendingDeletion && scheduledDeletionAt && (
         <Alert variant="warning">
@@ -342,7 +343,7 @@ export default function Settings() {
         </Alert>
       )}
 
-      <Tabs defaultValue={defaultTab}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList variant="line" className="overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
