@@ -2185,3 +2185,57 @@ User feedback on Session 64 dashboard: card background color wrong, period selec
 - Platform Worker `platform.node2flow.net` — 2 wrangler deploys
 
 **Date**: 2026-02-18
+
+---
+
+## Session 64c — Card Borders, Settings Tabs, Header Title Gray
+
+### Summary
+UI polish: added visible borders to dashboard cards/chart, made Settings tabs URL-synced like connection pages, expanded Settings cards to full width, and made the header bar page title gray across all pages.
+
+### Changes
+
+**1. Dashboard Card Borders** (commit `390cd3b`):
+- Removed `border-0` from 4 section cards + Usage History chart card
+- Cards now have visible borders matching the connections data table
+
+**2. Settings URL-Synced Tabs** (commit `c4744ae`):
+- Changed `Tabs defaultValue` → `Tabs value={activeTab} onValueChange={handleTabChange}`
+- Uses `useSearchParams`/`setSearchParams` — same pattern as `PluginTabs` (connection pages)
+- URL updates to `/settings?tab=security`, `/settings?tab=api-keys`, etc.
+- Back button works, URLs are bookmarkable/shareable
+
+**3. Settings Full-Width Cards** (commit `c4744ae`):
+- Changed container from `max-w-2xl mx-auto` → `px-4 lg:px-6`
+- All tab cards now expand to fill available width consistently
+
+**4. Header Bar Title Gray** (commit `1417dca`):
+- `Layout.tsx` HeaderBar `<h1>`: added `text-muted-foreground` (gray)
+- Applies to ALL pages (Dashboard, Services, Settings, admin, plugin pages)
+- In-page h1 titles remain white/bold as before
+
+**5. Services Title Restored** (commit `1417dca`):
+- Reverted removal of Services page h1 + subtitle
+
+### Commits (3):
+
+| Commit | Description |
+|--------|-------------|
+| `390cd3b` | fix: add borders to dashboard cards and usage chart to match table |
+| `c4744ae` | fix: remove duplicate titles + URL-synced tabs + full-width cards |
+| `1417dca` | fix: revert page titles, make header bar title gray across all pages |
+
+### Files Changed (4):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/components/section-cards.tsx` | Removed `border-0` from 4 cards |
+| `apps/dashboard/src/components/chart-area-interactive.tsx` | Removed `border-0` from chart cards |
+| `apps/dashboard/src/pages/Settings.tsx` | URL-synced tabs + full-width + title restored |
+| `apps/dashboard/src/pages/Services.tsx` | Title restored |
+| `packages/dashboard-core/src/components/Layout.tsx` | Header title `text-muted-foreground` |
+
+### Deployed:
+- Dashboard `app.node2flow.net` — 5 CF Pages deploys
+
+**Date**: 2026-02-18
