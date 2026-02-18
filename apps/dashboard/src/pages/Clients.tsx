@@ -12,7 +12,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   Button, Input, Badge,
 } from '@node2flow/dashboard-core';
-import { ArrowUpDown, ChevronLeft, ChevronRight, Loader2, Copy, Check, Search, BookOpen } from 'lucide-react';
+import { ArrowUpDown, ChevronLeft, ChevronRight, Loader2, Copy, Check, Search, BookOpen, MessageSquarePlus, Plus } from 'lucide-react';
 import { getClientUsage, type ClientUsageStats } from '@/lib/platform-api';
 
 // ============================================
@@ -24,7 +24,7 @@ const MCP_URL = 'https://mcp.node2flow.net';
 interface McpClient {
   id: string;
   name: string;
-  auth: 'OAuth' | 'API Key';
+  auth: 'OAuth' | 'API Key' | '';
   recommended?: boolean;
   description: string;
   copyLabel: string;
@@ -32,6 +32,7 @@ interface McpClient {
   docsUrl?: string;
   color: string;
   icon?: string;
+  linkUrl?: string;
 }
 
 const mcpClients: McpClient[] = [
@@ -147,6 +148,106 @@ const mcpClients: McpClient[] = [
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL, type: "http" } } }, null, 2),
     color: '#6366f1',
   },
+  {
+    id: 'genspark',
+    name: 'Genspark',
+    auth: 'API Key',
+    description: 'Add MCP server via Tools settings with Streamable HTTP transport.',
+    copyLabel: 'Copy Request Header',
+    copyValue: `Authorization: Bearer YOUR_API_KEY`,
+    color: '#3b82f6',
+  },
+  {
+    id: 'huggingchat',
+    name: 'HuggingChat',
+    auth: 'API Key',
+    description: 'Add MCP server with Bearer token in HTTP headers.',
+    copyLabel: 'Copy Auth Header',
+    copyValue: `Authorization: Bearer YOUR_API_KEY`,
+    color: '#ffd21e',
+  },
+  {
+    id: 'cursor-ide',
+    name: 'Cursor IDE',
+    auth: 'OAuth',
+    description: 'One-click install with OAuth authentication.',
+    copyLabel: 'Add to Cursor',
+    copyValue: MCP_URL,
+    color: '#000000',
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code',
+    auth: 'API Key',
+    description: 'Add to .vscode/mcp.json with Bearer token authentication.',
+    copyLabel: 'Copy Config',
+    copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
+    color: '#007acc',
+  },
+  {
+    id: 'google-antigravity',
+    name: 'Google Antigravity',
+    auth: 'API Key',
+    description: 'Add MCP server via raw config with Bearer token.',
+    copyLabel: 'Copy Config',
+    copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
+    color: '#34a853',
+  },
+  {
+    id: 'lm-studio',
+    name: 'LM Studio',
+    auth: 'API Key',
+    description: 'Add MCP server via mcp.json with Bearer token.',
+    copyLabel: 'Copy Config',
+    copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
+    color: '#22c55e',
+  },
+  {
+    id: 'anythingllm',
+    name: 'AnythingLLM',
+    auth: 'API Key',
+    description: 'Add MCP server via config file with Bearer token.',
+    copyLabel: 'Copy Config',
+    copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
+    color: '#8b5cf6',
+  },
+  {
+    id: 'manus-ai',
+    name: 'Manus AI',
+    auth: 'API Key',
+    description: 'Add custom MCP server in Manus Connectors with Bearer token.',
+    copyLabel: 'Copy Server URL',
+    copyValue: `${MCP_URL}/mcp`,
+    color: '#ef4444',
+  },
+  {
+    id: 'elevenlabs',
+    name: 'ElevenLabs Agent',
+    auth: 'API Key',
+    description: 'Add custom MCP server in ElevenLabs Agent settings with Bearer token.',
+    copyLabel: 'Copy Server URL',
+    copyValue: `${MCP_URL}/mcp`,
+    color: '#000000',
+  },
+  {
+    id: 'other',
+    name: 'Other MCP Clients',
+    auth: 'API Key',
+    description: 'Generic setup for any MCP-compatible client.',
+    copyLabel: 'Copy Server URL',
+    copyValue: `${MCP_URL}/mcp`,
+    color: '#6b7280',
+  },
+  {
+    id: 'request',
+    name: 'Your AI Agent not listed?',
+    auth: '',
+    description: 'Let us know which client you\'d like to see integrated.',
+    copyLabel: 'Request Integration',
+    copyValue: '',
+    linkUrl: 'mailto:support@node2flow.net?subject=MCP%20Client%20Integration%20Request',
+    color: '#374151',
+  },
 ];
 
 function ClientCard({ client }: { client: McpClient }) {
@@ -158,6 +259,8 @@ function ClientCard({ client }: { client: McpClient }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const isRequestCard = client.id === 'request';
+
   return (
     <div className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3">
       <div className="flex items-start gap-3">
@@ -167,6 +270,8 @@ function ClientCard({ client }: { client: McpClient }) {
         >
           {client.icon ? (
             <img src={client.icon} alt="" className="h-5 w-5" />
+          ) : isRequestCard ? (
+            <Plus className="h-5 w-5" />
           ) : (
             client.name.charAt(0)
           )}
@@ -177,23 +282,39 @@ function ClientCard({ client }: { client: McpClient }) {
             {client.recommended && (
               <Badge variant="default" className="bg-orange-600 hover:bg-orange-600 text-[10px] px-1.5 py-0">Recommended</Badge>
             )}
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-              {client.auth}
-            </Badge>
+            {client.auth && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                {client.auth}
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{client.description}</p>
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 h-8 text-xs"
-          onClick={handleCopy}
-        >
-          {copied ? <Check className="h-3 w-3 mr-1.5" /> : <Copy className="h-3 w-3 mr-1.5" />}
-          {copied ? 'Copied!' : client.copyLabel}
-        </Button>
+        {isRequestCard ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            asChild
+          >
+            <a href={client.linkUrl} target="_blank" rel="noopener noreferrer">
+              <MessageSquarePlus className="h-3 w-3 mr-1.5" />
+              {client.copyLabel}
+            </a>
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={handleCopy}
+          >
+            {copied ? <Check className="h-3 w-3 mr-1.5" /> : <Copy className="h-3 w-3 mr-1.5" />}
+            {copied ? 'Copied!' : client.copyLabel}
+          </Button>
+        )}
         {client.docsUrl && (
           <Button
             variant="ghost"
