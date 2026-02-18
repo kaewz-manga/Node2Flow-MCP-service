@@ -6,6 +6,7 @@ import {
   Zap,
   LayoutDashboard,
   Blocks,
+  Monitor,
   BarChart3,
   Settings,
   LogOut,
@@ -78,6 +79,7 @@ interface LayoutProps {
 const platformNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Services', href: '/services', icon: Blocks },
+  { name: 'Clients', href: '/clients', icon: Monitor },
 ];
 
 const secondaryNav = [

@@ -121,6 +121,15 @@ export interface ConnectionUsageStats {
   last_request_at: string | null;
 }
 
+export interface ClientUsageStats {
+  client_name: string;
+  total_requests: number;
+  successes: number;
+  errors: number;
+  connections_used: number;
+  last_seen_at: string | null;
+}
+
 export interface TopTool {
   tool_name: string;
   count: number;
@@ -269,6 +278,10 @@ export async function getUserDailyUsage(days = 7): Promise<ApiResponse<{ daily: 
 
 export async function getConnectionUsage(days: number = 7): Promise<ApiResponse<{ connections: ConnectionUsageStats[]; period_days: number }>> {
   return platformRequest(`/api/usage/by-connection?days=${days}`);
+}
+
+export async function getClientUsage(days: number = 7): Promise<ApiResponse<{ clients: ClientUsageStats[]; period_days: number }>> {
+  return platformRequest(`/api/usage/clients?days=${days}`);
 }
 
 // ============================================

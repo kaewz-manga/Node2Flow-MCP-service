@@ -27,6 +27,7 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Documentation = lazy(() => import('./pages/Documentation'));
 const Status = lazy(() => import('./pages/Status'));
+const Clients = lazy(() => import('./pages/Clients'));
 
 // Admin pages (lazy-loaded)
 const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
@@ -100,6 +101,7 @@ function AppRoutes() {
         {/* Protected routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
         <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
