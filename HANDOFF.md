@@ -2343,3 +2343,62 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - D1 Migration `006_client_name.sql` applied
 
 **Date**: 2026-02-18
+
+---
+
+## Session 65: Clients Page — MCP Client Usage Data Table (2026-02-18)
+
+> New page showing which MCP clients (Claude Desktop, Cursor, etc.) connect to each connection
+
+### Changes:
+
+**1. Backend API** (commit `cb37741`):
+- New endpoint: `GET /api/usage/clients?days=7|30|90|180`
+- SQL: `GROUP BY client_name` from `usage_logs` — counts requests/success/error, distinct connections, last seen
+- Validates days param (7/30/90/180), returns 400 for invalid
+- File: `apps/platform-worker/src/routes/user.ts`
+
+**2. Frontend Types + API** (commit `cb37741`):
+- New interface: `ClientUsageStats` (client_name, total_requests, successes, errors, connections_used, last_seen_at)
+- New function: `getClientUsage(days)` → `GET /api/usage/clients?days=N`
+- File: `apps/dashboard/src/lib/platform-api.ts`
+
+**3. Clients Page** (commit `cb37741`):
+- New page: `apps/dashboard/src/pages/Clients.tsx`
+- Uses `@tanstack/react-table` — same pattern as `connections-table.tsx`
+- 6 columns: Client Name, Requests (sortable), Success (green), Errors (red), Connections Used, Last Seen
+- Period selector: 4 buttons (7d / 30d / 90d / 180d) — re-fetches data on change
+- Pagination: pageSize 10, ChevronLeft/ChevronRight buttons
+
+**4. Router + Sidebar** (commit `cb37741`):
+- Lazy import + `/clients` protected route in `App.tsx`
+- "Clients" entry with `Monitor` icon in sidebar `platformNav` (below Dashboard + Services)
+- File: `packages/dashboard-core/src/components/Layout.tsx`
+
+### Implementation:
+- Used **agent team** (backend + frontend agents working in parallel)
+- Backend agent: Task #1 (API endpoint)
+- Frontend agent: Tasks #2-4 (types, page component, router + sidebar)
+- Team lead: Code review + typecheck + deploy
+
+### Commits (1):
+
+| Commit | Description |
+|--------|-------------|
+| `cb37741` | feat: add Clients page with MCP client usage data table |
+
+### Files Changed (5):
+
+| File | Change |
+|------|--------|
+| `apps/platform-worker/src/routes/user.ts` | New `GET /api/usage/clients` endpoint |
+| `apps/dashboard/src/lib/platform-api.ts` | `ClientUsageStats` interface + `getClientUsage()` |
+| `apps/dashboard/src/pages/Clients.tsx` | NEW — full page with data table |
+| `apps/dashboard/src/App.tsx` | Lazy import + `/clients` route |
+| `packages/dashboard-core/src/components/Layout.tsx` | `Monitor` icon + "Clients" sidebar entry |
+
+### Deployed:
+- Platform Worker `platform.node2flow.net`
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-18
