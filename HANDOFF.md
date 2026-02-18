@@ -2299,3 +2299,47 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net` — 4 CF Pages deploys
 
 **Date**: 2026-02-18
+
+---
+
+## Session 64e: client_name Tracking + Admin Avatar Fix (2026-02-18)
+
+> Track MCP client name (User-Agent) in usage_logs + fix admin sidebar avatar showing generic icon
+
+### Changes:
+
+**1. client_name in usage_logs** (commit `863fb09`):
+- **Migration**: `006_client_name.sql` — `ALTER TABLE usage_logs ADD COLUMN client_name TEXT DEFAULT NULL`
+- **Gateway** (`mcp.ts`): Reads `User-Agent` header at start of `handleMcpRequest()`, includes `client_name` in report-usage payload
+- **Platform** (`internal.ts`): Accepts `client_name?: string` in report-usage body, stores in D1 INSERT
+- **Approach**: User-Agent header (stateless — Gateway can't persist `clientInfo` from MCP `initialize` to `tools/call`)
+- **Result**: Every tool call now records which client made the request (e.g., `Claude Desktop/1.x`, `cursor/0.x`)
+
+**2. Admin Sidebar Avatar Fix** (commit `863fb09`):
+- `AdminLayout.tsx` used `<div className="bg-sidebar-accent"><User icon /></div>` — generic icon, no personalization
+- Replaced with `<Avatar>` + `<AvatarImage>` + `<AvatarFallback>` — same pattern as Layout.tsx
+- Shows initials (e.g., "CL") on `bg-muted` background, OAuth users see profile picture via `avatar_url`
+- Removed unused `User` import from lucide-react
+
+### Commits (1):
+
+| Commit | Description |
+|--------|-------------|
+| `863fb09` | feat: track client_name in usage_logs + fix admin sidebar avatar |
+
+### Files Changed (4):
+
+| File | Change |
+|------|--------|
+| `apps/platform-worker/migrations/006_client_name.sql` | NEW — ALTER TABLE add client_name column |
+| `apps/mcp-gateway/src/routes/mcp.ts` | Read User-Agent header, send in report-usage |
+| `apps/platform-worker/src/routes/internal.ts` | Accept client_name in body, INSERT into usage_logs |
+| `packages/dashboard-core/src/components/AdminLayout.tsx` | Replace User icon with Avatar + initials |
+
+### Deployed:
+- Platform Worker `platform.node2flow.net`
+- Gateway Worker `mcp.node2flow.net`
+- Dashboard `app.node2flow.net`
+- D1 Migration `006_client_name.sql` applied
+
+**Date**: 2026-02-18
