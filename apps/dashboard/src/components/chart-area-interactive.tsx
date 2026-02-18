@@ -39,8 +39,7 @@ interface DashboardUsageChartProps {
 
 export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriodChange }: DashboardUsageChartProps) {
   const filteredData = React.useMemo(() => {
-    // Map connection period to chart months: 7d→3m, 3m→3m, 6m→6m
-    const months = connectionPeriod <= 90 ? 3 : 6
+    const months = connectionPeriod <= 7 ? 3 : connectionPeriod <= 90 ? 3 : 6
     return data.slice(-months)
   }, [data, connectionPeriod])
 
@@ -64,10 +63,10 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
         <CardTitle>Usage History</CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Monthly requests for the last {connectionPeriod <= 90 ? "3" : "6"} months
+            Monthly requests for the last {connectionPeriod <= 7 ? "7 days" : connectionPeriod <= 90 ? "3 months" : "6 months"}
           </span>
           <span className="@[540px]/card:hidden">
-            Last {connectionPeriod <= 90 ? "3" : "6"} months
+            Last {connectionPeriod <= 7 ? "7 days" : connectionPeriod <= 90 ? "3 months" : "6 months"}
           </span>
         </CardDescription>
         <div className="absolute right-4 top-4">
@@ -79,13 +78,13 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
             className="@[540px]/card:flex hidden"
           >
             <ToggleGroupItem value="7" className="h-8 px-2.5">
-              7d
+              7 days
             </ToggleGroupItem>
             <ToggleGroupItem value="90" className="h-8 px-2.5">
-              3m
+              3 months
             </ToggleGroupItem>
             <ToggleGroupItem value="180" className="h-8 px-2.5">
-              6m
+              6 months
             </ToggleGroupItem>
           </ToggleGroup>
           <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 90 | 180)}>
@@ -93,17 +92,17 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
               className="@[540px]/card:hidden flex w-40"
               aria-label="Select time range"
             >
-              <SelectValue placeholder="7d" />
+              <SelectValue placeholder="7 days" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="7" className="rounded-lg">
-                7d
+                7 days
               </SelectItem>
               <SelectItem value="90" className="rounded-lg">
-                3m
+                3 months
               </SelectItem>
               <SelectItem value="180" className="rounded-lg">
-                6m
+                6 months
               </SelectItem>
             </SelectContent>
           </Select>
