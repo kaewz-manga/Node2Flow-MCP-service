@@ -105,6 +105,8 @@ export async function handleMcpRequest(
   authContext: AuthContext,
   ctx: ExecutionContext
 ): Promise<Response> {
+  const clientName = request.headers.get('User-Agent') || null;
+
   let body: Record<string, unknown>;
   try {
     body = await request.json() as Record<string, unknown>;
@@ -263,6 +265,7 @@ export async function handleMcpRequest(
                 status: isError ? 'error' : 'success',
                 response_time_ms: responseTime,
                 error_message: isError ? result.content?.[0]?.text : undefined,
+                client_name: clientName,
               }),
             })
           ).catch(() => {}) // Silently ignore reporting errors

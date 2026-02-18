@@ -165,6 +165,7 @@ export async function handleInternalRoutes(
       status: 'success' | 'error';
       response_time_ms: number;
       error_message?: string;
+      client_name?: string;
     };
 
     const today = getCurrentDate();
@@ -182,8 +183,8 @@ export async function handleInternalRoutes(
         `INSERT INTO usage_monthly (id, user_id, year_month, request_count, success_count, error_count, created_at, updated_at) VALUES (?, ?, ?, 1, ?, ?, ?, ?) ON CONFLICT(user_id, year_month) DO UPDATE SET request_count = request_count + 1, success_count = success_count + ?, error_count = error_count + ?, updated_at = ?`
       ).bind(generateUUID(), body.user_id, yearMonth, successInc, errorInc, now, now, successInc, errorInc, now),
       env.DB.prepare(
-        `INSERT INTO usage_logs (id, user_id, api_key_id, connection_id, tool_name, status, response_time_ms, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      ).bind(logId, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null, now),
+        `INSERT INTO usage_logs (id, user_id, api_key_id, connection_id, tool_name, status, response_time_ms, error_message, client_name, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(logId, body.user_id, body.api_key_id, body.connection_id, body.tool_name, body.status, body.response_time_ms, body.error_message || null, body.client_name || null, now),
       env.DB.prepare(
         `INSERT INTO platform_stats (key, value, updated_at) VALUES ('total_executions', 1, datetime('now')) ON CONFLICT(key) DO UPDATE SET value = value + 1, updated_at = datetime('now')`
       ),

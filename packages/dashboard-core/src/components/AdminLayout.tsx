@@ -13,8 +13,8 @@ import {
   LogOut,
   Settings,
   ChevronsUpDown,
-  User,
 } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +54,8 @@ const adminNav = [
 function AdminSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
+  const avatarUrl = user?.avatar_url || undefined;
 
   return (
     <Sidebar collapsible="icon">
@@ -127,9 +129,10 @@ function AdminSidebar() {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <div className="bg-sidebar-accent rounded-lg flex aspect-square size-8 items-center justify-center">
-                    <User className="size-4" />
-                  </div>
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.email || ''} />}
+                    <AvatarFallback className="rounded-lg bg-muted text-xs">{initials}</AvatarFallback>
+                  </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user?.email}</span>
                     <span className="truncate text-xs text-primary font-medium">Admin</span>
