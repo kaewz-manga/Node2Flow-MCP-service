@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Usage, UsageMonthlyHistory, ConnectionUsageStats } from '../lib/platform-api';
-import { getUsage, getUserUsageHistory, getConnectionUsage } from '../lib/platform-api';
+import type { Usage, UsageMonthlyHistory, UsageDailyHistory, ConnectionUsageStats } from '../lib/platform-api';
+import { getUsage, getUserUsageHistory, getUserDailyUsage, getConnectionUsage } from '../lib/platform-api';
 import type { Connection } from '@node2flow/dashboard-core';
 import { getConnections } from '@node2flow/dashboard-core';
 
@@ -17,8 +17,9 @@ export default function Dashboard() {
   const [usage, setUsage] = useState<Usage | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [usageHistory, setUsageHistory] = useState<UsageMonthlyHistory[]>([]);
+  const [dailyUsage, setDailyUsage] = useState<UsageDailyHistory[]>([]);
   const [connectionUsage, setConnectionUsage] = useState<ConnectionUsageStats[]>([]);
-  const [connectionPeriod, setConnectionPeriod] = useState<7 | 90 | 180>(7);
+  const [connectionPeriod, setConnectionPeriod] = useState<7 | 30 | 90 | 180>(7);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -33,10 +34,11 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageRes, connectionsRes, historyRes, connUsageRes] = await Promise.all([
+        const [usageRes, connectionsRes, historyRes, dailyRes, connUsageRes] = await Promise.all([
           getUsage(),
           getConnections(),
           getUserUsageHistory(12),
+          getUserDailyUsage(7),
           getConnectionUsage(7),
         ]);
 
@@ -57,6 +59,10 @@ export default function Dashboard() {
           setUsageHistory(historyRes.data.history);
         }
 
+        if (dailyRes.success && dailyRes.data) {
+          setDailyUsage(dailyRes.data.daily);
+        }
+
         if (connUsageRes.success && connUsageRes.data) {
           setConnectionUsage(connUsageRes.data.connections);
         }
@@ -70,11 +76,17 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const handlePeriodChange = useCallback(async (days: 7 | 90 | 180) => {
+  const handlePeriodChange = useCallback(async (days: 7 | 30 | 90 | 180) => {
     setConnectionPeriod(days);
-    const res = await getConnectionUsage(days);
-    if (res.success && res.data) {
-      setConnectionUsage(res.data.connections);
+    const [connRes, dailyRes] = await Promise.all([
+      getConnectionUsage(days),
+      days <= 30 ? getUserDailyUsage(days) : Promise.resolve(null),
+    ]);
+    if (connRes.success && connRes.data) {
+      setConnectionUsage(connRes.data.connections);
+    }
+    if (dailyRes && dailyRes.success && dailyRes.data) {
+      setDailyUsage(dailyRes.data.daily);
     }
   }, []);
 
@@ -115,7 +127,8 @@ export default function Dashboard() {
         </div>
         <div className="px-4 lg:px-6">
           <DashboardUsageChart
-            data={usageHistory}
+            monthlyData={usageHistory}
+            dailyData={dailyUsage}
             connectionPeriod={connectionPeriod}
             onConnectionPeriodChange={handlePeriodChange}
           />

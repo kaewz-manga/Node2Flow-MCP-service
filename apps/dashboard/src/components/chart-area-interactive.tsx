@@ -15,7 +15,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
-import type { UsageMonthlyHistory } from "@/lib/platform-api"
+import type { UsageMonthlyHistory, UsageDailyHistory } from "@/lib/platform-api"
 
 const chartConfig = {
   usage: {
@@ -31,19 +31,42 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-interface DashboardUsageChartProps {
-  data: UsageMonthlyHistory[]
-  connectionPeriod: 7 | 90 | 180
-  onConnectionPeriodChange: (days: 7 | 90 | 180) => void
+interface ChartDataPoint {
+  label: string
+  requests: number
+  errors: number
 }
 
-export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriodChange }: DashboardUsageChartProps) {
-  const filteredData = React.useMemo(() => {
-    const months = connectionPeriod <= 7 ? 3 : connectionPeriod <= 90 ? 3 : 6
-    return data.slice(-months)
-  }, [data, connectionPeriod])
+interface DashboardUsageChartProps {
+  monthlyData: UsageMonthlyHistory[]
+  dailyData: UsageDailyHistory[]
+  connectionPeriod: 7 | 30 | 90 | 180
+  onConnectionPeriodChange: (days: 7 | 30 | 90 | 180) => void
+}
 
-  if (data.length === 0) {
+export function DashboardUsageChart({ monthlyData, dailyData, connectionPeriod, onConnectionPeriodChange }: DashboardUsageChartProps) {
+  const chartData = React.useMemo((): ChartDataPoint[] => {
+    if (connectionPeriod <= 30) {
+      // Daily data for 7d/30d
+      return dailyData.map((d) => ({
+        label: d.date,
+        requests: d.requests,
+        errors: d.errors,
+      }))
+    }
+    // Monthly data for 3m/6m
+    const months = connectionPeriod <= 90 ? 3 : 6
+    return monthlyData.slice(-months).map((d) => ({
+      label: d.year_month,
+      requests: d.requests,
+      errors: d.errors,
+    }))
+  }, [monthlyData, dailyData, connectionPeriod])
+
+  const isDaily = connectionPeriod <= 30
+  const hasData = chartData.length > 0
+
+  if (!hasData) {
     return (
       <Card className="border-0">
         <CardHeader>
@@ -57,28 +80,33 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
     )
   }
 
+  const periodLabel = connectionPeriod === 7 ? "7 days" : connectionPeriod === 30 ? "30 days" : connectionPeriod <= 90 ? "3 months" : "6 months"
+
   return (
     <Card className="@container/card border-0">
       <CardHeader className="relative">
         <CardTitle>Usage History</CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Monthly requests for the last {connectionPeriod <= 7 ? "7 days" : connectionPeriod <= 90 ? "3 months" : "6 months"}
+            {isDaily ? "Daily" : "Monthly"} requests for the last {periodLabel}
           </span>
           <span className="@[540px]/card:hidden">
-            Last {connectionPeriod <= 7 ? "7 days" : connectionPeriod <= 90 ? "3 months" : "6 months"}
+            Last {periodLabel}
           </span>
         </CardDescription>
         <div className="absolute right-4 top-4">
           <ToggleGroup
             type="single"
             value={connectionPeriod.toString()}
-            onValueChange={(v) => v && onConnectionPeriodChange(parseInt(v) as 7 | 90 | 180)}
+            onValueChange={(v) => v && onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90 | 180)}
             variant="outline"
             className="@[540px]/card:flex hidden"
           >
             <ToggleGroupItem value="7" className="h-8 px-2.5">
               7 days
+            </ToggleGroupItem>
+            <ToggleGroupItem value="30" className="h-8 px-2.5">
+              30 days
             </ToggleGroupItem>
             <ToggleGroupItem value="90" className="h-8 px-2.5">
               3 months
@@ -87,7 +115,7 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
               6 months
             </ToggleGroupItem>
           </ToggleGroup>
-          <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 90 | 180)}>
+          <Select value={connectionPeriod.toString()} onValueChange={(v) => onConnectionPeriodChange(parseInt(v) as 7 | 30 | 90 | 180)}>
             <SelectTrigger
               className="@[540px]/card:hidden flex w-40"
               aria-label="Select time range"
@@ -97,6 +125,9 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
             <SelectContent className="rounded-xl">
               <SelectItem value="7" className="rounded-lg">
                 7 days
+              </SelectItem>
+              <SelectItem value="30" className="rounded-lg">
+                30 days
               </SelectItem>
               <SelectItem value="90" className="rounded-lg">
                 3 months
@@ -113,7 +144,7 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillRequests" x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -142,18 +173,21 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="year_month"
+              dataKey="label"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
+                if (isDaily) {
+                  // "2026-02-18" → "Feb 18"
+                  const d = new Date(value + "T00:00:00")
+                  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                }
+                // "2026-02" → "Feb '26"
                 const [year, month] = value.split("-")
-                const date = new Date(parseInt(year), parseInt(month) - 1)
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "2-digit",
-                })
+                const d = new Date(parseInt(year), parseInt(month) - 1)
+                return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
               }}
             />
             <ChartTooltip
@@ -161,12 +195,13 @@ export function DashboardUsageChart({ data, connectionPeriod, onConnectionPeriod
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
+                    if (isDaily) {
+                      const d = new Date(value + "T00:00:00")
+                      return d.toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" })
+                    }
                     const [year, month] = value.split("-")
-                    const date = new Date(parseInt(year), parseInt(month) - 1)
-                    return date.toLocaleDateString("en-US", {
-                      month: "long",
-                      year: "numeric",
-                    })
+                    const d = new Date(parseInt(year), parseInt(month) - 1)
+                    return d.toLocaleDateString("en-US", { month: "long", year: "numeric" })
                   }}
                   indicator="dot"
                 />
