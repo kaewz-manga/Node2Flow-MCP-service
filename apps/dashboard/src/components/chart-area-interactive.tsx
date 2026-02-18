@@ -68,7 +68,7 @@ export function DashboardUsageChart({ monthlyData, dailyData, connectionPeriod, 
 
   if (!hasData) {
     return (
-      <Card className="border-0">
+      <Card>
         <CardHeader>
           <CardTitle>Usage History</CardTitle>
           <CardDescription>No usage data yet</CardDescription>
@@ -83,7 +83,7 @@ export function DashboardUsageChart({ monthlyData, dailyData, connectionPeriod, 
   const periodLabel = connectionPeriod === 7 ? "7 days" : connectionPeriod === 30 ? "30 days" : connectionPeriod <= 90 ? "3 months" : "6 months"
 
   return (
-    <Card className="@container/card border-0">
+    <Card className="@container/card">
       <CardHeader className="relative">
         <CardTitle>Usage History</CardTitle>
         <CardDescription>
