@@ -2239,3 +2239,63 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net` — 5 CF Pages deploys
 
 **Date**: 2026-02-18
+
+---
+
+## Session 64d: Scrollbar, Status Dots, Avatar Fix (2026-02-18)
+
+> Dark scrollbar theme, status dot indicators across all admin pages, sidebar avatar fix, services padding
+
+### Changes:
+
+**1. Dark Scrollbar Theme** (commit `82a200d`):
+- Added custom scrollbar CSS in `index.css`
+- Firefox: `scrollbar-color: hsl(var(--border)) transparent; scrollbar-width: thin`
+- Chrome/Edge: `::-webkit-scrollbar` — 6px width, `--border` colored thumb, transparent track
+- Hover: thumb brightens to `--muted-foreground` at 50% opacity
+- Applies globally to all scrollable elements (sidebar, tables, etc.)
+
+**2. Dashboard Status Column** (commit `82a200d`):
+- `connections-table.tsx`: Replaced `Badge "active"` with green dot (`bg-green-500`) + text
+- Non-active status uses `bg-muted-foreground` dot
+- Removed unused `Badge` import
+
+**3. Admin Status Dot Indicators** (commit `ce3e3f2`):
+- `AdminUsers.tsx`: active=`bg-green-500`, suspended=`bg-amber-500`, deleted=`bg-red-500`
+- `AdminFeedback.tsx`: new=`bg-blue-500`, reviewed=`bg-yellow-500`, resolved=`bg-green-500`, archived=`bg-muted-foreground`
+- `AdminSystem.tsx`: maintenance ENABLED=`bg-red-500`, DISABLED=`bg-green-500`
+- Removed unused `Badge` import from AdminSystem
+
+**4. Services Page Padding** (commit `ce3e3f2`):
+- Added `px-4 lg:px-6` to outer container so cards don't touch screen edges
+
+**5. Sidebar Avatar Fix** (commit `ce3e3f2`):
+- Removed Gravatar fallback (identicon pattern too dark/invisible on black sidebar)
+- Changed `avatarUrl` to only use `user.avatar_url` (from OAuth)
+- Changed `AvatarFallback` background from `bg-sidebar-accent` → `bg-muted` (visible contrast)
+- Now shows initials (e.g., "CL") on gray background — clean and always visible
+- OAuth users (Google/GitHub) still see their real profile picture via `avatar_url`
+
+### Commits (2):
+
+| Commit | Description |
+|--------|-------------|
+| `82a200d` | fix: dark scrollbar theme + status column green dot indicator |
+| `ce3e3f2` | fix: status dot indicators, services padding, sidebar avatar fallback |
+
+### Files Changed (7):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/index.css` | Custom scrollbar CSS (scrollbar-color + webkit) |
+| `apps/dashboard/src/components/connections-table.tsx` | Badge → green dot for status |
+| `apps/dashboard/src/pages/admin/AdminUsers.tsx` | Badge → colored dot for user status |
+| `apps/dashboard/src/pages/admin/AdminFeedback.tsx` | Badge → colored dot for feedback status |
+| `apps/dashboard/src/pages/admin/AdminSystem.tsx` | Badge → dot for maintenance status |
+| `apps/dashboard/src/pages/Services.tsx` | Added `px-4 lg:px-6` padding |
+| `packages/dashboard-core/src/components/Layout.tsx` | Removed Gravatar, `bg-muted` fallback |
+
+### Deployed:
+- Dashboard `app.node2flow.net` — 4 CF Pages deploys
+
+**Date**: 2026-02-18
