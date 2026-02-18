@@ -2123,3 +2123,65 @@ Root cause 2: `--sidebar-background: 240 5.9% 10%` (dark blue-gray) ≠ `--backg
 - Platform Worker `platform.node2flow.net` — 1 wrangler deploy
 
 **Date**: 2026-02-17
+
+---
+
+## Session 64b continued — Dashboard UI Polish + Daily Usage API
+
+### Summary
+User feedback on Session 64 dashboard: card background color wrong, period selector needs work, admin panel broken, support items misplaced. Fixed all issues + added daily usage API for chart.
+
+### Changes
+
+**1. Card Background Color** (commit `e2bcb5c`):
+- CSS `--card: 230 15% 4%` (dark blue-black) → `0 0% 0%` (pure black, matches `--background`)
+- Cards now blend seamlessly with page background
+
+**2. Period Selector + Daily Usage API** (commit `a013fad`):
+- Moved period selector from connection table → usage history chart
+- New API: `GET /api/usage/daily?days=N` — daily aggregated from `usage_logs` (GROUP BY DATE)
+- Updated: `GET /api/usage/by-connection` accepts days 7/30/90/180 (was 7/30/90)
+- Chart period options: **7 days | 30 days | 3 months | 6 months**
+  - 7d/30d → daily data (new endpoint)
+  - 3m/6m → monthly data (existing `/api/usage/history`)
+- New type: `UsageDailyHistory`, new function: `getUserDailyUsage(days)`
+- Chart component takes `monthlyData` + `dailyData` props, switches data source based on period
+
+**3. Support Items → User Dropdown** (commit `2f95856`):
+- Moved Documentation, FAQ, Status from sidebar secondary nav → user profile dropdown menu
+- Settings already existed in dropdown — no duplicate
+
+**4. Admin Panel Fix** (commit `2f95856`):
+- NEW `admin-nav.tsx` — tab navigation for 7 admin pages (Overview, Users, Analytics, Revenue, Health, Feedback, System)
+- Removed duplicate `<h1>`, `<p>`, `<Separator>` from all 7 admin pages
+- Consistent padding: `flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6`
+
+### Commits (4):
+
+| Commit | Description |
+|--------|-------------|
+| `2f95856` | fix: dashboard UI refinements (period move, sidebar, admin layout) |
+| `b2779be` | fix: period selector labels + card border-0 |
+| `e2bcb5c` | fix: card background color to pure black + period labels |
+| `a013fad` | feat: daily usage API + chart with 7d/30d/3m/6m period selector |
+
+### Files Changed (10):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/index.css` | `--card` changed to `0 0% 0%` |
+| `apps/dashboard/src/components/chart-area-interactive.tsx` | Rewritten — dual data source (daily+monthly), 4 period options |
+| `apps/dashboard/src/components/connections-table.tsx` | Removed period selector (moved to chart) |
+| `apps/dashboard/src/components/section-cards.tsx` | Added `border-0` to cards |
+| `apps/dashboard/src/components/admin-nav.tsx` | NEW — admin tab navigation |
+| `apps/dashboard/src/pages/Dashboard.tsx` | Daily usage fetch + new chart props |
+| `apps/dashboard/src/pages/admin/*.tsx` | All 7 admin pages — removed duplicate headers, added AdminNav |
+| `apps/dashboard/src/lib/platform-api.ts` | New `UsageDailyHistory` type + `getUserDailyUsage()` |
+| `apps/platform-worker/src/routes/user.ts` | New `/api/usage/daily` endpoint + updated by-connection validation |
+| `packages/dashboard-core/src/components/Layout.tsx` | Support items moved to dropdown |
+
+### Deployed:
+- Dashboard `app.node2flow.net` — 4 CF Pages deploys
+- Platform Worker `platform.node2flow.net` — 2 wrangler deploys
+
+**Date**: 2026-02-18
