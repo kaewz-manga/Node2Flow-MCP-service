@@ -302,6 +302,11 @@ export default function Settings() {
 
   return (
     <div className="space-y-6 px-4 lg:px-6 overflow-x-hidden">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-1">Manage your account settings</p>
+      </div>
+
       {/* Account Recovery Banner */}
       {isPendingDeletion && scheduledDeletionAt && (
         <Alert variant="warning">

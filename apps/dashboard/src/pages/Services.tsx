@@ -181,10 +181,13 @@ export default function Services() {
 
   return (
     <div className="space-y-6 overflow-x-hidden">
-      {/* Summary */}
-      <p className="text-muted-foreground">
-        {connectedServices}/{plugins.length} services connected — {plugins.reduce((sum, p) => sum + (TOOL_COUNTS[p.id] || 0), 0)} tools available
-      </p>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Services</h1>
+        <p className="text-muted-foreground mt-1">
+          {connectedServices}/{plugins.length} services connected — {plugins.reduce((sum, p) => sum + (TOOL_COUNTS[p.id] || 0), 0)} tools available
+        </p>
+      </div>
 
       {/* Services Grid — Compact cards */}
       <div>
