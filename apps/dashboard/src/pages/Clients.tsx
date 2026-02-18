@@ -11,8 +11,9 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   Button, Input, Badge,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@node2flow/dashboard-core';
-import { ArrowUpDown, ChevronLeft, ChevronRight, Loader2, Copy, Check, Search, BookOpen, MessageSquarePlus, Plus } from 'lucide-react';
+import { ArrowUpDown, ChevronLeft, ChevronRight, Loader2, Copy, Check, Search, BookOpen, MessageSquarePlus, Plus, Info, AlertTriangle } from 'lucide-react';
 import { getClientUsage, type ClientUsageStats } from '@/lib/platform-api';
 
 // ============================================
@@ -20,6 +21,13 @@ import { getClientUsage, type ClientUsageStats } from '@/lib/platform-api';
 // ============================================
 
 const MCP_URL = 'https://mcp.node2flow.net';
+
+interface GuideStep {
+  title: string;
+  content: string;
+  copyItems?: { label: string; value: string }[];
+  note?: { type: 'info' | 'warning'; title: string; content: string };
+}
 
 interface McpClient {
   id: string;
@@ -29,7 +37,7 @@ interface McpClient {
   description: string;
   copyLabel: string;
   copyValue: string;
-  docsUrl?: string;
+  guide?: GuideStep[];
   color: string;
   icon?: string;
   linkUrl?: string;
@@ -45,6 +53,12 @@ const mcpClients: McpClient[] = [
     copyValue: `${MCP_URL}/mcp`,
     color: '#ea4b71',
     icon: '/logos/n8n.svg',
+    guide: [
+      { title: 'Open n8n Workflow', content: 'Open your n8n workflow editor and add an **AI Agent** node' },
+      { title: 'Add MCP Client Tool', content: 'Add a **MCP Client** tool to your AI Agent node', copyItems: [{ label: 'Endpoint', value: `${MCP_URL}/mcp` }] },
+      { title: 'Configure Authentication', content: 'Set the authentication header', copyItems: [{ label: 'Header Name', value: 'Authorization' }, { label: 'Header Value', value: 'Bearer YOUR_API_KEY' }], note: { type: 'info', title: 'API Key', content: 'Get your API key from Settings \u2192 API Keys in the Node2Flow dashboard' } },
+      { title: 'Test Connection', content: 'Run the workflow to verify the MCP connection is working' },
+    ],
   },
   {
     id: 'claude-ai',
@@ -54,8 +68,13 @@ const mcpClients: McpClient[] = [
     description: "Connect via OAuth in Claude's custom connector settings.",
     copyLabel: 'Copy Server URL',
     copyValue: MCP_URL,
-    docsUrl: 'https://docs.anthropic.com/en/docs/agents-and-tools/remote-mcp-servers',
     color: '#d97706',
+    guide: [
+      { title: 'Open Claude.ai Settings', content: 'Go to **Settings \u2192 Connectors \u2192 Add custom connector**' },
+      { title: 'Configure Connector', content: 'Enter the connector details:', copyItems: [{ label: 'Name', value: 'node2flow' }, { label: 'Remote MCP server URL', value: MCP_URL }] },
+      { title: 'Authenticate', content: 'Log in using your Node2Flow account (email/password or social login)', note: { type: 'warning', title: 'Account Sync', content: 'If you used different login methods on Node2Flow and in this client (e.g., Google vs GitHub), log out from OAuth and re-authorize to sync your accounts.' } },
+      { title: 'Start Using', content: 'You can now use Node2Flow tools directly in your Claude.ai conversations!', note: { type: 'info', title: 'Claude Desktop', content: 'The setup process is identical for Claude Desktop \u2014 just use the same connector configuration in the desktop app settings.' } },
+    ],
   },
   {
     id: 'chatgpt',
@@ -65,6 +84,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: MCP_URL,
     color: '#10a37f',
+    guide: [
+      { title: 'Open ChatGPT Settings', content: 'Go to **Settings \u2192 Connectors \u2192 Add custom connector**' },
+      { title: 'Configure Connector', content: 'Enter the connector details:', copyItems: [{ label: 'Name', value: 'node2flow' }, { label: 'Server URL', value: MCP_URL }] },
+      { title: 'Authenticate', content: 'Log in using your Node2Flow account' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in your ChatGPT conversations!' },
+    ],
   },
   {
     id: 'claude-code',
@@ -73,8 +98,13 @@ const mcpClients: McpClient[] = [
     description: 'Add MCP server via CLI command with OAuth authentication.',
     copyLabel: 'Copy CLI Command',
     copyValue: `claude mcp add node2flow ${MCP_URL} --transport http`,
-    docsUrl: 'https://docs.anthropic.com/en/docs/claude-code/mcp',
     color: '#d97706',
+    guide: [
+      { title: 'Open Terminal', content: 'Open your terminal or command prompt' },
+      { title: 'Run CLI Command', content: 'Run the following command to add Node2Flow:', copyItems: [{ label: 'Command', value: `claude mcp add node2flow ${MCP_URL} --transport http` }] },
+      { title: 'Authenticate', content: 'A browser window will open. Log in with your Node2Flow account to authorize.' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Claude Code sessions!' },
+    ],
   },
   {
     id: 'codex-cli',
@@ -84,6 +114,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy CLI Command',
     copyValue: `codex mcp add ${MCP_URL}`,
     color: '#10a37f',
+    guide: [
+      { title: 'Open Terminal', content: 'Open your terminal' },
+      { title: 'Run CLI Command', content: 'Run the following command:', copyItems: [{ label: 'Command', value: `codex mcp add ${MCP_URL}` }] },
+      { title: 'Authenticate', content: 'Follow the OAuth prompt in your browser' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Codex CLI!' },
+    ],
   },
   {
     id: 'cursor',
@@ -93,6 +129,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#000000',
+    guide: [
+      { title: 'Open Cursor Settings', content: 'Go to **Cursor Settings \u2192 MCP** section' },
+      { title: 'Add MCP Server', content: 'Add the following JSON configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key from **Settings \u2192 API Keys**', note: { type: 'info', title: 'API Key', content: 'You can create a new API key in the Node2Flow dashboard under Settings \u2192 API Keys' } },
+      { title: 'Restart', content: 'Restart Cursor to apply the changes' },
+    ],
   },
   {
     id: 'windsurf',
@@ -102,6 +144,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#06b6d4',
+    guide: [
+      { title: 'Open Windsurf Settings', content: 'Go to **Windsurf Settings \u2192 MCP** section' },
+      { title: 'Add MCP Server', content: 'Add the following JSON configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key from **Settings \u2192 API Keys**' },
+      { title: 'Restart', content: 'Restart Windsurf to apply the changes' },
+    ],
   },
   {
     id: 'warp',
@@ -111,6 +159,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: MCP_URL,
     color: '#01a4ff',
+    guide: [
+      { title: 'Open Warp Settings', content: 'Go to **Settings \u2192 MCP Servers**' },
+      { title: 'Add Server', content: 'Add a new MCP server with the URL:', copyItems: [{ label: 'Server URL', value: MCP_URL }] },
+      { title: 'Authenticate', content: 'Complete the OAuth flow in your browser' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Warp!' },
+    ],
   },
   {
     id: 'kiro',
@@ -120,6 +174,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL, type: "http" } } }, null, 2),
     color: '#7c3aed',
+    guide: [
+      { title: 'Open Project Settings', content: "Open your project's `.kiro/mcp.json` file (create if needed)" },
+      { title: 'Add Config', content: 'Add the following configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL, type: "http" } } }, null, 2) }] },
+      { title: 'Authenticate', content: 'Kiro will prompt you to authenticate via OAuth' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Kiro!' },
+    ],
   },
   {
     id: 'gemini-cli',
@@ -129,6 +189,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL } } }, null, 2),
     color: '#4285f4',
+    guide: [
+      { title: 'Open Settings', content: 'Open your `settings.json` configuration file' },
+      { title: 'Add Config', content: 'Add the following MCP server configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL } } }, null, 2) }] },
+      { title: 'Authenticate', content: 'Gemini CLI will prompt you to authenticate via OAuth' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Gemini CLI!' },
+    ],
   },
   {
     id: 'raycast',
@@ -138,6 +204,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#ff6363',
+    guide: [
+      { title: 'Open Raycast Config', content: 'Edit your `mcp-config.json` file' },
+      { title: 'Add Config', content: 'Add the following configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Restart', content: 'Restart Raycast to load the MCP server' },
+    ],
   },
   {
     id: 'opencode',
@@ -147,6 +219,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL, type: "http" } } }, null, 2),
     color: '#6366f1',
+    guide: [
+      { title: 'Open Config', content: 'Open your OpenCode configuration file' },
+      { title: 'Add Config', content: 'Add the following MCP server:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL, type: "http" } } }, null, 2) }] },
+      { title: 'Authenticate', content: 'OpenCode will prompt you to authenticate via OAuth' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in OpenCode!' },
+    ],
   },
   {
     id: 'genspark',
@@ -156,6 +234,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Request Header',
     copyValue: `Authorization: Bearer YOUR_API_KEY`,
     color: '#3b82f6',
+    guide: [
+      { title: 'Open Tools Settings', content: 'Go to **Tools Settings** in Genspark' },
+      { title: 'Add MCP Server', content: 'Add a new MCP server with Streamable HTTP transport', copyItems: [{ label: 'URL', value: `${MCP_URL}/mcp` }, { label: 'Authorization Header', value: 'Bearer YOUR_API_KEY' }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Genspark!' },
+    ],
   },
   {
     id: 'huggingchat',
@@ -165,6 +249,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Auth Header',
     copyValue: `Authorization: Bearer YOUR_API_KEY`,
     color: '#ffd21e',
+    guide: [
+      { title: 'Open Settings', content: 'Go to **Settings** in HuggingChat' },
+      { title: 'Add MCP Server', content: 'Add a new MCP server with Bearer token authentication', copyItems: [{ label: 'URL', value: `${MCP_URL}/mcp` }, { label: 'Authorization Header', value: 'Bearer YOUR_API_KEY' }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in HuggingChat!' },
+    ],
   },
   {
     id: 'cursor-ide',
@@ -174,6 +264,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Add to Cursor',
     copyValue: MCP_URL,
     color: '#000000',
+    guide: [
+      { title: 'Open Cursor Settings', content: 'Go to **Cursor Settings \u2192 MCP** section' },
+      { title: 'Add Server URL', content: 'Add Node2Flow as an MCP server:', copyItems: [{ label: 'URL', value: MCP_URL }] },
+      { title: 'Authenticate', content: 'Cursor will automatically start the OAuth flow. Log in with your Node2Flow account.' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Cursor!' },
+    ],
   },
   {
     id: 'vscode',
@@ -183,6 +279,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#007acc',
+    guide: [
+      { title: 'Open MCP Config', content: 'Create or edit `.vscode/mcp.json` in your project root' },
+      { title: 'Add Config', content: 'Add the following configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Reload', content: 'Reload VS Code window to apply changes (Ctrl+Shift+P \u2192 Reload Window)' },
+    ],
   },
   {
     id: 'google-antigravity',
@@ -192,6 +294,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#34a853',
+    guide: [
+      { title: 'Open Settings', content: 'Go to **Settings** in Google Antigravity' },
+      { title: 'Add Config', content: 'Add the MCP server with Bearer token authentication:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available!' },
+    ],
   },
   {
     id: 'lm-studio',
@@ -201,6 +309,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#22c55e',
+    guide: [
+      { title: 'Open MCP Config', content: 'Edit your `mcp.json` configuration file' },
+      { title: 'Add Config', content: 'Add the following MCP server:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in LM Studio!' },
+    ],
   },
   {
     id: 'anythingllm',
@@ -210,6 +324,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#8b5cf6',
+    guide: [
+      { title: 'Open Settings', content: 'Go to **Settings** in AnythingLLM' },
+      { title: 'Add Config', content: 'Add the MCP server configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key' },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in AnythingLLM!' },
+    ],
   },
   {
     id: 'manus-ai',
@@ -219,6 +339,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: `${MCP_URL}/mcp`,
     color: '#ef4444',
+    guide: [
+      { title: 'Open Manus Connectors', content: 'Go to **Connectors** in Manus AI settings' },
+      { title: 'Add MCP Server', content: 'Add a custom MCP server:', copyItems: [{ label: 'Server URL', value: `${MCP_URL}/mcp` }] },
+      { title: 'Configure Auth', content: 'Add your Node2Flow API key as Bearer token', note: { type: 'info', title: 'API Key', content: 'Get your API key from Settings \u2192 API Keys in the Node2Flow dashboard' } },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in Manus AI!' },
+    ],
   },
   {
     id: 'elevenlabs',
@@ -228,6 +354,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: `${MCP_URL}/mcp`,
     color: '#000000',
+    guide: [
+      { title: 'Open Agent Settings', content: 'Go to your **ElevenLabs Agent** configuration' },
+      { title: 'Add MCP Server', content: 'Add a custom MCP server:', copyItems: [{ label: 'Server URL', value: `${MCP_URL}/mcp` }] },
+      { title: 'Configure Auth', content: 'Add your Node2Flow API key as Bearer token:', copyItems: [{ label: 'Authorization Header', value: 'Bearer YOUR_API_KEY' }], note: { type: 'info', title: 'API Key', content: 'Get your API key from Settings → API Keys in the Node2Flow dashboard' } },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in your ElevenLabs Agent!' },
+    ],
   },
   {
     id: 'other',
@@ -237,6 +369,12 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: `${MCP_URL}/mcp`,
     color: '#6b7280',
+    guide: [
+      { title: 'Find MCP Settings', content: 'Open the MCP server configuration in your client' },
+      { title: 'Add Server', content: 'Add Node2Flow as an MCP server:', copyItems: [{ label: 'Server URL', value: `${MCP_URL}/mcp` }, { label: 'Authorization Header', value: 'Bearer YOUR_API_KEY' }] },
+      { title: 'Add API Key', content: 'Replace `YOUR_API_KEY` with your Node2Flow API key from **Settings \u2192 API Keys**', note: { type: 'info', title: 'OAuth Clients', content: `For OAuth-compatible clients, use the server URL without /mcp suffix: ${MCP_URL}` } },
+      { title: 'Start Using', content: 'Node2Flow tools are now available in your MCP client!' },
+    ],
   },
   {
     id: 'request',
@@ -250,13 +388,112 @@ const mcpClients: McpClient[] = [
   },
 ];
 
-function ClientCard({ client }: { client: McpClient }) {
+// ============================================
+// Copy Button Helper
+// ============================================
+
+function CopyButton({ value, label }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(client.copyValue);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard not available */ }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+      title={label ? `Copy ${label}` : 'Copy'}
+    >
+      {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+      {copied ? 'Copied' : 'Copy'}
+    </button>
+  );
+}
+
+// ============================================
+// Guide Dialog
+// ============================================
+
+function renderMarkdownBold(text: string) {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
+  );
+}
+
+function GuideDialog({ client, open, onOpenChange }: { client: McpClient | null; open: boolean; onOpenChange: (open: boolean) => void }) {
+  if (!client?.guide) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Step-by-Step Guide</DialogTitle>
+          <DialogDescription>{client.name}</DialogDescription>
+        </DialogHeader>
+        <div className="overflow-y-auto max-h-[70vh] space-y-5 pr-1">
+          {client.guide.map((step, idx) => (
+            <div key={idx} className="space-y-2">
+              <div className="flex items-baseline gap-2">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                  {idx + 1}
+                </span>
+                <h4 className="font-semibold text-sm">{step.title}</h4>
+              </div>
+              <div className="ml-8 space-y-2">
+                <p className="text-sm text-muted-foreground">{renderMarkdownBold(step.content)}</p>
+                {step.copyItems?.map((item, ci) => (
+                  <div key={ci} className="rounded-md border bg-muted/50 px-3 py-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
+                      <CopyButton value={item.value} label={item.label} />
+                    </div>
+                    <pre className="text-xs break-all whitespace-pre-wrap font-mono text-foreground">{item.value}</pre>
+                  </div>
+                ))}
+                {step.note && (
+                  <div className={`flex gap-2 rounded-md border px-3 py-2 text-xs ${
+                    step.note.type === 'warning'
+                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                      : 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400'
+                  }`}>
+                    {step.note.type === 'warning'
+                      ? <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                      : <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    }
+                    <div>
+                      <span className="font-semibold">{step.note.title}: </span>
+                      {step.note.content}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============================================
+// Client Card
+// ============================================
+
+function ClientCard({ client, onShowGuide }: { client: McpClient; onShowGuide?: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(client.copyValue);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard not available */ }
   }
 
   const isRequestCard = client.id === 'request';
@@ -315,16 +552,14 @@ function ClientCard({ client }: { client: McpClient }) {
             {copied ? 'Copied!' : client.copyLabel}
           </Button>
         )}
-        {client.docsUrl && (
+        {!isRequestCard && (
           <Button
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 shrink-0"
-            asChild
+            onClick={onShowGuide}
           >
-            <a href={client.docsUrl} target="_blank" rel="noopener noreferrer">
-              <BookOpen className="h-4 w-4" />
-            </a>
+            <BookOpen className="h-4 w-4" />
           </Button>
         )}
       </div>
@@ -404,19 +639,19 @@ export default function Clients() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [guideClient, setGuideClient] = useState<McpClient | null>(null);
 
   useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError('');
+      const res = await getClientUsage(period);
+      if (res.data) setClients(res.data.clients);
+      else setError(res.error?.message || 'Failed to load');
+      setLoading(false);
+    }
     fetchData();
   }, [period]);
-
-  async function fetchData() {
-    setLoading(true);
-    setError('');
-    const res = await getClientUsage(period);
-    if (res.data) setClients(res.data.clients);
-    else setError(res.error?.message || 'Failed to load');
-    setLoading(false);
-  }
 
   const filteredClients = useMemo(() => {
     if (!search.trim()) return mcpClients;
@@ -458,7 +693,7 @@ export default function Clients() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredClients.map((client) => (
-              <ClientCard key={client.id} client={client} />
+              <ClientCard key={client.id} client={client} onShowGuide={() => setGuideClient(client)} />
             ))}
             {filteredClients.length === 0 && (
               <div className="col-span-full text-center py-8 text-muted-foreground text-sm">
@@ -561,6 +796,12 @@ export default function Clients() {
         </div>
 
       </div>
+
+      <GuideDialog
+        client={guideClient}
+        open={guideClient !== null}
+        onOpenChange={(open) => { if (!open) setGuideClient(null); }}
+      />
     </div>
   );
 }
