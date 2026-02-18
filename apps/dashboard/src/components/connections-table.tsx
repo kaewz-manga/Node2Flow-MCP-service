@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-  Badge, Button,
+  Button,
 } from '@node2flow/dashboard-core';
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Connection } from '@node2flow/dashboard-core';
@@ -84,9 +84,10 @@ const columns: ColumnDef<ConnectionRow>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       return (
-        <Badge variant={status === 'active' ? 'default' : 'secondary'} className="text-xs">
-          {status}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${status === 'active' ? 'bg-green-500' : 'bg-muted-foreground'}`} />
+          <span className="text-sm text-muted-foreground capitalize">{status}</span>
+        </div>
       );
     },
   },
