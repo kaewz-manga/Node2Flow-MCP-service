@@ -2478,3 +2478,45 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net`
 
 **Date**: 2026-02-18
+
+## Session 65d: Step-by-Step Guide Dialog for All Client Cards (2026-02-19)
+
+> Add GuideDialog component — clicking BookOpen icon on any client card opens a step-by-step configuration guide
+
+### Changes:
+
+**1. GuideDialog Component** (commit `fcdd9e6`):
+- New `GuideStep` interface: `{ title, content, copyItems?: {label, value}[], note?: {type: 'info'|'warning', title, content} }`
+- `GuideDialog`: controlled Dialog with numbered steps, inline copy blocks, info/warning note alerts
+- `CopyButton`: standalone copy button with own `copied` state + clipboard error handling (try/catch)
+- `renderMarkdownBold`: splits `**text**` pattern for bold text rendering in step content
+
+**2. Guide Data — All 23 Clients**:
+- OAuth clients (Claude.ai, ChatGPT, Claude Code, Codex CLI, Warp, Kiro, Gemini CLI, OpenCode, Cursor IDE): Settings → Add Connector → Name/URL [Copy] → Authenticate → Use
+- API Key clients (n8n, Cursor, Windsurf, Raycast, VS Code, Google Antigravity, LM Studio, AnythingLLM, Genspark, HuggingChat, Manus AI, ElevenLabs): Settings → Add Config/URL [Copy] → Replace API key → Restart/Use
+- CLI clients (Claude Code, Codex CLI): Terminal → Run command [Copy] → OAuth prompt → Use
+- Each guide includes relevant copy items and info/warning notes
+
+**3. ClientCard Updated**:
+- BookOpen icon now appears on ALL cards (was only some with `docsUrl`)
+- `onShowGuide` prop opens GuideDialog with that client's steps
+
+**4. Code Review Fixes**:
+- Clipboard error handling (try/catch), useEffect exhaustive-deps fix, ElevenLabs missing copyItems
+
+### Commits (1):
+
+| Commit | Description |
+|--------|-------------|
+| `fcdd9e6` | feat: add step-by-step guide dialog for all MCP client cards |
+
+### Files Changed (1):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/pages/Clients.tsx` | +264 lines — GuideDialog + CopyButton + guide data for 23 clients |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-19
