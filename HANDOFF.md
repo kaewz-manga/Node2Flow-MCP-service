@@ -2402,3 +2402,36 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net`
 
 **Date**: 2026-02-18
+
+## Session 65b: Clients Page Redesign — Card Grid + Data Table (2026-02-18)
+
+> Redesign Clients page with "Connect Client" card grid above existing data table
+
+### Changes:
+
+**1. Card Grid Section** (commit `da754ac`):
+- 12 MCP client cards in 3-column responsive grid
+- Clients: n8n, Claude.ai (Recommended), ChatGPT, Claude Code, Codex CLI, Cursor, Windsurf, Warp, Kiro, Gemini CLI, Raycast, OpenCode
+- Each card: colored icon, name, auth badge (OAuth/API Key), description, copy button
+- Search filter by name/auth type
+- Copy values: endpoint URLs, CLI commands, JSON configs (varies per client)
+- `MCP_URL = 'https://mcp.node2flow.net'`
+
+**2. Data Table Section** preserved from Session 65 (Client Activity with period selector)
+
+### Commits (1):
+
+| Commit | Description |
+|--------|-------------|
+| `da754ac` | feat: redesign Clients page with MCP client card grid + data table |
+
+### Files Changed (1):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/pages/Clients.tsx` | Rewritten — card grid (12 clients) + data table (446 lines) |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-18
