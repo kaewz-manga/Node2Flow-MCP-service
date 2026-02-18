@@ -7,7 +7,7 @@ import {
   setMaintenanceMode,
   type MaintenanceState,
 } from '../../lib/platform-api';
-import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Badge, Switch } from '@node2flow/dashboard-core';
+import { useSudoContext, Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Switch } from '@node2flow/dashboard-core';
 import { AdminNav } from '../../components/admin-nav';
 
 import { Loader2, RotateCcw, Trash2, AlertTriangle, Power, Server, Shield, Wrench } from 'lucide-react';
@@ -212,16 +212,12 @@ export default function AdminSystem() {
               <Power className={`h-5 w-5 ${maintenance.enabled ? 'text-red-400' : 'text-green-400'}`} />
             </div>
             <h2 className="text-lg font-semibold text-foreground">Maintenance Mode</h2>
-            <Badge
-              variant="secondary"
-              className={`ml-auto ${
-                maintenance.enabled
-                  ? 'bg-red-500/10 text-red-400'
-                  : 'bg-green-500/10 text-green-400'
-              }`}
-            >
-              {maintenance.enabled ? 'ENABLED' : 'DISABLED'}
-            </Badge>
+            <div className="ml-auto flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${maintenance.enabled ? 'bg-red-500' : 'bg-green-500'}`} />
+              <span className={`text-sm ${maintenance.enabled ? 'text-red-400' : 'text-green-400'}`}>
+                {maintenance.enabled ? 'ENABLED' : 'DISABLED'}
+              </span>
+            </div>
           </div>
 
           <p className="text-sm text-muted-foreground mb-4">

@@ -278,16 +278,13 @@ export default function AdminUsers() {
                           </Select>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={
-                            u.status === 'active' ? 'default' :
-                            u.status === 'suspended' ? 'secondary' : 'destructive'
-                          } className={
-                            u.status === 'active' ? 'bg-green-900/30 text-green-400 hover:bg-green-900/40' :
-                            u.status === 'suspended' ? 'bg-amber-900/30 text-amber-400 hover:bg-amber-900/40' :
-                            'bg-red-900/30 text-red-400 hover:bg-red-900/40'
-                          }>
-                            {u.status}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${
+                              u.status === 'active' ? 'bg-green-500' :
+                              u.status === 'suspended' ? 'bg-amber-500' : 'bg-red-500'
+                            }`} />
+                            <span className="text-sm text-muted-foreground capitalize">{u.status}</span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground capitalize">{u.oauth_provider || 'email'}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</TableCell>

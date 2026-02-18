@@ -180,7 +180,7 @@ export default function Services() {
   const connectedServices = new Set(connections.map(c => c.product_type)).size;
 
   return (
-    <div className="space-y-6 overflow-x-hidden">
+    <div className="space-y-6 overflow-x-hidden px-4 lg:px-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">Services</h1>

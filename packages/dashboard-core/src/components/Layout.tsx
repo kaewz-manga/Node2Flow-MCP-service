@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { Separator } from './ui/separator';
-import { getGravatarUrl } from '../lib/gravatar';
 import FeedbackBubble from './FeedbackBubble';
 import {
   DropdownMenu,
@@ -123,7 +122,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
-  const avatarUrl = user?.avatar_url || (user?.email ? getGravatarUrl(user.email) : undefined);
+  const avatarUrl = user?.avatar_url || undefined;
 
   const isOnServicePage = useMemo(() => {
     return plugins.some((plugin) => {
@@ -233,7 +232,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.email || ''} />}
-                    <AvatarFallback className="rounded-lg bg-sidebar-accent text-xs">{initials}</AvatarFallback>
+                    <AvatarFallback className="rounded-lg bg-muted text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user?.email}</span>
@@ -252,7 +251,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
                       {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.email || ''} />}
-                      <AvatarFallback className="rounded-lg bg-sidebar-accent text-xs">{initials}</AvatarFallback>
+                      <AvatarFallback className="rounded-lg bg-muted text-xs">{initials}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">{user?.email}</span>

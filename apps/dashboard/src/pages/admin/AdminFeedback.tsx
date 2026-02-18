@@ -267,9 +267,14 @@ export default function AdminFeedback() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{item.message}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className={stat.badgeClass}>
-                          {stat.label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className={`h-2 w-2 rounded-full ${
+                            item.status === 'new' ? 'bg-blue-500' :
+                            item.status === 'reviewed' ? 'bg-yellow-500' :
+                            item.status === 'resolved' ? 'bg-green-500' : 'bg-muted-foreground'
+                          }`} />
+                          <span className="text-sm text-muted-foreground">{stat.label}</span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {new Date(item.created_at).toLocaleDateString()}
