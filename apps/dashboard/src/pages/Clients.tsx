@@ -21,6 +21,8 @@ import { getClientUsage, type ClientUsageStats } from '@/lib/platform-api';
 // ============================================
 
 const MCP_URL = 'https://mcp.node2flow.net';
+const DI = 'https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg';
+const SI = 'https://cdn.simpleicons.org';
 
 interface GuideStep {
   title: string;
@@ -69,6 +71,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: MCP_URL,
     color: '#d97706',
+    icon: `${DI}/claude-ai.svg`,
     guide: [
       { title: 'Open Claude.ai Settings', content: 'Go to **Settings \u2192 Connectors \u2192 Add custom connector**' },
       { title: 'Configure Connector', content: 'Enter the connector details:', copyItems: [{ label: 'Name', value: 'node2flow' }, { label: 'Remote MCP server URL', value: MCP_URL }] },
@@ -84,6 +87,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: MCP_URL,
     color: '#10a37f',
+    icon: `${DI}/chatgpt.svg`,
     guide: [
       { title: 'Open ChatGPT Settings', content: 'Go to **Settings \u2192 Connectors \u2192 Add custom connector**' },
       { title: 'Configure Connector', content: 'Enter the connector details:', copyItems: [{ label: 'Name', value: 'node2flow' }, { label: 'Server URL', value: MCP_URL }] },
@@ -99,6 +103,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy CLI Command',
     copyValue: `claude mcp add node2flow ${MCP_URL} --transport http`,
     color: '#d97706',
+    icon: `${DI}/claude-ai.svg`,
     guide: [
       { title: 'Open Terminal', content: 'Open your terminal or command prompt' },
       { title: 'Run CLI Command', content: 'Run the following command to add Node2Flow:', copyItems: [{ label: 'Command', value: `claude mcp add node2flow ${MCP_URL} --transport http` }] },
@@ -114,6 +119,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy CLI Command',
     copyValue: `codex mcp add ${MCP_URL}`,
     color: '#10a37f',
+    icon: `${DI}/codex.svg`,
     guide: [
       { title: 'Open Terminal', content: 'Open your terminal' },
       { title: 'Run CLI Command', content: 'Run the following command:', copyItems: [{ label: 'Command', value: `codex mcp add ${MCP_URL}` }] },
@@ -129,6 +135,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#000000',
+    icon: `${SI}/cursor/white`,
     guide: [
       { title: 'Open Cursor Settings', content: 'Go to **Cursor Settings \u2192 MCP** section' },
       { title: 'Add MCP Server', content: 'Add the following JSON configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -144,6 +151,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#06b6d4',
+    icon: `${SI}/windsurf/white`,
     guide: [
       { title: 'Open Windsurf Settings', content: 'Go to **Windsurf Settings \u2192 MCP** section' },
       { title: 'Add MCP Server', content: 'Add the following JSON configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -159,6 +167,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: MCP_URL,
     color: '#01a4ff',
+    icon: `${SI}/warp/white`,
     guide: [
       { title: 'Open Warp Settings', content: 'Go to **Settings \u2192 MCP Servers**' },
       { title: 'Add Server', content: 'Add a new MCP server with the URL:', copyItems: [{ label: 'Server URL', value: MCP_URL }] },
@@ -189,6 +198,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL } } }, null, 2),
     color: '#4285f4',
+    icon: `${DI}/google-gemini.svg`,
     guide: [
       { title: 'Open Settings', content: 'Open your `settings.json` configuration file' },
       { title: 'Add Config', content: 'Add the following MCP server configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: MCP_URL } } }, null, 2) }] },
@@ -204,6 +214,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#ff6363',
+    icon: `${SI}/raycast/white`,
     guide: [
       { title: 'Open Raycast Config', content: 'Edit your `mcp-config.json` file' },
       { title: 'Add Config', content: 'Add the following configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -249,6 +260,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Auth Header',
     copyValue: `Authorization: Bearer YOUR_API_KEY`,
     color: '#ffd21e',
+    icon: `${DI}/hugging-face.svg`,
     guide: [
       { title: 'Open Settings', content: 'Go to **Settings** in HuggingChat' },
       { title: 'Add MCP Server', content: 'Add a new MCP server with Bearer token authentication', copyItems: [{ label: 'URL', value: `${MCP_URL}/mcp` }, { label: 'Authorization Header', value: 'Bearer YOUR_API_KEY' }] },
@@ -264,6 +276,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Add to Cursor',
     copyValue: MCP_URL,
     color: '#000000',
+    icon: `${SI}/cursor/white`,
     guide: [
       { title: 'Open Cursor Settings', content: 'Go to **Cursor Settings \u2192 MCP** section' },
       { title: 'Add Server URL', content: 'Add Node2Flow as an MCP server:', copyItems: [{ label: 'URL', value: MCP_URL }] },
@@ -279,6 +292,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#007acc',
+    icon: `${SI}/vscodium/white`,
     guide: [
       { title: 'Open MCP Config', content: 'Create or edit `.vscode/mcp.json` in your project root' },
       { title: 'Add Config', content: 'Add the following configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -294,6 +308,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#34a853',
+    icon: `${DI}/google.svg`,
     guide: [
       { title: 'Open Settings', content: 'Go to **Settings** in Google Antigravity' },
       { title: 'Add Config', content: 'Add the MCP server with Bearer token authentication:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -324,6 +339,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Config',
     copyValue: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2),
     color: '#8b5cf6',
+    icon: `${DI}/anything-llm.svg`,
     guide: [
       { title: 'Open Settings', content: 'Go to **Settings** in AnythingLLM' },
       { title: 'Add Config', content: 'Add the MCP server configuration:', copyItems: [{ label: 'Config', value: JSON.stringify({ mcpServers: { "node2flow": { url: `${MCP_URL}/mcp`, headers: { Authorization: "Bearer YOUR_API_KEY" } } } }, null, 2) }] },
@@ -354,6 +370,7 @@ const mcpClients: McpClient[] = [
     copyLabel: 'Copy Server URL',
     copyValue: `${MCP_URL}/mcp`,
     color: '#000000',
+    icon: `${SI}/elevenlabs/white`,
     guide: [
       { title: 'Open Agent Settings', content: 'Go to your **ElevenLabs Agent** configuration' },
       { title: 'Add MCP Server', content: 'Add a custom MCP server:', copyItems: [{ label: 'Server URL', value: `${MCP_URL}/mcp` }] },
@@ -502,13 +519,15 @@ function ClientCard({ client, onShowGuide }: { client: McpClient; onShowGuide?: 
     <div className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white text-sm font-bold"
-          style={{ backgroundColor: client.color }}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+            client.icon ? 'bg-muted' : 'text-white text-sm font-bold'
+          }`}
+          style={client.icon ? undefined : { backgroundColor: client.color }}
         >
           {client.icon ? (
-            <img src={client.icon} alt="" className="h-5 w-5" />
+            <img src={client.icon} alt="" className="h-7 w-7 object-contain" />
           ) : isRequestCard ? (
-            <Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5 text-muted-foreground" />
           ) : (
             client.name.charAt(0)
           )}
