@@ -2520,3 +2520,51 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net`
 
 **Date**: 2026-02-19
+
+## Session 65e: Brand Icons for Client Cards (2026-02-19)
+
+> Add brand logos/icons to 16 of 23 MCP client cards using DashboardIcons + SimpleIcons CDN
+
+### Changes:
+
+**1. Icon CDN Sources**:
+- `DI` = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg` — full-color SVG logos
+- `SI` = `https://cdn.simpleicons.org` — monochrome white icons (with `/white` suffix)
+
+**2. Icons Added (16 clients)**:
+
+| Client | Source | Icon |
+|--------|--------|------|
+| n8n | Local | `/logos/n8n.svg` |
+| Claude.ai | DI | `claude-ai.svg` |
+| ChatGPT | DI | `chatgpt.svg` |
+| Claude Code | DI | `claude-ai.svg` |
+| Codex CLI | DI | `codex.svg` |
+| Cursor (x2) | SI | `cursor/white` |
+| Windsurf | SI | `windsurf/white` |
+| Warp | SI | `warp/white` |
+| Gemini CLI | DI | `google-gemini.svg` |
+| Raycast | SI | `raycast/white` |
+| HuggingChat | DI | `hugging-face.svg` |
+| VS Code | SI | `vscodium/white` |
+| Google Antigravity | DI | `google.svg` |
+| AnythingLLM | DI | `anything-llm.svg` |
+| ElevenLabs | SI | `elevenlabs/white` |
+
+**3. Icon Display Fix**:
+- Problem: colored logos on matching colored backgrounds → invisible
+- Fix: `bg-muted` (neutral dark gray) when icon exists, `client.color` only for letter fallback
+- Icon size: `h-5 w-5` → `h-7 w-7` + `object-contain`
+
+**4. Letter Fallback (5 clients)**: Kiro, OpenCode, Genspark, LM Studio, Manus AI — no CDN icons available
+
+### Files Changed (1):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/pages/Clients.tsx` | Add `icon` field to 16 clients + conditional bg-muted rendering |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-19
