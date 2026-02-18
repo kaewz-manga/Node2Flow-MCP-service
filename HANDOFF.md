@@ -2435,3 +2435,46 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net`
 
 **Date**: 2026-02-18
+
+## Session 65c: Add 12 More MCP Client Cards (2026-02-18)
+
+> Expand Clients page from 12 to 24 client cards
+
+### New Clients Added (commit `ab6f984`):
+
+| Client | Auth | Copy Action |
+|--------|------|-------------|
+| Genspark | API Key | Copy Request Header |
+| HuggingChat | API Key | Copy Auth Header |
+| Cursor IDE | OAuth | Add to Cursor |
+| VS Code | API Key | Copy Config (.vscode/mcp.json) |
+| Google Antigravity | API Key | Copy Config |
+| LM Studio | API Key | Copy Config (mcp.json) |
+| AnythingLLM | API Key | Copy Config |
+| Manus AI | API Key | Copy Server URL |
+| ElevenLabs Agent | API Key | Copy Server URL |
+| Other MCP Clients | API Key | Copy Server URL (generic) |
+| Your AI Agent not listed? | — | Request Integration (mailto link) |
+
+### Changes:
+- `McpClient.auth` type: added `''` for request card (no auth badge)
+- `McpClient.linkUrl`: new optional field for external links
+- `ClientCard`: special handling for request card (`Plus` icon, `MessageSquarePlus` button, `<a>` link)
+- New lucide imports: `MessageSquarePlus`, `Plus`
+
+### Commits (1):
+
+| Commit | Description |
+|--------|-------------|
+| `ab6f984` | feat: add 12 more MCP client cards to Clients page |
+
+### Files Changed (1):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/pages/Clients.tsx` | +135 lines — 12 new client entries + request card logic |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-18
