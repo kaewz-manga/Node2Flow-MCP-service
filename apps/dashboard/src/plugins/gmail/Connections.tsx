@@ -168,7 +168,7 @@ export default function Connections() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 lg:px-6">
       <Item>
         <ItemMedia><img src="/logos/gmail.svg?v=2" alt="Gmail" className="h-10 w-10" /></ItemMedia>
         <ItemContent>

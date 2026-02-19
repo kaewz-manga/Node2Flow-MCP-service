@@ -69,7 +69,7 @@ export default function AdminAnalytics() {
   const totalProductRequests = productUsage.reduce((sum, p) => sum + p.requests, 0);
 
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <AdminNav />
       <div className="flex items-center justify-end">
         <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
