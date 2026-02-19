@@ -2665,3 +2665,17 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 
 **Commit**: `6cd838a`
 **Date**: 2026-02-19 (65h)
+
+### Session 65i: Full-Width Connection Tables (2026-02-19)
+
+Removed `max-w-4xl mx-auto` from table wrapper in all 32 plugin Connections.tsx files so tables extend full width.
+
+- **Before**: `"rounded-md border max-w-4xl mx-auto"` (capped at 896px, centered)
+- **After**: `"rounded-md border"` (full width)
+- **Files**: All 32 `apps/dashboard/src/plugins/*/Connections.tsx`
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Commit**: `c80255d`
+**Date**: 2026-02-19 (65i)
