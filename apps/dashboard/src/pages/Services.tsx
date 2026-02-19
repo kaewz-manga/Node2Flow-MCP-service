@@ -189,34 +189,54 @@ export default function Services() {
         </p>
       </div>
 
-      {/* Services Grid — Compact cards */}
-      <div>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-          {plugins.map((plugin) => {
-            const pluginConns = connections.filter(c => c.product_type === plugin.id);
-            const isConnected = pluginConns.length > 0;
-            const connectionsHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
-            const PluginIcon = plugin.icon;
-            const logoUrl = SERVICE_LOGOS[plugin.id];
+      {/* Services Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {plugins.map((plugin) => {
+          const pluginConns = connections.filter(c => c.product_type === plugin.id);
+          const isConnected = pluginConns.length > 0;
+          const connectionsHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
+          const PluginIcon = plugin.icon;
+          const logoUrl = SERVICE_LOGOS[plugin.id];
+          const toolCount = TOOL_COUNTS[plugin.id];
 
-            return (
-              <Link
-                key={plugin.id}
-                to={connectionsHref}
-                className={`block rounded-md border bg-card p-2 transition-all hover:shadow-md hover:border-primary/40 ${isConnected ? 'border-l-[3px] border-l-emerald-500' : 'border-border/60'}`}
-              >
-                <div className="flex items-center gap-2">
-                  {logoUrl ? (
-                    <img src={logoUrl} alt={plugin.name} className="h-5 w-5 shrink-0" />
-                  ) : (
-                    <PluginIcon className={`h-5 w-5 shrink-0 ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`} />
-                  )}
-                  <span className="text-xs font-medium truncate">{plugin.name}</span>
+          return (
+            <Link
+              key={plugin.id}
+              to={connectionsHref}
+              className={`block rounded-lg border bg-card p-4 transition-all hover:shadow-md hover:border-primary/40 ${isConnected ? 'border-l-[3px] border-l-emerald-500' : 'border-border'}`}
+            >
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="" className="h-7 w-7 object-contain" />
+                    ) : (
+                      <PluginIcon className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-sm">{plugin.name}</span>
+                      {isConnected && (
+                        <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600 text-[10px] px-1.5 py-0">Connected</Badge>
+                      )}
+                      {toolCount && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{toolCount} tools</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plugin.content.tagline}</p>
+                  </div>
                 </div>
-              </Link>
-            );
-          })}
-        </div>
+                <div className="flex items-center">
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${isConnected ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                    {isConnected ? 'Manage' : 'Connect'}
+                    <ArrowRight className="h-3 w-3" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Connections Table */}
