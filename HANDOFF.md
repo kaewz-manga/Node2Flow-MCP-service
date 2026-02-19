@@ -2694,8 +2694,24 @@ Added `px-4 lg:px-6` to `PluginTabs` wrapper so tab headers AND all sub-page con
 - **Cleanup**: Removed duplicate `px-4 lg:px-6` from 32 `Connections.tsx` root wrappers (now handled by PluginTabs)
 - **Scope**: Single fix covers all 32 plugins × all tabs (Connections, Workflows, Executions, etc.)
 
+### Session 65k: Standardize Padding Across All Pages (2026-02-19)
+
+Full audit of every dashboard page — fixed inconsistent padding across 32 files.
+
+**3 rendering contexts**:
+1. **Layout (top-level pages)**: NO padding → pages MUST add `px-4 lg:px-6`
+2. **AdminLayout (admin pages)**: HAS `p-4 lg:p-8` → pages must NOT add horizontal padding
+3. **PluginTabs (tabbed sub-pages)**: HAS `px-4 lg:px-6` → sub-pages must NOT add padding
+
+**Issues found & fixed**:
+- `Usage.tsx`: MISSING padding → added `px-4 lg:px-6`
+- 7 Admin pages (`AdminOverview`, `AdminUsers`, `AdminAnalytics`, `AdminRevenue`, `AdminHealth`, `AdminFeedback`, `AdminSystem`): DOUBLE padding → removed `px-4 lg:px-6` (AdminLayout provides `p-4 lg:p-8`)
+- 24 direct-route plugin Connections.tsx: MISSING padding → added `px-4 lg:px-6`
+
+**OK pages** (no changes needed): Dashboard, Services, Clients, Settings (own `px-4 lg:px-6`), 8 tabbed sub-pages (PluginTabs handles), public/standalone pages (own patterns)
+
 ### Deployed:
 - Dashboard `app.node2flow.net`
 
-**Commit**: `1afcec4`
-**Date**: 2026-02-19 (65j)
+**Commit**: `8f0522b`
+**Date**: 2026-02-19 (65k)
