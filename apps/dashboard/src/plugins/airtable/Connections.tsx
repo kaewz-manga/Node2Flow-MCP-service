@@ -223,7 +223,7 @@ export default function Connections() {
           </EmptyContent>
         </Empty>
       ) : (
-        <div className="rounded-md border max-w-4xl mx-auto">
+        <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
