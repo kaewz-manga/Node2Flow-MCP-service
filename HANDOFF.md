@@ -2606,4 +2606,35 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Gateway Worker `mcp.node2flow.net`
 - Dashboard `app.node2flow.net`
 
-**Date**: 2026-02-19
+**Date**: 2026-02-19 (65f)
+
+### Session 65g: Move Client Activity Table to Dashboard + Client Logos (2026-02-19)
+
+**Change**: Moved Client Activity table from Clients page to Dashboard page. Simplified and added client logos.
+
+1. **Dashboard.tsx** — Added Client Activity table section:
+   - `CLIENT_ICONS` mapping: 11 known clients (n8n, claude, chatgpt, cursor, windsurf, warp, codex, gemini, raycast, vscode, hugging)
+   - `getClientIcon()` fuzzy matching via `client_name.toLowerCase().includes(key)` — matches e.g. "Claude-User" → 'claude' key
+   - DashboardIcons CDN (full-color) + SimpleIcons CDN (white monochrome)
+   - 6 columns: Client (icon+name), Requests, Success, Errors, Connections, Last Seen
+   - Fixed 30-day default (no period selector)
+   - Added `getClientUsage(30)` to initial `Promise.all` fetch
+
+2. **Clients.tsx** — Removed Client Activity table:
+   - Removed: `@tanstack/react-table` imports, `ColumnDef`, `flexRender`, `Table*` components
+   - Removed: `ArrowUpDown`, `ChevronLeft`, `ChevronRight`, `Loader2`, `getClientUsage`, `ClientUsageStats`
+   - Removed: columns definition, periods/periodLabels, state variables, `useReactTable`, entire table section
+   - Kept: MCP client card grid, ClientCard, GuideDialog, search
+
+### Files Changed (2):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/pages/Dashboard.tsx` | Added Client Activity table + CLIENT_ICONS + getClientIcon() |
+| `apps/dashboard/src/pages/Clients.tsx` | Removed Client Activity table + unused imports |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Commit**: `b8fe12f`
+**Date**: 2026-02-19 (65g)
