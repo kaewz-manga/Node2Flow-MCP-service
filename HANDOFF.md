@@ -2715,3 +2715,25 @@ Full audit of every dashboard page — fixed inconsistent padding across 32 file
 
 **Commit**: `8f0522b`
 **Date**: 2026-02-19 (65k)
+
+### Session 65l: Feedback to Dropdown + Services Search + Dashboard Title (2026-02-19)
+
+3 UI improvements:
+
+1. **Feedback bubble → user profile dropdown**: Floating bubble (fixed bottom-right) removed. Feedback now opens as Dialog from "Feedback" item in sidebar user dropdown.
+   - `FeedbackBubble.tsx`: Rewritten from Popover to Dialog with `open`/`onOpenChange` props
+   - `Layout.tsx`: Added `feedbackOpen` state, `MessageSquarePlus` icon, Feedback DropdownMenuItem
+   - Removed `<FeedbackBubble />` from Layout render
+
+2. **Services page search**: Added search box (same pattern as Clients page)
+   - `useMemo` filter by plugin name/id
+   - Search icon + Input with `pl-9`
+   - Empty state "No services match your search."
+
+3. **Dashboard title header**: Added `<h1>Dashboard</h1>` + subtitle matching Services/Clients pattern
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Commit**: `b417eff`
+**Date**: 2026-02-19 (65l)
