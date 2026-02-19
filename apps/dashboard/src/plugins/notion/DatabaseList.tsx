@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { notionSearch, notionQueryDatabase, notionCreateDatabase } from '../../lib/gateway-api';
 import {
   usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
-  Alert, AlertDescription, Separator, Badge, Label,
+  Alert, AlertDescription, Separator, Label,
   Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@node2flow/dashboard-core';
@@ -67,6 +67,7 @@ export default function DatabaseList() {
     setLoadingMore(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchDatabases(); }, [connectionId]);
 
   async function handleSearch() {

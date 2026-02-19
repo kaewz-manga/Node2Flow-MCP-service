@@ -13,7 +13,6 @@ import {
   Code,
   Key,
   Shield,
-  AlertTriangle,
 } from 'lucide-react';
 import type { PluginContent } from '../registry';
 

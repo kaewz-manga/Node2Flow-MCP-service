@@ -3,7 +3,7 @@
  * All Supabase-specific content used by global pages (Landing, Dashboard, Documentation, FAQ).
  */
 
-import { Database, HardDrive, Shield, Cloud } from 'lucide-react';
+import { Database, Shield, Cloud } from 'lucide-react';
 import type { PluginContent } from '../registry';
 
 export const supabaseContent: PluginContent = {

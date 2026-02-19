@@ -19,7 +19,6 @@ import {
   Alert,
   AlertTitle,
   AlertDescription,
-  Badge,
   Table,
   TableHeader,
   TableBody,
@@ -83,7 +82,7 @@ import {
 
 export default function SlackConnections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
-  const { activeConnection, setActiveConnectionId } = useConnection();
+  useConnection();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +130,7 @@ export default function SlackConnections() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load
     fetchConnections();
   }, []);
 

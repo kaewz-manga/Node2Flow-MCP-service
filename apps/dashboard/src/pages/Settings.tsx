@@ -65,7 +65,6 @@ import {
   AlertCircle,
   Clock,
   Smartphone,
-  QrCode,
   Copy,
   CheckCircle,
   Download,
@@ -161,13 +160,20 @@ export default function Settings() {
   const isPendingDeletion = user?.status === 'pending_deletion';
   const scheduledDeletionAt = (user as any)?.scheduled_deletion_at;
 
-  useEffect(() => { loadTOTPStatus(); }, []);
-  useEffect(() => { setTotpEnabled(contextTotpEnabled); }, [contextTotpEnabled]);
+  useEffect(() => {
+    async function loadTOTPStatus() {
+      const res = await getTOTPStatus();
+      if (res.success && res.data) setTotpEnabled(res.data.enabled);
+    }
+    loadTOTPStatus();
+  }, []);
 
-  const loadTOTPStatus = async () => {
-    const res = await getTOTPStatus();
-    if (res.success && res.data) setTotpEnabled(res.data.enabled);
-  };
+  useEffect(() => {
+    function syncTotpEnabled() {
+      setTotpEnabled(contextTotpEnabled);
+    }
+    syncTotpEnabled();
+  }, [contextTotpEnabled]);
 
   const handleSetupTOTP = async () => {
     setTotpLoading(true); setTotpError('');

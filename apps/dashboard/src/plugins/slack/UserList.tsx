@@ -41,7 +41,6 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
-  Link,
 } from 'lucide-react';
 
 interface SlackUser {

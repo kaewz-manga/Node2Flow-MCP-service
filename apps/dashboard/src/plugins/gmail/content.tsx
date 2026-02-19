@@ -2,7 +2,7 @@
  * Gmail Plugin Content
  */
 
-import { Mail, Tag, MessageSquare, Settings, FileText } from 'lucide-react';
+import { Mail, Tag, MessageSquare } from 'lucide-react';
 import type { PluginContent } from '../registry';
 
 export const gmailContent: PluginContent = {

@@ -39,6 +39,7 @@ export default function MessageTools() {
 
   useEffect(() => {
     if (connectionId) fetchBotInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionId]);
 
   async function handleSendMessage() {

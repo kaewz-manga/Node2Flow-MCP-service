@@ -11,7 +11,7 @@ import JsonViewer from '../n8n/components/JsonViewer';
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import {
   Loader2, Plus, RefreshCw, ChevronDown, ChevronRight, Trash2,
-  Pencil, AlertCircle, FileText, Eye, Clock, X,
+  Pencil, AlertCircle, Eye, Clock, X,
   Layers, CheckCircle, FileEdit,
 } from 'lucide-react';
 
@@ -56,6 +56,7 @@ export default function PostList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId]);
 
   async function loadDetail(id: number) {

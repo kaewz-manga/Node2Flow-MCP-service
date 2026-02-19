@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { createConnection, updateConnection, deleteConnection, startGoogleWorkspaceOAuth, getGoogleWorkspaceOAuthStatus, disconnectGoogleWorkspace } from '../../lib/gateway-api';
 import { getApiKeys, createApiKey, deleteApiKey } from '../../lib/platform-api';
 import type { ApiKeyInfo } from '../../lib/platform-api';
-import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, FieldDescription, InputGroup, InputGroupInput, InputGroupAddon, Button, Card, CardContent, Alert, AlertTitle, AlertDescription, Badge, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
+import { getConnections, useConnection, useSudoContext, type Connection, Field, FieldLabel, InputGroup, InputGroupInput, InputGroupAddon, Button, Alert, AlertTitle, AlertDescription, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Dialog, DialogContent, DialogHeader, DialogTitle, AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, useIsMobile, Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@node2flow/dashboard-core';
 
 import {
   Plus,
@@ -36,7 +36,7 @@ interface OAuthStatus {
 
 export default function Connections() {
   const { withSudo, totpEnabled, statusLoaded } = useSudoContext();
-  const { activeConnection, setActiveConnectionId } = useConnection();
+  useConnection();
   const [searchParams, setSearchParams] = useSearchParams();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKeyInfo[]>([]);
@@ -92,6 +92,7 @@ export default function Connections() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load
     fetchConnections();
   }, []);
 
@@ -99,17 +100,20 @@ export default function Connections() {
   useEffect(() => {
     if (searchParams.get('google_connected') === 'true') {
       toast.success('Google account connected successfully');
-      searchParams.delete('google_connected');
-      setSearchParams(searchParams, { replace: true });
+      const next = new URLSearchParams(searchParams);
+      next.delete('google_connected');
+      setSearchParams(next, { replace: true });
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reload after OAuth redirect
       fetchConnections();
     }
     const googleError = searchParams.get('google_error');
     if (googleError) {
       toast.error(`Google connection failed: ${googleError}`);
-      searchParams.delete('google_error');
-      setSearchParams(searchParams, { replace: true });
+      const next = new URLSearchParams(searchParams);
+      next.delete('google_error');
+      setSearchParams(next, { replace: true });
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   const handleAddConnection = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +142,7 @@ export default function Connections() {
     setConnectingId(connectionId);
     const res = await startGoogleWorkspaceOAuth(connectionId);
     if (res.success && res.data) {
-      window.location.href = res.data.authorize_url;
+      window.location.assign(res.data.authorize_url);
     } else {
       toast.error(res.error?.message || 'Failed to start Google OAuth');
       setConnectingId(null);

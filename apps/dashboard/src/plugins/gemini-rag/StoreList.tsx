@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { listStores, createStore, getStore, deleteStore } from '../../lib/gateway-api';
 import {
-  usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
+  usePluginConnection, Button, Input, Card, CardHeader, CardTitle, CardDescription, CardFooter,
   Alert, AlertDescription, Separator, Field, FieldLabel,
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -75,6 +75,7 @@ export default function StoreList() {
       setCurrentPage(0);
       fetchPage(null, true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionId]);
 
   function handlePrevPage() {

@@ -5,7 +5,6 @@ import { useAuth, Card, CardContent, CardHeader, CardTitle, Button, Input, Separ
 import {
   Zap,
   ArrowLeft,
-  Book,
   Rocket,
   Code,
   Key,
@@ -20,7 +19,6 @@ import {
   Users,
   Terminal,
   ExternalLink,
-  Loader2,
 } from 'lucide-react';
 import { plugins } from '../plugins/registry';
 import { getPluginTools } from '../lib/gateway-api';
@@ -80,7 +78,7 @@ function CodeBlock({ code, language = 'json' }: { code: string; language?: strin
   );
 }
 
-function TabButton({ id, label, icon, active, onClick }: {
+function TabButton({ label, icon, active, onClick }: {
   id: TabId;
   label: string;
   icon: React.ReactNode;
@@ -104,7 +102,7 @@ export default function Documentation() {
   const [activeTab, setActiveTab] = useState<TabId>('quickstart');
   const [toolFilter, setToolFilter] = useState('');
   const [mcpTools, setMcpTools] = useState<Tool[]>([]);
-  const [toolsLoading, setToolsLoading] = useState(false);
+  const [, setToolsLoading] = useState(false);
   const [selectedPluginIdx, setSelectedPluginIdx] = useState(0);
 
   const selectedPlugin = plugins[selectedPluginIdx];
@@ -123,7 +121,6 @@ export default function Documentation() {
             for (const t of res.data.tools) {
               // Derive category from tool name prefix (e.g., n8n_list_workflows -> Workflows)
               const parts = t.name.replace(`${plugin.id}_`, '').split('_');
-              const action = parts.slice(0, -1).join('_'); // e.g., "list"
               const resource = parts[parts.length - 1]; // e.g., "workflows"
               const category = resource.charAt(0).toUpperCase() + resource.slice(1);
               allTools.push({ name: t.name, description: t.description, category });

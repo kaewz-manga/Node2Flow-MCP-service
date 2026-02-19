@@ -2,7 +2,7 @@
  * Google Calendar Plugin Content
  */
 
-import { CalendarDays, Tag, Share2, Settings, FileText } from 'lucide-react';
+import { CalendarDays, Tag, Share2 } from 'lucide-react';
 import type { PluginContent } from '../registry';
 
 export const googleCalendarContent: PluginContent = {

@@ -36,6 +36,7 @@ export default function TagList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetch(); }, [connectionId]);
 
   async function handleCreate() {

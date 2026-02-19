@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { tgGetChat, tgGetChatMember, tgBanChatMember, tgUnbanChatMember, tgCreateChatInviteLink } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, Separator, Alert, AlertDescription } from '@node2flow/dashboard-core';
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
-import { Loader2, Search, Users, UserMinus, UserPlus, Link as LinkIcon, AlertCircle, Shield } from 'lucide-react';
-import { Alert, AlertDescription } from '@node2flow/dashboard-core';
+import { Loader2, Search, Users, UserMinus, UserPlus, Link as LinkIcon, Shield } from 'lucide-react';
 
 export default function ChatManagement() {
   const activeConnection = usePluginConnection('telegram');
@@ -27,7 +26,8 @@ export default function ChatManagement() {
   const [modChatId, setModChatId] = useState('');
   const [modUserId, setModUserId] = useState('');
   const [banTarget, setBanTarget] = useState<{ chatId: string; userId: string } | null>(null);
-  const [banning, setBanning] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_banning, setBanning] = useState(false);
   const [unbanning, setUnbanning] = useState(false);
 
   // Invite Link

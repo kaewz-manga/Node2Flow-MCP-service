@@ -1,4 +1,4 @@
-import { FileText, HardDrive, Calendar, Mail, Sheet, Presentation, MessageSquare, Users, Clock } from 'lucide-react';
+import { FileText, HardDrive, Calendar, Mail } from 'lucide-react';
 import type { PluginContent } from '../registry';
 
 export const googleWorkspaceContent: PluginContent = {

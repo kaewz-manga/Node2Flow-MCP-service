@@ -70,11 +70,6 @@ import { n8nContent } from './n8n/content';
 import {
   Server,
   Link as LinkIcon,
-  Workflow,
-  PlayCircle,
-  Key,
-  Tag,
-  Users,
 } from 'lucide-react';
 
 const n8nPlugin: AppPlugin = {
@@ -100,10 +95,6 @@ import { wordpressContent } from './wordpress/content';
 import {
   Globe,
   Link as WPLinkIcon,
-  FileText,
-  File,
-  Image,
-  MessageCircle,
 } from 'lucide-react';
 
 const wordpressPlugin: AppPlugin = {
@@ -129,9 +120,6 @@ import { clN8nMcpContent } from './cl-n8n-mcp/content';
 import {
   Cpu,
   Link as McpLinkIcon,
-  Search,
-  FileCode,
-  Wrench,
 } from 'lucide-react';
 
 const clN8nMcpPlugin: AppPlugin = {
@@ -157,8 +145,6 @@ import { geminiRagContent } from './gemini-rag/content';
 import {
   Database,
   Link as GeminiLinkIcon,
-  FolderOpen,
-  FileSearch,
 } from 'lucide-react';
 
 const geminiRagPlugin: AppPlugin = {
@@ -184,9 +170,6 @@ import { lineContent } from './line/content';
 import {
   MessageCircle as LineIcon,
   Link as LineLinkIcon,
-  Send,
-  Menu as LineMenu,
-  Users as LineUsers,
 } from 'lucide-react';
 
 const linePlugin: AppPlugin = {
@@ -212,9 +195,6 @@ import { telegramContent } from './telegram/content';
 import {
   Send as TelegramIcon,
   Link as TelegramLinkIcon,
-  Send as TelegramSend,
-  Users as TelegramUsers,
-  Globe as TelegramWebhook,
 } from 'lucide-react';
 
 const telegramPlugin: AppPlugin = {
@@ -240,9 +220,6 @@ import { notionContent } from './notion/content';
 import {
   BookOpen as NotionIcon,
   Link as NotionLinkIcon,
-  Database as NotionDB,
-  FileText as NotionPages,
-  LayoutList,
 } from 'lucide-react';
 
 const notionPlugin: AppPlugin = {
@@ -368,10 +345,6 @@ import { slackContent } from './slack/content';
 import {
   MessageSquare as SlackIcon,
   Link as SlackLinkIcon,
-  Send as SlackSend,
-  Hash as SlackHash,
-  Paperclip as SlackFiles,
-  Users as SlackUsers,
 } from 'lucide-react';
 
 const slackPlugin: AppPlugin = {

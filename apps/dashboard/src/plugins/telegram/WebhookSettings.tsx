@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { tgGetWebhookInfo, tgSetWebhook, tgDeleteWebhook } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, RefreshCw, AlertCircle, Webhook, CheckCircle2, XCircle, Trash2 } from 'lucide-react';
@@ -17,7 +17,8 @@ export default function WebhookSettings() {
   // Set Webhook form
   const [webhookUrl, setWebhookUrl] = useState('');
   const [setting, setSetting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_deleting, setDeleting] = useState(false);
 
   async function fetchWebhookInfo() {
     if (!connectionId) return;
@@ -38,6 +39,7 @@ export default function WebhookSettings() {
 
   useEffect(() => {
     if (connectionId) fetchWebhookInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionId]);
 
   async function handleSetWebhook() {

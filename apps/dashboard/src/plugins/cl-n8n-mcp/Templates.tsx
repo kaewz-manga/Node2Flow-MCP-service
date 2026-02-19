@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { searchMcpTemplates, getMcpTemplate, deployMcpTemplate } from '../../lib/gateway-api';
 import {
-  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
+  usePluginConnection, Button, Card, CardContent,
   Input, Badge, Separator, Alert, AlertDescription,
   Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
 } from '@node2flow/dashboard-core';

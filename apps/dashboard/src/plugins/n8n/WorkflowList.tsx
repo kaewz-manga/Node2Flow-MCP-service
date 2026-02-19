@@ -66,6 +66,7 @@ export default function WorkflowList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId]);
 
   async function handleLoadMore() {

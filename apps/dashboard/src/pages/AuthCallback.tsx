@@ -13,23 +13,25 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    const errorParam = searchParams.get('error');
+    async function processCallback() {
+      const token = searchParams.get('token');
+      const errorParam = searchParams.get('error');
 
-    if (errorParam) {
-      setError(decodeURIComponent(errorParam));
-      return;
-    }
+      if (errorParam) {
+        setError(decodeURIComponent(errorParam));
+        return;
+      }
 
-    if (token) {
-      // Save token and redirect to dashboard
-      handleOAuthToken(token);
-      refreshUser().then(() => {
+      if (token) {
+        // Save token and redirect to dashboard
+        handleOAuthToken(token);
+        await refreshUser();
         navigate('/dashboard', { replace: true });
-      });
-    } else {
-      setError('No token received from OAuth provider');
+      } else {
+        setError('No token received from OAuth provider');
+      }
     }
+    processCallback();
   }, [searchParams, navigate, refreshUser]);
 
   if (error) {

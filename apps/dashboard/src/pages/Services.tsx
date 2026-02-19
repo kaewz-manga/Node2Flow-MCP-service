@@ -109,6 +109,14 @@ export default function Services() {
     fetchData();
   }, []);
 
+  const connectedServices = new Set(connections.map(c => c.product_type)).size;
+
+  const filteredPlugins = useMemo(() => {
+    if (!search.trim()) return plugins;
+    const q = search.toLowerCase();
+    return plugins.filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+  }, [search]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -125,14 +133,6 @@ export default function Services() {
       </Alert>
     );
   }
-
-  const connectedServices = new Set(connections.map(c => c.product_type)).size;
-
-  const filteredPlugins = useMemo(() => {
-    if (!search.trim()) return plugins;
-    const q = search.toLowerCase();
-    return plugins.filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
-  }, [search]);
 
   return (
     <div className="space-y-6 overflow-x-hidden px-4 lg:px-6">

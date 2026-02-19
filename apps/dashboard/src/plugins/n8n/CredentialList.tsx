@@ -5,7 +5,7 @@ import { usePluginConnection, Button, Input, Label, Card, CardContent, CardHeade
 
 import JsonViewer from './components/JsonViewer';
 import ConfirmDialog from './components/ConfirmDialog';
-import { Loader2, Plus, Trash2, Search, X, Pencil, Save, KeyRound, FileSearch, ShieldCheck } from 'lucide-react';
+import { Loader2, Plus, Trash2, Search, X, Pencil, Save, FileSearch } from 'lucide-react';
 
 
 

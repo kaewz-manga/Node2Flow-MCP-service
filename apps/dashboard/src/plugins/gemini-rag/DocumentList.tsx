@@ -12,7 +12,7 @@ import {
 } from '@node2flow/dashboard-core';
 
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
-import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, Trash2, ChevronDown, Database, Settings, MoreHorizontal, File } from 'lucide-react';
+import { Loader2, Plus, X, RefreshCw, AlertCircle, FileText, Upload, Search, ChevronDown, Database, Settings, MoreHorizontal, File } from 'lucide-react';
 
 // Metadata row type
 interface MetadataRow {
@@ -79,15 +79,6 @@ export default function DocumentList() {
     fetchStores();
   }, [connectionId]);
 
-  // Load documents when store selected
-  useEffect(() => {
-    if (selectedStore && connectionId) {
-      setCurrentPage(0);
-      setPageTokens([null]);
-      fetchDocuments(null, true);
-    }
-  }, [selectedStore, connectionId]);
-
   async function fetchDocuments(pageToken?: string | null, isInitial = true) {
     if (!connectionId || !selectedStore) return;
     if (isInitial) { setLoading(true); setDocuments([]); }
@@ -117,6 +108,16 @@ export default function DocumentList() {
     if (isInitial) setLoading(false);
     else setPageLoading(false);
   }
+
+  // Load documents when store selected
+  useEffect(() => {
+    if (selectedStore && connectionId) {
+      setCurrentPage(0);
+      setPageTokens([null]);
+      fetchDocuments(null, true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStore, connectionId]);
 
   function handlePrevPage() {
     if (currentPage <= 0) return;

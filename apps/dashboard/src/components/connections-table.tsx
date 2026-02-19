@@ -164,6 +164,7 @@ export function ConnectionsDataTable({
     [connections, usageStats, pluginMap]
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

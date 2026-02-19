@@ -75,7 +75,10 @@ export default function AdminFeedback() {
     setLoading(false);
   }
 
-  useEffect(() => { fetchFeedback(); }, [offset, statusFilter, categoryFilter]);
+  useEffect(() => {
+    fetchFeedback();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offset, statusFilter, categoryFilter]);
 
   function openDetail(item: AdminFeedbackItem) {
     setSelected(item);

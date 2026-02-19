@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { notionSearch, notionGetPage } from '../../lib/gateway-api';
-import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator, Badge } from '@node2flow/dashboard-core';
+import { usePluginConnection, Button, Input, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter, Alert, AlertDescription, Separator } from '@node2flow/dashboard-core';
 
 import JsonViewer from '../n8n/components/JsonViewer';
 import { Loader2, RefreshCw, AlertCircle, FileText, Search, ChevronRight, ChevronDown, Calendar, ExternalLink } from 'lucide-react';
@@ -42,6 +42,7 @@ export default function PageList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetch(); }, [connectionId]);
 
   async function handleSearch() {

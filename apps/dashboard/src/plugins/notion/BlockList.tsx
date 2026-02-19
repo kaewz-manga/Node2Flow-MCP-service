@@ -83,7 +83,7 @@ export default function BlockList() {
     setAppending(true);
 
     // Build block object based on type
-    let blockObject: any = {
+    const blockObject: any = {
       object: 'block',
       type: appendType,
     };

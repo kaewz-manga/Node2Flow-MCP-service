@@ -4,8 +4,6 @@ import { listComments, createComment, updateComment, deleteComment } from '../..
 import {
   usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
   Input, Textarea, Badge, Separator, Alert, AlertDescription,
-  Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle,
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
@@ -55,6 +53,7 @@ export default function CommentList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId]);
 
   async function handleCreate() {

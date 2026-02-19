@@ -40,6 +40,7 @@ export default function MessageTools() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchData(); }, [connectionId]);
 
   async function handleSend() {

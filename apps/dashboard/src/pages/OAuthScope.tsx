@@ -49,38 +49,39 @@ export default function OAuthScopeTab() {
   const [originalPlugins, setOriginalPlugins] = useState<string[]>(plugins.map(p => p.id));
   const [originalPerms, setOriginalPerms] = useState<string[]>(['read', 'write', 'delete']);
 
-  useEffect(() => { loadScope(); }, []);
+  useEffect(() => {
+    async function loadScope() {
+      setLoading(true);
+      const res = await getOAuthScope();
+      if (res.success && res.data) {
+        const scope = res.data.scope;
+        const p = detectPreset(scope);
+        setPreset(p);
+        setOriginalPreset(p);
 
-  const loadScope = async () => {
-    setLoading(true);
-    const res = await getOAuthScope();
-    if (res.success && res.data) {
-      const scope = res.data.scope;
-      const p = detectPreset(scope);
-      setPreset(p);
-      setOriginalPreset(p);
+        if (scope?.plugins) {
+          setSelectedPlugins(scope.plugins);
+          setOriginalPlugins(scope.plugins);
+        } else {
+          setSelectedPlugins(plugins.map(pl => pl.id));
+          setOriginalPlugins(plugins.map(pl => pl.id));
+        }
 
-      if (scope?.plugins) {
-        setSelectedPlugins(scope.plugins);
-        setOriginalPlugins(scope.plugins);
-      } else {
-        setSelectedPlugins(plugins.map(pl => pl.id));
-        setOriginalPlugins(plugins.map(pl => pl.id));
+        if (scope?.permissions) {
+          setSelectedPerms(scope.permissions);
+          setOriginalPerms(scope.permissions);
+        } else if (p === 'readonly') {
+          setSelectedPerms(['read']);
+          setOriginalPerms(['read']);
+        } else {
+          setSelectedPerms(['read', 'write', 'delete']);
+          setOriginalPerms(['read', 'write', 'delete']);
+        }
       }
-
-      if (scope?.permissions) {
-        setSelectedPerms(scope.permissions);
-        setOriginalPerms(scope.permissions);
-      } else if (p === 'readonly') {
-        setSelectedPerms(['read']);
-        setOriginalPerms(['read']);
-      } else {
-        setSelectedPerms(['read', 'write', 'delete']);
-        setOriginalPerms(['read', 'write', 'delete']);
-      }
+      setLoading(false);
     }
-    setLoading(false);
-  };
+    loadScope();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);

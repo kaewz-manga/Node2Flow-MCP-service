@@ -3,11 +3,11 @@ import { toast } from 'sonner';
 import { validateMcpWorkflow, autofixMcpWorkflow, testMcpWorkflow } from '../../lib/gateway-api';
 import {
   usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
-  Input, Textarea, Badge, Separator, Alert, AlertDescription,
+  Input, Textarea, Separator, Alert, AlertDescription,
 } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';
 import {
-  Loader2, AlertCircle, CheckCircle, Wrench, Play, ShieldCheck, AlertTriangle,
+  Loader2, CheckCircle, Wrench, Play, ShieldCheck, AlertTriangle,
 } from 'lucide-react';
 
 export default function WorkflowTools() {

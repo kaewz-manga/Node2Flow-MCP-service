@@ -10,7 +10,7 @@ import { useSudoContext, Button, Input, Card, CardContent, CardHeader, CardTitle
 import { AdminNav } from '../../components/admin-nav';
 import { toast } from 'sonner';
 
-import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Shield, Users, UserCheck, Crown, UserX } from 'lucide-react';
+import { Loader2, Search, ChevronLeft, ChevronRight, AlertCircle, Users, UserCheck, Crown, UserX } from 'lucide-react';
 
 
 
@@ -49,7 +49,10 @@ export default function AdminUsers() {
     setLoading(false);
   }
 
-  useEffect(() => { fetchUsers(); }, [offset, planFilter, statusFilter]);
+  useEffect(() => {
+    fetchUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offset, planFilter, statusFilter]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { searchMcpNodes, getMcpNode } from '../../lib/gateway-api';
 import {
-  usePluginConnection, Button, Card, CardContent, CardHeader, CardTitle, CardDescription,
+  usePluginConnection, Button, Card, CardContent,
   Input, Badge, Separator, Alert, AlertDescription,
 } from '@node2flow/dashboard-core';
 import JsonViewer from '../n8n/components/JsonViewer';

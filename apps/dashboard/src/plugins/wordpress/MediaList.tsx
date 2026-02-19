@@ -9,7 +9,7 @@ import JsonViewer from '../n8n/components/JsonViewer';
 import ConfirmDialog from '../n8n/components/ConfirmDialog';
 import {
   Loader2, RefreshCw, ChevronDown, ChevronRight, Trash2,
-  AlertCircle, Clock, Image, FileVideo, FileAudio, File,
+  AlertCircle, Image, FileVideo, FileAudio, File,
   Layers,
 } from 'lucide-react';
 
@@ -45,6 +45,7 @@ export default function MediaList() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (connectionId) fetchList(); }, [connectionId]);
 
   async function handleDelete() {

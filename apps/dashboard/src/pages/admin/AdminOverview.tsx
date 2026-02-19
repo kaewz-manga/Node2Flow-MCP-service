@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, type AdminStats } from '../../lib/platform-api';
 import { Users, DollarSign, Activity, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@node2flow/dashboard-core';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@node2flow/dashboard-core';
 import { AdminNav } from '../../components/admin-nav';
 
 

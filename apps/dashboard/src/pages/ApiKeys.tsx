@@ -53,7 +53,6 @@ import {
   Check,
   Copy,
   MoreHorizontal,
-  AlertCircle,
   Ban,
   Info,
   Globe,
@@ -102,14 +101,19 @@ export default function ApiKeysTab() {
   // Delete
   const [deleteTarget, setDeleteTarget] = useState<ApiKeyInfo | null>(null);
 
-  useEffect(() => { loadKeys(); }, []);
-
   const loadKeys = async () => {
     setLoading(true);
     const res = await getApiKeys();
     if (res.success && res.data) setKeys(res.data.api_keys);
     setLoading(false);
   };
+
+  useEffect(() => {
+    async function init() {
+      await loadKeys();
+    }
+    init();
+  }, []);
 
   const handleCreate = async () => {
     setCreateLoading(true);
