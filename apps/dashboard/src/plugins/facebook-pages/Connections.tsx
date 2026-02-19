@@ -173,7 +173,7 @@ export default function Connections() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 lg:px-6">
       <Item>
         <ItemMedia><img src="/logos/facebook.svg?v=2" alt="Facebook Pages" className="h-10 w-10" /></ItemMedia>
         <ItemContent>
