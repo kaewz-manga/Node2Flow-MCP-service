@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Connection } from '@node2flow/dashboard-core';
 import {
   getConnections,
   Card, CardContent, CardHeader, CardTitle, CardFooter,
-  Button, Alert, AlertDescription, Badge,
+  Button, Alert, AlertDescription, Badge, Input,
 } from '@node2flow/dashboard-core';
 
 import { plugins } from '../plugins/registry';
@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  Search,
 } from 'lucide-react';
 
 // Tool count per plugin (from gateway)
@@ -89,6 +90,7 @@ export default function Services() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -126,6 +128,12 @@ export default function Services() {
 
   const connectedServices = new Set(connections.map(c => c.product_type)).size;
 
+  const filteredPlugins = useMemo(() => {
+    if (!search.trim()) return plugins;
+    const q = search.toLowerCase();
+    return plugins.filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+  }, [search]);
+
   return (
     <div className="space-y-6 overflow-x-hidden px-4 lg:px-6">
       {/* Header */}
@@ -136,9 +144,20 @@ export default function Services() {
         </p>
       </div>
 
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search services..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {plugins.map((plugin) => {
+        {filteredPlugins.map((plugin) => {
           const pluginConns = connections.filter(c => c.product_type === plugin.id);
           const isConnected = pluginConns.length > 0;
           const connectionsHref = plugin.sidebarItems[0]?.href || `/${plugin.id}`;
@@ -184,6 +203,11 @@ export default function Services() {
             </Link>
           );
         })}
+        {filteredPlugins.length === 0 && (
+          <div className="col-span-full text-center py-8 text-muted-foreground text-sm">
+            No services match your search.
+          </div>
+        )}
       </div>
 
       {/* Quick Start Guide */}

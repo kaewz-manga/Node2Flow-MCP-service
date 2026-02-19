@@ -1,4 +1,4 @@
-import { useMemo, type ComponentType, type ReactNode } from 'react';
+import { useMemo, useState, type ComponentType, type ReactNode } from 'react';
 import { Toaster } from './ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,10 +16,11 @@ import {
   Activity,
   ChevronsUpDown,
   ChevronRight,
+  MessageSquarePlus,
 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { Separator } from './ui/separator';
-import FeedbackBubble from './FeedbackBubble';
+import FeedbackDialog from './FeedbackBubble';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -125,6 +126,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
   const { user, logout, isAdmin } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U';
   const avatarUrl = user?.avatar_url || undefined;
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const isOnServicePage = useMemo(() => {
     return plugins.some((plugin) => {
@@ -278,6 +280,10 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
+                  <DropdownMenuItem onSelect={() => setFeedbackOpen(true)}>
+                    <MessageSquarePlus className="mr-2 h-4 w-4" />
+                    Feedback
+                  </DropdownMenuItem>
                   {dropdownSupportNav.map((item) => (
                     <DropdownMenuItem key={item.name} asChild>
                       <Link to={item.href}>
@@ -310,6 +316,7 @@ function AppSidebar({ plugins }: { plugins: DashboardPlugin[] }) {
       </SidebarFooter>
 
       <SidebarRail />
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </Sidebar>
   );
 }
@@ -348,7 +355,6 @@ export default function Layout({ children, plugins = [] }: LayoutProps) {
           </div>
         </SidebarInset>
       </SidebarProvider>
-      <FeedbackBubble />
       <Toaster />
     </TooltipProvider>
   );

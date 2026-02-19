@@ -44,7 +44,7 @@ export type { DashboardPlugin, SidebarItem } from './components/Layout';
 export { default as AdminLayout } from './components/AdminLayout';
 export { default as AdminRoute } from './components/AdminRoute';
 export { default as SudoModal } from './components/SudoModal';
-export { default as FeedbackBubble } from './components/FeedbackBubble';
+export { default as FeedbackDialog } from './components/FeedbackBubble';
 export { default as PluginTabs } from './components/PluginTabs';
 export type { PluginTab, PluginTabsProps } from './components/PluginTabs';
 
