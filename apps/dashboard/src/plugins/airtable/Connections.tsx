@@ -159,7 +159,7 @@ export default function Connections() {
   }
 
   return (
-    <div className="space-y-6 px-4 lg:px-6">
+    <div className="space-y-6">
       <Item>
         <ItemMedia><img src="/logos/airtable.svg?v=2" alt="Airtable" className="h-10 w-10" /></ItemMedia>
         <ItemContent>

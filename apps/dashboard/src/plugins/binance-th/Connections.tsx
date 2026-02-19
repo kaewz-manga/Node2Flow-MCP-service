@@ -255,7 +255,7 @@ export default function BinanceThConnections() {
   }
 
   return (
-    <div className="space-y-6 px-4 lg:px-6">
+    <div className="space-y-6">
       {/* MCP Endpoint */}
       <Item>
         <ItemMedia>

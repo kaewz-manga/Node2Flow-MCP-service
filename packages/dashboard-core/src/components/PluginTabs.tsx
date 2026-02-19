@@ -25,7 +25,7 @@ export function PluginTabs({ tabs, defaultTab }: PluginTabsProps) {
   };
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange}>
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="px-4 lg:px-6">
       <TabsList variant="line" className="overflow-x-auto mb-6">
         {tabs.map((tab) => (
           <TabsTrigger key={tab.id} value={tab.id}>
