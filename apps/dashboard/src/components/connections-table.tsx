@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   type ColumnDef,
   flexRender,
@@ -28,13 +29,14 @@ export interface ConnectionRow {
   last_used: string | null;
   logo?: string;
   plugin_name?: string;
+  href?: string;
 }
 
 // Merge connections with usage stats
 export function mergeConnectionData(
   connections: Connection[],
   usageStats: ConnectionUsageStats[],
-  pluginMap: Map<string, { name: string; logo?: string }>
+  pluginMap: Map<string, { name: string; logo?: string; href?: string }>
 ): ConnectionRow[] {
   const usageMap = new Map(usageStats.map(u => [u.connection_id, u]));
 
@@ -52,22 +54,30 @@ export function mergeConnectionData(
       last_used: usage?.last_request_at || c.last_used_at || null,
       logo: plugin?.logo,
       plugin_name: plugin?.name || c.product_type,
+      href: plugin?.href,
     };
   });
 }
 
-const columns: ColumnDef<ConnectionRow>[] = [
+function createColumns(navigate: (path: string) => void): ColumnDef<ConnectionRow>[] {
+  return [
   {
     accessorKey: 'plugin_name',
     header: 'Service',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        {row.original.logo && (
-          <img src={row.original.logo} alt="" className="h-4 w-4 shrink-0" />
-        )}
-        <span className="text-muted-foreground text-sm">{row.original.plugin_name}</span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const href = row.original.href;
+      return (
+        <div
+          className={`flex items-center gap-2 ${href ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+          onClick={href ? () => navigate(href) : undefined}
+        >
+          {row.original.logo && (
+            <img src={row.original.logo} alt="" className="h-4 w-4 shrink-0" />
+          )}
+          <span className={`text-sm ${href ? 'text-foreground hover:text-primary' : 'text-muted-foreground'}`}>{row.original.plugin_name}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'name',
@@ -131,11 +141,12 @@ const columns: ColumnDef<ConnectionRow>[] = [
     },
   },
 ];
+}
 
 interface ConnectionsDataTableProps {
   connections: Connection[];
   usageStats: ConnectionUsageStats[];
-  pluginMap: Map<string, { name: string; logo?: string }>;
+  pluginMap: Map<string, { name: string; logo?: string; href?: string }>;
 }
 
 export function ConnectionsDataTable({
@@ -143,7 +154,10 @@ export function ConnectionsDataTable({
   usageStats,
   pluginMap,
 }: ConnectionsDataTableProps) {
+  const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const columns = useMemo(() => createColumns(navigate), [navigate]);
 
   const data = useMemo(
     () => mergeConnectionData(connections, usageStats, pluginMap),

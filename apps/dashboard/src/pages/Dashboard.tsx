@@ -50,9 +50,9 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   const pluginMap = useMemo(() => {
-    const map = new Map<string, { name: string; logo?: string }>();
+    const map = new Map<string, { name: string; logo?: string; href?: string }>();
     for (const p of plugins) {
-      map.set(p.id, { name: p.name, logo: p.logo });
+      map.set(p.id, { name: p.name, logo: p.logo, href: p.sidebarItems[0]?.href });
     }
     return map;
   }, []);

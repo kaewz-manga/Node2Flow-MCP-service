@@ -1,24 +1,17 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Connection } from '@node2flow/dashboard-core';
 import {
   getConnections,
-  Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
-  Button, Alert, AlertDescription, Badge, Input,
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
-  Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis,
-  Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
+  Card, CardContent, CardHeader, CardTitle, CardFooter,
+  Button, Alert, AlertDescription, Badge,
 } from '@node2flow/dashboard-core';
 
 import { plugins } from '../plugins/registry';
-import type { AppPlugin } from '../plugins/registry';
 import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  Globe,
-  Search,
-  ArrowUpDown,
 } from 'lucide-react';
 
 // Tool count per plugin (from gateway)
@@ -96,10 +89,6 @@ export default function Services() {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortAsc, setSortAsc] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     async function fetchData() {
@@ -117,48 +106,6 @@ export default function Services() {
 
     fetchData();
   }, []);
-
-  const getPlugin = (productType: string): AppPlugin | undefined =>
-    plugins.find(p => p.id === productType);
-
-  // Filter + sort connections
-  const filteredConnections = useMemo(() => {
-    const q = searchQuery.toLowerCase();
-    const filtered = connections.filter(conn => {
-      const plugin = getPlugin(conn.product_type);
-      return conn.name.toLowerCase().includes(q)
-        || (plugin?.name || conn.product_type).toLowerCase().includes(q);
-    });
-    filtered.sort((a, b) => {
-      const cmp = a.name.localeCompare(b.name);
-      return sortAsc ? cmp : -cmp;
-    });
-    return filtered;
-  }, [connections, searchQuery, sortAsc]);
-
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredConnections.length / rowsPerPage));
-  const paginatedConnections = filteredConnections.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-  // Page numbers with ellipsis
-  const paginationPages = useMemo(() => {
-    const pages: (number | '...')[] = [];
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (currentPage > 3) pages.push('...');
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-        pages.push(i);
-      }
-      if (currentPage < totalPages - 2) pages.push('...');
-      pages.push(totalPages);
-    }
-    return pages;
-  }, [totalPages, currentPage]);
 
   if (loading) {
     return (
@@ -238,165 +185,6 @@ export default function Services() {
           );
         })}
       </div>
-
-      {/* Connections Table */}
-      <Card className="bg-black border-border/60 max-w-4xl mx-auto">
-        <CardHeader className="px-4 pt-4 pb-2">
-          <CardTitle className="text-lg">Your Connections</CardTitle>
-          <CardDescription>
-            {connections.length > 0
-              ? `${connections.length} active connection${connections.length > 1 ? 's' : ''} across ${connectedServices} service${connectedServices > 1 ? 's' : ''}`
-              : 'No connections yet. Choose a service above to get started.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4 pb-4">
-          {connections.length > 0 ? (
-            <>
-              {/* Search filter */}
-              <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by connection name or service..."
-                  value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                  className="pl-9 h-9"
-                />
-              </div>
-
-              <div className="rounded-md border border-border/60 overflow-x-auto">
-                <Table className="min-w-0">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[1%] text-center h-7 px-2 text-xs">Status</TableHead>
-                      <TableHead className="w-[40%] h-7 px-2 text-xs">
-                        <button
-                          onClick={() => setSortAsc(prev => !prev)}
-                          className="flex items-center gap-1 hover:text-foreground transition-colors"
-                        >
-                          Name
-                          <ArrowUpDown className="h-3 w-3" />
-                        </button>
-                      </TableHead>
-                      <TableHead className="text-center h-7 px-2 text-xs">Service</TableHead>
-                      <TableHead className="w-[1%] whitespace-nowrap text-center h-7 px-2"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedConnections.map((conn) => {
-                      const plugin = getPlugin(conn.product_type);
-                      const ConnIcon = plugin?.icon;
-                      const connHref = plugin?.sidebarItems[0]?.href || '/dashboard';
-                      return (
-                        <TableRow key={conn.id}>
-                          <TableCell className="text-center py-2 px-2">
-                            <div className={`w-2 h-2 rounded-full mx-auto ${conn.status === 'active' ? 'bg-green-400' : 'bg-muted-foreground'}`} />
-                          </TableCell>
-                          <TableCell className="font-medium text-sm py-2 px-2">
-                            {conn.name}
-                          </TableCell>
-                          <TableCell className="text-center py-2 px-2">
-                            <div className="flex items-center justify-center gap-1.5">
-                              {SERVICE_LOGOS[conn.product_type] ? (
-                                <img src={SERVICE_LOGOS[conn.product_type]} alt="" className="h-3.5 w-3.5" />
-                              ) : (
-                                ConnIcon && <ConnIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                              )}
-                              <Badge variant="secondary" className="text-[11px] px-1.5 py-0">
-                                {plugin?.name || conn.product_type}
-                              </Badge>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center py-2 px-2">
-                            <Button variant="outline" size="sm" asChild className="h-6 text-xs px-2">
-                              <Link to={connHref}>
-                                Manage
-                                <ArrowRight className="h-3 w-3 ml-1" />
-                              </Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                    {paginatedConnections.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                          No connections match "{searchQuery}"
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-
-              {/* Pagination */}
-              {filteredConnections.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
-                    <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
-                      <SelectTrigger className="w-18 h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align="start">
-                        <SelectGroup>
-                          <SelectItem value="10">10</SelectItem>
-                          <SelectItem value="25">25</SelectItem>
-                          <SelectItem value="50">50</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <span className="text-xs text-muted-foreground">
-                      {Math.min((currentPage - 1) * rowsPerPage + 1, filteredConnections.length)}–{Math.min(currentPage * rowsPerPage, filteredConnections.length)} of {filteredConnections.length}
-                    </span>
-                  </div>
-                  {totalPages > 1 && (
-                    <Pagination className="mx-0 w-auto">
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                          />
-                        </PaginationItem>
-                        {paginationPages.map((page, i) =>
-                          page === '...' ? (
-                            <PaginationItem key={`ellipsis-${i}`}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          ) : (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                isActive={currentPage === page}
-                                onClick={() => setCurrentPage(page as number)}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          )
-                        )}
-                        <PaginationItem>
-                          <PaginationNext
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-              <Globe className="h-10 w-10 text-muted-foreground/40 mb-3" />
-              <p className="text-sm text-muted-foreground">
-                Connect your first service to start using AI-powered automation.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Quick Start Guide */}
       {connections.length === 0 && (
