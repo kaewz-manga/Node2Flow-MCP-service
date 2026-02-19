@@ -2638,3 +2638,30 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 
 **Commit**: `b8fe12f`
 **Date**: 2026-02-19 (65g)
+
+### Session 65h: Clickable Service Names + Remove Services Table (2026-02-19)
+
+1. **Dashboard connections table** (`apps/dashboard/src/components/connections-table.tsx`):
+   - Service name column now clickable — navigates to that plugin's connection page
+   - Added `href` to `ConnectionRow` interface and `mergeConnectionData()`
+   - `createColumns(navigate)` factory function replaces static `columns` array
+   - `useNavigate()` from react-router-dom
+   - `pluginMap` extended with `href` from `plugin.sidebarItems[0]?.href`
+
+2. **Services page** (`apps/dashboard/src/pages/Services.tsx`):
+   - Removed entire Connections Table section (Card, search, pagination, sort, ~200 lines)
+   - Kept: card grid + Quick Start guide only
+
+### Files Changed (3):
+
+| File | Change |
+|------|--------|
+| `apps/dashboard/src/components/connections-table.tsx` | Clickable service names with `useNavigate` |
+| `apps/dashboard/src/pages/Dashboard.tsx` | `pluginMap` includes `href` |
+| `apps/dashboard/src/pages/Services.tsx` | Removed connections table |
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Commit**: `6cd838a`
+**Date**: 2026-02-19 (65h)
