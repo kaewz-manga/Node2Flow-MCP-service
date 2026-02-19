@@ -2685,3 +2685,17 @@ Two changes to all 32 plugin `Connections.tsx` files:
 
 **Commits**: `c80255d` (remove max-w), `2f436dc` (add padding)
 **Date**: 2026-02-19 (65i)
+
+### Session 65j: PluginTabs Padding Fix (2026-02-19)
+
+Added `px-4 lg:px-6` to `PluginTabs` wrapper so tab headers AND all sub-page content have proper padding.
+
+- **Root fix**: `packages/dashboard-core/src/components/PluginTabs.tsx` — added `className="px-4 lg:px-6"` to `<Tabs>` wrapper
+- **Cleanup**: Removed duplicate `px-4 lg:px-6` from 32 `Connections.tsx` root wrappers (now handled by PluginTabs)
+- **Scope**: Single fix covers all 32 plugins × all tabs (Connections, Workflows, Executions, etc.)
+
+### Deployed:
+- Dashboard `app.node2flow.net`
+
+**Commit**: `1afcec4`
+**Date**: 2026-02-19 (65j)
