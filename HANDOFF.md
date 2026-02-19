@@ -2568,3 +2568,42 @@ UI polish: added visible borders to dashboard cards/chart, made Settings tabs UR
 - Dashboard `app.node2flow.net`
 
 **Date**: 2026-02-19
+
+---
+
+### Session 65f: Gateway Multiple Connections Fix + Services Card Redesign (2026-02-19)
+
+**Bug**: OAuth JWT and `_all`-scoped API key users got error `"Multiple n8n connections found"` when they had 2+ active connections for the same plugin (e.g. two n8n instances).
+
+**Root cause**: `mcp.ts:211-228` queried all matching connections with `.all()`, then errored if count > 1.
+
+**Fix** (`apps/mcp-gateway/src/routes/mcp.ts`):
+- Changed SQL: added `ORDER BY last_used_at DESC, created_at DESC LIMIT 1`
+- Changed method: `.all()` → `.first()` (returns single row)
+- Removed the `if (conns.results.length > 1)` error block
+- Auto-selects most recently used connection instead of erroring
+
+**Auth compatibility** (3 cases, all safe):
+
+| Auth Method | Affected? | Why |
+|---|---|---|
+| Single-connection API key | No | `authContext.connection.config` already populated, skips DB query |
+| All-services API key (`_all`) | Fixed | Was erroring, now auto-selects |
+| OAuth JWT | Fixed | Was erroring, now auto-selects |
+
+**Services page redesign** (`apps/dashboard/src/pages/Services.tsx`):
+- Grid: `grid-cols-3~6 gap-2` → `grid-cols-1 md:2 lg:3 gap-3`
+- Cards: compact pills → Clients-style cards (h-10 w-10 icon box, name, tool count badge, Connected badge, tagline, Manage/Connect link)
+
+### Files Changed (2):
+
+| File | Change |
+|------|--------|
+| `apps/mcp-gateway/src/routes/mcp.ts` | Auto-select most recently used connection (lines 211-223) |
+| `apps/dashboard/src/pages/Services.tsx` | Card grid redesign to match Clients page style |
+
+### Deployed:
+- Gateway Worker `mcp.node2flow.net`
+- Dashboard `app.node2flow.net`
+
+**Date**: 2026-02-19

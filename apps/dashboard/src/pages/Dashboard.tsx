@@ -1,16 +1,41 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Usage, UsageMonthlyHistory, UsageDailyHistory, ConnectionUsageStats } from '../lib/platform-api';
-import { getUsage, getUserUsageHistory, getUserDailyUsage, getConnectionUsage } from '../lib/platform-api';
+import type { Usage, UsageMonthlyHistory, UsageDailyHistory, ConnectionUsageStats, ClientUsageStats } from '../lib/platform-api';
+import { getUsage, getUserUsageHistory, getUserDailyUsage, getConnectionUsage, getClientUsage } from '../lib/platform-api';
 import type { Connection } from '@node2flow/dashboard-core';
 import { getConnections } from '@node2flow/dashboard-core';
 
 import { useAuth } from '@node2flow/dashboard-core';
 import { plugins } from '../plugins/registry';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@node2flow/dashboard-core';
+import { Loader2, AlertCircle, Monitor } from 'lucide-react';
+import { Alert, AlertDescription, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@node2flow/dashboard-core';
 import { DashboardSectionCards } from '../components/section-cards';
 import { DashboardUsageChart } from '../components/chart-area-interactive';
 import { ConnectionsDataTable } from '../components/connections-table';
+
+const DI = 'https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg';
+const SI = 'https://cdn.simpleicons.org';
+
+const CLIENT_ICONS: Record<string, string> = {
+  'n8n': '/logos/n8n.svg',
+  'claude': `${DI}/claude-ai.svg`,
+  'chatgpt': `${DI}/chatgpt.svg`,
+  'cursor': `${SI}/cursor/white`,
+  'windsurf': `${SI}/windsurf/white`,
+  'warp': `${SI}/warp/white`,
+  'codex': `${DI}/codex.svg`,
+  'gemini': `${DI}/google-gemini.svg`,
+  'raycast': `${SI}/raycast/white`,
+  'vscode': `${SI}/vscodium/white`,
+  'hugging': `${DI}/hugging-face.svg`,
+};
+
+function getClientIcon(clientName: string): string | null {
+  const lower = clientName.toLowerCase();
+  for (const [key, icon] of Object.entries(CLIENT_ICONS)) {
+    if (lower.includes(key)) return icon;
+  }
+  return null;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -19,6 +44,7 @@ export default function Dashboard() {
   const [usageHistory, setUsageHistory] = useState<UsageMonthlyHistory[]>([]);
   const [dailyUsage, setDailyUsage] = useState<UsageDailyHistory[]>([]);
   const [connectionUsage, setConnectionUsage] = useState<ConnectionUsageStats[]>([]);
+  const [clientUsage, setClientUsage] = useState<ClientUsageStats[]>([]);
   const [connectionPeriod, setConnectionPeriod] = useState<7 | 30 | 90 | 180>(7);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -34,12 +60,13 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageRes, connectionsRes, historyRes, dailyRes, connUsageRes] = await Promise.all([
+        const [usageRes, connectionsRes, historyRes, dailyRes, connUsageRes, clientRes] = await Promise.all([
           getUsage(),
           getConnections(),
           getUserUsageHistory(12),
           getUserDailyUsage(7),
           getConnectionUsage(7),
+          getClientUsage(30),
         ]);
 
         if (connectionsRes.success && connectionsRes.data) {
@@ -65,6 +92,10 @@ export default function Dashboard() {
 
         if (connUsageRes.success && connUsageRes.data) {
           setConnectionUsage(connUsageRes.data.connections);
+        }
+
+        if (clientRes.success && clientRes.data) {
+          setClientUsage(clientRes.data.clients);
         }
       } catch {
         setError('Failed to load dashboard data');
@@ -138,6 +169,61 @@ export default function Dashboard() {
           usageStats={connectionUsage}
           pluginMap={pluginMap}
         />
+        {/* Client Activity */}
+        <div className="px-4 lg:px-6 space-y-3">
+          <div className="flex items-center gap-2">
+            <Monitor className="h-4 w-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold">Client Activity</h3>
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead className="text-right">Requests</TableHead>
+                  <TableHead className="text-right">Success</TableHead>
+                  <TableHead className="text-right">Errors</TableHead>
+                  <TableHead className="text-right">Connections</TableHead>
+                  <TableHead>Last Seen</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clientUsage.length > 0 ? (
+                  clientUsage.map((c) => {
+                    const icon = getClientIcon(c.client_name);
+                    return (
+                      <TableRow key={c.client_name}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {icon ? (
+                              <img src={icon} alt="" className="h-5 w-5 object-contain" />
+                            ) : (
+                              <Monitor className="h-4 w-4 text-muted-foreground" />
+                            )}
+                            <span className="font-medium">{c.client_name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{c.total_requests.toLocaleString()}</TableCell>
+                        <TableCell className="text-right tabular-nums text-green-500">{c.successes.toLocaleString()}</TableCell>
+                        <TableCell className={`text-right tabular-nums ${c.errors > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>{c.errors.toLocaleString()}</TableCell>
+                        <TableCell className="text-right tabular-nums">{c.connections_used.toLocaleString()}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {c.last_seen_at ? new Date(c.last_seen_at).toLocaleDateString() : 'Never'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                      No client activity yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
     </div>
   );
